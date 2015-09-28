@@ -1,0 +1,160 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{85A9F7F0-C91D-49EB-82FF-3797F32307D7}</ProjectGuid>
+    <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{F184B08F-C81C-45F6-A57F-5ABD9991F28F}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <StartupObject>
+    </StartupObject>
+    <RootNamespace>PInvokeTest</RootNamespace>
+    <AssemblyName>PInvokeTest</AssemblyName>
+    <NoWarn>40025,40028,40027</NoWarn>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <IncrementalBuild>true</IncrementalBuild>
+    <OutputPath>bin\</OutputPath>
+    <DocumentationFile>PInvokeTest.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugSymbols>false</DebugSymbols>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <IncrementalBuild>false</IncrementalBuild>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DocumentationFile>PInvokeTest.xml</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Windows\assembly\GAC_MSIL\Microsoft.VisualStudio.QualityTools.UnitTestFramework\8.0.0.0__b03f5f7f11d50a3a\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CodeDomIteratorTest.vb" />
+    <Compile Include="CodeTransformTest.vb" />
+    <Compile Include="ExpressionEvaluatorTest.vb" />
+    <Compile Include="ExpressionParserTest.vb" />
+    <Compile Include="ExpressionValueTest.vb" />
+    <Compile Include="Generated.vb" />
+    <Compile Include="MacroTest.vb" />
+    <Compile Include="MarshalTransformTest.vb" />
+    <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="NativeParserTest.vb" />
+    <Compile Include="NativePreProcessorTest.vb" />
+    <Compile Include="NativeStorageTest.vb" />
+    <Compile Include="NativeSymbolTransformTest.vb" />
+    <Compile Include="NativeTypeBagTest.vb" />
+    <Compile Include="NativeTypeEqualityComparer.vb" />
+    <Compile Include="NativeTypeEqualityComparerTest.vb" />
+    <Compile Include="NativeTypeIteratorTest.vb" />
+    <Compile Include="NativeTypesTest.vb" />
+    <Compile Include="PInvokeTestLib.vb" />
+    <Compile Include="ProcedureFinderTest.vb" />
+    <Compile Include="SalAnalyzerTest.vb" />
+    <Compile Include="ScannerTest.vb" />
+    <Compile Include="SelfHost.vb" />
+    <Compile Include="TestPInvokeTestLib.vb" />
+    <Compile Include="TokensTest.vb" />
+    <Compile Include="Utilities.vb" />
+    <Compile Include="VSCodeGenAccessors.vb" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="AuthoringTests.txt" />
+    <Content Include="SampleFiles\Complex1.txt" />
+    <Content Include="SampleFiles\Class1.txt" />
+    <Content Include="SampleFiles\Errors1.txt" />
+    <Content Include="SampleFiles\TypeDef9.txt" />
+    <Content Include="SampleFiles\Struct21.txt" />
+    <Content Include="SampleFiles\TypeDef8.txt" />
+    <Content Include="SampleFiles\FuncPtr4.txt" />
+    <Content Include="SampleFiles\Struct20.txt" />
+    <Content Include="SampleFiles\FuncPtr3.txt" />
+    <Content Include="SampleFiles\TypeDef7.txt" />
+    <Content Include="SampleFiles\TypeDef6.txt" />
+    <Content Include="SampleFiles\Proc11.txt" />
+    <Content Include="SampleFiles\Struct18.txt" />
+    <Content Include="SampleFiles\Proc10.txt" />
+    <Content Include="SampleFiles\Proc9.txt" />
+    <Content Include="SampleFiles\Proc8.txt" />
+    <Content Include="SampleFiles\Struct17.txt" />
+    <Content Include="SampleFiles\Proc7.txt" />
+    <Content Include="SampleFiles\Struct16.txt" />
+    <Content Include="SampleFiles\FuncPtr2.txt" />
+    <Content Include="SampleFiles\Proc6.txt" />
+    <Content Include="SampleFiles\Struct15.txt" />
+    <Content Include="SampleFiles\Struct14.txt" />
+    <Content Include="SampleFiles\Struct13.txt" />
+    <Content Include="SampleFiles\Mixed3.txt" />
+    <Content Include="SampleFiles\FuncPtr1.txt" />
+    <Content Include="SampleFiles\Sal.txt" />
+    <Content Include="SampleFiles\Struct19.txt" />
+    <Content Include="SampleFiles\TypeDef5.txt" />
+    <Content Include="SampleFiles\Proc5.txt" />
+    <Content Include="SampleFiles\TypeDef4.txt" />
+    <Content Include="SampleFiles\Proc4.txt" />
+    <Content Include="SampleFiles\Proc3.txt" />
+    <Content Include="SampleFiles\Proc2.txt" />
+    <Content Include="SampleFiles\Proc1.txt" />
+    <Content Include="SampleFiles\Struct12.txt" />
+    <Content Include="SampleFiles\Enum4.txt" />
+    <Content Include="SampleFiles\Enum3.txt" />
+    <Content Include="SampleFiles\Enum2.txt" />
+    <Content Include="SampleFiles\Enum1.txt" />
+    <Content Include="SampleFiles\Struct11.txt" />
+    <Content Include="SampleFiles\Struct10.txt" />
+    <Content Include="SampleFiles\Struct9.txt" />
+    <Content Include="SampleFiles\TypeDef3.txt" />
+    <Content Include="SampleFiles\TypeDef2.txt" />
+    <Content Include="SampleFiles\TypeDef1.txt" />
+    <Content Include="SampleFiles\Mixed2.txt" />
+    <Content Include="SampleFiles\Mixed1.txt" />
+    <Content Include="SampleFiles\Union2.txt" />
+    <Content Include="SampleFiles\Union1.txt" />
+    <Content Include="SampleFiles\Struct8.txt" />
+    <Content Include="SampleFiles\Struct7.txt" />
+    <Content Include="SampleFiles\Struct6.txt" />
+    <Content Include="SampleFiles\Struct5.txt" />
+    <Content Include="SampleFiles\Struct1.txt" />
+    <Content Include="SampleFiles\Struct2.txt" />
+    <Content Include="SampleFiles\Struct3.txt" />
+    <Content Include="SampleFiles\Struct4.txt" />
+    <EmbeddedResource Include="SampleFiles\specstrings.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Engine\PInvoke.vbproj">
+      <Project>{993F376E-970F-462F-A3BF-DD8EBEDE9319}</Project>
+      <Name>PInvoke</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.Targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+</Project>

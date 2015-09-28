@@ -1,0 +1,12 @@
+/* Struct with a typedef */
+struct s1
+{
+	int i;
+} t1;
+
+/* Struct with several typedefs */
+struct s2
+{
+	int i;
+} t2, t3;
+	

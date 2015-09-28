@@ -1,0 +1,14 @@
+/* Structs with inline unions */
+struct s1
+{
+	union 
+	{
+		int i;
+		int j;
+	} i;
+	
+	char j;
+};
+
+
+	

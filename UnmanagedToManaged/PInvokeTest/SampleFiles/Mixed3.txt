@@ -1,0 +1,14 @@
+/* Struct with an inline anonymous union */
+struct s1
+{
+	union 
+	{
+		int j;
+		float i;
+	};
+	
+	char k;
+};
+
+
+	

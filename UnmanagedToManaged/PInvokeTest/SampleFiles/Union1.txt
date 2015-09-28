@@ -1,0 +1,13 @@
+/* Simple unions */
+union u1
+{
+	int i;
+};
+
+union u2
+{
+	char i;
+	int j;
+};
+
+	

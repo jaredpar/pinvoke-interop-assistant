@@ -14,9 +14,7 @@ Imports System.Runtime.InteropServices
 <Assembly: AssemblyCompany("")> 
 <Assembly: AssemblyProduct("PInvokeTest")> 
 <Assembly: AssemblyCopyright("Copyright ©  2006")> 
-<Assembly: AssemblyTrademark("")> 
-
-<Assembly: CLSCompliant(True)> 
+<Assembly: AssemblyTrademark("")>
 
 <Assembly: ComVisible(False)>
 

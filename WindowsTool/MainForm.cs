@@ -13,7 +13,6 @@ using System.Windows.Forms;
 using System.ComponentModel;
 using System.Collections.Generic;
 using System.Threading;
-using SignatureGenerator;
 using PInvoke;
 using PInvoke.Controls;
 
@@ -81,9 +80,6 @@ namespace WindowsTool
         #region Fields and Properties
 
         private Properties.Settings userSettings = Properties.Settings.Default;
-
-        private ICodePrinter codePrinter;
-        private ILogPrinter logPrinter;
 
         private bool firstTimeActivated;
         private bool printing;
@@ -208,14 +204,6 @@ namespace WindowsTool
 
             treeView.PathSeparator = "\0";
             treeView.TreeViewNodeSorter = new NodeSorter();
-
-            codePrinter = new RichTextPrinter(this.richTextBoxCode);
-            logPrinter = new RichTextPrinter(this.richTextBoxMessages);
-
-            if (assemblyPath != null)
-            {
-                LoadAssembly(assemblyPath);
-            }
         }
 
         #endregion
@@ -295,7 +283,7 @@ namespace WindowsTool
 
         private void treeView_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            Print(e.Node);
+            // Print(e.Node);
         }
 
         private void MainForm_Activated(object sender, EventArgs e)
@@ -318,6 +306,8 @@ namespace WindowsTool
         {
             // stringize the signature and comments
             TreeNode node = treeView.SelectedNode;
+
+            /*
 
             MethodDescriptor method_descr;
             if (node != null && (method_descr = node.Tag as MethodDescriptor) != null)
@@ -342,12 +332,15 @@ namespace WindowsTool
                 this.signatureString = log_builder.ToString() + writer.GetStringBuilder().ToString();
             }
 
+            */
+
             this.DialogResult = DialogResult.OK;
             this.Close();
         }
 
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
         {
+            /*
             // remember the assembly and the path in the tree
             TreeNode node = treeView.SelectedNode;
             lastTreePath = (node == null ? null : node.FullPath);
@@ -361,11 +354,13 @@ namespace WindowsTool
                 Reflector.CurrentReflector = null;
             }
             else lastAssemblyPath = null;
+            */
         }
 
         private void MainForm_Shown(object sender, EventArgs e)
         {
             // restore the original state when the dialog is shown again
+            /*
             if (lastAssemblyPath != null)
             {
                 LoadAssembly(lastAssemblyPath);
@@ -375,6 +370,7 @@ namespace WindowsTool
             {
                 TrySelectNode(lastTreePath);
             }
+            */
         }
 
         private void OnTabPageChanged(object sender, EventArgs e)
@@ -383,7 +379,7 @@ namespace WindowsTool
 
             // Force all of the menus to update now so that the hotkeys will
             // be disabled
-            editToolStripMenuItem_DropDownOpening(this, EventArgs.Empty);
+            // editToolStripMenuItem_DropDownOpening(this, EventArgs.Empty);
             openToolStripMenuItem.Enabled = sigexp;
 
             optionsToolStripMenuItemExp.Available = sigexp;
@@ -456,11 +452,13 @@ namespace WindowsTool
 
         private void treeView_DragDrop(object sender, DragEventArgs e)
         {
+            /*
             string[] files = (string[])e.Data.GetData("FileDrop");
             if (files != null && files.Length == 1)
             {
                 LoadAssembly(files[0]);
             }
+            */
         }
 
         private void treeView_DragEnter(object sender, DragEventArgs e)
@@ -478,6 +476,8 @@ namespace WindowsTool
         #endregion
 
         #region Menu Handlers
+
+        /*
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -1115,6 +1115,8 @@ namespace WindowsTool
                 Severity.Info, 0,
                 "Please select an individual method in the tree to view additional information.");
         }
+
+    */
 
         #endregion
 

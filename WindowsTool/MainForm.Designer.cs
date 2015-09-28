@@ -316,6 +316,8 @@ namespace WindowsTool
             this.fileToolStripMenuItemExp.Name = "fileToolStripMenuItemExp";
             this.fileToolStripMenuItemExp.Size = new System.Drawing.Size(35, 20);
             this.fileToolStripMenuItemExp.Text = "&File";
+
+            /*
             // 
             // openToolStripMenuItem
             // 
@@ -542,6 +544,7 @@ namespace WindowsTool
             this.aboutToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
             this.aboutToolStripMenuItem.Text = "&About...";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
+            */
             // 
             // openFileDialog
             // 

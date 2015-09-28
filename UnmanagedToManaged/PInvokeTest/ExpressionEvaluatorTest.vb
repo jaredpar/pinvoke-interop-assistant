@@ -2,10 +2,10 @@
 Imports System
 Imports System.Text
 Imports System.Collections.Generic
-Imports Microsoft.VisualStudio.TestTools.UnitTesting
 Imports PInvoke.Parser
+Imports Xunit
 
-<TestClass()> Public Class ExpressionEvaluatorTest
+Public Class ExpressionEvaluatorTest
 
 #Region "Additional test attributes"
     '
@@ -32,102 +32,102 @@ Imports PInvoke.Parser
     Private Sub AssertEval(ByVal expr As String, ByVal result As Object)
         Dim ee As New ExpressionEvaluator()
         Dim actual As ExpressionValue = Nothing
-        Assert.IsTrue(ee.TryEvaluate(expr, actual))
-        Assert.AreEqual(result, actual.Value)
+        Assert.True(ee.TryEvaluate(expr, actual))
+        Assert.Equal(result, actual.Value)
     End Sub
 
-    <TestMethod()> _
+    <Fact>
     Public Sub Leaf1()
         AssertEval("1", 1)
         AssertEval("0xf", 15)
     End Sub
 
-    <TestMethod()> _
+    <Fact>
     Public Sub Plus1()
         AssertEval("1+2", 3)
         AssertEval("540+50+50", 640)
     End Sub
 
-    <TestMethod()> _
+    <Fact>
     Public Sub Plus2()
         AssertEval("0x1 + 0x2", 3)
     End Sub
 
-    <TestMethod()> _
+    <Fact>
     Public Sub Minus1()
         AssertEval("10-2", 8)
         AssertEval("(20-5)-5", 10)
     End Sub
 
-    <TestMethod()> _
+    <Fact>
     Public Sub Minus2()
         AssertEval("1-2", -1)
     End Sub
 
-    <TestMethod()> _
+    <Fact>
     Public Sub Divide1()
         AssertEval("10/2", 5.0R)
     End Sub
 
-    <TestMethod()> _
+    <Fact>
     Public Sub Modulus1()
         AssertEval("5 % 2 ", 1)
         AssertEval("10 % 3", 1)
         AssertEval("15 % 8", 7)
     End Sub
 
-    <TestMethod()> _
+    <Fact>
     Public Sub ShiftLeft1()
         AssertEval("2 << 1", 4)
     End Sub
 
-    <TestMethod()> _
+    <Fact>
     Public Sub ShiftRight1()
         AssertEval("4 >> 1", 2)
     End Sub
 
-    <TestMethod()> _
+    <Fact>
     Public Sub Negative1()
         AssertEval("-1", -1)
         AssertEval("-(2+4)", -6)
     End Sub
 
-    <TestMethod()> _
+    <Fact>
     Public Sub Negative2()
         AssertEval("-0.1F", -0.1F)
         AssertEval("-3.2F", -3.2F)
     End Sub
 
-    <TestMethod()> _
+    <Fact>
     Public Sub Boolean1()
         AssertEval("true", 1)
         AssertEval("false", 0)
     End Sub
 
-    <TestMethod()> _
+    <Fact>
     Public Sub OpAnd1()
         AssertEval("true && true", 1)
         AssertEval("true && false", 0)
     End Sub
 
-    <TestMethod()> _
+    <Fact>
     Public Sub OpOr1()
         AssertEval("true || true", 1)
         AssertEval("false || true", 1)
         AssertEval("false || false", 0)
     End Sub
 
-    <TestMethod()> _
+    <Fact>
     Public Sub OpAssign()
         AssertEval("1=2", 2)
     End Sub
 
-    <TestMethod()> _
+    <Fact>
     Public Sub Char1()
         AssertEval("'c'", "c"c)
     End Sub
 
-    <TestMethod()> _
+    <Fact>
     Public Sub OpEquals1()
         AssertEval("1==1", 1)
         AssertEval("1==2", 0)

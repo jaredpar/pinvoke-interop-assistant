@@ -27,7 +27,7 @@ Namespace Transform
     ''' Used to transform from NativeType instances to actual PInvokeable instances
     ''' </summary>
     ''' <remarks></remarks>
-    Friend Class CodeTransform
+    Public Class CodeTransform
 
         Private m_lang As LanguageType
         Private m_typeMap As New Dictionary(Of String, NativeSymbol)(StringComparer.Ordinal)
@@ -168,7 +168,7 @@ Namespace Transform
             For Each member As CodeTypeMember In ctd.Members
                 Dim fieldMember As CodeMemberField = TryCast(member, CodeMemberField)
                 If fieldMember IsNot Nothing Then
-                    fieldMember.CustomAttributes.Add( _
+                    fieldMember.CustomAttributes.Add(
                         MarshalAttributeFactory.CreateFieldOffsetAttribute(0))
                 End If
             Next
@@ -258,7 +258,7 @@ Namespace Transform
             If String.IsNullOrEmpty(dllName) Then
                 dllName = "<Unknown>"
             End If
-            proc.CustomAttributes.Add( _
+            proc.CustomAttributes.Add(
                 MarshalAttributeFactory.CreateDllImportAttribute(dllName, ntProc.Name, ntProc.CallingConvention))
 
             ' Generate the parameters
@@ -340,7 +340,7 @@ Namespace Transform
                     ' Generation of macro methods is not supported entirely.  Right now macro methods
                     ' expressions are stored as text and they are outputted as a string.  Offer an explanation
                     ' here
-                    cMember.Comments.Add(New CodeCommentStatement( _
+                    cMember.Comments.Add(New CodeCommentStatement(
                         "Warning: Generation of Method Macros is not supported at this time", True))
                 End If
 
@@ -387,8 +387,8 @@ Namespace Transform
                     ' Generate the int for the list of bit vectors
                     bitVectorCount += 1
 
-                    Dim cMember As CodeMemberField = GenerateContainerMember( _
-                        New NativeMember("bitvector" & bitVectorCount, New NativeBuiltinType(BuiltinType.NativeInt32, True)), _
+                    Dim cMember As CodeMemberField = GenerateContainerMember(
+                        New NativeMember("bitvector" & bitVectorCount, New NativeBuiltinType(BuiltinType.NativeInt32, True)),
                         ctd)
                     cMember.Comments.Clear()
 
@@ -471,15 +471,15 @@ Namespace Transform
             prop.HasGet = True
 
             ' Get the value from the mask
-            Dim exprGet As New CodeBinaryOperatorExpression( _
-                New CodeFieldReferenceExpression(New CodeThisReferenceExpression(), fieldName), _
-                CodeBinaryOperatorType.BitwiseAnd, _
+            Dim exprGet As New CodeBinaryOperatorExpression(
+                New CodeFieldReferenceExpression(New CodeThisReferenceExpression(), fieldName),
+                CodeBinaryOperatorType.BitwiseAnd,
                 New CodePrimitiveExpression(mask))
 
             ' Shift the result down
-            Dim exprShift As New CodeBinaryOperatorExpression( _
-                exprGet, _
-                CodeBinaryOperatorType.Divide, _
+            Dim exprShift As New CodeBinaryOperatorExpression(
+                exprGet,
+                CodeBinaryOperatorType.Divide,
                 New CodePrimitiveExpression(Math.Pow(2, offset)))
 
             ' If the offset is 0 then don't do the shift
@@ -492,8 +492,8 @@ Namespace Transform
 
             ' Cast it back to an integer since we are now at a UInteger and the property is Integer 
             Dim retStmt As New CodeMethodReturnStatement()
-            retStmt.Expression = New CodeCastExpression( _
-                New CodeTypeReference(GetType(UInteger)), _
+            retStmt.Expression = New CodeCastExpression(
+                New CodeTypeReference(GetType(UInteger)),
                 outerExpr)
 
             prop.GetStatements.Add(retStmt)
@@ -505,25 +505,25 @@ Namespace Transform
             ' Shift it
             Dim exprShift As CodeExpression
             If offset <> 0 Then
-                exprShift = New CodeBinaryOperatorExpression( _
-                    New CodePropertySetValueReferenceExpression(), _
-                    CodeBinaryOperatorType.Multiply, _
+                exprShift = New CodeBinaryOperatorExpression(
+                    New CodePropertySetValueReferenceExpression(),
+                    CodeBinaryOperatorType.Multiply,
                     New CodePrimitiveExpression(Math.Pow(2, offset)))
             Else
                 exprShift = New CodePropertySetValueReferenceExpression()
             End If
 
             ' Or it with the current
-            Dim exprOr As New CodeBinaryOperatorExpression( _
-                exprShift, _
-                CodeBinaryOperatorType.BitwiseOr, _
+            Dim exprOr As New CodeBinaryOperatorExpression(
+                exprShift,
+                CodeBinaryOperatorType.BitwiseOr,
                 New CodeFieldReferenceExpression(New CodeThisReferenceExpression(), fieldName))
 
             ' Assign it to the field
-            Dim asg As New CodeAssignStatement( _
-                New CodeFieldReferenceExpression(New CodeThisReferenceExpression(), fieldName), _
-                New CodeCastExpression( _
-                    New CodeTypeReference(GetType(UInteger)), _
+            Dim asg As New CodeAssignStatement(
+                New CodeFieldReferenceExpression(New CodeThisReferenceExpression(), fieldName),
+                New CodeCastExpression(
+                    New CodeTypeReference(GetType(UInteger)),
                     exprOr))
             prop.SetStatements.Add(asg)
         End Sub
@@ -559,8 +559,8 @@ Namespace Transform
                 ' ByValArray
                 Dim asArg As New CodeAttributeArgument()
                 asArg.Name = String.Empty
-                asArg.Value = New CodeFieldReferenceExpression( _
-                    New CodeTypeReferenceExpression(GetType(UnmanagedType)), _
+                asArg.Value = New CodeFieldReferenceExpression(
+                    New CodeTypeReferenceExpression(GetType(UnmanagedType)),
                     "ByValArray")
                 attr.Arguments.Add(asArg)
 
@@ -577,18 +577,18 @@ Namespace Transform
                 If elemType.Kind = NativeSymbolKind.BuiltinType Then
                     ' Builtin types know their size in bytes
                     Dim elemBt As NativeBuiltinType = DirectCast(elemType, NativeBuiltinType)
-                    subTypeArg.Value = New CodeFieldReferenceExpression( _
-                        New CodeTypeReferenceExpression(GetType(UnmanagedType)), _
+                    subTypeArg.Value = New CodeFieldReferenceExpression(
+                        New CodeTypeReferenceExpression(GetType(UnmanagedType)),
                         elemBt.UnmanagedType.ToString())
                 ElseIf elemType.Kind = NativeSymbolKind.PointerType OrElse elemType.Kind = NativeSymbolKind.ArrayType Then
 
                     ' Marshal pointers as system ints
-                    subTypeArg.Value = New CodeFieldReferenceExpression( _
-                        New CodeTypeReferenceExpression(GetType(UnmanagedType)), _
+                    subTypeArg.Value = New CodeFieldReferenceExpression(
+                        New CodeTypeReferenceExpression(GetType(UnmanagedType)),
                         "SysUInt")
                 Else
-                    subTypeArg.Value = New CodeFieldReferenceExpression( _
-                        New CodeTypeReferenceExpression(GetType(UnmanagedType)), _
+                    subTypeArg.Value = New CodeFieldReferenceExpression(
+                        New CodeTypeReferenceExpression(GetType(UnmanagedType)),
                         "Struct")
 
                 End If
@@ -621,8 +621,8 @@ Namespace Transform
                 Return False
             End If
 
-            member.Comments.Add(New CodeCommentStatement( _
-                String.Format("{0} -> {1}", member.Name, ntExpr.Expression), _
+            member.Comments.Add(New CodeCommentStatement(
+                String.Format("{0} -> {1}", member.Name, ntExpr.Expression),
                 True))
 
             ' It's not legal for a symbol to be used as part of it's initialization expression in most languages.  
@@ -633,8 +633,8 @@ Namespace Transform
                 If TryGenerateValueExpression(ntExpr, member.InitExpression, member.Type, ex) Then
                     Return True
                 Else
-                    member.Comments.Add(New CodeCommentStatement( _
-                        String.Format("Error generating expression: {0}", ex.Message), _
+                    member.Comments.Add(New CodeCommentStatement(
+                        String.Format("Error generating expression: {0}", ex.Message),
                         True))
                     member.InitExpression = New CodePrimitiveExpression(ntExpr.Expression)
                     member.Type = New CodeTypeReference(GetType(String))
@@ -830,9 +830,9 @@ Namespace Transform
 
             Dim leftType As CodeTypeReference = Nothing
             Dim rightType As CodeTypeReference = Nothing
-            Dim expr As CodeExpression = New CodeBinaryOperatorExpression( _
-                GenerateValueExpressionImpl(node.LeftNode, leftType), _
-                type, _
+            Dim expr As CodeExpression = New CodeBinaryOperatorExpression(
+                GenerateValueExpressionImpl(node.LeftNode, leftType),
+                type,
                 GenerateValueExpressionImpl(node.RightNode, rightType))
             exprType = leftType
             Return expr
@@ -853,10 +853,10 @@ Namespace Transform
 
             Dim leftType As CodeTypeReference = Nothing
             Dim rightType As CodeTypeReference = Nothing
-            Dim expr As CodeExpression = New CodeShiftExpression( _
-                Me.m_lang, _
-                isLeft, _
-                GenerateValueExpressionImpl(node.LeftNode, leftType), _
+            Dim expr As CodeExpression = New CodeShiftExpression(
+                Me.m_lang,
+                isLeft,
+                GenerateValueExpressionImpl(node.LeftNode, leftType),
                 GenerateValueExpressionImpl(node.RightNode, rightType))
             exprType = leftType
             Return expr
@@ -899,13 +899,13 @@ Namespace Transform
                     Select Case ns.Kind
                         Case NativeSymbolKind.Constant
                             leafType = CalculateConstantType(DirectCast(ns, NativeConstant))
-                            Return New CodeFieldReferenceExpression( _
-                                New CodeTypeReferenceExpression(TransformConstants.NativeConstantsName), _
+                            Return New CodeFieldReferenceExpression(
+                                New CodeTypeReferenceExpression(TransformConstants.NativeConstantsName),
                                 ns.Name)
                         Case NativeSymbolKind.EnumType
                             leafType = Me.GenerateTypeReference(DirectCast(ns, NativeEnum))
-                            Return New CodeFieldReferenceExpression( _
-                                New CodeTypeReferenceExpression(ns.Name), _
+                            Return New CodeFieldReferenceExpression(
+                                New CodeTypeReferenceExpression(ns.Name),
                                 ntVal.Name)
                         Case Else
                             Throw New InvalidOperationException(String.Format("Generation of {0} not supported as a value", ns.Kind))

@@ -4,8 +4,7 @@ Imports System.Text
 Imports System.Collections.Generic
 Imports PInvoke
 Imports PInvoke.Transform
-Imports Microsoft.VisualStudio.TestTools.UnitTesting
-Imports CodeTransform_Acc = PInvokeTest.PInvoke_Transform_CodeTransformAccessor
+Imports Xunit
 
 Public Module CodeDomPrinter
 
@@ -291,13 +290,13 @@ Public Module GeneratedCodeVerification
     End Sub
 
     Public Sub VerifyExpression(ByVal lang As LanguageType, ByVal nativeExpr As String, ByVal managedExpr As String, ByVal managedType As String)
-        Dim trans As CodeTransform_Acc = New CodeTransform_Acc(CodeTransform_Acc.CreatePrivate(lang))
+        Dim trans As New CodeTransform(lang)
         Dim nExpr As New NativeValueExpression(nativeExpr)
         Dim cExpr As CodeExpression = Nothing
         Dim codeType As CodeTypeReference = Nothing
         Dim ex As Exception = Nothing
 
-        Assert.IsTrue(trans.TryGenerateValueExpression(nExpr, cExpr, codeType, ex))
+        Assert.True(trans.TryGenerateValueExpression(nExpr, cExpr, codeType, ex))
 
         Dim provider As Compiler.CodeDomProvider
         Select Case lang
@@ -309,14 +308,14 @@ Public Module GeneratedCodeVerification
                 provider = Nothing
         End Select
 
-        Assert.IsNotNull(provider)
+        Assert.NotNull(provider)
         Using writer As New IO.StringWriter
             provider.GenerateCodeFromExpression(cExpr, writer, New Compiler.CodeGeneratorOptions())
-            Assert.AreEqual(managedExpr, writer.ToString())
+            Assert.Equal(managedExpr, writer.ToString())
         End Using
 
         If managedType IsNot Nothing Then
-            Assert.AreEqual(managedType, CodeDomPrinter.Convert(codeType))
+            Assert.Equal(managedType, CodeDomPrinter.Convert(codeType))
         End If
     End Sub
 
@@ -342,7 +341,7 @@ Public Module GeneratedCodeVerification
     End Sub
 
     Public Sub VerifyConstValue(ByVal lang As LanguageType, ByVal bag As NativeSymbolBag, ByVal name As String, ByVal val As String, ByVal type As String)
-        Assert.IsTrue(bag.TryResolveSymbolsAndValues())
+        Assert.True(bag.TryResolveSymbolsAndValues())
 
         Dim con As New BasicConverter()
         Dim col As CodeTypeDeclarationCollection = con.ConvertToCodeDom(bag, New ErrorProvider())
@@ -362,7 +361,7 @@ Public Module GeneratedCodeVerification
 
         ' Make sure it's a constant value
         Dim field As CodeMemberField = TryCast(cMem, CodeMemberField)
-        Assert.IsNotNull(field)
+        Assert.NotNull(field)
 
         ' Get the provider
         Dim provider As Compiler.CodeDomProvider
@@ -377,11 +376,11 @@ Public Module GeneratedCodeVerification
 
         Using writer As New IO.StringWriter
             provider.GenerateCodeFromExpression(field.InitExpression, writer, New Compiler.CodeGeneratorOptions())
-            Assert.AreEqual(val, writer.ToString())
+            Assert.Equal(val, writer.ToString())
         End Using
 
         If type IsNot Nothing Then
-            Assert.AreEqual(type, CodeDomPrinter.Convert(field.Type))
+            Assert.Equal(type, CodeDomPrinter.Convert(field.Type))
         End If
     End Sub
 
@@ -390,7 +389,7 @@ Public Module GeneratedCodeVerification
     End Sub
 
     Public Sub VerifyEnumValue(ByVal lang As LanguageType, ByVal bag As NativeSymbolBag, ByVal e As NativeEnum, ByVal name As String, ByVal val As String)
-        Assert.IsTrue(bag.TryResolveSymbolsAndValues())
+        Assert.True(bag.TryResolveSymbolsAndValues())
 
         Dim con As New BasicConverter()
         Dim col As CodeTypeDeclarationCollection = con.ConvertToCodeDom(bag, New ErrorProvider())
@@ -403,7 +402,7 @@ Public Module GeneratedCodeVerification
                 Exit For
             End If
         Next
-        Assert.IsNotNull(ctd)
+        Assert.NotNull(ctd)
 
         ' Find the value
         Dim cMem As CodeTypeMember = Nothing
@@ -413,11 +412,11 @@ Public Module GeneratedCodeVerification
                 Exit For
             End If
         Next
-        Assert.IsNotNull(cMem)
+        Assert.NotNull(cMem)
 
         ' Make sure it's a constant value
         Dim field As CodeMemberField = TryCast(cMem, CodeMemberField)
-        Assert.IsNotNull(field)
+        Assert.NotNull(field)
 
         ' Get the provider
         Dim provider As Compiler.CodeDomProvider
@@ -432,7 +431,7 @@ Public Module GeneratedCodeVerification
 
         Using writer As New IO.StringWriter
             provider.GenerateCodeFromExpression(field.InitExpression, writer, New Compiler.CodeGeneratorOptions())
-            Assert.AreEqual(val, writer.ToString())
+            Assert.Equal(val, writer.ToString())
         End Using
     End Sub
 
@@ -440,7 +439,7 @@ Public Module GeneratedCodeVerification
         Dim ep As New ErrorProvider()
         Dim con As New BasicConverter(LanguageType.VisualBasic)
         Dim result As CodeTypeDeclarationCollection = con.ConvertNativeCodeToCodeDom(code, ep)
-        Assert.AreEqual(0, ep.Errors.Count, "Errors while compiling code " & vbCrLf & ep.CreateDisplayString)
+        Assert.Equal(0, ep.Errors.Count)
         Return result
     End Function
 
@@ -458,7 +457,7 @@ Public Module GeneratedCodeVerification
             For Each type As CodeTypeDeclaration In col
                 msg &= type.Name & " "
             Next
-            Assert.Fail(msg)
+            Throw New Exception(msg)
         End If
     End Sub
 
@@ -487,7 +486,7 @@ Public Module GeneratedCodeVerification
             End If
         Next
 
-        Assert.IsNotNull(found, "Could not find a procedure by name " & name)
+        Assert.NotNull(found)
         Return found
     End Function
 
@@ -510,14 +509,14 @@ Public Module GeneratedCodeVerification
         Dim all As String = String.Empty
         For Each sig As String In sigArray
             Dim ret As Boolean = VerifyProcImpl(code, sig, all)
-            Assert.IsTrue(ret, "Could not find the method. Looking For :" & sig & vbCrLf & "Found:" & all)
+            Assert.True(ret, "Could not find the method. Looking For :" & sig & vbCrLf & "Found:" & all)
         Next
     End Sub
 
     Public Sub VerifyNotProc(ByVal code As String, ByVal sig As String)
         Dim all As String = String.Empty
         Dim ret As Boolean = VerifyProcImpl(code, sig, all)
-        Assert.IsTrue(Not ret, "Found a matching method")
+        Assert.True(Not ret, "Found a matching method")
     End Sub
 
     Public Sub VerifyMember(ByVal ctd As CodeTypeDeclaration, ByVal name As String, ByRef cMem As CodeTypeMember)
@@ -530,18 +529,18 @@ Public Module GeneratedCodeVerification
             End If
         Next
 
-        Assert.IsNotNull(cMem)
+        Assert.NotNull(cMem)
     End Sub
 
     Public Sub VerifyAttribute(ByVal col As CodeAttributeDeclarationCollection, ByVal type As Type, ByRef decl As CodeAttributeDeclaration)
         VerifyAttributeImpl(col, type, decl)
-        Assert.IsNotNull(decl, "Could not find an attribute named: " & type.FullName)
+        Assert.NotNull(decl)
     End Sub
 
     Public Sub VerifyNoAttribute(ByVal col As CodeAttributeDeclarationCollection, ByVal type As Type)
         Dim decl As CodeAttributeDeclaration = Nothing
         VerifyAttributeImpl(col, type, decl)
-        Assert.IsNull(decl, "Found an attribute named: " & type.FullName)
+        Assert.Null(decl)
     End Sub
 
     Private Sub VerifyAttributeImpl(ByVal col As CodeAttributeDeclarationCollection, ByVal type As Type, ByRef decl As CodeAttributeDeclaration)
@@ -569,26 +568,26 @@ Public Module GeneratedCodeVerification
 
     Public Sub VerifyArgument(ByVal decl As CodeAttributeDeclaration, ByVal name As String, ByRef arg As CodeAttributeArgument)
         VerifyArgumentImpl(decl, name, arg)
-        Assert.IsNotNull(arg, "Could not find an argument named: " & name)
+        Assert.NotNull(arg)
     End Sub
 
     Public Sub VerifyNoArgument(ByVal decl As CodeAttributeDeclaration, ByVal name As String)
         Dim arg As CodeAttributeArgument = Nothing
         VerifyArgumentImpl(decl, name, arg)
-        Assert.IsNull(arg, "Could not find an argument named: " & name)
+        Assert.Null(arg)
     End Sub
 
     Public Sub VerifyField(ByVal ctd As CodeTypeDeclaration, ByVal name As String, ByRef cField As CodeMemberField)
         Dim cMem As CodeTypeMember = Nothing
         VerifyMember(ctd, name, cMem)
         cField = TryCast(cMem, CodeMemberField)
-        Assert.IsNotNull(cField)
+        Assert.NotNull(cField)
     End Sub
 
     Public Sub VerifyField(ByVal ctd As CodeTypeDeclaration, ByVal name As String, ByVal value As String)
         Dim cField As CodeMemberField = Nothing
         VerifyField(ctd, name, cField)
-        Assert.AreEqual(value, CodeDomPrinter.Convert(cField))
+        Assert.Equal(value, CodeDomPrinter.Convert(cField))
     End Sub
 
     Public Sub VerifyTypeMembers(ByVal code As String, ByVal name As String, ByVal ParamArray members() As String)
@@ -611,7 +610,7 @@ Public Module GeneratedCodeVerification
         Else
             Dim arg As CodeAttributeArgument = Nothing
             VerifyArgument(decl, "CallingConvention", arg)
-            Assert.AreEqual("CallingConvention." & conv.ToString(), CodeDomPrinter.Convert(arg.Value))
+            Assert.Equal("CallingConvention." & conv.ToString(), CodeDomPrinter.Convert(arg.Value))
         End If
     End Sub
 
@@ -627,7 +626,7 @@ Public Module GeneratedCodeVerification
 
             Dim arg As CodeAttributeArgument = Nothing
             VerifyArgument(decl, String.Empty, arg)
-            Assert.AreEqual("CallingConvention." & conv.ToString(), CodeDomPrinter.Convert(arg.Value))
+            Assert.Equal("CallingConvention." & conv.ToString(), CodeDomPrinter.Convert(arg.Value))
         Else
             VerifyNoAttribute(type.CustomAttributes, GetType(Runtime.InteropServices.UnmanagedFunctionPointerAttribute))
         End If

@@ -265,7 +265,7 @@ Public Module StorageFactory
 
     Private Function ProcessSal() As List(Of NativeConstant)
         Dim analyzer As Parser.NativeCodeAnalyzer = Parser.NativeCodeAnalyzerFactory.Create(Parser.OsVersion.WindowsVista)
-        Dim result As Parser.NativeCodeAnalyzerResult = analyzer.Analyze("specstrings.h")
+        Dim result As Parser.NativeCodeAnalyzerResult = analyzer.Analyze("SampleFiles\specstrings.h")
         Return result.ConvertMacrosToConstants()
     End Function
 
@@ -437,7 +437,7 @@ Public Module GeneratedCodeVerification
 
     Private Function ConvertToCodeDom(ByVal code As String) As CodeTypeDeclarationCollection
         Dim ep As New ErrorProvider()
-        Dim con As New BasicConverter(LanguageType.VisualBasic)
+        Dim con As New BasicConverter(LanguageType.VisualBasic, CreateStandard())
         Dim result As CodeTypeDeclarationCollection = con.ConvertNativeCodeToCodeDom(code, ep)
         Assert.Equal(0, ep.Errors.Count)
         Return result

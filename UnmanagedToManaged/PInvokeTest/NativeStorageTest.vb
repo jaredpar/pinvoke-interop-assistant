@@ -20,7 +20,7 @@ Public Class NativeStorageTest
 
         Dim s2 As NativeType = Nothing
 
-        Dim ns As NativeStorage = NativeStorage.DefaultInstance
+        Dim ns As New NativeStorage()
         ns.AddDefinedType(s1)
 
         Assert.True(ns.TryLoadByName(s1.Name, s2))
@@ -39,7 +39,7 @@ Public Class NativeStorageTest
 
         Dim s2 As NativeType = Nothing
 
-        Dim ns As NativeStorage = NativeStorage.DefaultInstance
+        Dim ns As New NativeStorage()
         ns.AddDefinedType(s1)
 
         Assert.True(ns.TryLoadByName(s1.Name, s2))
@@ -54,7 +54,7 @@ Public Class NativeStorageTest
         Dim p1 As New NativeProcedure("p1")
         p1.Signature.ReturnType = New NativeBuiltinType(BuiltinType.NativeByte)
 
-        Dim ns As NativeStorage = NativeStorage.DefaultInstance()
+        Dim ns As New NativeStorage()
         ns.AddProcedure(p1)
 
         Dim retp1 As NativeProcedure = Nothing
@@ -72,7 +72,7 @@ Public Class NativeStorageTest
         Dim p1 As New NativeProcedure("p1")
         p1.Signature.ReturnType = s1
 
-        Dim ns As NativeStorage = NativeStorage.DefaultInstance()
+        Dim ns As New NativeStorage()
         ns.AddProcedure(p1)
 
         Dim retp1 As NativeProcedure = Nothing
@@ -90,7 +90,7 @@ Public Class NativeStorageTest
         p1.Signature.ReturnType = New NativeBuiltinType(BuiltinType.NativeByte)
         p1.Signature.Parameters.Add(New NativeParameter("param1", New NativeBuiltinType(BuiltinType.NativeDouble)))
 
-        Dim ns As NativeStorage = NativeStorage.DefaultInstance()
+        Dim ns As New NativeStorage()
         ns.AddProcedure(p1)
 
         Dim retp1 As NativeProcedure = Nothing
@@ -110,7 +110,7 @@ Public Class NativeStorageTest
         Dim p1 As New NativeProcedure("p1")
         p1.Signature.ReturnType = s1
 
-        Dim ns As NativeStorage = NativeStorage.DefaultInstance()
+        Dim ns As New NativeStorage()
         ns.AddProcedure(p1)
 
         Dim retp1 As NativeProcedure = Nothing
@@ -133,7 +133,7 @@ Public Class NativeStorageTest
         Dim s2 As New NativeStruct("s2")
         s2.Members.Add(New NativeMember("m1", s1))
 
-        Dim ns As NativeStorage = NativeStorage.DefaultInstance()
+        Dim ns As New NativeStorage()
         ns.AddDefinedType(s2)
 
         Dim rets2 As NativeDefinedType = Nothing
@@ -152,7 +152,7 @@ Public Class NativeStorageTest
         Dim s1 As New NativeStruct("s1")
         s1.Members.Add(New NativeMember("m1", New NativePointer(s1)))
 
-        Dim ns As NativeStorage = NativeStorage.DefaultInstance()
+        Dim ns As New NativeStorage()
         ns.AddDefinedType(s1)
 
         Dim rets1 As NativeType = Nothing
@@ -170,7 +170,7 @@ Public Class NativeStorageTest
         Dim s1 As New NativeStruct("s1")
         s1.Members.Add(New NativeMember("m1", New NativeNamedType("foo")))
 
-        Dim ns As NativeStorage = NativeStorage.DefaultInstance()
+        Dim ns As New NativeStorage()
         ns.AddDefinedType(s1)
 
         Dim rets1 As NativeType = Nothing
@@ -187,7 +187,7 @@ Public Class NativeStorageTest
         Dim t1 As New NativeTypeDef("t1")
         t1.RealType = New NativeBuiltinType(BuiltinType.NativeByte)
 
-        Dim ns As NativeStorage = NativeStorage.DefaultInstance()
+        Dim ns As New NativeStorage()
         ns.AddTypedef(t1)
 
         Dim rett1 As NativeType = Nothing
@@ -203,7 +203,7 @@ Public Class NativeStorageTest
     Public Sub SaveAndLoad5()
         Dim c1 As New NativeConstant("c1", "v1")
         Dim c2 As New NativeConstant("c2", "v2", ConstantKind.MacroMethod)
-        Dim ns As NativeStorage = NativeStorage.DefaultInstance()
+        Dim ns As New NativeStorage()
         ns.AddConstant(c1)
         ns.AddConstant(c2)
 
@@ -268,7 +268,7 @@ Public Class NativeStorageTest
         Assert.Equal("boolean p1(LPWSTR param1)", p1.DisplayName)
         Assert.Equal("p1(Sig(boolean)(Sal)(param1(LPWSTR(LPWSTR(*(wchar))))(Sal)))", SymbolPrinter.Convert(p1))
 
-        Dim ns As NativeStorage = NativeStorage.DefaultInstance()
+        Dim ns As New NativeStorage()
         ns.AddProcedure(p1)
         ns.AddTypedef(td)
 
@@ -285,7 +285,7 @@ Public Class NativeStorageTest
         p1.Signature.ReturnType = New NativeBuiltinType(BuiltinType.NativeChar)
         p1.Signature.ReturnTypeSalAttribute = New NativeSalAttribute(SalEntryType.ReadOnly)
 
-        Dim ns As NativeStorage = NativeStorage.DefaultInstance()
+        Dim ns As New NativeStorage()
         ns.AddProcedure(p1)
 
         Dim retp1 As NativeProcedure = Nothing
@@ -300,7 +300,7 @@ Public Class NativeStorageTest
         p1.Signature.ReturnTypeSalAttribute = New NativeSalAttribute(
             New NativeSalEntry(SalEntryType.Deref, "foo"))
 
-        Dim ns As NativeStorage = NativeStorage.DefaultInstance()
+        Dim ns As New NativeStorage()
         ns.AddProcedure(p1)
 
         Dim retp1 As NativeProcedure = Nothing
@@ -318,7 +318,7 @@ Public Class NativeStorageTest
         p1.Signature.ReturnType = New NativeBuiltinType(BuiltinType.NativeChar)
         p1.Signature.Parameters.Add(param)
 
-        Dim ns As NativeStorage = NativeStorage.DefaultInstance()
+        Dim ns As New NativeStorage()
         ns.AddProcedure(p1)
 
         Dim retp1 As NativeProcedure = Nothing
@@ -332,7 +332,7 @@ Public Class NativeStorageTest
         fptr.Signature.ReturnType = New NativeBuiltinType(BuiltinType.NativeChar)
         fptr.Signature.Parameters.Add(New NativeParameter("f", New NativeBuiltinType(BuiltinType.NativeFloat)))
 
-        Dim ns As NativeStorage = NativeStorage.DefaultInstance()
+        Dim ns As New NativeStorage()
         ns.AddDefinedType(fptr)
 
         Dim retFptr As NativeDefinedType = Nothing

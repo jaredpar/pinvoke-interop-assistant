@@ -479,7 +479,7 @@ Public Class NativeSymbolBagTest
     ''' <remarks></remarks>
     <Fact>
     Public Sub ValueFromStorage1()
-        Dim bag As New NativeSymbolBag()
+        Dim bag As New NativeSymbolBag(New NativeStorage())
         bag.NativeStorageLookup.AddConstant(New NativeConstant("c1", "1"))
         Dim ntConst2 As New NativeConstant("c2", "5+c1")
         bag.AddConstant(ntConst2)
@@ -513,7 +513,7 @@ Public Class NativeSymbolBagTest
     ''' <remarks></remarks>
     <Fact>
     Public Sub ValueFromStorage3()
-        Dim bag As New NativeSymbolBag()
+        Dim bag As New NativeSymbolBag(New NativeStorage())
         bag.NativeStorageLookup.AddDefinedType(New NativeStruct("s1"))
 
         Dim ntConst1 As New NativeConstant("c1", "(s1)1")

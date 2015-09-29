@@ -801,7 +801,6 @@ Public Class ScannerTest
         scanner.GetNextToken()
         scanner.GetNextToken()
         scanner.GetNextToken()
-        scanner.GetNextToken()
         Assert.Throws(Of EndOfStreamException)(Sub() scanner.GetNextToken())
     End Sub
 

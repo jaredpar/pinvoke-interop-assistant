@@ -13,27 +13,7 @@
     <RootNamespace>PInvokeTest</RootNamespace>
     <AssemblyName>PInvokeTest</AssemblyName>
     <NoWarn>40025,40028,40027</NoWarn>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
-    <OldToolsVersion>3.5</OldToolsVersion>
-    <UpgradeBackupLocation>
-    </UpgradeBackupLocation>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <PublishUrl>publish\</PublishUrl>
-    <Install>true</Install>
-    <InstallFrom>Disk</InstallFrom>
-    <UpdateEnabled>false</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
-    <UpdateInterval>7</UpdateInterval>
-    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>false</UpdatePeriodically>
-    <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
-    <UseApplicationTrust>false</UseApplicationTrust>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -42,7 +22,7 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <IncrementalBuild>true</IncrementalBuild>
-    <OutputPath>bin\</OutputPath>
+    <OutputPath>bin\Debug</OutputPath>
     <DocumentationFile>PInvokeTest.xml</DocumentationFile>
     <NoWarn>42353,42354,42355</NoWarn>
     <CodeAnalysisIgnoreGeneratedCode>false</CodeAnalysisIgnoreGeneratedCode>
@@ -54,7 +34,7 @@
     <DefineTrace>true</DefineTrace>
     <IncrementalBuild>false</IncrementalBuild>
     <Optimize>true</Optimize>
-    <OutputPath>bin\</OutputPath>
+    <OutputPath>bin\Release</OutputPath>
     <DocumentationFile>PInvokeTest.xml</DocumentationFile>
     <NoWarn>42353,42354,42355</NoWarn>
     <Prefer32Bit>false</Prefer32Bit>
@@ -116,66 +96,183 @@
     <Compile Include="Utilities.vb" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="AuthoringTests.txt" />
-    <Content Include="SampleFiles\Complex1.txt" />
-    <Content Include="SampleFiles\Class1.txt" />
-    <Content Include="SampleFiles\Errors1.txt" />
-    <Content Include="SampleFiles\TypeDef9.txt" />
-    <Content Include="SampleFiles\Struct21.txt" />
-    <Content Include="SampleFiles\TypeDef8.txt" />
-    <Content Include="SampleFiles\FuncPtr4.txt" />
-    <Content Include="SampleFiles\Struct20.txt" />
-    <Content Include="SampleFiles\FuncPtr3.txt" />
-    <Content Include="SampleFiles\TypeDef7.txt" />
-    <Content Include="SampleFiles\TypeDef6.txt" />
-    <Content Include="SampleFiles\Proc11.txt" />
-    <Content Include="SampleFiles\Struct18.txt" />
-    <Content Include="SampleFiles\Proc10.txt" />
-    <Content Include="SampleFiles\Proc9.txt" />
-    <Content Include="SampleFiles\Proc8.txt" />
-    <Content Include="SampleFiles\Struct17.txt" />
-    <Content Include="SampleFiles\Proc7.txt" />
-    <Content Include="SampleFiles\Struct16.txt" />
-    <Content Include="SampleFiles\FuncPtr2.txt" />
-    <Content Include="SampleFiles\Proc6.txt" />
-    <Content Include="SampleFiles\Struct15.txt" />
-    <Content Include="SampleFiles\Struct14.txt" />
-    <Content Include="SampleFiles\Struct13.txt" />
-    <Content Include="SampleFiles\Mixed3.txt" />
-    <Content Include="SampleFiles\FuncPtr1.txt" />
-    <Content Include="SampleFiles\Sal.txt" />
-    <Content Include="SampleFiles\Struct19.txt" />
-    <Content Include="SampleFiles\TypeDef5.txt" />
-    <Content Include="SampleFiles\Proc5.txt" />
-    <Content Include="SampleFiles\TypeDef4.txt" />
-    <Content Include="SampleFiles\Proc4.txt" />
-    <Content Include="SampleFiles\Proc3.txt" />
-    <Content Include="SampleFiles\Proc2.txt" />
-    <Content Include="SampleFiles\Proc1.txt" />
-    <Content Include="SampleFiles\Struct12.txt" />
-    <Content Include="SampleFiles\Enum4.txt" />
-    <Content Include="SampleFiles\Enum3.txt" />
-    <Content Include="SampleFiles\Enum2.txt" />
-    <Content Include="SampleFiles\Enum1.txt" />
-    <Content Include="SampleFiles\Struct11.txt" />
-    <Content Include="SampleFiles\Struct10.txt" />
-    <Content Include="SampleFiles\Struct9.txt" />
-    <Content Include="SampleFiles\TypeDef3.txt" />
-    <Content Include="SampleFiles\TypeDef2.txt" />
-    <Content Include="SampleFiles\TypeDef1.txt" />
-    <Content Include="SampleFiles\Mixed2.txt" />
-    <Content Include="SampleFiles\Mixed1.txt" />
-    <Content Include="SampleFiles\Union2.txt" />
-    <Content Include="SampleFiles\Union1.txt" />
-    <Content Include="SampleFiles\Struct8.txt" />
-    <Content Include="SampleFiles\Struct7.txt" />
-    <Content Include="SampleFiles\Struct6.txt" />
-    <Content Include="SampleFiles\Struct5.txt" />
-    <Content Include="SampleFiles\Struct1.txt" />
-    <Content Include="SampleFiles\Struct2.txt" />
-    <Content Include="SampleFiles\Struct3.txt" />
-    <Content Include="SampleFiles\Struct4.txt" />
-    <EmbeddedResource Include="SampleFiles\specstrings.h" />
+    <Content Include="SampleFiles\Complex1.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Class1.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Errors1.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\TypeDef9.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Struct21.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\TypeDef8.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\FuncPtr4.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Struct20.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\FuncPtr3.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\TypeDef7.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\TypeDef6.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Proc11.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Struct18.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Proc10.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Proc9.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Proc8.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Struct17.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Proc7.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Struct16.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\FuncPtr2.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Proc6.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Struct15.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Struct14.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Struct13.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Mixed3.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\FuncPtr1.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Sal.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Struct19.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\TypeDef5.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Proc5.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\TypeDef4.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Proc4.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Proc3.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Proc2.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Proc1.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Struct12.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Enum4.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Enum3.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Enum2.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Enum1.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Struct11.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Struct10.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Struct9.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\TypeDef3.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\TypeDef2.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\TypeDef1.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Mixed2.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Mixed1.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Union2.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Union1.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Struct8.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Struct7.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Struct6.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Struct5.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Struct1.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Struct2.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Struct3.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SampleFiles\Struct4.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Include="SampleFiles\specstrings.h">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Engine\PInvoke.vbproj">

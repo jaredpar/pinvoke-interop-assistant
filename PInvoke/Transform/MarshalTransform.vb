@@ -19,58 +19,58 @@ Namespace Transform
 
     Friend Class MarshalTransform
 
-        Private m_kind As TransformKindFlags
-        Private m_trans As CodeTransform
-        Private m_list As New List(Of TransformPlugin)
+        Private _kind As TransformKindFlags
+        Private _trans As CodeTransform
+        Private _list As New List(Of TransformPlugin)
 
         Friend Property Kind() As TransformKindFlags
             Get
-                Return m_kind
+                Return _kind
             End Get
             Set(ByVal value As TransformKindFlags)
-                m_kind = value
+                _kind = value
             End Set
         End Property
 
         Friend Sub New(ByVal lang As LanguageType, ByVal kind As TransformKindFlags)
-            m_trans = New CodeTransform(lang)
-            m_kind = kind
+            _trans = New CodeTransform(lang)
+            _kind = kind
 
             ' Method Parameters
-            m_list.Add(New BooleanTypesTransformPlugin)
+            _list.Add(New BooleanTypesTransformPlugin)
 
             ' Process BSTR types before any other string.  BSTR can techinally be used as other String types
             ' such as LPWSTR and the other string matching code will flag them as such.  Therefore we will 
             ' process them first since the reverse is not true
-            m_list.Add(New BstrTransformPlugin)
-            m_list.Add(New MutableStringBufferTransformPlugin)
-            m_list.Add(New ConstantStringTransformPlugin)
-            m_list.Add(New ArrayParameterTransformPlugin(m_trans))
-            m_list.Add(New BetterManagedTypesTransformPlugin)
-            m_list.Add(New PointerToKnownTypeTransformPlugin(m_trans))
-            m_list.Add(New SystemIntTransformPlugin)
-            m_list.Add(New RawStringTransformPlugin)
+            _list.Add(New BstrTransformPlugin)
+            _list.Add(New MutableStringBufferTransformPlugin)
+            _list.Add(New ConstantStringTransformPlugin)
+            _list.Add(New ArrayParameterTransformPlugin(_trans))
+            _list.Add(New BetterManagedTypesTransformPlugin)
+            _list.Add(New PointerToKnownTypeTransformPlugin(_trans))
+            _list.Add(New SystemIntTransformPlugin)
+            _list.Add(New RawStringTransformPlugin)
 
             ' Very low on the list as it's a last ditch effort
-            m_list.Add(New DoublePointerOutTransformPlugin)
-            m_list.Add(New PointerPointerTransformPlugin)
-            m_list.Add(New DirectionalModifiersTransformPlugin)
+            _list.Add(New DoublePointerOutTransformPlugin)
+            _list.Add(New PointerPointerTransformPlugin)
+            _list.Add(New DirectionalModifiersTransformPlugin)
 
             ' Struct Member
-            m_list.Add(New StringBufferStructMemberTransformPlugin)
-            m_list.Add(New StringPointerStructMemberTransformPlugin)
-            m_list.Add(New BoolStructMemberTransformPlugin)
+            _list.Add(New StringBufferStructMemberTransformPlugin)
+            _list.Add(New StringPointerStructMemberTransformPlugin)
+            _list.Add(New BoolStructMemberTransformPlugin)
 
             ' Union Members
-            m_list.Add(New BoolUnionMemberTransformPlugin)
+            _list.Add(New BoolUnionMemberTransformPlugin)
 
             ' Mainly wrapper generators
-            m_list.Add(New OneWayStringBufferTransformPlugin)
-            m_list.Add(New TwoWayStringBufferTransformPlugin)
-            m_list.Add(New TwoWayViaReturnStringBufferTransformPlugin)
-            m_list.Add(New PInvokePointerTransformPlugin)
+            _list.Add(New OneWayStringBufferTransformPlugin)
+            _list.Add(New TwoWayStringBufferTransformPlugin)
+            _list.Add(New TwoWayViaReturnStringBufferTransformPlugin)
+            _list.Add(New PInvokePointerTransformPlugin)
 
-            For Each cur As TransformPlugin In m_list
+            For Each cur As TransformPlugin In _list
                 cur.LanguageType = lang
             Next
         End Sub
@@ -128,7 +128,7 @@ Namespace Transform
         End Sub
 
         Private Sub ProcessDelegate(ByVal del As CodeTypeDelegate)
-            For Each plugin As TransformPlugin In m_list
+            For Each plugin As TransformPlugin In _list
                 If 0 <> (plugin.TransformKind And TransformKindFlags.Signature) Then
                     plugin.ProcessParameters(del)
                 End If
@@ -140,7 +140,7 @@ Namespace Transform
         End Sub
 
         Private Sub RunPluginUnionMembers(ByVal ctd As CodeTypeDeclaration)
-            If TransformKindFlags.UnionMembers <> (m_kind And TransformKindFlags.UnionMembers) Then
+            If TransformKindFlags.UnionMembers <> (_kind And TransformKindFlags.UnionMembers) Then
                 Return
             End If
 
@@ -148,7 +148,7 @@ Namespace Transform
             ' left in the raw form of IntPtr, Int and such.  Essentially all value types.  It's possible
             ' to create an alignment issue if we try and refactor these out to better types.  For instance
             ' we could create a string for an IntPtr and create an alignment issue
-            For Each plugin As TransformPlugin In m_list
+            For Each plugin As TransformPlugin In _list
                 If 0 <> (plugin.TransformKind And TransformKindFlags.UnionMembers) Then
                     plugin.ProcessUnionMembers(ctd)
                 End If
@@ -156,7 +156,7 @@ Namespace Transform
         End Sub
 
         Private Sub RunPluginEnumMembers(ByVal ctd As CodeTypeDeclaration)
-            If TransformKindFlags.EnumMembers <> (m_kind And TransformKindFlags.EnumMembers) Then
+            If TransformKindFlags.EnumMembers <> (_kind And TransformKindFlags.EnumMembers) Then
                 Return
             End If
 
@@ -164,11 +164,11 @@ Namespace Transform
         End Sub
 
         Private Sub ProcessParameters(ByVal codeProc As CodeMemberMethod)
-            If TransformKindFlags.Signature <> (m_kind And TransformKindFlags.Signature) Then
+            If TransformKindFlags.Signature <> (_kind And TransformKindFlags.Signature) Then
                 Return
             End If
 
-            For Each plugin As TransformPlugin In m_list
+            For Each plugin As TransformPlugin In _list
                 If 0 <> (plugin.TransformKind And TransformKindFlags.Signature) Then
                     plugin.ProcessParameters(codeProc)
                 End If
@@ -176,11 +176,11 @@ Namespace Transform
         End Sub
 
         Private Sub ProcessReturnType(ByVal codeMethod As CodeMemberMethod)
-            If TransformKindFlags.Signature <> (m_kind And TransformKindFlags.Signature) Then
+            If TransformKindFlags.Signature <> (_kind And TransformKindFlags.Signature) Then
                 Return
             End If
 
-            For Each plugin As TransformPlugin In m_list
+            For Each plugin As TransformPlugin In _list
                 If 0 <> (plugin.TransformKind And TransformKindFlags.Signature) Then
                     plugin.ProcessReturnType(codeMethod)
                 End If
@@ -188,11 +188,11 @@ Namespace Transform
         End Sub
 
         Private Sub ProcessStructMembers(ByVal ctd As CodeTypeDeclaration, ByVal kind As TransformKindFlags)
-            If TransformKindFlags.StructMembers <> (m_kind And TransformKindFlags.StructMembers) Then
+            If TransformKindFlags.StructMembers <> (_kind And TransformKindFlags.StructMembers) Then
                 Return
             End If
 
-            For Each plugin As TransformPlugin In m_list
+            For Each plugin As TransformPlugin In _list
                 If 0 <> (plugin.TransformKind And kind) Then
                     plugin.ProcessStructMembers(ctd)
                 End If
@@ -200,12 +200,12 @@ Namespace Transform
         End Sub
 
         Private Sub ProcessWrapperMethods(ByVal ctd As CodeTypeDeclaration, ByVal codeMethod As CodeMemberMethod)
-            If TransformKindFlags.WrapperMethods <> (m_kind And TransformKindFlags.WrapperMethods) Then
+            If TransformKindFlags.WrapperMethods <> (_kind And TransformKindFlags.WrapperMethods) Then
                 Return
             End If
 
             Dim list As New List(Of CodeMemberMethod)
-            For Each plugin As TransformPlugin In m_list
+            For Each plugin As TransformPlugin In _list
                 If 0 <> (plugin.TransformKind And TransformKindFlags.WrapperMethods) Then
                     list.AddRange(plugin.ProcessWrapperMethods(codeMethod))
                 End If

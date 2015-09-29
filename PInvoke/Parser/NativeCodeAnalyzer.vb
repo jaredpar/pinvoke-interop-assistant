@@ -13,12 +13,12 @@ Namespace Parser
     ''' </summary>
     ''' <remarks></remarks>
     Public Class NativeCodeAnalyzerResult
-        Private m_macroMap As New Dictionary(Of String, Macro)
-        Private m_typedefList As New List(Of NativeTypeDef)
-        Private m_definedTypeListt As New List(Of NativeDefinedType)
-        Private m_procList As New List(Of NativeProcedure)
-        Private m_constList As New List(Of NativeConstant)
-        Private m_ep As New ErrorProvider
+        Private _macroMap As New Dictionary(Of String, Macro)
+        Private _typedefList As New List(Of NativeTypeDef)
+        Private _definedTypeListt As New List(Of NativeDefinedType)
+        Private _procList As New List(Of NativeProcedure)
+        Private _constList As New List(Of NativeConstant)
+        Private _ep As New ErrorProvider
 
         ''' <summary>
         ''' Final set of the macros once the code is analyzed
@@ -28,7 +28,7 @@ Namespace Parser
         ''' <remarks></remarks>
         Public ReadOnly Property MacroMap() As Dictionary(Of String, Macro)
             Get
-                Return m_macroMap
+                Return _macroMap
             End Get
         End Property
 
@@ -40,7 +40,7 @@ Namespace Parser
         ''' <remarks></remarks>
         Public ReadOnly Property NativeTypeDefs() As List(Of NativeTypeDef)
             Get
-                Return m_typedefList
+                Return _typedefList
             End Get
         End Property
 
@@ -52,7 +52,7 @@ Namespace Parser
         ''' <remarks></remarks>
         Public ReadOnly Property NativeDefinedTypes() As List(Of NativeDefinedType)
             Get
-                Return m_definedTypeListt
+                Return _definedTypeListt
             End Get
         End Property
 
@@ -64,7 +64,7 @@ Namespace Parser
         ''' <remarks></remarks>
         Public ReadOnly Property NativeProcedures() As List(Of NativeProcedure)
             Get
-                Return m_procList
+                Return _procList
             End Get
         End Property
 
@@ -76,7 +76,7 @@ Namespace Parser
         ''' <remarks></remarks>
         Public ReadOnly Property NativeConstants() As List(Of NativeConstant)
             Get
-                Return m_constList
+                Return _constList
             End Get
         End Property
 
@@ -104,7 +104,7 @@ Namespace Parser
         ''' <remarks></remarks>
         Public ReadOnly Property ErrorProvider() As ErrorProvider
             Get
-                Return m_ep
+                Return _ep
             End Get
         End Property
 
@@ -120,7 +120,7 @@ Namespace Parser
         Public Function ConvertMacrosToConstants() As List(Of NativeConstant)
             Dim list As New List(Of NativeConstant)
 
-            For Each macro As Macro In m_macroMap.Values
+            For Each macro As Macro In _macroMap.Values
                 If macro.IsMethod Then
                     Dim method As MethodMacro = DirectCast(macro, MethodMacro)
                     list.Add(New NativeConstant(macro.Name, method.MethodSignature, ConstantKind.MacroMethod))
@@ -144,12 +144,12 @@ Namespace Parser
     ''' </summary>
     ''' <remarks></remarks>
     Public Class NativeCodeAnalyzer
-        Private m_includePathList As New List(Of String)
-        Private m_followIncludes As Boolean = True
-        Private m_customIncludeMap As New Dictionary(Of String, String)(StringComparer.OrdinalIgnoreCase)
-        Private m_initialMacroList As New List(Of Macro)
-        Private m_includeInitialMacroInResult As Boolean = True
-        Private m_trace As Boolean
+        Private _includePathList As New List(Of String)
+        Private _followIncludes As Boolean = True
+        Private _customIncludeMap As New Dictionary(Of String, String)(StringComparer.OrdinalIgnoreCase)
+        Private _initialMacroList As New List(Of Macro)
+        Private _includeInitialMacroInResult As Boolean = True
+        Private _trace As Boolean
 
         ''' <summary>
         ''' Whether or not #includes should be followed when encountered
@@ -157,7 +157,7 @@ Namespace Parser
         ''' <remarks></remarks>
         Public ReadOnly Property InitialMacroList() As IEnumerable(Of Macro)
             Get
-                Return m_initialMacroList
+                Return _initialMacroList
             End Get
         End Property
 
@@ -169,10 +169,10 @@ Namespace Parser
         ''' <remarks></remarks>
         Public Property FollowIncludes() As Boolean
             Get
-                Return m_followIncludes
+                Return _followIncludes
             End Get
             Set(ByVal value As Boolean)
-                m_followIncludes = value
+                _followIncludes = value
             End Set
         End Property
 
@@ -184,7 +184,7 @@ Namespace Parser
         ''' <remarks></remarks>
         Public ReadOnly Property IncludePathList() As List(Of String)
             Get
-                Return m_includePathList
+                Return _includePathList
             End Get
         End Property
 
@@ -196,19 +196,19 @@ Namespace Parser
         ''' <remarks></remarks>
         Public Property Trace() As Boolean
             Get
-                Return m_trace
+                Return _trace
             End Get
             Set(ByVal value As Boolean)
-                m_trace = value
+                _trace = value
             End Set
         End Property
 
         Public Property IncludeInitialMacrosInResult() As Boolean
             Get
-                Return m_includeInitialMacroInResult
+                Return _includeInitialMacroInResult
             End Get
             Set(ByVal value As Boolean)
-                m_includeInitialMacroInResult = value
+                _includeInitialMacroInResult = value
             End Set
         End Property
 
@@ -218,7 +218,7 @@ Namespace Parser
 
         Public Sub AddInitialMacro(ByVal m As Macro)
             m.IsFromParse = False
-            m_initialMacroList.Add(m)
+            _initialMacroList.Add(m)
         End Sub
 
         ''' <summary>
@@ -301,7 +301,7 @@ Namespace Parser
             Dim opts As New PreProcessorOptions()
             opts.FollowIncludes = Me.FollowIncludes
             opts.IncludePathList.AddRange(Me.IncludePathList)
-            opts.InitialMacroList.AddRange(m_initialMacroList)
+            opts.InitialMacroList.AddRange(_initialMacroList)
             opts.Trace = Me.Trace
 
             Dim preprocessor As New PreProcessorEngine(opts)
@@ -312,7 +312,7 @@ Namespace Parser
             ' Process the results
             result.ErrorProvider.Append(preprocessor.ErrorProvider)
             For Each pair As KeyValuePair(Of String, Macro) In preprocessor.MacroMap
-                If m_includeInitialMacroInResult OrElse pair.Value.IsFromParse Then
+                If _includeInitialMacroInResult OrElse pair.Value.IsFromParse Then
                     result.MacroMap.Add(pair.Key, pair.Value)
                 End If
             Next

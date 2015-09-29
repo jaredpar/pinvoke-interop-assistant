@@ -23,18 +23,18 @@ Namespace Controls
         Inherits DataGridView
 
         Private WithEvents m_timer As New Timer
-        Private m_nameColumn As DataGridViewColumn
-        Private m_valueColumn As DataGridViewColumn
-        Private m_ns As NativeStorage
-        Private m_search As IncrementalSearch
-        Private m_searchText As String
-        Private m_showInvalidData As Boolean
-        Private m_list As New List(Of Object)
-        Private m_kind As SearchKind
-        Private m_info As SearchDataGridInfo
-        Private m_handleCreated As Boolean
-        Private m_selectionBag As NativeSymbolBag
-        Private m_selectionList As New List(Of String)
+        Private _nameColumn As DataGridViewColumn
+        Private _valueColumn As DataGridViewColumn
+        Private _ns As NativeStorage
+        Private _search As IncrementalSearch
+        Private _searchText As String
+        Private _showInvalidData As Boolean
+        Private _list As New List(Of Object)
+        Private _kind As SearchKind
+        Private _info As SearchDataGridInfo
+        Private _handleCreated As Boolean
+        Private _selectionBag As NativeSymbolBag
+        Private _selectionList As New List(Of String)
 
         ''' <summary>
         ''' Have to do this to prevent the designer from serializing my columns
@@ -51,10 +51,10 @@ Namespace Controls
 
         Public Property SearchText() As String
             Get
-                Return m_searchText
+                Return _searchText
             End Get
             Set(ByVal value As String)
-                m_searchText = value
+                _searchText = value
                 StartSearch()
             End Set
         End Property
@@ -62,12 +62,12 @@ Namespace Controls
         <DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)> _
         Public Property NativeStorage() As NativeStorage
             Get
-                Return m_ns
+                Return _ns
             End Get
             Set(ByVal value As NativeStorage)
-                m_ns = value
-                If m_info IsNot Nothing Then
-                    m_info.NativeStorage = value
+                _ns = value
+                If _info IsNot Nothing Then
+                    _info.NativeStorage = value
                     StartSearch()
                 End If
             End Set
@@ -78,7 +78,7 @@ Namespace Controls
                 Dim list As New List(Of NativeSymbol)
                 For Each row As DataGridViewRow In SelectedRows
                     Dim symbol As NativeSymbol = Nothing
-                    If m_info.TryConvertToSymbol(m_list(row.Index), symbol) Then
+                    If _info.TryConvertToSymbol(_list(row.Index), symbol) Then
                         list.Add(symbol)
                     End If
                 Next
@@ -90,11 +90,11 @@ Namespace Controls
         Public ReadOnly Property SelectedSymbolBag() As NativeSymbolBag
             Get
                 ' Only calculate this once per selection because it can be very expensive
-                If m_selectionBag IsNot Nothing Then
-                    Return m_selectionBag
+                If _selectionBag IsNot Nothing Then
+                    Return _selectionBag
                 End If
 
-                Dim bag As New NativeSymbolBag(m_ns)
+                Dim bag As New NativeSymbolBag(_ns)
                 For Each cur As NativeSymbol In SelectedSymbols
                     Try
 
@@ -117,45 +117,45 @@ Namespace Controls
                     End Try
                 Next
 
-                m_selectionBag = bag
+                _selectionBag = bag
                 Return bag
             End Get
         End Property
 
         Public Property SearchKind() As SearchKind
             Get
-                Return m_kind
+                Return _kind
             End Get
             Set(ByVal value As SearchKind)
-                m_kind = value
-                Select Case m_kind
+                _kind = value
+                Select Case _kind
                     Case PInvoke.Controls.SearchKind.Constant
-                        m_info = New SearchDataGridInfo.ConstantsInfo()
+                        _info = New SearchDataGridInfo.ConstantsInfo()
                     Case PInvoke.Controls.SearchKind.Procedure
-                        m_info = New SearchDataGridInfo.ProcedureInfo()
+                        _info = New SearchDataGridInfo.ProcedureInfo()
                     Case PInvoke.Controls.SearchKind.Type
-                        m_info = New SearchDataGridInfo.TypeInfo()
+                        _info = New SearchDataGridInfo.TypeInfo()
                     Case PInvoke.Controls.SearchKind.None
-                        m_info = New SearchDataGridInfo.EmptyInfo()
+                        _info = New SearchDataGridInfo.EmptyInfo()
                     Case PInvoke.Controls.SearchKind.All
-                        m_info = New SearchDataGridInfo.AllInfo()
+                        _info = New SearchDataGridInfo.AllInfo()
                     Case Else
-                        m_info = New SearchDataGridInfo.EmptyInfo
-                        Contract.InvalidEnumValue(m_kind)
+                        _info = New SearchDataGridInfo.EmptyInfo
+                        Contract.InvalidEnumValue(_kind)
                 End Select
 
-                m_valueColumn.Name = m_info.ValueColumnName
+                _valueColumn.Name = _info.ValueColumnName
                 StartSearch()
             End Set
         End Property
 
         Public Property ShowInvalidData() As Boolean
             Get
-                Return m_showInvalidData
+                Return _showInvalidData
             End Get
             Set(ByVal value As Boolean)
-                If value <> m_showInvalidData Then
-                    m_showInvalidData = value
+                If value <> _showInvalidData Then
+                    _showInvalidData = value
                     StartSearch()
                 End If
             End Set
@@ -165,7 +165,7 @@ Namespace Controls
         Public Event SelectedSymbolsChanged As EventHandler
 
         Public Sub New()
-            m_ns = PInvoke.NativeStorage.DefaultInstance
+            _ns = PInvoke.NativeStorage.DefaultInstance
             m_timer.Enabled = False
             m_timer.Interval = 500
 
@@ -182,14 +182,14 @@ Namespace Controls
             nameColumn.HeaderText = "Name"
             nameColumn.ReadOnly = True
             nameColumn.Width = 180
-            m_nameColumn = nameColumn
+            _nameColumn = nameColumn
 
             Dim valueColumn As New DataGridViewTextBoxColumn()
             valueColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
             valueColumn.HeaderText = "Value"
             valueColumn.ReadOnly = True
             valueColumn.MinimumWidth = 100
-            m_valueColumn = valueColumn
+            _valueColumn = valueColumn
 
             MyBase.Columns.AddRange(New DataGridViewColumn() {nameColumn, valueColumn})
 
@@ -208,15 +208,15 @@ Namespace Controls
 
         Protected Overrides Sub OnCellValueNeeded(ByVal e As System.Windows.Forms.DataGridViewCellValueEventArgs)
             MyBase.OnCellValueNeeded(e)
-            If e.RowIndex >= m_list.Count Then
+            If e.RowIndex >= _list.Count Then
                 Return
             End If
 
-            Dim cur As Object = m_list(e.RowIndex)
-            If e.ColumnIndex = m_nameColumn.Index Then
-                e.Value = m_info.GetName(cur)
-            ElseIf e.ColumnIndex = m_valueColumn.Index Then
-                e.Value = m_info.GetValue(cur)
+            Dim cur As Object = _list(e.RowIndex)
+            If e.ColumnIndex = _nameColumn.Index Then
+                e.Value = _info.GetName(cur)
+            ElseIf e.ColumnIndex = _valueColumn.Index Then
+                e.Value = _info.GetValue(cur)
             Else
                 Debug.Fail("Unexpected")
                 e.Value = String.Empty
@@ -230,7 +230,7 @@ Namespace Controls
 
         Protected Overrides Sub OnCreateControl()
             MyBase.OnCreateControl()
-            m_handleCreated = True
+            _handleCreated = True
             StartSearch()
         End Sub
 
@@ -249,41 +249,41 @@ Namespace Controls
         Private Sub StartSearch()
 
             ' Don't start searching until we are actually displayed.  
-            If Not m_handleCreated Then
+            If Not _handleCreated Then
                 Return
             End If
 
-            m_list.Clear()
+            _list.Clear()
             m_timer.Enabled = True
             RowCount = 0
 
-            If m_search IsNot Nothing Then
-                m_search.Cancel()
+            If _search IsNot Nothing Then
+                _search.Cancel()
             End If
 
-            m_info.ShowInvalidData = m_showInvalidData
-            m_info.SearchText = SearchText
-            m_info.NativeStorage = m_ns
-            m_search = New IncrementalSearch(m_info.GetInitialData(), AddressOf m_info.ShouldAllow)
+            _info.ShowInvalidData = _showInvalidData
+            _info.SearchText = SearchText
+            _info.NativeStorage = _ns
+            _search = New IncrementalSearch(_info.GetInitialData(), AddressOf _info.ShouldAllow)
 
             SearchImpl()
         End Sub
 
         Private Sub SearchImpl()
-            If m_search Is Nothing Then
+            If _search Is Nothing Then
                 CheckForSelectedSymbolChange()
                 m_timer.Enabled = False
                 Return
             End If
 
-            Dim result As Result = m_search.Search()
+            Dim result As Result = _search.Search()
             If result.Completed Then
-                m_search = Nothing
+                _search = Nothing
             End If
 
-            m_list.AddRange(result.IncrementalFound)
-            m_list.Sort(AddressOf SearchSort)
-            RowCount = m_list.Count
+            _list.AddRange(result.IncrementalFound)
+            _list.Sort(AddressOf SearchSort)
+            RowCount = _list.Count
             Refresh()
         End Sub
 
@@ -302,8 +302,8 @@ Namespace Controls
         ''' <remarks></remarks>
         Private Function SearchSort(ByVal left As Object, ByVal right As Object) As Integer
             Dim target As String = SearchText
-            Dim leftName As String = m_info.GetName(left)
-            Dim rightName As String = m_info.GetName(right)
+            Dim leftName As String = _info.GetName(left)
+            Dim rightName As String = _info.GetName(right)
             If Not String.IsNullOrEmpty(target) Then
 
 
@@ -328,7 +328,7 @@ Namespace Controls
         Private Function GetHashString(ByVal row As DataGridViewRow) As String
             Dim val As String
             Try
-                val = TryCast(row.Cells(m_nameColumn.Index).Value, String)
+                val = TryCast(row.Cells(_nameColumn.Index).Value, String)
             Catch ex As Exception
                 val = String.Empty
             End Try
@@ -344,11 +344,11 @@ Namespace Controls
 
         Private Sub CheckForSelectedSymbolChange()
             Dim changed As Boolean = False
-            If m_selectionList.Count <> Me.SelectedRows.Count Then
+            If _selectionList.Count <> Me.SelectedRows.Count Then
                 changed = True
             Else
-                For i As Integer = 0 To m_selectionList.Count - 1
-                    If Not StringComparer.Ordinal.Equals(m_selectionList(i), GetHashString(SelectedRows(i))) Then
+                For i As Integer = 0 To _selectionList.Count - 1
+                    If Not StringComparer.Ordinal.Equals(_selectionList(i), GetHashString(SelectedRows(i))) Then
                         changed = True
                         Exit For
                     End If
@@ -356,12 +356,12 @@ Namespace Controls
             End If
 
             If changed Then
-                m_selectionBag = Nothing    ' Eliminate the cache
+                _selectionBag = Nothing    ' Eliminate the cache
 
                 ' Cache the current selection
-                m_selectionList.Clear()
+                _selectionList.Clear()
                 For Each row As DataGridViewRow In Me.SelectedRows
-                    m_selectionList.Add(GetHashString(row))
+                    _selectionList.Add(GetHashString(row))
                 Next
 
                 RaiseEvent SelectedSymbolsChanged(Me, EventArgs.Empty)

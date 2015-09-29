@@ -127,8 +127,8 @@ Namespace Parser
 
     <DebuggerDisplay("{TokenType} - {Value}")> _
     Public Class Token
-        Private m_tokenType As TokenType
-        Private m_value As String
+        Private _tokenType As TokenType
+        Private _value As String
 
         ''' <summary>
         ''' Type of the token
@@ -138,79 +138,79 @@ Namespace Parser
         ''' <remarks></remarks>
         Public ReadOnly Property TokenType() As TokenType
             Get
-                Return m_tokenType
+                Return _tokenType
             End Get
         End Property
 
         Public ReadOnly Property Value() As String
             Get
-                Return m_value
+                Return _value
             End Get
         End Property
 
         Public ReadOnly Property IsKeyword() As Boolean
             Get
-                Return TokenHelper.IsKeyword(m_tokenType)
+                Return TokenHelper.IsKeyword(_tokenType)
             End Get
         End Property
 
         Public ReadOnly Property IsAnyWord() As Boolean
             Get
-                Return m_tokenType = Parser.TokenType.Word OrElse IsKeyword
+                Return _tokenType = Parser.TokenType.Word OrElse IsKeyword
             End Get
         End Property
 
         Public ReadOnly Property IsCallTypeModifier() As Boolean
             Get
-                Return TokenHelper.IsCallTypeModifier(m_tokenType)
+                Return TokenHelper.IsCallTypeModifier(_tokenType)
             End Get
         End Property
 
         Public ReadOnly Property IsBinaryOperation() As Boolean
             Get
-                Return TokenHelper.IsBinaryOperation(m_tokenType)
+                Return TokenHelper.IsBinaryOperation(_tokenType)
             End Get
         End Property
 
         Public ReadOnly Property IsPreProcessorDirective() As Boolean
             Get
-                Return TokenHelper.IsPreprocessorToken(m_tokenType)
+                Return TokenHelper.IsPreprocessorToken(_tokenType)
             End Get
         End Property
 
         Public ReadOnly Property IsCharacter() As Boolean
             Get
-                Return TokenHelper.IsCharacter(m_tokenType)
+                Return TokenHelper.IsCharacter(_tokenType)
             End Get
         End Property
 
         Public ReadOnly Property IsQuotedString() As Boolean
             Get
-                Return TokenHelper.IsQuotedString(m_tokenType)
+                Return TokenHelper.IsQuotedString(_tokenType)
             End Get
         End Property
 
         Public ReadOnly Property IsNumber() As Boolean
             Get
-                Return TokenHelper.IsNumber(m_tokenType)
+                Return TokenHelper.IsNumber(_tokenType)
             End Get
         End Property
 
         Public ReadOnly Property IsAccessModifier() As Boolean
             Get
-                Return TokenHelper.IsAccessModifier(m_tokenType)
+                Return TokenHelper.IsAccessModifier(_tokenType)
             End Get
         End Property
 
         Public ReadOnly Property IsTypeKeyword() As Boolean
             Get
-                Return TokenHelper.IsTypeKeyword(m_tokenType)
+                Return TokenHelper.IsTypeKeyword(_tokenType)
             End Get
         End Property
 
         Public Sub New(ByVal tType As TokenType, ByVal val As String)
-            m_tokenType = tType
-            m_value = val
+            _tokenType = tType
+            _value = val
         End Sub
     End Class
 

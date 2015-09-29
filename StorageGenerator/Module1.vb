@@ -5,7 +5,7 @@ Imports Pinvoke
 Imports PInvoke.Parser
 Imports PInvoke.Transform
 
-Module Module1
+Friend Module Module1
 
     ''' <summary>
     ''' Dll's which are somewhat more troublesome and should not be loaded by default
@@ -131,7 +131,7 @@ Module Module1
         Return ns
     End Function
 
-    Sub Main()
+    Public Sub Main()
 
         Using sw As New StreamWriter("d:\temp\windows.vb")
             Generate(sw)

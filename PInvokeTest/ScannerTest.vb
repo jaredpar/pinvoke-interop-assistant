@@ -13,32 +13,32 @@ Imports Xunit
 '''</summary>
 Public Class ScannerTest
 
-    Private m_defaultOpts As ScannerOptions
-    Private m_lineOpts As ScannerOptions
-    Private m_commentOpts As ScannerOptions
-    Private m_rudeEndOpts As ScannerOptions
+    Private _defaultOpts As ScannerOptions
+    Private _lineOpts As ScannerOptions
+    Private _commentOpts As ScannerOptions
+    Private _rudeEndOpts As ScannerOptions
 
     Public Sub New()
-        m_defaultOpts = New ScannerOptions()
-        m_defaultOpts.ThrowOnEndOfStream = False
-        m_defaultOpts.HideComments = True
-        m_defaultOpts.HideNewLines = True
-        m_defaultOpts.HideWhitespace = True
+        _defaultOpts = New ScannerOptions()
+        _defaultOpts.ThrowOnEndOfStream = False
+        _defaultOpts.HideComments = True
+        _defaultOpts.HideNewLines = True
+        _defaultOpts.HideWhitespace = True
 
-        m_lineOpts = New ScannerOptions()
-        m_lineOpts.ThrowOnEndOfStream = False
-        m_lineOpts.HideComments = True
-        m_lineOpts.HideNewLines = False
-        m_lineOpts.HideWhitespace = True
+        _lineOpts = New ScannerOptions()
+        _lineOpts.ThrowOnEndOfStream = False
+        _lineOpts.HideComments = True
+        _lineOpts.HideNewLines = False
+        _lineOpts.HideWhitespace = True
 
-        m_commentOpts = New ScannerOptions()
-        m_commentOpts.HideComments = False
-        m_commentOpts.ThrowOnEndOfStream = False
-        m_commentOpts.HideNewLines = True
-        m_commentOpts.HideWhitespace = True
+        _commentOpts = New ScannerOptions()
+        _commentOpts.HideComments = False
+        _commentOpts.ThrowOnEndOfStream = False
+        _commentOpts.HideNewLines = True
+        _commentOpts.HideWhitespace = True
 
-        m_rudeEndOpts = New ScannerOptions()
-        m_rudeEndOpts.ThrowOnEndOfStream = True
+        _rudeEndOpts = New ScannerOptions()
+        _rudeEndOpts.ThrowOnEndOfStream = True
     End Sub
 
     Private Sub VerifyNext(ByVal scanner As Scanner, ByVal tt As TokenType)
@@ -73,35 +73,35 @@ Public Class ScannerTest
 
     <Fact>
     Public Sub BasicScan1()
-        Dim scanner As Scanner = CreateScanner("#define ", m_defaultOpts)
+        Dim scanner As Scanner = CreateScanner("#define ", _defaultOpts)
         Dim token As Token = scanner.GetNextToken()
         Assert.Equal(TokenType.PoundDefine, token.TokenType)
     End Sub
 
     <Fact>
     Public Sub BasicScan2()
-        Dim scanner As Scanner = CreateScanner("#if ", m_defaultOpts)
+        Dim scanner As Scanner = CreateScanner("#if ", _defaultOpts)
         Dim token As Token = scanner.GetNextToken()
         Assert.Equal(TokenType.PoundIf, token.TokenType)
     End Sub
 
     <Fact>
     Public Sub BasicScan3()
-        Dim scanner As Scanner = CreateScanner("{} ", m_defaultOpts)
+        Dim scanner As Scanner = CreateScanner("{} ", _defaultOpts)
         VerifyNext(scanner, TokenType.BraceOpen)
         VerifyNext(scanner, TokenType.BraceClose)
     End Sub
 
     <Fact>
     Public Sub BasicScan4()
-        Dim scanner As Scanner = CreateScanner("#define {", m_defaultOpts)
+        Dim scanner As Scanner = CreateScanner("#define {", _defaultOpts)
         VerifyNext(scanner, TokenType.PoundDefine)
         VerifyNext(scanner, TokenType.BraceOpen)
     End Sub
 
     <Fact>
     Public Sub BasicScan5()
-        Dim scanner As Scanner = CreateScanner("#define val {}", m_defaultOpts)
+        Dim scanner As Scanner = CreateScanner("#define val {}", _defaultOpts)
         VerifyNext(scanner, TokenType.PoundDefine)
         VerifyNext(scanner, TokenType.Word, "val")
         VerifyNext(scanner, TokenType.BraceOpen)
@@ -360,7 +360,7 @@ Public Class ScannerTest
 
     <Fact>
     Public Sub MultilineBasicScan1()
-        Dim scanner As Scanner = CreateScanner("foo" & vbCrLf & "bar", m_lineOpts)
+        Dim scanner As Scanner = CreateScanner("foo" & vbCrLf & "bar", _lineOpts)
         VerifyNext(scanner, TokenType.Word, "foo")
         VerifyNext(scanner, TokenType.NewLine)
         VerifyNext(scanner, TokenType.Word, "bar")
@@ -368,7 +368,7 @@ Public Class ScannerTest
 
     <Fact>
     Public Sub MultilineBasicScan2()
-        Dim scanner As Scanner = CreateScanner("foo," & vbCrLf & "bar[]", m_lineOpts)
+        Dim scanner As Scanner = CreateScanner("foo," & vbCrLf & "bar[]", _lineOpts)
         VerifyNext(scanner, TokenType.Word, "foo")
         VerifyNext(scanner, TokenType.Comma)
         VerifyNext(scanner, TokenType.NewLine)
@@ -379,7 +379,7 @@ Public Class ScannerTest
 
     <Fact>
     Public Sub MultilineBasicScan3()
-        Dim scanner As Scanner = CreateScanner("bar,   " & vbCrLf & "foo", m_lineOpts)
+        Dim scanner As Scanner = CreateScanner("bar,   " & vbCrLf & "foo", _lineOpts)
         VerifyNext(scanner, TokenType.Word, "bar")
         VerifyNext(scanner, TokenType.Comma)
         VerifyNext(scanner, TokenType.NewLine)
@@ -429,21 +429,21 @@ Public Class ScannerTest
 
     <Fact>
     Public Sub QuotedString1()
-        Dim scanner As Scanner = CreateScanner("bar ""uu""", m_defaultOpts)
+        Dim scanner As Scanner = CreateScanner("bar ""uu""", _defaultOpts)
         VerifyNext(scanner, TokenType.Word, "bar")
         VerifyNext(scanner, TokenType.QuotedStringAnsi, """uu""")
     End Sub
 
     <Fact>
     Public Sub QuotedString2()
-        Dim scanner As Scanner = CreateScanner("""a""""b""", m_defaultOpts)
+        Dim scanner As Scanner = CreateScanner("""a""""b""", _defaultOpts)
         VerifyNext(scanner, TokenType.QuotedStringAnsi, """a""")
         VerifyNext(scanner, TokenType.QuotedStringAnsi, """b""")
     End Sub
 
     <Fact>
     Public Sub QuotedString3()
-        Dim scanner As Scanner = CreateScanner("""b""hello", m_defaultOpts)
+        Dim scanner As Scanner = CreateScanner("""b""hello", _defaultOpts)
         VerifyNext(scanner, TokenType.QuotedStringAnsi, """b""")
         VerifyNext(scanner, TokenType.Word, "hello")
     End Sub
@@ -454,7 +454,7 @@ Public Class ScannerTest
     ''' <remarks></remarks>
     <Fact>
     Public Sub QuotedString4()
-        Dim scanner As Scanner = CreateScanner("""b\n""foo", m_defaultOpts)
+        Dim scanner As Scanner = CreateScanner("""b\n""foo", _defaultOpts)
         VerifyNext(scanner, TokenType.QuotedStringAnsi, """b\n""")
         VerifyNext(scanner, TokenType.Word, "foo")
     End Sub
@@ -465,7 +465,7 @@ Public Class ScannerTest
     ''' <remarks></remarks>
     <Fact>
     Public Sub QuotedString5()
-        Dim scanner As Scanner = CreateScanner("""aaaa\""""bar", m_defaultOpts)
+        Dim scanner As Scanner = CreateScanner("""aaaa\""""bar", _defaultOpts)
         VerifyNext(scanner, TokenType.QuotedStringAnsi, """aaaa\""""")
         VerifyNext(scanner, TokenType.Word, "bar")
     End Sub
@@ -481,7 +481,7 @@ Public Class ScannerTest
 
     <Fact>
     Public Sub LineComment1()
-        Dim scanner As Scanner = CreateScanner("hello // bar", m_commentOpts)
+        Dim scanner As Scanner = CreateScanner("hello // bar", _commentOpts)
         VerifyNext(scanner, TokenType.Word, "hello")
         VerifyNext(scanner, TokenType.LineComment, "// bar")
     End Sub
@@ -492,7 +492,7 @@ Public Class ScannerTest
     ''' <remarks></remarks>
     <Fact>
     Public Sub LineComment2()
-        Dim scanner As Scanner = CreateScanner("foo // // bar", m_commentOpts)
+        Dim scanner As Scanner = CreateScanner("foo // // bar", _commentOpts)
         VerifyNext(scanner, TokenType.Word, "foo")
         VerifyNext(scanner, TokenType.LineComment, "// // bar")
     End Sub
@@ -503,7 +503,7 @@ Public Class ScannerTest
     ''' <remarks></remarks>
     <Fact>
     Public Sub LineComment3()
-        Dim scanner As Scanner = CreateScanner("foo // /* bar */", m_commentOpts)
+        Dim scanner As Scanner = CreateScanner("foo // /* bar */", _commentOpts)
         VerifyNext(scanner, TokenType.Word, "foo")
         VerifyNext(scanner, TokenType.LineComment, "// /* bar */")
     End Sub
@@ -514,7 +514,7 @@ Public Class ScannerTest
     ''' <remarks></remarks>
     <Fact>
     Public Sub LineComment4()
-        Dim scanner As Scanner = CreateScanner("// hello", m_commentOpts)
+        Dim scanner As Scanner = CreateScanner("// hello", _commentOpts)
         VerifyNext(scanner, TokenType.LineComment, "// hello")
     End Sub
 
@@ -524,7 +524,7 @@ Public Class ScannerTest
     ''' <remarks></remarks>
     <Fact>
     Public Sub LineComment5()
-        Dim scanner As Scanner = CreateScanner("foo //", m_commentOpts)
+        Dim scanner As Scanner = CreateScanner("foo //", _commentOpts)
         VerifyNext(scanner, TokenType.Word, "foo")
         VerifyNext(scanner, TokenType.LineComment, "//")
     End Sub
@@ -540,14 +540,14 @@ Public Class ScannerTest
 
     <Fact>
     Public Sub BlockComment1()
-        Dim scanner As Scanner = CreateScanner("foo /* bar */", m_commentOpts)
+        Dim scanner As Scanner = CreateScanner("foo /* bar */", _commentOpts)
         VerifyNext(scanner, TokenType.Word, "foo")
         VerifyNext(scanner, TokenType.BlockComment, "/* bar */")
     End Sub
 
     <Fact>
     Public Sub BlockComment2()
-        Dim scanner As Scanner = CreateScanner("foo /* bar */ a", m_commentOpts)
+        Dim scanner As Scanner = CreateScanner("foo /* bar */ a", _commentOpts)
         VerifyNext(scanner, TokenType.Word, "foo")
         VerifyNext(scanner, TokenType.BlockComment, "/* bar */")
         VerifyNext(scanner, TokenType.Word, "a")
@@ -559,7 +559,7 @@ Public Class ScannerTest
     ''' <remarks></remarks>
     <Fact>
     Public Sub BlockComment3()
-        Dim scanner As Scanner = CreateScanner("foo /* one */ /* two */", m_commentOpts)
+        Dim scanner As Scanner = CreateScanner("foo /* one */ /* two */", _commentOpts)
         VerifyNext(scanner, TokenType.Word, "foo")
         VerifyNext(scanner, TokenType.BlockComment, "/* one */")
         VerifyNext(scanner, TokenType.BlockComment, "/* two */")
@@ -571,33 +571,33 @@ Public Class ScannerTest
     ''' <remarks></remarks>
     <Fact>
     Public Sub BlockComment4()
-        Dim scanner As Scanner = CreateScanner("/* foo", m_commentOpts)
+        Dim scanner As Scanner = CreateScanner("/* foo", _commentOpts)
         VerifyNext(scanner, TokenType.BlockComment, "/* foo")
     End Sub
 
     <Fact>
     Public Sub NextOfType()
-        Dim scanner As Scanner = CreateScanner("foo/* bar*/bar", m_defaultOpts)
+        Dim scanner As Scanner = CreateScanner("foo/* bar*/bar", _defaultOpts)
         VerifyNext(scanner, TokenType.Word, "foo")
         VerifyNext(scanner, TokenType.Word, "bar")
     End Sub
 
     <Fact>
     Public Sub NextOfType2()
-        Dim scanner As Scanner = CreateScanner("/*bar*/foo", m_defaultOpts)
+        Dim scanner As Scanner = CreateScanner("/*bar*/foo", _defaultOpts)
         VerifyNext(scanner, TokenType.Word, "foo")
     End Sub
 
     <Fact>
     Public Sub NextOfType3()
-        Dim scanner As Scanner = CreateScanner("/*bar*/foo//hello", m_defaultOpts)
+        Dim scanner As Scanner = CreateScanner("/*bar*/foo//hello", _defaultOpts)
         VerifyNext(scanner, TokenType.Word, "foo")
         VerifyNext(scanner, TokenType.EndOfStream, String.Empty)
     End Sub
 
     <Fact>
     Public Sub PeekOfType()
-        Dim scanner As Scanner = CreateScanner("bar/*foo*/", m_defaultOpts)
+        Dim scanner As Scanner = CreateScanner("bar/*foo*/", _defaultOpts)
         VerifyPeek(scanner, TokenType.Word, "bar")
         VerifyNext(scanner, TokenType.Word, "bar")
         VerifyNext(scanner, TokenType.EndOfStream, String.Empty)
@@ -605,7 +605,7 @@ Public Class ScannerTest
 
     <Fact>
     Public Sub PeekOfType2()
-        Dim scanner As Scanner = CreateScanner("bar/*foo*/green", m_defaultOpts)
+        Dim scanner As Scanner = CreateScanner("bar/*foo*/green", _defaultOpts)
         VerifyNext(scanner, TokenType.Word, "bar")
         VerifyPeek(scanner, TokenType.Word, "green")
         VerifyNext(scanner, TokenType.Word, "green")
@@ -613,13 +613,13 @@ Public Class ScannerTest
 
     <Fact>
     Public Sub GetNextRealToken()
-        Dim scanner As Scanner = CreateScanner("bar", m_defaultOpts)
+        Dim scanner As Scanner = CreateScanner("bar", _defaultOpts)
         scanner.GetNextToken(TokenType.Word)
     End Sub
 
     <Fact>
     Public Sub GetNextRealToken2()
-        Dim scanner As Scanner = CreateScanner("bar", m_defaultOpts)
+        Dim scanner As Scanner = CreateScanner("bar", _defaultOpts)
         Assert.Throws(Of InvalidOperationException)(
             Sub()
                 scanner.GetNextToken(TokenType.Asterisk)
@@ -634,39 +634,39 @@ Public Class ScannerTest
 
     <Fact>
     Public Sub NumberTest2()
-        Dim scanner As Scanner = CreateScanner("foo 22", m_defaultOpts)
+        Dim scanner As Scanner = CreateScanner("foo 22", _defaultOpts)
         VerifyNext(scanner, TokenType.Word, "foo")
         VerifyNext(scanner, TokenType.Number, "22")
     End Sub
 
     <Fact>
     Public Sub NumberTest3()
-        Dim scanner As Scanner = CreateScanner("22foo 3.3", m_defaultOpts)
+        Dim scanner As Scanner = CreateScanner("22foo 3.3", _defaultOpts)
         VerifyNext(scanner, TokenType.Word, "22foo")
         VerifyNext(scanner, TokenType.Number, "3.3")
     End Sub
 
     <Fact>
     Public Sub NumberTest4()
-        Dim scanner As Scanner = CreateScanner("22L", m_defaultOpts)
+        Dim scanner As Scanner = CreateScanner("22L", _defaultOpts)
         VerifyNext(scanner, TokenType.Number, "22L")
     End Sub
 
     <Fact>
     Public Sub NumberTest5()
-        Dim scanner As Scanner = CreateScanner("12u", m_defaultOpts)
+        Dim scanner As Scanner = CreateScanner("12u", _defaultOpts)
         VerifyNext(scanner, TokenType.Number, "12u")
     End Sub
 
     <Fact>
     Public Sub NumberTest6()
-        Dim scanner As Scanner = CreateScanner("12U", m_defaultOpts)
+        Dim scanner As Scanner = CreateScanner("12U", _defaultOpts)
         VerifyNext(scanner, TokenType.Number, "12U")
     End Sub
 
     <Fact>
     Public Sub NumberTest7()
-        Dim scanner As Scanner = CreateScanner("12UL", m_defaultOpts)
+        Dim scanner As Scanner = CreateScanner("12UL", _defaultOpts)
         VerifyNext(scanner, TokenType.Number, "12UL")
     End Sub
 
@@ -676,7 +676,7 @@ Public Class ScannerTest
     ''' <remarks></remarks>
     <Fact>
     Public Sub NumberTest8()
-        Dim scanner As Scanner = CreateScanner("12U 0x5U 6u", m_defaultOpts)
+        Dim scanner As Scanner = CreateScanner("12U 0x5U 6u", _defaultOpts)
         VerifyNext(scanner, TokenType.Number, "12U")
         VerifyNext(scanner, TokenType.HexNumber, "0x5U")
         VerifyNext(scanner, TokenType.Number, "6u")
@@ -688,7 +688,7 @@ Public Class ScannerTest
     ''' <remarks></remarks>
     <Fact>
     Public Sub NumberTest9()
-        Dim scanner As Scanner = CreateScanner("12L 0x5L 6l", m_defaultOpts)
+        Dim scanner As Scanner = CreateScanner("12L 0x5L 6l", _defaultOpts)
         VerifyNext(scanner, TokenType.Number, "12L")
         VerifyNext(scanner, TokenType.HexNumber, "0x5L")
         VerifyNext(scanner, TokenType.Number, "6l")
@@ -700,7 +700,7 @@ Public Class ScannerTest
     ''' <remarks></remarks>
     <Fact>
     Public Sub NumberTest10()
-        Dim scanner As Scanner = CreateScanner("12F 0x5F 6f", m_defaultOpts)
+        Dim scanner As Scanner = CreateScanner("12F 0x5F 6f", _defaultOpts)
         VerifyNext(scanner, TokenType.Number, "12F")
         VerifyNext(scanner, TokenType.HexNumber, "0x5F")
         VerifyNext(scanner, TokenType.Number, "6f")
@@ -712,7 +712,7 @@ Public Class ScannerTest
     ''' <remarks></remarks>
     <Fact>
     Public Sub NumberTest11()
-        Dim scanner As Scanner = CreateScanner("1e2 0x5e5 7e2", m_defaultOpts)
+        Dim scanner As Scanner = CreateScanner("1e2 0x5e5 7e2", _defaultOpts)
         VerifyNext(scanner, TokenType.Number, "1e2")
         VerifyNext(scanner, TokenType.HexNumber, "0x5e5")
         VerifyNext(scanner, TokenType.Number, "7e2")
@@ -790,14 +790,14 @@ Public Class ScannerTest
 
     <Fact>
     Public Sub RudeEnd1()
-        Dim scanner As Scanner = CreateScanner("foo", m_rudeEndOpts)
+        Dim scanner As Scanner = CreateScanner("foo", _rudeEndOpts)
         scanner.GetNextToken()
         Assert.Throws(Of EndOfStreamException)(Sub() scanner.GetNextToken())
     End Sub
 
     <Fact>
     Public Sub RudeEnd2()
-        Dim scanner As Scanner = CreateScanner("foo bar", m_rudeEndOpts)
+        Dim scanner As Scanner = CreateScanner("foo bar", _rudeEndOpts)
         scanner.GetNextToken()
         scanner.GetNextToken()
         scanner.GetNextToken()

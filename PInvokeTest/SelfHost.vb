@@ -14,15 +14,15 @@ Imports Xunit
 Public Class SelfHost
 
     Public Sub New()
-        m_nameList.Clear()
+        _nameList.Clear()
     End Sub
 
-    Private m_nameList As New List(Of String)
+    Private _nameList As New List(Of String)
 
     Private Function CaptureWindowNameCb(ByVal intPtr As IntPtr, ByVal param2 As IntPtr) As Integer
         Dim builder As New StringBuilder(256)
         If 0 <> NativeMethods.GetWindowTextW(intPtr, builder, builder.Capacity) Then
-            m_nameList.Add(builder.ToString())
+            _nameList.Add(builder.ToString())
         End If
 
         Return 1
@@ -31,7 +31,7 @@ Public Class SelfHost
     Private Function CaptureWindowNameCb2(ByVal intPtr As IntPtr, ByVal param2 As IntPtr) As Integer
         Dim name As String = String.Empty
         If 0 <> NativeMethods.GetWindowTextW(intPtr, name) Then
-            m_nameList.Add(name)
+            _nameList.Add(name)
         End If
 
         Return 1
@@ -67,7 +67,7 @@ Public Class SelfHost
     <Fact>
     Public Sub EnumWindows1()
         NativeMethods.EnumWindows(AddressOf Me.CaptureWindowNameCb, IntPtr.Zero)
-        Assert.True(m_nameList.Count > 0)
+        Assert.True(_nameList.Count > 0)
     End Sub
 
     ''' <summary>
@@ -77,7 +77,7 @@ Public Class SelfHost
     <Fact>
     Public Sub EnumWindows2()
         NativeMethods.EnumWindows(AddressOf Me.CaptureWindowNameCb2, IntPtr.Zero)
-        Assert.True(m_nameList.Count > 0)
+        Assert.True(_nameList.Count > 0)
     End Sub
 
     '<Fact>

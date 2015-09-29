@@ -18,10 +18,10 @@ Namespace Controls
             Friend ParseOutput As String
         End Class
 
-        Private m_ns As NativeStorage = NativeStorage.DefaultInstance
-        Private m_transKind As TransformKindFlags = TransformKindFlags.All
-        Private m_initialMacroList As New List(Of Macro)
-        Private m_changed As Boolean
+        Private _ns As NativeStorage = NativeStorage.DefaultInstance
+        Private _transKind As TransformKindFlags = TransformKindFlags.All
+        Private _initialMacroList As New List(Of Macro)
+        Private _changed As Boolean
 
         Public Property AutoGenerate() As Boolean
             Get
@@ -32,7 +32,7 @@ Namespace Controls
             End Set
         End Property
 
-        Sub New()
+        Public Sub New()
 
             ' This call is required by the Windows Form Designer.
             InitializeComponent()
@@ -63,24 +63,24 @@ Namespace Controls
             End Set
         End Property
 
-        <DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)> _
+        <DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)>
         Public Property NativeStorage() As NativeStorage Implements ISignatureImportControl.NativeStorage
             Get
-                Return m_ns
+                Return _ns
             End Get
             Set(ByVal value As NativeStorage)
-                m_ns = value
-                m_initialMacroList = Nothing
+                _ns = value
+                _initialMacroList = Nothing
             End Set
         End Property
 
-        <DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)> _
+        <DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)>
         Public Property TransformKindFlags() As TransformKindFlags Implements ISignatureImportControl.TransformKindFlags
             Get
-                Return m_transKind
+                Return _transKind
             End Get
             Set(ByVal value As TransformKindFlags)
-                m_transKind = value
+                _transKind = value
             End Set
         End Property
 
@@ -98,7 +98,7 @@ Namespace Controls
 
         Private Sub OnNativeCodeChanged(ByVal sender As Object, ByVal e As EventArgs) Handles m_nativeCodeTb.TextChanged
             If m_bgWorker.IsBusy Then
-                m_changed = True
+                _changed = True
             Else
                 RunWorker()
             End If
@@ -129,7 +129,7 @@ Namespace Controls
         Private Sub OnBackgroundOperationCompleted(ByVal sender As System.Object, ByVal e As System.ComponentModel.RunWorkerCompletedEventArgs) Handles m_bgWorker.RunWorkerCompleted
             Dim response As ResponseData = DirectCast(e.Result, ResponseData)
             m_errorsTb.Text = response.ParseOutput
-            If m_changed Then
+            If _changed Then
                 RunWorker()
             ElseIf m_autoGenerateBtn.Checked Then
                 GenerateCode()
@@ -167,22 +167,22 @@ Namespace Controls
 #Region "Helpers"
 
         Private Sub RunWorker()
-            m_changed = False
+            _changed = False
             m_errorsTb.Text = "Parsing ..."
-            If m_initialMacroList Is Nothing Then
-                m_initialMacroList = m_ns.LoadAllMacros()
+            If _initialMacroList Is Nothing Then
+                _initialMacroList = _ns.LoadAllMacros()
             End If
 
             Dim data As New RequestData()
-            data.InitialMacroList = New ReadOnlyCollection(Of Macro)(m_initialMacroList)
+            data.InitialMacroList = New ReadOnlyCollection(Of Macro)(_initialMacroList)
             data.Text = m_nativeCodeTb.Text
             m_bgWorker.RunWorkerAsync(data)
         End Sub
 
         Private Sub GenerateCode()
             Try
-                Dim conv As New BasicConverter(LanguageType, m_ns)
-                conv.TransformKindFlags = m_transKind
+                Dim conv As New BasicConverter(LanguageType, _ns)
+                conv.TransformKindFlags = _transKind
                 m_managedCodeBox.Code = conv.ConvertNativeCodeToPInvokeCode(m_nativeCodeTb.Text)
             Catch ex As Exception
                 m_managedCodeBox.Code = ex.Message

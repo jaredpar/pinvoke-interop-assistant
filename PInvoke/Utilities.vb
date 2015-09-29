@@ -21,8 +21,8 @@ End Module
 ''' <remarks></remarks>
 Public Class ErrorProvider
 
-    Private m_warningList As New List(Of String)
-    Private m_errorList As New List(Of String)
+    Private _warningList As New List(Of String)
+    Private _errorList As New List(Of String)
 
     ''' <summary>
     ''' Errors
@@ -32,7 +32,7 @@ Public Class ErrorProvider
     ''' <remarks></remarks>
     Public ReadOnly Property Errors() As List(Of String)
         Get
-            Return m_errorList
+            Return _errorList
         End Get
     End Property
 
@@ -44,7 +44,7 @@ Public Class ErrorProvider
     ''' <remarks></remarks>
     Public ReadOnly Property Warnings() As List(Of String)
         Get
-            Return m_warningList
+            Return _warningList
         End Get
     End Property
 
@@ -57,28 +57,28 @@ Public Class ErrorProvider
     Public ReadOnly Property AllMessages() As IEnumerable(Of String)
         Get
             Dim list As New List(Of String)
-            list.AddRange(m_warningList)
-            list.AddRange(m_errorList)
+            list.AddRange(_warningList)
+            list.AddRange(_errorList)
             Return list
         End Get
     End Property
 
     Public Sub AddWarning(ByVal str As String)
-        m_warningList.Add(str)
+        _warningList.Add(str)
     End Sub
 
     Public Sub AddWarning(ByVal str As String, ByVal ParamArray args As Object())
         Dim msg As String = String.Format(str, args)
-        m_warningList.Add(msg)
+        _warningList.Add(msg)
     End Sub
 
     Public Sub AddError(ByVal str As String)
-        m_errorList.Add(str)
+        _errorList.Add(str)
     End Sub
 
     Public Sub AddError(ByVal str As String, ByVal ParamArray args As Object())
         Dim msg As String = String.Format(str, args)
-        m_errorList.Add(msg)
+        _errorList.Add(msg)
     End Sub
 
     ''' <summary>
@@ -87,8 +87,8 @@ Public Class ErrorProvider
     ''' <param name="ep"></param>
     ''' <remarks></remarks>
     Public Sub Append(ByVal ep As ErrorProvider)
-        m_errorList.AddRange(ep.Errors)
-        m_warningList.AddRange(ep.Warnings)
+        _errorList.AddRange(ep.Errors)
+        _warningList.AddRange(ep.Warnings)
     End Sub
 
     Public Sub New()
@@ -126,30 +126,30 @@ Friend Class EnumerableShim(Of T)
     Private Class EnumeratorShim
         Implements IEnumerator(Of T)
 
-        Private m_enumerator As IEnumerator
+        Private _enumerator As IEnumerator
 
         Public Sub New(ByVal e As IEnumerator)
-            m_enumerator = e
+            _enumerator = e
         End Sub
 
         Public ReadOnly Property Current() As T Implements System.Collections.Generic.IEnumerator(Of T).Current
             Get
-                Return DirectCast(m_enumerator.Current, T)
+                Return DirectCast(_enumerator.Current, T)
             End Get
         End Property
 
         Public ReadOnly Property Current1() As Object Implements System.Collections.IEnumerator.Current
             Get
-                Return m_enumerator.Current
+                Return _enumerator.Current
             End Get
         End Property
 
         Public Function MoveNext() As Boolean Implements System.Collections.IEnumerator.MoveNext
-            Return m_enumerator.MoveNext()
+            Return _enumerator.MoveNext()
         End Function
 
         Public Sub Reset() Implements System.Collections.IEnumerator.Reset
-            m_enumerator.Reset()
+            _enumerator.Reset()
         End Sub
 
 #Region " IDisposable Support "
@@ -168,18 +168,18 @@ Friend Class EnumerableShim(Of T)
 
     End Class
 
-    Private m_enumerable As IEnumerable
+    Private _enumerable As IEnumerable
 
     Public Sub New(ByVal e As IEnumerable)
-        m_enumerable = e
+        _enumerable = e
     End Sub
 
     Public Function GetEnumerator() As System.Collections.Generic.IEnumerator(Of T) Implements System.Collections.Generic.IEnumerable(Of T).GetEnumerator
-        Return New EnumeratorShim(m_enumerable.GetEnumerator())
+        Return New EnumeratorShim(_enumerable.GetEnumerator())
     End Function
 
     Public Function GetEnumerator1() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
-        Return m_enumerable.GetEnumerator()
+        Return _enumerable.GetEnumerator()
     End Function
 End Class
 

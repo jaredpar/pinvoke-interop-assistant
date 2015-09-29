@@ -9,13 +9,13 @@ Namespace Transform
     ''' <remarks></remarks>
     Public Class NativeSymbolTransform
 
-        Private m_it As New NativeSymbolIterator()
+        Private _it As New NativeSymbolIterator()
 
         Public Sub New()
         End Sub
 
         Public Sub CollapseNamedTypes(ByVal ns As NativeSymbol)
-            For Each rel As NativeSymbolRelationship In m_it.FindAllNativeSymbolRelationships(ns)
+            For Each rel As NativeSymbolRelationship In _it.FindAllNativeSymbolRelationships(ns)
                 CollapseNamedTypesImpl(rel.Parent, rel.Symbol)
             Next
         End Sub
@@ -35,7 +35,7 @@ Namespace Transform
         End Sub
 
         Public Sub CollapseTypedefs(ByVal ns As NativeSymbol)
-            For Each rel As NativeSymbolRelationship In m_it.FindAllNativeSymbolRelationships(ns)
+            For Each rel As NativeSymbolRelationship In _it.FindAllNativeSymbolRelationships(ns)
                 CollapseTypedefsImpl(rel.Parent, rel.Symbol)
             Next
         End Sub
@@ -62,7 +62,7 @@ Namespace Transform
         ''' <param name="newName"></param>
         ''' <remarks></remarks>
         Public Sub RenameTypeSymbol(ByVal ns As NativeSymbol, ByVal oldName As String, ByVal newName As String)
-            For Each sym As NativeSymbol In m_it.FindAllNativeSymbols(ns)
+            For Each sym As NativeSymbol In _it.FindAllNativeSymbols(ns)
                 If (sym.Category = NativeSymbolCategory.Defined OrElse sym.Kind = NativeSymbolKind.NamedType) _
                     AndAlso 0 = String.CompareOrdinal(sym.Name, oldName) Then
                     sym.Name = newName

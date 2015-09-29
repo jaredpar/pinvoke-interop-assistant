@@ -35,18 +35,18 @@ Namespace Transform
     ''' <remarks></remarks>
     Public MustInherit Class TransformPlugin
 
-        Private Const ProcessedParamKey As String = "158d1b71-b224-4637-bd73-4f7f83b6777c"
-        Private Const ProcessedReturnKey As String = "fd83becd-ba9f-4c08-9e79-c3285b74c8cb"
-        Private Const ProcessedMemberKey As String = "a12fe995-7b38-4b84-82d5-38e315499806"
+        Private Const s_processedParamKey As String = "158d1b71-b224-4637-bd73-4f7f83b6777c"
+        Private Const s_processedReturnKey As String = "fd83becd-ba9f-4c08-9e79-c3285b74c8cb"
+        Private Const s_processedMemberKey As String = "a12fe995-7b38-4b84-82d5-38e315499806"
 
-        Private m_lang As LanguageType
+        Private _lang As LanguageType
 
         Public Property LanguageType() As LanguageType
             Get
-                Return m_lang
+                Return _lang
             End Get
             Set(ByVal value As LanguageType)
-                m_lang = value
+                _lang = value
             End Set
         End Property
 
@@ -489,30 +489,30 @@ Namespace Transform
         End Function
 
         Protected Function IsReturnProcessed(ByVal co As CodeMemberMethod) As Boolean
-            Return co.UserData.Contains(ProcessedReturnKey)
+            Return co.UserData.Contains(s_processedReturnKey)
         End Function
 
         Protected Sub SetReturnProcessed(ByVal co As CodeMemberMethod)
             ThrowIfTrue(IsReturnProcessed(co))
-            co.UserData(ProcessedReturnKey) = True
+            co.UserData(s_processedReturnKey) = True
         End Sub
 
         Protected Function IsParamProcessed(ByVal co As CodeParam) As Boolean
-            Return co.UserData.Contains(ProcessedParamKey)
+            Return co.UserData.Contains(s_processedParamKey)
         End Function
 
         Protected Sub SetParamProcessed(ByVal co As CodeParam)
             ThrowIfTrue(IsParamProcessed(co))
-            co.UserData(ProcessedParamKey) = True
+            co.UserData(s_processedParamKey) = True
         End Sub
 
         Protected Function IsMemberProcessed(ByVal co As CodeTypeMember) As Boolean
-            Return co.UserData.Contains(ProcessedMemberKey)
+            Return co.UserData.Contains(s_processedMemberKey)
         End Function
 
         Protected Sub SetMemberProcessed(ByVal co As CodeTypeMember)
             ThrowIfTrue(IsMemberProcessed(co))
-            co.UserData(ProcessedMemberKey) = True
+            co.UserData(s_processedMemberKey) = True
         End Sub
 
         ''' <summary>
@@ -598,7 +598,7 @@ Namespace Transform
             Return False
         End Function
 
-        Function IsBstr(ByVal nt As NativeType) As Boolean
+        Public Function IsBstr(ByVal nt As NativeType) As Boolean
             If nt Is Nothing Then
                 Return False
             End If
@@ -924,7 +924,7 @@ Namespace Transform
     Friend Class ArrayParameterTransformPlugin
         Inherits TransformPlugin
 
-        Private m_trans As CodeTransform
+        Private _trans As CodeTransform
 
         Public Overrides ReadOnly Property TransformKind() As TransformKindFlags
             Get
@@ -933,7 +933,7 @@ Namespace Transform
         End Property
 
         Friend Sub New(ByVal trans As CodeTransform)
-            m_trans = trans
+            _trans = trans
         End Sub
 
         Protected Overrides Sub ProcessParametersImpl(ByVal col As System.CodeDom.CodeParameterDeclarationExpressionCollection, ByVal isDelegate As Boolean)
@@ -1045,7 +1045,7 @@ Namespace Transform
                 Return True
             ElseIf arr.RealTypeDigged.Kind = NativeSymbolKind.StructType _
                 OrElse arr.RealTypeDigged.Kind = NativeSymbolKind.UnionType Then
-                elemType = m_trans.GenerateTypeReference(arr.RealTypeDigged)
+                elemType = _trans.GenerateTypeReference(arr.RealTypeDigged)
                 unmanagedType = Runtime.InteropServices.UnmanagedType.Struct
                 Return True
             End If
@@ -1073,7 +1073,7 @@ Namespace Transform
             ElseIf ptr.RealTypeDigged.Kind = NativeSymbolKind.StructType _
                 OrElse ptr.RealTypeDigged.Kind = NativeSymbolKind.UnionType Then
 
-                elemType = m_trans.GenerateTypeReference(ptr.RealTypeDigged)
+                elemType = _trans.GenerateTypeReference(ptr.RealTypeDigged)
                 unmanagedType = Runtime.InteropServices.UnmanagedType.Struct
                 Return True
             End If
@@ -1220,7 +1220,7 @@ Namespace Transform
     Friend Class PointerToKnownTypeTransformPlugin
         Inherits TransformPlugin
 
-        Private m_trans As CodeTransform
+        Private _trans As CodeTransform
 
         Public Overrides ReadOnly Property TransformKind() As TransformKindFlags
             Get
@@ -1229,7 +1229,7 @@ Namespace Transform
         End Property
 
         Friend Sub New(ByVal trans As CodeTransform)
-            m_trans = trans
+            _trans = trans
         End Sub
 
         Protected Overrides Sub ProcessSingleParameter(ByVal codeParam As System.CodeDom.CodeParameterDeclarationExpression, ByVal ntParam As NativeParameter, ByVal isDelegateParam As Boolean)
@@ -1288,7 +1288,7 @@ Namespace Transform
 
             If isSingle Then
                 ' Found one
-                codeParam.Type = m_trans.GenerateTypeReference(realNt)
+                codeParam.Type = _trans.GenerateTypeReference(realNt)
                 codeParam.Direction = direction
                 SetParamProcessed(codeParam)
             End If

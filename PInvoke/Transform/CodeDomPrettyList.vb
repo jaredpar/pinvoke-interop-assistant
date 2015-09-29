@@ -10,11 +10,11 @@ Namespace Transform
     ''' </summary>
     ''' <remarks></remarks>
     Public Class CodeDomPrettyList
-        Private m_bag As NativeSymbolBag
-        Private m_resolvedTypeDefList As List(Of NativeTypeDef)
+        Private _bag As NativeSymbolBag
+        Private _resolvedTypeDefList As List(Of NativeTypeDef)
 
         Public Sub New(ByVal bag As NativeSymbolBag)
-            m_bag = bag
+            _bag = bag
         End Sub
 
         Public Sub PerformRename(ByVal col As CodeTypeDeclarationCollection)
@@ -136,26 +136,26 @@ Namespace Transform
         ''' <remarks></remarks>
         Private Function FindTypedefsTargeting(ByVal target As NativeType) As List(Of NativeTypeDef)
             ' Build the cache
-            If m_resolvedTypeDefList Is Nothing Then
-                m_resolvedTypeDefList = New List(Of NativeTypeDef)(m_bag.FindResolvedTypedefs())
+            If _resolvedTypeDefList Is Nothing Then
+                _resolvedTypeDefList = New List(Of NativeTypeDef)(_bag.FindResolvedTypedefs())
             End If
 
             Dim list As New List(Of NativeTypeDef)
 
             ' First look in the symbol bag
-            For Each td As NativeTypeDef In m_resolvedTypeDefList 
+            For Each td As NativeTypeDef In _resolvedTypeDefList
                 If Object.ReferenceEquals(td.RealTypeDigged, target) Then
                     list.Add(td)
                 End If
             Next
 
             ' Next look in the native storage for more types  
-            Dim ns As NativeStorage = m_bag.NativeStorageLookup
+            Dim ns As NativeStorage = _bag.NativeStorageLookup
             Dim typeRef As NativeStorage.TypeReference = ns.CreateTypeReference(target)
             If typeRef IsNot Nothing Then
                 For Each trow As NativeStorage.TypedefTypeRow In ns.TypedefType.FindByTarget(typeRef)
                     Dim found As NativeTypeDef = Nothing
-                    If m_bag.TryFindOrLoadTypedef(trow.Name, found) Then
+                    If _bag.TryFindOrLoadTypedef(trow.Name, found) Then
                         list.Add(found)
                     End If
                 Next

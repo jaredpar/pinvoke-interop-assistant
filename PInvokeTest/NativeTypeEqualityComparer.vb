@@ -2,7 +2,7 @@
 Imports System.Collections.Generic
 Imports PInvoke
 
-Class TypePair(Of K, V)
+Friend Class TypePair(Of K, V)
     Public Key As K
     Public Value As V
 End Class
@@ -35,10 +35,10 @@ Public Class NativeTypeEqualityComparer
         End Get
     End Property
 
-    Private m_type As ComparerType
+    Private _type As ComparerType
 
     Private Sub New(ByVal type As ComparerType)
-        m_type = type
+        _type = type
     End Sub
 
 #Region "Shared Methods"
@@ -62,7 +62,7 @@ Public Class NativeTypeEqualityComparer
             Return x Is Nothing AndAlso y Is Nothing
         End If
 
-        Select Case m_type
+        Select Case _type
             Case ComparerType.Recursive
                 Return EqualsRecursive(x, y)
             Case ComparerType.TopLevel

@@ -4,27 +4,27 @@ Namespace Parser
 
     <DebuggerDisplay("Value={Value}")> _
     Public Class ExpressionValue
-        Private m_value As Object
+        Private _value As Object
 
         Public Property Value() As Object
             Get
-                Return m_value
+                Return _value
             End Get
             Set(ByVal value As Object)
-                m_value = value
+                _value = value
             End Set
         End Property
 
         Public Sub New(ByVal value As Object)
             Contract.ThrowIfNull(value)
-            m_value = value
+            _value = value
         End Sub
 
         Public Sub New(ByVal value As Boolean)
             If value Then
-                m_value = 1
+                _value = 1
             Else
-                m_value = 0
+                _value = 0
             End If
         End Sub
 

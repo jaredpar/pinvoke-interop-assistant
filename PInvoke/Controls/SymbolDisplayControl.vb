@@ -8,8 +8,8 @@ Namespace Controls
 
     Public Class SymbolDisplayControl
 
-        Private m_ns As NativeStorage
-        Private m_conv As BasicConverter
+        Private _ns As NativeStorage
+        Private _conv As BasicConverter
 
         ''' <summary>
         ''' Kind of search being performed
@@ -52,8 +52,8 @@ Namespace Controls
         Public Event SearchKindChanged As EventHandler
 
         Public Sub New()
-            m_ns = PInvoke.NativeStorage.DefaultInstance
-            m_conv = New BasicConverter(LanguageType.VisualBasic)
+            _ns = PInvoke.NativeStorage.DefaultInstance
+            _conv = New BasicConverter(LanguageType.VisualBasic)
 
             ' This call is required by the Windows Form Designer.
             InitializeComponent()
@@ -99,11 +99,11 @@ Namespace Controls
         <DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)> _
         Public Property NativeStorage() As NativeStorage Implements ISignatureImportControl.NativeStorage
             Get
-                Return m_ns
+                Return _ns
             End Get
             Set(ByVal value As NativeStorage)
-                m_ns = value
-                m_conv.NativeStorage = value
+                _ns = value
+                _conv.NativeStorage = value
                 m_searchGrid.NativeStorage = value
             End Set
         End Property
@@ -111,10 +111,10 @@ Namespace Controls
         <DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)> _
         Public Property TransformKindFlags() As Transform.TransformKindFlags Implements ISignatureImportControl.TransformKindFlags
             Get
-                Return m_conv.TransformKindFlags
+                Return _conv.TransformKindFlags
             End Get
             Set(ByVal value As Transform.TransformKindFlags)
-                m_conv.TransformKindFlags = value
+                _conv.TransformKindFlags = value
             End Set
         End Property
 
@@ -162,7 +162,7 @@ Namespace Controls
         ''' <remarks></remarks>
         Private Sub OnLanguageChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles m_languageCb.SelectedIndexChanged
             ' During initialization this can be true
-            m_conv.LanguageType = Me.LanguageType
+            _conv.LanguageType = Me.LanguageType
             RaiseEvent LanguageTypeChanged(Me, EventArgs.Empty)
 
             AutoGenerateCode()
@@ -236,7 +236,7 @@ Namespace Controls
 
             Dim text As String
             If force OrElse m_searchGrid.SelectedRows.Count <= 5 Then
-                text = m_conv.ConvertToPInvokeCode(m_searchGrid.SelectedSymbolBag)
+                text = _conv.ConvertToPInvokeCode(m_searchGrid.SelectedSymbolBag)
             Else
                 text = "More than 5 rows selected.  Will not autogenerate"
             End If

@@ -32,8 +32,8 @@ Public Class ProcedureFinder
         End Get
     End Property
 
-    Private m_dllMap As New Dictionary(Of String, IntPtr)
-    Private m_loaded As Boolean = False
+    Private _dllMap As New Dictionary(Of String, IntPtr)
+    Private _loaded As Boolean = False
 
     ''' <summary>
     ''' List of dll's to look for
@@ -43,7 +43,7 @@ Public Class ProcedureFinder
     ''' <remarks></remarks>
     Public ReadOnly Property DllNames() As IEnumerable(Of String)
         Get
-            Return m_dllMap.Keys
+            Return _dllMap.Keys
         End Get
     End Property
 
@@ -58,7 +58,7 @@ Public Class ProcedureFinder
     End Sub
 
     Public Sub Dispose() Implements System.IDisposable.Dispose
-        For Each ptr As IntPtr In m_dllMap.Values
+        For Each ptr As IntPtr In _dllMap.Values
             NativeMethods.FreeLibrary(ptr)
         Next
 
@@ -67,8 +67,8 @@ Public Class ProcedureFinder
     Public Sub AddDll(ByVal dllName As String)
         If dllName Is Nothing Then : Throw New ArgumentNullException("dllName") : End If
 
-        m_dllMap.Add(dllName, IntPtr.Zero)
-        m_loaded = False
+        _dllMap.Add(dllName, IntPtr.Zero)
+        _loaded = False
     End Sub
 
     Public Function TryFindDllNameExact(ByVal procName As String, ByRef dllName As String) As Boolean
@@ -91,11 +91,11 @@ Public Class ProcedureFinder
     Private Function TryFindDllNameImpl(ByVal procName As String, ByRef dllName As String) As Boolean
         ThrowIfNull(procName)
 
-        If Not m_loaded Then
+        If Not _loaded Then
             LoadLibraryList()
         End If
 
-        For Each pair As KeyValuePair(Of String, IntPtr) In m_dllMap
+        For Each pair As KeyValuePair(Of String, IntPtr) In _dllMap
             If pair.Value = IntPtr.Zero Then
                 Continue For
             End If
@@ -112,16 +112,16 @@ Public Class ProcedureFinder
 
     Private Sub LoadLibraryList()
 
-        Dim list As New List(Of String)(m_dllMap.Keys)
+        Dim list As New List(Of String)(_dllMap.Keys)
         For Each name As String In list
-            Dim ptr As IntPtr = m_dllMap(name)
+            Dim ptr As IntPtr = _dllMap(name)
             If ptr = IntPtr.Zero Then
                 ptr = NativeMethods.LoadLibraryEx(name, IntPtr.Zero, 0UL)
-                m_dllMap(name) = ptr
+                _dllMap(name) = ptr
             End If
         Next
 
-        m_loaded = True
+        _loaded = True
     End Sub
 
 End Class

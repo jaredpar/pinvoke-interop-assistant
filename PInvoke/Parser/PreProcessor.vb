@@ -12,10 +12,10 @@ Namespace Parser
     ''' </summary>
     ''' <remarks></remarks>
     Public Class PreProcessorOptions
-        Private m_macroList As New List(Of Macro)
-        Private m_followIncludes As Boolean
-        Private m_includePathList As New List(Of String)
-        Private m_trace As Boolean
+        Private _macroList As New List(Of Macro)
+        Private _followIncludes As Boolean
+        Private _includePathList As New List(Of String)
+        Private _trace As Boolean
 
         ''' <summary>
         ''' Options to start the preprocessor with
@@ -25,7 +25,7 @@ Namespace Parser
         ''' <remarks></remarks>
         Public ReadOnly Property InitialMacroList() As List(Of Macro)
             Get
-                Return m_macroList
+                Return _macroList
             End Get
         End Property
 
@@ -37,10 +37,10 @@ Namespace Parser
         ''' <remarks></remarks>
         Public Property FollowIncludes() As Boolean
             Get
-                Return m_followIncludes
+                Return _followIncludes
             End Get
             Set(ByVal value As Boolean)
-                m_followIncludes = value
+                _followIncludes = value
             End Set
         End Property
 
@@ -52,7 +52,7 @@ Namespace Parser
         ''' <remarks></remarks>
         Public ReadOnly Property IncludePathList() As List(Of String)
             Get
-                Return m_includePathList
+                Return _includePathList
             End Get
         End Property
 
@@ -64,10 +64,10 @@ Namespace Parser
         ''' </summary>
         Public Property Trace() As Boolean
             Get
-                Return m_trace
+                Return _trace
             End Get
             Set(ByVal value As Boolean)
-                m_trace = value
+                _trace = value
             End Set
         End Property
 
@@ -134,14 +134,14 @@ Namespace Parser
 
         Private Class PreProcessorException
             Inherits Exception
-            Private m_isError As Boolean = True
+            Private _isError As Boolean = True
 
             Friend Property IsError() As Boolean
                 Get
-                    Return m_isError
+                    Return _isError
                 End Get
                 Set(ByVal value As Boolean)
-                    m_isError = value
+                    _isError = value
                 End Set
             End Property
 
@@ -151,7 +151,7 @@ Namespace Parser
 
             Public Sub New(ByVal msg As String, ByVal isError As Boolean)
                 MyBase.New(msg)
-                m_isError = isError
+                _isError = isError
             End Sub
 
             Public Sub New(ByVal msg As String, ByVal inner As Exception)
@@ -163,10 +163,10 @@ Namespace Parser
         Private Class PreProcessorEvaluator
             Inherits ExpressionEvaluator
 
-            Private m_engine As PreProcessorEngine
+            Private _engine As PreProcessorEngine
 
             Public Sub New(ByVal engine As PreProcessorEngine)
-                m_engine = engine
+                _engine = engine
             End Sub
 
             ''' <summary>
@@ -201,7 +201,7 @@ Namespace Parser
 
                 Dim value As ExpressionValue = Nothing
                 If Not MyBase.TryEvaluate(list, value) Then
-                    m_engine.m_errorProvider.AddError("Could not evaluate expression {0}", line.ToString())
+                    _engine._errorProvider.AddError("Could not evaluate expression {0}", line.ToString())
                     Return False
                 End If
 
@@ -212,7 +212,7 @@ Namespace Parser
                 Dim value As ExpressionValue
                 If node.Token.Value = "defined" _
                                 AndAlso node.LeftNode IsNot Nothing _
-                                AndAlso m_engine.m_macroMap.ContainsKey(node.LeftNode.Token.Value) Then
+                                AndAlso _engine._macroMap.ContainsKey(node.LeftNode.Token.Value) Then
                     value = True
                 Else
                     value = False
@@ -233,7 +233,7 @@ Namespace Parser
                 If node.Kind = ExpressionKind.Leaf AndAlso node.Token.TokenType = TokenType.Word Then
                     Dim value As ExpressionValue
                     Dim m As Macro = Nothing
-                    If Me.m_engine.m_macroMap.TryGetValue(node.Token.Value, m) Then
+                    If Me._engine._macroMap.TryGetValue(node.Token.Value, m) Then
                         Dim numValue As Object = Nothing
                         If TokenHelper.TryConvertToNumber(m.Value, numValue) Then
                             value = New ExpressionValue(numValue)
@@ -266,14 +266,14 @@ Namespace Parser
             End Function
         End Class
 
-        Private m_options As PreProcessorOptions
-        Private m_macroMap As New Dictionary(Of String, Macro)
-        Private m_processing As Boolean
-        Private m_scanner As Scanner
-        Private m_outputStream As TextWriter
-        Private m_errorProvider As New ErrorProvider()
-        Private m_eval As PreProcessorEvaluator
-        Private m_metadataMap As New Dictionary(Of String, String)(StringComparer.OrdinalIgnoreCase)
+        Private _options As PreProcessorOptions
+        Private _macroMap As New Dictionary(Of String, Macro)
+        Private _processing As Boolean
+        Private _scanner As Scanner
+        Private _outputStream As TextWriter
+        Private _errorProvider As New ErrorProvider()
+        Private _eval As PreProcessorEvaluator
+        Private _metadataMap As New Dictionary(Of String, String)(StringComparer.OrdinalIgnoreCase)
 
         ''' <summary>
         ''' Options of the NativePreProcessor
@@ -283,10 +283,10 @@ Namespace Parser
         ''' <remarks></remarks>
         Public Property Options() As PreProcessorOptions
             Get
-                Return m_options
+                Return _options
             End Get
             Set(ByVal value As PreProcessorOptions)
-                m_options = value
+                _options = value
             End Set
         End Property
 
@@ -298,22 +298,22 @@ Namespace Parser
         ''' <remarks></remarks>
         Public ReadOnly Property MacroMap() As Dictionary(Of String, Macro)
             Get
-                Return m_macroMap
+                Return _macroMap
             End Get
         End Property
 
         Public Property ErrorProvider() As ErrorProvider
             Get
-                Return m_errorProvider
+                Return _errorProvider
             End Get
             Set(ByVal value As ErrorProvider)
-                m_errorProvider = value
+                _errorProvider = value
             End Set
         End Property
 
         Public Sub New(ByVal options As PreProcessorOptions)
-            m_eval = New PreProcessorEvaluator(Me)
-            m_options = options
+            _eval = New PreProcessorEvaluator(Me)
+            _options = options
         End Sub
 
         ''' <summary>
@@ -324,28 +324,28 @@ Namespace Parser
         ''' <returns></returns>
         ''' <remarks></remarks>
         Public Function Process(ByVal readerBag As TextReaderBag) As String
-            ThrowIfTrue(m_processing, "Recursive parsing not supported in this manner.")
+            ThrowIfTrue(_processing, "Recursive parsing not supported in this manner.")
 
             Dim builder As New StringBuilder()
             Try
                 ' Setup the macro map
-                m_macroMap.Clear()
-                For Each m As Macro In m_options.InitialMacroList
-                    m_macroMap(m.Name) = m
+                _macroMap.Clear()
+                For Each m As Macro In _options.InitialMacroList
+                    _macroMap(m.Name) = m
                 Next
 
-                m_outputStream = New StringWriter(builder)
-                Using m_outputStream
-                    m_processing = True
+                _outputStream = New StringWriter(builder)
+                Using _outputStream
+                    _processing = True
                     ProcessCore(readerBag)
 
-                    If m_options.Trace Then
+                    If _options.Trace Then
                         TraceMacroMap()
                     End If
                 End Using
             Finally
-                m_processing = False
-                m_outputStream = Nothing
+                _processing = False
+                _outputStream = Nothing
             End Try
 
             Return builder.ToString()
@@ -358,17 +358,17 @@ Namespace Parser
         ''' <param name="readerBag"></param>
         ''' <remarks></remarks>
         Private Sub ProcessCore(ByVal readerBag As TextReaderBag)
-            ThrowIfFalse(m_processing)
-            Dim oldScanner As Scanner = m_scanner
+            ThrowIfFalse(_processing)
+            Dim oldScanner As Scanner = _scanner
             Try
                 ' Create the scanner
-                m_scanner = New Scanner(readerBag, CreateScannerOptions())
-                m_scanner.ErrorProvider = Me.ErrorProvider
+                _scanner = New Scanner(readerBag, CreateScannerOptions())
+                _scanner.ErrorProvider = Me.ErrorProvider
 
                 ProcessLoop()
 
             Finally
-                m_scanner = oldScanner
+                _scanner = oldScanner
             End Try
 
         End Sub
@@ -391,7 +391,7 @@ Namespace Parser
             Dim done As Boolean = False
             While Not done
 
-                Dim mark As ScannerMark = m_scanner.Mark()
+                Dim mark As ScannerMark = _scanner.Mark()
                 Try
 
                     Dim line As PreprocessorLine = Me.GetNextLine()
@@ -428,11 +428,11 @@ Namespace Parser
 
                 Catch ex As PreProcessorException
                     If ex.IsError Then
-                        m_errorProvider.AddError(ex.Message)
+                        _errorProvider.AddError(ex.Message)
                     Else
-                        m_errorProvider.AddWarning(ex.Message)
+                        _errorProvider.AddWarning(ex.Message)
                     End If
-                    m_scanner.Rollback(mark)
+                    _scanner.Rollback(mark)
                     GetNextLine()   ' Chew through the line
                 End Try
             End While
@@ -456,7 +456,7 @@ Namespace Parser
                 Dim name As String = list(1).Value
                 macro = New Macro(name, String.Empty)
             ElseIf list.Count = 1 Then
-                m_scanner.AddWarning("Encountered an empty #define")
+                _scanner.AddWarning("Encountered an empty #define")
             ElseIf list.Count > 3 _
                 AndAlso list(1).TokenType = TokenType.Word _
                 AndAlso list(2).TokenType = TokenType.ParenOpen Then
@@ -468,10 +468,10 @@ Namespace Parser
 
             If macro IsNot Nothing Then
                 Dim oldMacro As Macro = Nothing
-                If m_macroMap.TryGetValue(macro.Name, oldMacro) AndAlso oldMacro.IsPermanent Then
+                If _macroMap.TryGetValue(macro.Name, oldMacro) AndAlso oldMacro.IsPermanent Then
                     TraceToStream("Kept: {0} -> {1} Attempted Value {2}", oldMacro.Name, oldMacro.Value, macro.Value)
                 Else
-                    m_macroMap(macro.Name) = macro
+                    _macroMap(macro.Name) = macro
                     If macro.IsMethod Then
                         Dim method As MethodMacro = DirectCast(macro, MethodMacro)
                         TraceToStream("Defined: {0} -> {1}", macro.Name, method.MethodSignature)
@@ -519,7 +519,7 @@ Namespace Parser
             End While
 
             If defineToken Is Nothing OrElse nameToken Is Nothing Then
-                m_errorProvider.AddWarning("Error processing line: {0}", line.ToString())
+                _errorProvider.AddWarning("Error processing line: {0}", line.ToString())
                 Return New Macro(NativeSymbolBag.GenerateAnonymousName(), String.Empty)
             End If
 
@@ -636,11 +636,11 @@ Namespace Parser
             ThrowIfFalse(list(0).TokenType = TokenType.PoundUnDef)
 
             If list.Count <> 2 OrElse list(1).TokenType <> TokenType.Word Then
-                m_scanner.AddWarning("Error processing #undef")
+                _scanner.AddWarning("Error processing #undef")
             Else
                 Dim name As String = list(1).Value
-                If m_macroMap.ContainsKey(name) Then
-                    m_macroMap.Remove(name)
+                If _macroMap.ContainsKey(name) Then
+                    _macroMap.Remove(name)
                     TraceToStream("Undefined: {0}", name)
                 End If
             End If
@@ -656,7 +656,7 @@ Namespace Parser
         ''' <remarks></remarks>
         Private Sub ProcessPoundInclude(ByVal line As PreprocessorLine)
 
-            If Not m_options.FollowIncludes Then
+            If Not _options.FollowIncludes Then
                 Return
             End If
 
@@ -684,7 +684,7 @@ Namespace Parser
             End If
 
             If name Is Nothing Then
-                m_scanner.AddWarning("Invalid #include statement")
+                _scanner.AddWarning("Invalid #include statement")
                 Return
             End If
 
@@ -699,10 +699,10 @@ Namespace Parser
                     ProcessCore(New TextReaderBag(name, reader))
                 End Using
                 TraceToStream("include {0} end", name)
-            ElseIf m_options.IncludePathList.Count > 0 Then
+            ElseIf _options.IncludePathList.Count > 0 Then
                 ' Search through the path list
                 found = False
-                For Each prefix As String In m_options.IncludePathList
+                For Each prefix As String In _options.IncludePathList
                     Dim fullPath As String = Path.Combine(prefix, name)
                     If File.Exists(fullPath) Then
                         found = True
@@ -720,7 +720,7 @@ Namespace Parser
             End If
 
             If Not found Then
-                m_scanner.AddWarning("Could not locate include file {0}", name)
+                _scanner.AddWarning("Could not locate include file {0}", name)
                 TraceToStream("include {0} not followed", name)
             End If
 
@@ -746,7 +746,7 @@ Namespace Parser
 
             ' The object here is to find the branch of the conditional that should
             ' be processed
-            Dim isCondTrue As Boolean = m_eval.EvalauteConditional(line)
+            Dim isCondTrue As Boolean = _eval.EvalauteConditional(line)
             TraceToStream("{0}: {1}", isCondTrue, line.DisplayLine)
             If isCondTrue Then
                 ' Start another processing loop
@@ -762,7 +762,7 @@ Namespace Parser
         ''' <param name="line"></param>
         ''' <remarks></remarks>
         Private Sub ProcessPoundIfndef(ByVal line As PreprocessorLine)
-            Dim isCondTrue As Boolean = m_eval.EvalauteConditional(line)
+            Dim isCondTrue As Boolean = _eval.EvalauteConditional(line)
             TraceToStream("{0}: {1}", isCondTrue, line.DisplayLine)
             If Not isCondTrue Then
                 ' Start a processing loop
@@ -783,7 +783,7 @@ Namespace Parser
 
                 ' It's possible to have unmatched #if blocks.  If we hit the end of the stream this means
                 ' it is unbalanced so throw an exception
-                If m_scanner.EndOfStream Then
+                If _scanner.EndOfStream Then
                     Throw New PreProcessorException("Found unbalanced conditional preprocessor branch")
                 End If
 
@@ -797,7 +797,7 @@ Namespace Parser
                         Me.ProcessLoop()
                         done = True
                     Case TokenType.PoundElseIf
-                        If m_eval.EvalauteConditional(cur) Then
+                        If _eval.EvalauteConditional(cur) Then
                             Me.ProcessLoop()
                             done = True
                         End If
@@ -820,7 +820,7 @@ Namespace Parser
             Dim lastValidToken As Token = Nothing
             Dim done As Boolean = False
             While Not done
-                Dim token As Token = m_scanner.GetNextToken()
+                Dim token As Token = _scanner.GetNextToken()
                 line.TokenList.Add(token)
 
                 Dim isValid As Boolean
@@ -922,12 +922,12 @@ Namespace Parser
         ''' <returns></returns>
         ''' <remarks></remarks>
         Private Function PeekNextLine() As PreprocessorLine
-            Dim mark As ScannerMark = m_scanner.Mark()
+            Dim mark As ScannerMark = _scanner.Mark()
             Dim line As PreprocessorLine
             Try
                 line = GetNextLine()
             Finally
-                m_scanner.Rollback(mark)
+                _scanner.Rollback(mark)
             End Try
 
             Return line
@@ -946,7 +946,7 @@ Namespace Parser
                 End If
 
                 Dim macro As Macro = Nothing
-                If m_macroMap.TryGetValue(token.Value, macro) Then
+                If _macroMap.TryGetValue(token.Value, macro) Then
                     ' Remove the original token
                     list.RemoveAt(i)
 
@@ -979,7 +979,7 @@ Namespace Parser
             ' Do one more pass to check and see if we need a recursive replace
             Dim needAnotherPass As Boolean = False
             For Each cur As Token In line.TokenList
-                If cur.TokenType = TokenType.Word AndAlso m_macroMap.ContainsKey(cur.Value) Then
+                If cur.TokenType = TokenType.Word AndAlso _macroMap.ContainsKey(cur.Value) Then
                     needAnotherPass = True
                     Exit For
                 End If
@@ -1003,7 +1003,7 @@ Namespace Parser
                 Dim cur As Token = retList(i)
                 If cur.TokenType = TokenType.Text AndAlso args.IndexOf(cur) >= 0 Then
                     retList.RemoveAt(i)
-                    retList.InsertRange(i, Scanner.TokenizeText(cur.Value, m_scanner.Options))
+                    retList.InsertRange(i, Scanner.TokenizeText(cur.Value, _scanner.Options))
                 End If
 
                 i += 1
@@ -1143,27 +1143,27 @@ Namespace Parser
 #Region "Trace"
 
         Private Sub Trace(ByVal msg As String)
-            If m_options.Trace Then
-                m_outputStream.Write("// ")
-                m_outputStream.WriteLine(msg)
+            If _options.Trace Then
+                _outputStream.Write("// ")
+                _outputStream.WriteLine(msg)
             End If
         End Sub
 
         Private Sub TraceToStream(ByVal format As String, ByVal ParamArray args() As Object)
-            If m_options.Trace Then
+            If _options.Trace Then
                 Trace(String.Format(format, args))
             End If
         End Sub
 
         Private Sub TraceSkippedLine(ByVal line As PreprocessorLine)
-            If m_options.Trace Then
+            If _options.Trace Then
                 Trace(String.Format("Skipped: {0}", line.DisplayLine))
             End If
         End Sub
 
         Private Sub TraceMacroMap()
-            If m_options.Trace Then
-                Dim list As New List(Of Macro)(m_macroMap.Values)
+            If _options.Trace Then
+                Dim list As New List(Of Macro)(_macroMap.Values)
                 list.Sort(AddressOf TraceCompareMacros)
                 Trace("Macro Map Dump")
                 For Each cur As Macro In list
@@ -1184,7 +1184,7 @@ Namespace Parser
 
         Private Sub WriteToStream(ByVal line As PreprocessorLine)
             For Each token As Token In line.TokenList
-                m_outputStream.Write(token.Value)
+                _outputStream.Write(token.Value)
             Next
         End Sub
 

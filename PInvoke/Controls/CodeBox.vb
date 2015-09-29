@@ -22,7 +22,7 @@ Namespace Controls
             End Set
         End Property
 
-        Sub New()
+        Public Sub New()
 
             ' This call is required by the Windows Form Designer.
             InitializeComponent()

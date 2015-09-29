@@ -4,7 +4,7 @@ Imports System.Text
 Imports Microsoft.Win32
 Imports PInvoke.Contract
 
-Partial Class NativeStorage
+Public Partial Class NativeStorage
 
     <DebuggerDisplay("Id={Id} Kind={Kind}")> _
     Public Class TypeReference
@@ -18,7 +18,7 @@ Partial Class NativeStorage
     End Class
 
     <ThreadStatic()> _
-    Private Shared m_default As NativeStorage
+    Private Shared t_default As NativeStorage
 
     ''' <summary>
     ''' Default Instance to use if not explicitly given one
@@ -28,17 +28,17 @@ Partial Class NativeStorage
     ''' <remarks></remarks>
     Public Shared Property DefaultInstance() As NativeStorage
         Get
-            If m_default Is Nothing Then
-                m_default = New NativeStorage()
+            If t_default Is Nothing Then
+                t_default = New NativeStorage()
             End If
-            Return m_default
+            Return t_default
         End Get
         Set(ByVal value As NativeStorage)
-            m_default = value
+            t_default = value
         End Set
     End Property
 
-    Partial Class DefinedTypeDataTable
+    Public Partial Class DefinedTypeDataTable
         Private Sub DefinedTypeDataTable_ColumnChanging(ByVal sender As System.Object, ByVal e As System.Data.DataColumnChangeEventArgs) Handles Me.ColumnChanging
             If (e.Column.ColumnName = Me.IdColumn.ColumnName) Then
                 'Add user code here
@@ -49,25 +49,25 @@ Partial Class NativeStorage
 
 #Region "DefinedType Table"
 
-    Partial Class DefinedTypeDataTable
+    Public Partial Class DefinedTypeDataTable
 
-        Private m_cacheMap As Dictionary(Of String, DefinedTypeRow)
+        Private _cacheMap As Dictionary(Of String, DefinedTypeRow)
 
         Public Property CacheLookup() As Boolean
             Get
-                Return m_cacheMap IsNot Nothing
+                Return _cacheMap IsNot Nothing
             End Get
             Set(ByVal value As Boolean)
                 If value Then
-                    If m_cacheMap Is Nothing Then
+                    If _cacheMap Is Nothing Then
 
-                        m_cacheMap = New Dictionary(Of String, DefinedTypeRow)(StringComparer.Ordinal)
+                        _cacheMap = New Dictionary(Of String, DefinedTypeRow)(StringComparer.Ordinal)
                         For Each row As DefinedTypeRow In Me.Rows
-                            m_cacheMap(row.Name) = row
+                            _cacheMap(row.Name) = row
                         Next
                     End If
                 Else
-                    m_cacheMap = Nothing
+                    _cacheMap = Nothing
                 End If
             End Set
         End Property
@@ -79,8 +79,8 @@ Partial Class NativeStorage
             row.Name = name
             Me.AddDefinedTypeRow(row)
 
-            If m_cacheMap IsNot Nothing Then
-                m_cacheMap(name) = row
+            If _cacheMap IsNot Nothing Then
+                _cacheMap(name) = row
             End If
 
             Return row
@@ -96,8 +96,8 @@ Partial Class NativeStorage
         Public Function TryFindByName(ByVal name As String, ByRef dRow As DefinedTypeRow) As Boolean
 
             ' Use the map if we are caching lookups
-            If m_cacheMap IsNot Nothing Then
-                Return m_cacheMap.TryGetValue(name, dRow)
+            If _cacheMap IsNot Nothing Then
+                Return _cacheMap.TryGetValue(name, dRow)
             End If
 
             dRow = Nothing
@@ -139,7 +139,7 @@ Partial Class NativeStorage
 
     End Class
 
-    Partial Class DefinedTypeRow
+    Public Partial Class DefinedTypeRow
         Public Property Kind() As NativeSymbolKind
             Get
                 Return CType(Me.KindRaw, NativeSymbolKind)
@@ -162,7 +162,7 @@ Partial Class NativeStorage
 #End Region
 
 #Region "Member Table"
-    Partial Class MemberDataTable
+    Public Partial Class MemberDataTable
 
         Friend Function Add(ByVal dtRow As DefinedTypeRow, ByVal name As String, ByVal typeRef As TypeReference) As MemberRow
             Dim row As MemberRow = Me.NewMemberRow()
@@ -192,7 +192,7 @@ Partial Class NativeStorage
         End Function
     End Class
 
-    Partial Class MemberRow
+    Public Partial Class MemberRow
         Public Property TypeKind() As NativeSymbolKind
             Get
                 Return CType(TypeKindRaw, NativeSymbolKind)
@@ -207,7 +207,7 @@ Partial Class NativeStorage
 
 #Region "EnumValue Table"
 
-    Partial Class EnumValueDataTable
+    Public Partial Class EnumValueDataTable
 
         Public Function Add(ByVal dtRow As DefinedTypeRow, ByVal name As String, ByVal value As String) As EnumValueRow
             Dim row As EnumValueRow = Me.NewEnumValueRow()
@@ -255,24 +255,24 @@ Partial Class NativeStorage
 
 #Region "TypedefType Table"
 
-    Partial Class TypedefTypeDataTable
+    Public Partial Class TypedefTypeDataTable
 
-        Private m_cacheMap As Dictionary(Of String, TypedefTypeRow)
+        Private _cacheMap As Dictionary(Of String, TypedefTypeRow)
 
         Public Property CacheLookup() As Boolean
             Get
-                Return m_cacheMap IsNot Nothing
+                Return _cacheMap IsNot Nothing
             End Get
             Set(ByVal value As Boolean)
                 If value Then
-                    If m_cacheMap IsNot Nothing Then
-                        m_cacheMap = New Dictionary(Of String, TypedefTypeRow)(StringComparer.Ordinal)
+                    If _cacheMap IsNot Nothing Then
+                        _cacheMap = New Dictionary(Of String, TypedefTypeRow)(StringComparer.Ordinal)
                         For Each cur As TypedefTypeRow In Rows
-                            m_cacheMap(cur.Name) = cur
+                            _cacheMap(cur.Name) = cur
                         Next
                     End If
                 Else
-                    m_cacheMap = Nothing
+                    _cacheMap = Nothing
                 End If
             End Set
         End Property
@@ -284,16 +284,16 @@ Partial Class NativeStorage
             row.RealTypeKind = typeRef.Kind
             Me.AddTypedefTypeRow(row)
 
-            If m_cacheMap IsNot Nothing Then
-                m_cacheMap(name) = row
+            If _cacheMap IsNot Nothing Then
+                _cacheMap(name) = row
             End If
 
             Return row
         End Function
 
         Public Function TryFindByName(ByVal name As String, ByRef row As TypedefTypeRow) As Boolean
-            If m_cacheMap IsNot Nothing Then
-                Return m_cacheMap.TryGetValue(name, row)
+            If _cacheMap IsNot Nothing Then
+                Return _cacheMap.TryGetValue(name, row)
             End If
 
             Dim filter As String = String.Format( _
@@ -349,7 +349,7 @@ Partial Class NativeStorage
         End Function
     End Class
 
-    Partial Class TypedefTypeRow
+    Public Partial Class TypedefTypeRow
         Public Property RealTypeKind() As NativeSymbolKind
             Get
                 Return CType(RealTypeKindRaw, NativeSymbolKind)
@@ -363,8 +363,8 @@ Partial Class NativeStorage
 
 #Region "NamedType Table"
 
-    Partial Class NamedTypeDataTable
-        Private m_cacheMap As Dictionary(Of String, NamedTypeRow)
+    Public Partial Class NamedTypeDataTable
+        Private _cacheMap As Dictionary(Of String, NamedTypeRow)
 
         Private Shared Function CreateMoniker(ByVal qual As String, ByVal name As String, ByVal isConst As Boolean) As String
             Return qual & "#" & name & "#" & isConst.ToString()
@@ -372,18 +372,18 @@ Partial Class NativeStorage
 
         Public Property CacheLookup() As Boolean
             Get
-                Return m_cacheMap IsNot Nothing
+                Return _cacheMap IsNot Nothing
             End Get
             Set(ByVal value As Boolean)
                 If value Then
-                    If m_cacheMap Is Nothing Then
-                        m_cacheMap = New Dictionary(Of String, NamedTypeRow)
+                    If _cacheMap Is Nothing Then
+                        _cacheMap = New Dictionary(Of String, NamedTypeRow)
                         For Each row As NamedTypeRow In Rows
-                            m_cacheMap.Add(CreateMoniker(row.Qualification, row.Name, row.IsConst), row)
+                            _cacheMap.Add(CreateMoniker(row.Qualification, row.Name, row.IsConst), row)
                         Next
                     End If
                 Else
-                    m_cacheMap = Nothing
+                    _cacheMap = Nothing
                 End If
             End Set
         End Property
@@ -397,17 +397,17 @@ Partial Class NativeStorage
             row.IsConst = isConst
             Me.AddNamedTypeRow(row)
 
-            If m_cacheMap IsNot Nothing Then
-                m_cacheMap.Add(CreateMoniker(qual, name, isConst), row)
+            If _cacheMap IsNot Nothing Then
+                _cacheMap.Add(CreateMoniker(qual, name, isConst), row)
             End If
 
             Return row
         End Function
 
         Public Function TryFindByName(ByVal qual As String, ByVal name As String, ByVal isConst As Boolean, ByRef row As NamedTypeRow) As Boolean
-            If m_cacheMap IsNot Nothing Then
+            If _cacheMap IsNot Nothing Then
                 Dim moniker As String = CreateMoniker(qual, name, isConst)
-                Return m_cacheMap.TryGetValue(moniker, row)
+                Return _cacheMap.TryGetValue(moniker, row)
             End If
 
             Dim rows() As DataRow
@@ -446,7 +446,7 @@ Partial Class NativeStorage
 
 #Region "PointerType Table"
 
-    Partial Class PointerTypeDataTable
+    Public Partial Class PointerTypeDataTable
 
         Public Function Add(ByVal typeRef As TypeReference) As PointerTypeRow
             ThrowIfNull(typeRef)
@@ -487,7 +487,7 @@ Partial Class NativeStorage
 
     End Class
 
-    Partial Class PointerTypeRow
+    Public Partial Class PointerTypeRow
         Public Property RealTypeKind() As NativeSymbolKind
             Get
                 Return CType(RealTypeKindRaw, NativeSymbolKind)
@@ -502,7 +502,7 @@ Partial Class NativeStorage
 
 #Region "ArrayType Table"
 
-    Partial Class ArrayTypeDataTable
+    Public Partial Class ArrayTypeDataTable
 
         Public Function Add(ByVal count As Integer, ByVal typeRef As TypeReference) As ArrayTypeRow
             ThrowIfNull(typeRef)
@@ -543,7 +543,7 @@ Partial Class NativeStorage
         End Function
     End Class
 
-    Partial Class ArrayTypeRow
+    Public Partial Class ArrayTypeRow
         Public Property RealTypeKind() As NativeSymbolKind
             Get
                 Return CType(RealTypeKindRaw, NativeSymbolKind)
@@ -557,7 +557,7 @@ Partial Class NativeStorage
 #End Region
 
 #Region "Specialized Table"
-    Partial Class SpecializedTypeDataTable
+    Public Partial Class SpecializedTypeDataTable
 
         Public Function TryFindById(ByVal id As Integer, ByRef srow As SpecializedTypeRow) As Boolean
             srow = Nothing
@@ -600,7 +600,7 @@ Partial Class NativeStorage
         End Function
     End Class
 
-    Partial Class SpecializedTypeRow
+    Public Partial Class SpecializedTypeRow
         Public Property Kind() As NativeSymbolKind
             Get
                 Return CType(KindRaw, NativeSymbolKind)
@@ -624,7 +624,7 @@ Partial Class NativeStorage
 
 #Region "Constants Table"
 
-    Partial Class ConstantDataTable
+    Public Partial Class ConstantDataTable
 
         Public Function FindByNamePattern(ByVal pattern As String) As List(Of ConstantRow)
             Dim list As New List(Of ConstantRow)
@@ -681,7 +681,7 @@ Partial Class NativeStorage
 
     End Class
 
-    Partial Class ConstantRow
+    Public Partial Class ConstantRow
         Public Property Kind() As ConstantKind
             Get
                 Return CType(KindRaw, ConstantKind)
@@ -695,7 +695,7 @@ Partial Class NativeStorage
 #End Region
 
 #Region "Procedure Table"
-    Partial Class ProcedureDataTable
+    Public Partial Class ProcedureDataTable
 
         Public Function Add(ByVal name As String, ByVal dllName As String, ByVal conv As NativeCallingConvention, ByVal sigId As Integer) As ProcedureRow
             Dim row As ProcedureRow = Me.NewProcedureRow()
@@ -736,7 +736,7 @@ Partial Class NativeStorage
 
     End Class
 
-    Partial Class ProcedureRow
+    Public Partial Class ProcedureRow
         Public Property CallingConvention() As NativeCallingConvention
             Get
                 Return CType(ConventionRaw, NativeCallingConvention)
@@ -749,7 +749,7 @@ Partial Class NativeStorage
 #End Region
 
 #Region "Signature Table"
-    Partial Class SignatureDataTable
+    Public Partial Class SignatureDataTable
 
         Public Function TryLoadById(ByVal id As Int32, ByRef sigRow As SignatureRow) As Boolean
             Dim rows As DataRow() = Me.Select( _
@@ -764,7 +764,7 @@ Partial Class NativeStorage
         End Function
     End Class
 
-    Partial Class SignatureRow
+    Public Partial Class SignatureRow
         Public Property ReturnTypeKind() As NativeSymbolKind
             Get
                 Return CType(ReturnTypeKindRaw, NativeSymbolKind)
@@ -777,7 +777,7 @@ Partial Class NativeStorage
 #End Region
 
 #Region "Parameter Table"
-    Partial Class ParameterDataTable
+    Public Partial Class ParameterDataTable
         Public Function Add(ByVal sig As SignatureRow, ByVal name As String, ByVal typeRef As TypeReference, ByVal salId As String) As ParameterRow
             Dim row As ParameterRow = Me.NewParameterRow()
             row.Name = name
@@ -790,7 +790,7 @@ Partial Class NativeStorage
         End Function
     End Class
 
-    Partial Class ParameterRow
+    Public Partial Class ParameterRow
         Public Property TypeKind() As NativeSymbolKind
             Get
                 Return CType(TypeKindRaw, NativeSymbolKind)
@@ -804,7 +804,7 @@ Partial Class NativeStorage
 
 #Region "SalEntry Table"
 
-    Partial Class SalEntryDataTable
+    Public Partial Class SalEntryDataTable
 
         Public Function Add(ByVal type As SalEntryType, ByVal text As String) As SalEntryRow
             Dim row As SalEntryRow = Me.NewSalEntryRow()
@@ -859,7 +859,7 @@ Partial Class NativeStorage
 
     End Class
 
-    Partial Class SalEntryRow
+    Public Partial Class SalEntryRow
         Public Property Type() As SalEntryType
             Get
                 Return CType(TypeRaw, SalEntryType)

@@ -22,8 +22,8 @@ Namespace Parser
     ''' </summary>
     ''' <remarks></remarks>
     Public Class TextReaderBag
-        Private m_name As String
-        Private m_reader As TextReader
+        Private _name As String
+        Private _reader As TextReader
 
         ''' <summary>
         ''' Name of the stream
@@ -33,7 +33,7 @@ Namespace Parser
         ''' <remarks></remarks>
         Public ReadOnly Property Name() As String
             Get
-                Return m_name
+                Return _name
             End Get
         End Property
 
@@ -45,7 +45,7 @@ Namespace Parser
         ''' <remarks></remarks>
         Public ReadOnly Property TextReader() As IO.TextReader
             Get
-                Return m_reader
+                Return _reader
             End Get
         End Property
 
@@ -54,8 +54,8 @@ Namespace Parser
         End Sub
 
         Public Sub New(ByVal name As String, ByVal reader As IO.TextReader)
-            Me.m_name = name
-            Me.m_reader = reader
+            Me._name = name
+            Me._reader = reader
         End Sub
 
     End Class

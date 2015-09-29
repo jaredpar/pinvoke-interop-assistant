@@ -10,11 +10,11 @@ Namespace Parser
     ''' <remarks></remarks>
     <DebuggerDisplay("{Name} -> {Value}")> _
     Public Class Macro
-        Private m_name As String
-        Private m_value As String
-        Private m_isMethod As Boolean
-        Private m_isPermanent As Boolean
-        Private m_isFromParse As Boolean = True
+        Private _name As String
+        Private _value As String
+        Private _isMethod As Boolean
+        Private _isPermanent As Boolean
+        Private _isFromParse As Boolean = True
 
         ''' <summary>
         ''' Name of the Macro
@@ -24,10 +24,10 @@ Namespace Parser
         ''' <remarks></remarks>
         Public Property Name() As String
             Get
-                Return m_name
+                Return _name
             End Get
             Set(ByVal value As String)
-                m_name = value
+                _name = value
             End Set
         End Property
 
@@ -39,10 +39,10 @@ Namespace Parser
         ''' <remarks></remarks>
         Public Property Value() As String
             Get
-                Return m_value
+                Return _value
             End Get
             Set(ByVal val As String)
-                m_value = val
+                _value = val
             End Set
         End Property
 
@@ -54,10 +54,10 @@ Namespace Parser
         ''' <remarks></remarks>
         Public Property IsMethod() As Boolean
             Get
-                Return m_isMethod
+                Return _isMethod
             End Get
             Set(ByVal value As Boolean)
-                m_isMethod = value
+                _isMethod = value
             End Set
         End Property
 
@@ -69,10 +69,10 @@ Namespace Parser
         ''' <remarks></remarks>
         Public Property IsPermanent() As Boolean
             Get
-                Return m_isPermanent
+                Return _isPermanent
             End Get
             Set(ByVal value As Boolean)
-                m_isPermanent = value
+                _isPermanent = value
             End Set
         End Property
 
@@ -86,15 +86,15 @@ Namespace Parser
         ''' <remarks></remarks>
         Friend Property IsFromParse() As Boolean
             Get
-                Return m_isFromParse
+                Return _isFromParse
             End Get
             Set(ByVal value As Boolean)
-                m_isFromParse = value
+                _isFromParse = value
             End Set
         End Property
 
         Public Sub New(ByVal name As String)
-            m_name = name
+            _name = name
         End Sub
 
         Public Sub New(ByVal name As String, ByVal val As String)
@@ -102,9 +102,9 @@ Namespace Parser
         End Sub
 
         Public Sub New(ByVal name As String, ByVal val As String, ByVal permanent As Boolean)
-            m_name = name
-            m_value = val
-            m_isPermanent = permanent
+            _name = name
+            _value = val
+            _isPermanent = permanent
         End Sub
 
     End Class
@@ -116,9 +116,9 @@ Namespace Parser
     Public Class MethodMacro
         Inherits Macro
 
-        Private m_paramList As List(Of String)
-        Private m_bodyList As List(Of Token)
-        Private m_fullBodyList As List(Of Token)
+        Private _paramList As List(Of String)
+        Private _bodyList As List(Of Token)
+        Private _fullBodyList As List(Of Token)
 
         ''' <summary>
         ''' Text parameters of the macro
@@ -128,7 +128,7 @@ Namespace Parser
         ''' <remarks></remarks>
         Public ReadOnly Property Parameters() As List(Of String)
             Get
-                Return m_paramList
+                Return _paramList
             End Get
         End Property
 
@@ -140,7 +140,7 @@ Namespace Parser
         ''' <remarks></remarks>
         Public ReadOnly Property Body() As List(Of Token)
             Get
-                Return m_bodyList
+                Return _bodyList
             End Get
         End Property
 
@@ -152,7 +152,7 @@ Namespace Parser
         ''' <remarks></remarks>
         Public ReadOnly Property FullBody() As List(Of Token)
             Get
-                Return m_fullBodyList
+                Return _fullBodyList
             End Get
         End Property
 
@@ -166,9 +166,9 @@ Namespace Parser
             Get
                 Dim b As New Text.StringBuilder()
                 b.Append("(")
-                For i As Integer = 0 To m_paramList.Count - 1
-                    b.Append(m_paramList(i))
-                    If i + 1 < m_paramList.Count Then
+                For i As Integer = 0 To _paramList.Count - 1
+                    b.Append(_paramList(i))
+                    If i + 1 < _paramList.Count Then
                         b.Append(",")
                     End If
                 Next
@@ -186,23 +186,23 @@ Namespace Parser
             MyBase.Value = name & "()"
             MyBase.IsMethod = True
 
-            m_paramList = paramList
-            m_bodyList = body
-            m_fullBodyList = fullBody
+            _paramList = paramList
+            _bodyList = body
+            _fullBodyList = fullBody
         End Sub
 
         Public Function Replace(ByVal argList As List(Of Token)) As List(Of Token)
-            If argList.Count <> m_paramList.Count Then
+            If argList.Count <> _paramList.Count Then
                 Return New List(Of Token)
             End If
 
             ' Replace is done in 2 passes.  The first puts the arguments into the token stream.
             Dim retList As New List(Of Token)
-            For Each item As Token In m_bodyList
+            For Each item As Token In _bodyList
                 If item.TokenType <> TokenType.Word Then
                     retList.Add(item)
                 Else
-                    Dim index As Int32 = m_paramList.IndexOf(item.Value)
+                    Dim index As Int32 = _paramList.IndexOf(item.Value)
                     If index >= 0 Then
                         retList.Add(argList(index))
                     Else

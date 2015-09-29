@@ -29,12 +29,12 @@ Namespace Transform
     ''' <remarks></remarks>
     Public Class CodeTransform
 
-        Private m_lang As LanguageType
-        Private m_typeMap As New Dictionary(Of String, NativeSymbol)(StringComparer.Ordinal)
-        Private m_symbolValueMap As New Dictionary(Of String, NativeSymbol)(StringComparer.Ordinal)
+        Private _lang As LanguageType
+        Private _typeMap As New Dictionary(Of String, NativeSymbol)(StringComparer.Ordinal)
+        Private _symbolValueMap As New Dictionary(Of String, NativeSymbol)(StringComparer.Ordinal)
 
         Public Sub New(ByVal lang As LanguageType)
-            m_lang = lang
+            _lang = lang
         End Sub
 
         ''' <summary>
@@ -627,7 +627,7 @@ Namespace Transform
 
             ' It's not legal for a symbol to be used as part of it's initialization expression in most languages.  
             ' There for we need to mark it as the initialization member so the generated will output NULL in it's place
-            m_symbolValueMap.Add(target.Name, target)
+            _symbolValueMap.Add(target.Name, target)
             Try
                 Dim ex As Exception = Nothing
                 If TryGenerateValueExpression(ntExpr, member.InitExpression, member.Type, ex) Then
@@ -641,7 +641,7 @@ Namespace Transform
                     Return False
                 End If
             Finally
-                m_symbolValueMap.Remove(target.Name)
+                _symbolValueMap.Remove(target.Name)
             End Try
         End Function
 
@@ -772,14 +772,14 @@ Namespace Transform
             ThrowIfNull(node)
 
             Dim left As CodeExpression = Me.GenerateValueExpressionImpl(node.LeftNode, exprType)
-            Return New CodeNegativeExpression(m_lang, left)
+            Return New CodeNegativeExpression(_lang, left)
         End Function
 
         Private Function GenerateValueExpressionNegation(ByVal node As ExpressionNode, ByRef exprType As CodeTypeReference) As CodeExpression
             ThrowIfNull(node)
 
             Dim left As CodeExpression = Me.GenerateValueExpressionImpl(node.LeftNode, exprType)
-            Return New CodeNotExpression(m_lang, left)
+            Return New CodeNotExpression(_lang, left)
         End Function
 
         Private Function GenerateValueExpressionBinaryOperation(ByVal node As ExpressionNode, ByRef exprType As CodeTypeReference) As CodeExpression
@@ -854,7 +854,7 @@ Namespace Transform
             Dim leftType As CodeTypeReference = Nothing
             Dim rightType As CodeTypeReference = Nothing
             Dim expr As CodeExpression = New CodeShiftExpression(
-                Me.m_lang,
+                Me._lang,
                 isLeft,
                 GenerateValueExpressionImpl(node.LeftNode, leftType),
                 GenerateValueExpressionImpl(node.RightNode, rightType))
@@ -891,7 +891,7 @@ Namespace Transform
                     Dim ns As NativeSymbol = ntVal.SymbolValue
 
                     ' Prevent the generation of a circular reference
-                    If m_symbolValueMap.ContainsKey(ns.Name) Then
+                    If _symbolValueMap.ContainsKey(ns.Name) Then
                         leafType = New CodeTypeReference(GetType(Object))
                         Return New CodePrimitiveExpression(Nothing)
                     End If
@@ -938,11 +938,11 @@ Namespace Transform
         Private Function CalculateConstantType(ByVal nConst As NativeConstant) As CodeTypeReference
             If nConst.Value Is Nothing Then
                 Return New CodeTypeReference(GetType(Integer))
-            ElseIf m_typeMap.ContainsKey(nConst.Name) Then
+            ElseIf _typeMap.ContainsKey(nConst.Name) Then
                 Return New CodeTypeReference(GetType(Object))
             End If
 
-            m_typeMap.Add(nConst.Name, nConst)
+            _typeMap.Add(nConst.Name, nConst)
             Try
                 Dim codeExpr As CodeExpression = Nothing
                 Dim codeType As CodeTypeReference = Nothing
@@ -953,7 +953,7 @@ Namespace Transform
 
                 Return codeType
             Finally
-                m_typeMap.Remove(nConst.Name)
+                _typeMap.Remove(nConst.Name)
             End Try
         End Function
 

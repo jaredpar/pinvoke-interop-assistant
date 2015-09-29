@@ -9,20 +9,20 @@ Namespace Transform
     Friend MustInherit Class CodeCustomExpression
         Inherits CodeSnippetExpression
 
-        Private m_lang As LanguageType
+        Private _lang As LanguageType
 
         Protected Property LanguageType() As LanguageType
             Get
-                Return m_lang
+                Return _lang
             End Get
             Set(ByVal value As LanguageType)
-                m_lang = value
+                _lang = value
                 UpdateValue()
             End Set
         End Property
 
         Protected Sub New(ByVal lang As LanguageType)
-            m_lang = lang
+            _lang = lang
         End Sub
 
         Public Sub ResetValue()
@@ -32,13 +32,13 @@ Namespace Transform
         Protected MustOverride Sub UpdateValue()
 
         Protected Function GetProvider() As CodeDomProvider
-            Select Case m_lang
+            Select Case _lang
                 Case Transform.LanguageType.CSharp
                     Return New Microsoft.CSharp.CSharpCodeProvider()
                 Case Transform.LanguageType.VisualBasic
                     Return New Microsoft.VisualBasic.VBCodeProvider()
                 Case Else
-                    InvalidEnumValue(m_lang)
+                    InvalidEnumValue(_lang)
                     Return Nothing
             End Select
         End Function
@@ -53,14 +53,14 @@ Namespace Transform
     Friend Class CodeNotExpression
         Inherits CodeCustomExpression
 
-        Private m_expr As CodeExpression
+        Private _expr As CodeExpression
 
         Friend Property Expression() As CodeExpression
             Get
-                Return m_expr
+                Return _expr
             End Get
             Set(ByVal value As CodeExpression)
-                m_expr = value
+                _expr = value
                 UpdateValue()
             End Set
         End Property
@@ -68,7 +68,7 @@ Namespace Transform
 
         Friend Sub New(ByVal lang As LanguageType, ByVal expr As CodeExpression)
             MyBase.New(lang)
-            m_expr = expr
+            _expr = expr
             UpdateValue()
         End Sub
 
@@ -87,7 +87,7 @@ Namespace Transform
             End Select
 
             Using writer As New IO.StringWriter()
-                provider.GenerateCodeFromExpression(m_expr, writer, New CodeGeneratorOptions())
+                provider.GenerateCodeFromExpression(_expr, writer, New CodeGeneratorOptions())
                 Value = prefix & writer.ToString() & ")"
             End Using
         End Sub
@@ -101,27 +101,27 @@ Namespace Transform
     Friend Class CodeShiftExpression
         Inherits CodeCustomExpression
 
-        Private m_leftExpr As CodeExpression
-        Private m_rightExpr As CodeExpression
-        Private m_shiftLeft As Boolean
+        Private _leftExpr As CodeExpression
+        Private _rightExpr As CodeExpression
+        Private _shiftLeft As Boolean
 
         Public ReadOnly Property Left() As CodeExpression
             Get
-                Return m_leftExpr
+                Return _leftExpr
             End Get
         End Property
 
         Public ReadOnly Property Right() As CodeExpression
             Get
-                Return m_rightExpr
+                Return _rightExpr
             End Get
         End Property
 
         Friend Sub New(ByVal lang As LanguageType, ByVal shiftLeft As Boolean, ByVal left As CodeExpression, ByVal right As CodeExpression)
             MyBase.New(lang)
-            m_leftExpr = left
-            m_rightExpr = right
-            m_shiftLeft = shiftLeft
+            _leftExpr = left
+            _rightExpr = right
+            _shiftLeft = shiftLeft
             UpdateValue()
         End Sub
 
@@ -131,19 +131,19 @@ Namespace Transform
             Dim expr As String = "("
 
             Using writer As New IO.StringWriter
-                provider.GenerateCodeFromExpression(m_leftExpr, writer, New CodeGeneratorOptions())
+                provider.GenerateCodeFromExpression(_leftExpr, writer, New CodeGeneratorOptions())
                 expr += writer.ToString()
                 expr += ")"
             End Using
 
-            If m_shiftLeft Then
+            If _shiftLeft Then
                 expr += " << "
             Else
                 expr += " >> "
             End If
 
             Using writer As New IO.StringWriter
-                provider.GenerateCodeFromExpression(m_rightExpr, writer, New CodeGeneratorOptions())
+                provider.GenerateCodeFromExpression(_rightExpr, writer, New CodeGeneratorOptions())
                 expr += String.Format("({0})", writer.ToString())
             End Using
 
@@ -160,14 +160,14 @@ Namespace Transform
     Friend Class CodeNegativeExpression
         Inherits CodeCustomExpression
 
-        Private m_expr As CodeExpression
+        Private _expr As CodeExpression
 
         Friend Property Expression() As CodeExpression
             Get
-                Return m_expr
+                Return _expr
             End Get
             Set(ByVal value As CodeExpression)
-                m_expr = value
+                _expr = value
                 UpdateValue()
             End Set
         End Property
@@ -175,7 +175,7 @@ Namespace Transform
 
         Friend Sub New(ByVal lang As LanguageType, ByVal expr As CodeExpression)
             MyBase.New(lang)
-            m_expr = expr
+            _expr = expr
             UpdateValue()
         End Sub
 
@@ -183,7 +183,7 @@ Namespace Transform
         Protected Overrides Sub UpdateValue()
             Dim provider As CodeDomProvider = GetProvider()
             Using writer As New IO.StringWriter()
-                provider.GenerateCodeFromExpression(m_expr, writer, New CodeGeneratorOptions())
+                provider.GenerateCodeFromExpression(_expr, writer, New CodeGeneratorOptions())
                 Value = "-" & writer.ToString()
             End Using
         End Sub
@@ -197,26 +197,26 @@ Namespace Transform
     Friend Class CodeDirectionalSymbolExpression
         Inherits CodeCustomExpression
 
-        Private m_symbolExpr As CodeExpression
-        Private m_direction As FieldDirection
+        Private _symbolExpr As CodeExpression
+        Private _direction As FieldDirection
 
         Public ReadOnly Property Expression() As CodeExpression
             Get
-                Return m_symbolExpr
+                Return _symbolExpr
             End Get
         End Property
 
         Private Sub New(ByVal lang As LanguageType, ByVal symbolExpr As CodeExpression, ByVal direction As FieldDirection)
             MyBase.New(lang)
-            m_symbolExpr = symbolExpr
-            m_direction = direction
+            _symbolExpr = symbolExpr
+            _direction = direction
         End Sub
 
         <SuppressMessage("Microsoft.Security", "CA2122")> _
         Protected Overrides Sub UpdateValue()
             Dim provider As CodeDomProvider = MyBase.GetProvider()
             Dim expr As String
-            Select Case m_direction
+            Select Case _direction
                 Case FieldDirection.Out
                     expr = "out "
                 Case FieldDirection.Ref
@@ -226,7 +226,7 @@ Namespace Transform
             End Select
 
             Using writer As New IO.StringWriter
-                provider.GenerateCodeFromExpression(m_symbolExpr, writer, New CodeGeneratorOptions())
+                provider.GenerateCodeFromExpression(_symbolExpr, writer, New CodeGeneratorOptions())
                 expr += writer.ToString()
             End Using
 

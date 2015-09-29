@@ -10,16 +10,16 @@ Imports System.Runtime.InteropServices
 ' Review the values of the assembly attributes
 
 'The following GUID is for the ID of the typelib if this project is exposed to COM
-<Assembly: Guid("40409a4a-6529-4096-b34e-5accbab81397")> 
+<Assembly: Guid("40409a4a-6529-4096-b34e-5accbab81397")>
 
 #If Not RAZZLE_BUILD
 
-<Assembly: AssemblyTitle("PInvoke")> 
-<Assembly: AssemblyDescription("")> 
-<Assembly: AssemblyCompany("")> 
-<Assembly: AssemblyProduct("PInvoke")> 
-<Assembly: AssemblyCopyright("Copyright ©  2006")> 
-<Assembly: AssemblyTrademark("")> 
+<Assembly: AssemblyTitle("PInvoke")>
+<Assembly: AssemblyDescription("")>
+<Assembly: AssemblyCompany("")>
+<Assembly: AssemblyProduct("PInvoke")>
+<Assembly: AssemblyCopyright("Copyright ©  2006")>
+<Assembly: AssemblyTrademark("")>
 
 <Assembly: ComVisible(False)>
 
@@ -34,7 +34,7 @@ Imports System.Runtime.InteropServices
 ' by using the '*' as shown below:
 ' <Assembly: AssemblyVersion("1.0.*")> 
 
-<Assembly: AssemblyVersion(Constants.Version)> 
-<Assembly: AssemblyFileVersion("1.0.0.0")> 
+<Assembly: AssemblyVersion(Constants.Version)>
+<Assembly: AssemblyFileVersion("1.0.0.0")>
 
 #End If

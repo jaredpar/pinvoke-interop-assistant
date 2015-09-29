@@ -12,8 +12,8 @@ Namespace Controls
             Public InitialMacroList As List(Of Macro)
         End Class
 
-        Private m_initialMacroList As List(Of Macro)
-        Private m_changed As Boolean
+        Private _initialMacroList As List(Of Macro)
+        Private _changed As Boolean
 
         Public Property Code() As String
             Get
@@ -30,21 +30,21 @@ Namespace Controls
         End Sub
 
         Private Sub RunWorker()
-            m_changed = False
+            _changed = False
             m_errorsTb.Text = "Parsing ..."
-            If m_initialMacroList Is Nothing Then
-                m_initialMacroList = NativeStorage.DefaultInstance.LoadAllMacros()
+            If _initialMacroList Is Nothing Then
+                _initialMacroList = NativeStorage.DefaultInstance.LoadAllMacros()
             End If
 
             Dim data As New Data()
-            data.InitialMacroList = m_initialMacroList
+            data.InitialMacroList = _initialMacroList
             data.Text = m_codeTb.Text
             m_bgWorker.RunWorkerAsync(data)
         End Sub
 
         Private Sub OnCodeChanged(ByVal sender As Object, ByVal e As EventArgs) Handles m_codeTb.TextChanged
             If m_bgWorker.IsBusy Then
-                m_changed = True
+                _changed = True
             Else
                 RunWorker()
             End If
@@ -52,7 +52,7 @@ Namespace Controls
 
         Private Sub OnCompleteBackgroundCompile(ByVal sender As System.Object, ByVal e As System.ComponentModel.RunWorkerCompletedEventArgs) Handles m_bgWorker.RunWorkerCompleted
             m_errorsTb.Text = DirectCast(e.Result, String)
-            If m_changed Then
+            If _changed Then
                 RunWorker()
             End If
         End Sub

@@ -16,11 +16,11 @@ Namespace Controls
     ''' </summary>
     ''' <remarks></remarks>
     Public Class IncrementalSearch
-        Private m_isSearching As Boolean
-        Private m_delayTime As TimeSpan = TimeSpan.FromSeconds(0.2)
-        Private m_enumerator As IEnumerator
-        Private m_found As New List(Of Object)
-        Private m_filter As Filter
+        Private _isSearching As Boolean
+        Private _delayTime As TimeSpan = TimeSpan.FromSeconds(0.2)
+        Private _enumerator As IEnumerator
+        Private _found As New List(Of Object)
+        Private _filter As Filter
 
         ''' <summary>
         ''' Whether or not the search is completed
@@ -30,27 +30,27 @@ Namespace Controls
         ''' <remarks></remarks>
         Public ReadOnly Property IsCompleted() As Boolean
             Get
-                Return m_enumerator Is Nothing
+                Return _enumerator Is Nothing
             End Get
         End Property
 
         Public Property DelayTime() As TimeSpan
             Get
-                Return m_delayTime
+                Return _delayTime
             End Get
             Set(ByVal value As TimeSpan)
-                m_delayTime = value
+                _delayTime = value
             End Set
         End Property
 
         Public Sub New(ByVal enumerable As IEnumerable, ByVal cb As Filter)
-            m_enumerator = enumerable.GetEnumerator()
-            m_filter = cb
+            _enumerator = enumerable.GetEnumerator()
+            _filter = cb
         End Sub
 
         Public Sub Cancel()
-            If m_enumerator IsNot Nothing Then
-                m_enumerator = Nothing
+            If _enumerator IsNot Nothing Then
+                _enumerator = Nothing
             End If
         End Sub
 
@@ -58,7 +58,7 @@ Namespace Controls
             If IsCompleted Then
                 Dim res2 As New Result
                 res2.Completed = True
-                res2.AllFound = m_found
+                res2.AllFound = _found
                 res2.IncrementalFound = New List(Of Object)()
                 Return res2
             End If
@@ -67,27 +67,27 @@ Namespace Controls
             Dim list As New List(Of Object)
             Dim completed As Boolean = False
             Do
-                If Not m_enumerator.MoveNext() Then
-                    m_enumerator = Nothing
+                If Not _enumerator.MoveNext() Then
+                    _enumerator = Nothing
                     completed = True
                     Exit Do
                 End If
 
-                Dim cur As Object = m_enumerator.Current
-                If m_filter(cur) Then
+                Dim cur As Object = _enumerator.Current
+                If _filter(cur) Then
                     list.Add(cur)
                 End If
 
-                If (DateTime.Now - start) > m_delayTime Then
+                If (DateTime.Now - start) > _delayTime Then
                     Exit Do
                 End If
             Loop
 
-            m_found.AddRange(list)
+            _found.AddRange(list)
 
             Dim res As New Result
             res.Completed = completed
-            res.AllFound = m_found
+            res.AllFound = _found
             res.IncrementalFound = list
             Return res
         End Function

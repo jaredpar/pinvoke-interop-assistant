@@ -14,9 +14,9 @@ Namespace Transform
     ''' </summary>
     ''' <remarks></remarks>
     Public Class BasicConverter
-        Private m_ns As NativeStorage
-        Private m_type As LanguageType
-        Private m_transformKind As TransformKindFlags = TransformKindFlags.All
+        Private _ns As NativeStorage
+        Private _type As LanguageType
+        Private _transformKind As TransformKindFlags = TransformKindFlags.All
 
         ''' <summary>
         ''' Native storage to use when resolving types
@@ -26,10 +26,10 @@ Namespace Transform
         ''' <remarks></remarks>
         Public Property NativeStorage() As NativeStorage
             Get
-                Return m_ns
+                Return _ns
             End Get
             Set(ByVal value As NativeStorage)
-                m_ns = value
+                _ns = value
             End Set
         End Property
 
@@ -41,19 +41,19 @@ Namespace Transform
         ''' <remarks></remarks>
         Public Property LanguageType() As LanguageType
             Get
-                Return m_type
+                Return _type
             End Get
             Set(ByVal value As LanguageType)
-                m_type = value
+                _type = value
             End Set
         End Property
 
         Public Property TransformKindFlags() As TransformKindFlags
             Get
-                Return m_transformKind
+                Return _transformKind
             End Get
             Set(ByVal value As TransformKindFlags)
-                m_transformKind = value
+                _transformKind = value
             End Set
         End Property
 
@@ -66,12 +66,12 @@ Namespace Transform
         End Sub
 
         Public Sub New(ByVal type As LanguageType, ByVal ns As NativeStorage)
-            m_ns = ns
-            m_type = type
+            _ns = ns
+            _type = type
         End Sub
 
         Public Function ConvertToCodeDom(ByVal c As NativeConstant, ByVal ep As ErrorProvider) As CodeTypeDeclarationCollection
-            Dim bag As New NativeSymbolBag(m_ns)
+            Dim bag As New NativeSymbolBag(_ns)
             bag.AddConstant(c)
             Return ConvertBagToCodeDom(bag, ep)
         End Function
@@ -83,7 +83,7 @@ Namespace Transform
         End Function
 
         Public Function ConvertToCodeDom(ByVal typedef As NativeTypeDef, ByVal ep As ErrorProvider) As CodeTypeDeclarationCollection
-            Dim bag As New NativeSymbolBag(m_ns)
+            Dim bag As New NativeSymbolBag(_ns)
             bag.AddTypedef(typedef)
             Return ConvertBagToCodeDom(bag, ep)
         End Function
@@ -95,7 +95,7 @@ Namespace Transform
         End Function
 
         Public Function ConvertToCodeDom(ByVal definedNt As NativeDefinedType, ByVal ep As ErrorProvider) As CodeTypeDeclarationCollection
-            Dim bag As New NativeSymbolBag(m_ns)
+            Dim bag As New NativeSymbolBag(_ns)
             bag.AddDefinedType(definedNt)
             Return ConvertBagToCodeDom(bag, ep)
         End Function
@@ -107,7 +107,7 @@ Namespace Transform
         End Function
 
         Public Function ConvertToCodeDom(ByVal proc As NativeProcedure, ByVal ep As ErrorProvider) As CodeTypeDeclarationCollection
-            Dim bag As New NativeSymbolBag(m_ns)
+            Dim bag As New NativeSymbolBag(_ns)
             bag.AddProcedure(proc)
             Return ConvertBagToCodeDom(bag, ep)
         End Function
@@ -152,13 +152,13 @@ Namespace Transform
             If code Is Nothing Then : Throw New ArgumentNullException("code") : End If
             If ep Is Nothing Then : Throw New ArgumentNullException("ep") : End If
 
-            Dim analyzer As NativeCodeAnalyzer = NativeCodeAnalyzerFactory.CreateForMiniParse(OsVersion.WindowsVista, m_ns.LoadAllMacros())
+            Dim analyzer As NativeCodeAnalyzer = NativeCodeAnalyzerFactory.CreateForMiniParse(OsVersion.WindowsVista, _ns.LoadAllMacros())
             Dim bag As NativeSymbolBag
             Using reader As New IO.StringReader(code)
                 Dim result As NativeCodeAnalyzerResult = analyzer.Analyze(reader)
 
                 ep.Append(result.ErrorProvider)
-                bag = NativeSymbolBag.CreateFrom(result, m_ns)
+                bag = NativeSymbolBag.CreateFrom(result, _ns)
             End Using
 
             Return ConvertBagToCodeDom(bag, ep)
@@ -193,7 +193,7 @@ Namespace Transform
             Dim commentStart As String
 
             ' Generate based on the language
-            Select Case m_type
+            Select Case _type
                 Case Transform.LanguageType.VisualBasic
                     commentStart = "'"
                     provider = New Microsoft.VisualBasic.VBCodeProvider()
@@ -201,7 +201,7 @@ Namespace Transform
                     commentStart = "//"
                     provider = New Microsoft.CSharp.CSharpCodeProvider()
                 Case Else
-                    InvalidEnumValue(m_type)
+                    InvalidEnumValue(_type)
                     Return String.Empty
             End Select
 
@@ -217,7 +217,7 @@ Namespace Transform
                 provider.GenerateCodeFromMember(ctd, writer, New Compiler.CodeGeneratorOptions())
             Next
 
-            If m_type = Transform.LanguageType.CSharp Then
+            If _type = Transform.LanguageType.CSharp Then
                 ' CSharp specific fixup
                 Return FixupCSharpCode(writer.ToString())
             Else
@@ -245,8 +245,8 @@ Namespace Transform
             bag.TryResolveSymbolsAndValues(ep)
 
             ' Create the codedom transform
-            Dim transform As New CodeTransform(Me.m_type)
-            Dim marshalUtil As New MarshalTransform(Me.m_type, m_transformKind)
+            Dim transform As New CodeTransform(Me._type)
+            Dim marshalUtil As New MarshalTransform(Me._type, _transformKind)
             Dim col As New CodeTypeDeclarationCollection()
 
             ' Only output the constants if there are actually any

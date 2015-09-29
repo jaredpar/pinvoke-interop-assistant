@@ -7,16 +7,16 @@ Imports System.Collections.Generic
 ''' <remarks></remarks>
 Public Class NativeSymbolBag
 
-    Private m_constMap As New Dictionary(Of String, NativeConstant)(StringComparer.Ordinal)
-    Private m_definedMap As New Dictionary(Of String, NativeDefinedType)(StringComparer.Ordinal)
-    Private m_typeDefMap As New Dictionary(Of String, NativeTypeDef)(StringComparer.Ordinal)
-    Private m_procMap As New Dictionary(Of String, NativeProcedure)(StringComparer.Ordinal)
-    Private m_valueMap As New Dictionary(Of String, NativeSymbol)(StringComparer.Ordinal)
-    Private m_storageLookup As NativeStorage
+    Private _constMap As New Dictionary(Of String, NativeConstant)(StringComparer.Ordinal)
+    Private _definedMap As New Dictionary(Of String, NativeDefinedType)(StringComparer.Ordinal)
+    Private _typeDefMap As New Dictionary(Of String, NativeTypeDef)(StringComparer.Ordinal)
+    Private _procMap As New Dictionary(Of String, NativeProcedure)(StringComparer.Ordinal)
+    Private _valueMap As New Dictionary(Of String, NativeSymbol)(StringComparer.Ordinal)
+    Private _storageLookup As NativeStorage
 
     Public ReadOnly Property Count() As Integer
         Get
-            Return m_constMap.Count + m_definedMap.Count + m_typeDefMap.Count + m_procMap.Count + m_valueMap.Count
+            Return _constMap.Count + _definedMap.Count + _typeDefMap.Count + _procMap.Count + _valueMap.Count
         End Get
     End Property
 
@@ -28,7 +28,7 @@ Public Class NativeSymbolBag
     ''' <remarks></remarks>
     Public ReadOnly Property NativeDefinedTypes() As IEnumerable(Of NativeDefinedType)
         Get
-            Return m_definedMap.Values
+            Return _definedMap.Values
         End Get
     End Property
 
@@ -40,7 +40,7 @@ Public Class NativeSymbolBag
     ''' <remarks></remarks>
     Public ReadOnly Property NativeTypedefs() As IEnumerable(Of NativeTypeDef)
         Get
-            Return m_typeDefMap.Values
+            Return _typeDefMap.Values
         End Get
     End Property
 
@@ -52,7 +52,7 @@ Public Class NativeSymbolBag
     ''' <remarks></remarks>
     Public ReadOnly Property NativeProcedures() As IEnumerable(Of NativeProcedure)
         Get
-            Return m_procMap.Values
+            Return _procMap.Values
         End Get
     End Property
 
@@ -64,7 +64,7 @@ Public Class NativeSymbolBag
     ''' <remarks></remarks>
     Public ReadOnly Property NativeConstants() As IEnumerable(Of NativeConstant)
         Get
-            Return m_constMap.Values
+            Return _constMap.Values
         End Get
     End Property
 
@@ -76,10 +76,10 @@ Public Class NativeSymbolBag
     ''' <remarks></remarks>
     Public Property NativeStorageLookup() As NativeStorage
         Get
-            Return m_storageLookup
+            Return _storageLookup
         End Get
         Set(ByVal value As NativeStorage)
-            m_storageLookup = value
+            _storageLookup = value
         End Set
     End Property
 
@@ -94,7 +94,7 @@ Public Class NativeSymbolBag
     Public Sub New(ByVal ns As NativeStorage)
         If ns Is Nothing Then : Throw New ArgumentNullException("ns") : End If
 
-        m_storageLookup = ns
+        _storageLookup = ns
     End Sub
 
     ''' <summary>
@@ -109,7 +109,7 @@ Public Class NativeSymbolBag
             nt.Name = GenerateAnonymousName()
         End If
 
-        m_definedMap.Add(nt.Name, nt)
+        _definedMap.Add(nt.Name, nt)
 
         Dim ntEnum As NativeEnum = TryCast(nt, NativeEnum)
         If ntEnum IsNot Nothing Then
@@ -128,7 +128,7 @@ Public Class NativeSymbolBag
     ''' <remarks></remarks>
     Public Function TryFindDefinedType(ByVal name As String, ByRef nt As NativeDefinedType) As Boolean
         If name Is Nothing Then : Throw New ArgumentNullException("name") : End If
-        Return m_definedMap.TryGetValue(name, nt)
+        Return _definedMap.TryGetValue(name, nt)
     End Function
 
     Public Function TryFindOrLoadDefinedType(ByVal name As String, ByRef nt As NativeDefinedType) As Boolean
@@ -143,7 +143,7 @@ Public Class NativeSymbolBag
             Return True
         End If
 
-        If m_storageLookup.TryLoadDefined(name, nt) Then
+        If _storageLookup.TryLoadDefined(name, nt) Then
             AddDefinedType(nt)
             fromStorage = True
             Return True
@@ -160,7 +160,7 @@ Public Class NativeSymbolBag
     Public Sub AddTypedef(ByVal nt As NativeTypeDef)
         If nt Is Nothing Then : Throw New ArgumentNullException("nt") : End If
 
-        m_typeDefMap.Add(nt.Name, nt)
+        _typeDefMap.Add(nt.Name, nt)
     End Sub
 
 
@@ -173,7 +173,7 @@ Public Class NativeSymbolBag
     ''' <remarks></remarks>
     Public Function TryFindTypedef(ByVal name As String, ByRef nt As NativeTypeDef) As Boolean
         If name Is Nothing Then : Throw New ArgumentNullException("name") : End If
-        Return m_typeDefMap.TryGetValue(name, nt)
+        Return _typeDefMap.TryGetValue(name, nt)
     End Function
 
     Public Function TryFindOrLoadTypedef(ByVal name As String, ByRef nt As NativeTypeDef) As Boolean
@@ -183,7 +183,7 @@ Public Class NativeSymbolBag
             Return True
         End If
 
-        If m_storageLookup.TryLoadTypedef(name, nt) Then
+        If _storageLookup.TryLoadTypedef(name, nt) Then
             AddTypedef(nt)
             Return True
         End If
@@ -199,7 +199,7 @@ Public Class NativeSymbolBag
     Public Sub AddProcedure(ByVal proc As NativeProcedure)
         If proc Is Nothing Then : Throw New ArgumentNullException("proc") : End If
 
-        m_procMap.Add(proc.Name, proc)
+        _procMap.Add(proc.Name, proc)
     End Sub
 
     ''' <summary>
@@ -212,7 +212,7 @@ Public Class NativeSymbolBag
     Public Function TryFindProcedure(ByVal name As String, ByRef proc As NativeProcedure) As Boolean
         If name Is Nothing Then : Throw New ArgumentNullException("name") : End If
 
-        Return m_procMap.TryGetValue(name, proc)
+        Return _procMap.TryGetValue(name, proc)
     End Function
 
     Public Function TryFindOrLoadProcedure(ByVal name As String, ByRef proc As NativeProcedure) As Boolean
@@ -221,7 +221,7 @@ Public Class NativeSymbolBag
             Return True
         End If
 
-        If m_storageLookup.TryLoadProcedure(name, proc) Then
+        If _storageLookup.TryLoadProcedure(name, proc) Then
             AddProcedure(proc)
             Return True
         End If
@@ -237,7 +237,7 @@ Public Class NativeSymbolBag
     Public Sub AddConstant(ByVal nConst As NativeConstant)
         If nConst Is Nothing Then : Throw New ArgumentNullException("nConst") : End If
 
-        m_constMap.Add(nConst.Name, nConst)
+        _constMap.Add(nConst.Name, nConst)
         AddValue(nConst.Name, nConst)
     End Sub
 
@@ -249,7 +249,7 @@ Public Class NativeSymbolBag
     Private Sub AddValue(ByVal name As String, ByVal value As NativeSymbol)
         If value Is Nothing Then : Throw New ArgumentNullException("expr") : End If
 
-        m_valueMap(name) = value
+        _valueMap(name) = value
     End Sub
 
     ''' <summary>
@@ -261,7 +261,7 @@ Public Class NativeSymbolBag
     ''' <remarks></remarks>
     Public Function TryFindConstant(ByVal name As String, ByRef nConst As NativeConstant) As Boolean
         If name Is Nothing Then : Throw New ArgumentNullException("name") : End If
-        Return m_constMap.TryGetValue(name, nConst)
+        Return _constMap.TryGetValue(name, nConst)
     End Function
 
     Public Function TryFindOrLoadConstant(ByVal name As String, ByRef nConst As NativeConstant) As Boolean
@@ -271,7 +271,7 @@ Public Class NativeSymbolBag
             Return True
         End If
 
-        If m_storageLookup.TryLoadConstant(name, nConst) Then
+        If _storageLookup.TryLoadConstant(name, nConst) Then
             AddConstant(nConst)
             Return True
         End If
@@ -324,19 +324,19 @@ Public Class NativeSymbolBag
     Public Function FindAllReachableNativeSymbolRelationships() As List(Of NativeSymbolRelationship)
         ' Build up the list of types
         Dim list As New List(Of NativeSymbol)
-        For Each definedNt As NativeDefinedType In m_definedMap.Values
+        For Each definedNt As NativeDefinedType In _definedMap.Values
             list.Add(definedNt)
         Next
 
-        For Each typedefNt As NativeTypeDef In m_typeDefMap.Values
+        For Each typedefNt As NativeTypeDef In _typeDefMap.Values
             list.Add(typedefNt)
         Next
 
-        For Each proc As NativeProcedure In m_procMap.Values
+        For Each proc As NativeProcedure In _procMap.Values
             list.Add(proc)
         Next
 
-        For Each c As NativeConstant In m_constMap.Values
+        For Each c As NativeConstant In _constMap.Values
             list.Add(c)
         Next
 
@@ -458,7 +458,7 @@ Public Class NativeSymbolBag
         End If
 
         ' Lastly try and find it in the stored file
-        If m_storageLookup.TryLoadByName(name, nt) Then
+        If _storageLookup.TryLoadByName(name, nt) Then
             ThrowIfNull(nt)
             loadFromStorage = True
 
@@ -486,7 +486,7 @@ Public Class NativeSymbolBag
     End Function
 
     Public Function TryFindValue(ByVal valueName As String, ByRef ns As NativeSymbol) As Boolean
-        Return m_valueMap.TryGetValue(valueName, ns)
+        Return _valueMap.TryGetValue(valueName, ns)
     End Function
 
     Public Function TryFindOrLoadValue(ByVal valueName As String, ByRef ns As NativeSymbol) As Boolean
@@ -502,7 +502,7 @@ Public Class NativeSymbolBag
 
         ' First look for a constant by this name
         Dim nConst As NativeConstant = Nothing
-        If m_storageLookup.TryLoadConstant(valueName, nConst) Then
+        If _storageLookup.TryLoadConstant(valueName, nConst) Then
             AddConstant(nConst)
             loaded = True
             ns = nConst
@@ -511,7 +511,7 @@ Public Class NativeSymbolBag
 
         ' Lastly look for enums by value 
         Dim erows As List(Of NativeStorage.EnumValueRow) = Nothing
-        If m_storageLookup.EnumValue.TryFindByValueName(valueName, erows) Then
+        If _storageLookup.EnumValue.TryFindByValueName(valueName, erows) Then
             ' Take the first one
             Dim erow As NativeStorage.EnumValueRow = erows(0)
             Dim prow As NativeStorage.DefinedTypeRow = erow.DefinedTypeRow
@@ -563,7 +563,7 @@ Public Class NativeSymbolBag
         Dim map As New Dictionary(Of NativeSymbol, Nullable(Of Boolean))
         Dim list As New List(Of NativeDefinedType)
 
-        For Each definedNt As NativeDefinedType In m_definedMap.Values
+        For Each definedNt As NativeDefinedType In _definedMap.Values
             If IsResolved(definedNt, map) Then
                 list.Add(definedNt)
             End If
@@ -581,7 +581,7 @@ Public Class NativeSymbolBag
         Dim map As New Dictionary(Of NativeSymbol, Nullable(Of Boolean))
         Dim list As New List(Of NativeTypeDef)
 
-        For Each typedefNt As NativeTypeDef In m_typeDefMap.Values
+        For Each typedefNt As NativeTypeDef In _typeDefMap.Values
             If IsResolved(typedefNt, map) Then
                 list.Add(typedefNt)
             End If
@@ -599,7 +599,7 @@ Public Class NativeSymbolBag
         Dim map As New Dictionary(Of NativeSymbol, Nullable(Of Boolean))
         Dim list As New List(Of NativeProcedure)
 
-        For Each proc As NativeProcedure In m_procMap.Values
+        For Each proc As NativeProcedure In _procMap.Values
             If IsResolved(proc, map) Then
                 list.Add(proc)
             End If
@@ -612,7 +612,7 @@ Public Class NativeSymbolBag
         Dim map As New Dictionary(Of NativeSymbol, Nullable(Of Boolean))
         Dim list As New List(Of NativeConstant)
 
-        For Each c As NativeConstant In m_constMap.Values
+        For Each c As NativeConstant In _constMap.Values
             If IsResolved(c, map) Then
                 list.Add(c)
             End If
@@ -645,7 +645,7 @@ Public Class NativeSymbolBag
         If ep Is Nothing Then : Throw New ArgumentNullException("ep") : End If
 
         ' Try and resolve the proc name
-        For Each proc As NativeProcedure In m_procMap.Values
+        For Each proc As NativeProcedure In _procMap.Values
             If String.IsNullOrEmpty(proc.DllName) Then
                 finder.TryFindDllNameExact(proc.Name, proc.DllName)
             End If

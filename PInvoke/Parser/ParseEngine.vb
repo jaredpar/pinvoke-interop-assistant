@@ -12,12 +12,12 @@ Namespace Parser
     ''' </summary>
     ''' <remarks></remarks>
     Public Class ParseResult
-        Private m_errorProvider As New ErrorProvider
-        Private m_bag As New NativeSymbolBag
-        Private m_definedList As New List(Of NativeDefinedType)
-        Private m_typedefList As New List(Of NativeTypeDef)
-        Private m_procList As New List(Of NativeProcedure)
-        Private m_parsedList As New List(Of NativeType)
+        Private _errorProvider As New ErrorProvider
+        Private _bag As New NativeSymbolBag
+        Private _definedList As New List(Of NativeDefinedType)
+        Private _typedefList As New List(Of NativeTypeDef)
+        Private _procList As New List(Of NativeProcedure)
+        Private _parsedList As New List(Of NativeType)
 
         Public Sub New()
 
@@ -31,7 +31,7 @@ Namespace Parser
         ''' <remarks></remarks>
         Public ReadOnly Property ErrorProvider() As ErrorProvider
             Get
-                Return m_errorProvider
+                Return _errorProvider
             End Get
         End Property
 
@@ -43,7 +43,7 @@ Namespace Parser
         ''' <remarks></remarks>
         Public ReadOnly Property NativeDefinedTypes() As List(Of NativeDefinedType)
             Get
-                Return m_definedList
+                Return _definedList
             End Get
         End Property
 
@@ -55,7 +55,7 @@ Namespace Parser
         ''' <remarks></remarks>
         Public ReadOnly Property NativeTypedefs() As List(Of NativeTypeDef)
             Get
-                Return m_typedefList
+                Return _typedefList
             End Get
         End Property
 
@@ -67,7 +67,7 @@ Namespace Parser
         ''' <remarks></remarks>
         Public ReadOnly Property NativeProcedures() As List(Of NativeProcedure)
             Get
-                Return m_procList
+                Return _procList
             End Get
         End Property
 
@@ -79,7 +79,7 @@ Namespace Parser
         ''' <remarks></remarks>
         Public ReadOnly Property ParsedTypes() As List(Of NativeType)
             Get
-                Return m_parsedList
+                Return _parsedList
             End Get
         End Property
 
@@ -87,24 +87,24 @@ Namespace Parser
 
     Public Class ParseException
         Inherits Exception
-        Private m_isError As Boolean = True
-        Private m_isStreamOk As Boolean
+        Private _isError As Boolean = True
+        Private _isStreamOk As Boolean
 
         Friend ReadOnly Property IsError() As Boolean
             Get
-                Return m_isError
+                Return _isError
             End Get
         End Property
 
         Friend ReadOnly Property IsStreamOk() As Boolean
             Get
-                Return m_isStreamOk
+                Return _isStreamOk
             End Get
         End Property
 
         Private Sub New(ByVal msg As String, ByVal isError As Boolean)
             MyBase.New(msg)
-            m_isError = isError
+            _isError = isError
         End Sub
 
         Private Sub New(ByVal msg As String, ByVal inner As Exception)
@@ -145,7 +145,7 @@ Namespace Parser
         ''' <remarks></remarks>
         Public Shared Function CreateWarningStreamOk(ByVal msg As String) As ParseException
             Dim ex As ParseException = CreateWarning(msg)
-            ex.m_isStreamOk = True
+            ex._isStreamOk = True
             Return ex
         End Function
 
@@ -171,22 +171,22 @@ Namespace Parser
         Private Class ParseEngineException
             Inherits Exception
 
-            Sub New(ByVal msg As String)
+            Public Sub New(ByVal msg As String)
                 MyBase.New(msg)
             End Sub
 
-            Sub New(ByVal msg As String, ByVal inner As Exception)
+            Public Sub New(ByVal msg As String, ByVal inner As Exception)
                 MyBase.New(msg, inner)
             End Sub
         End Class
 
 #End Region
 
-        Private m_parsing As Boolean
-        Private m_scanner As Scanner
-        Private m_result As ParseResult
-        Private m_errorProvider As New ErrorProvider
-        Private m_salTable As New Dictionary(Of String, SalEntryType)(StringComparer.OrdinalIgnoreCase)
+        Private _parsing As Boolean
+        Private _scanner As Scanner
+        Private _result As ParseResult
+        Private _errorProvider As New ErrorProvider
+        Private _salTable As New Dictionary(Of String, SalEntryType)(StringComparer.OrdinalIgnoreCase)
 
         Private ReadOnly Property DisplayString() As String
             Get
@@ -198,7 +198,7 @@ Namespace Parser
         ''' Create a new Parser
         ''' </summary>
         ''' <remarks></remarks>
-        Sub New()
+        Public Sub New()
             BuildLookupTables()
         End Sub
 
@@ -206,7 +206,7 @@ Namespace Parser
 
             ' Build the SAL table 
             For Each e As SalEntryType In System.Enum.GetValues(GetType(SalEntryType))
-                m_salTable.Add( _
+                _salTable.Add( _
                  NativeSalEntry.GetDirectiveForEntry(e), _
                  e)
             Next
@@ -226,7 +226,7 @@ Namespace Parser
 
         Private Function ParseCore(ByVal readerBag As TextReaderBag) As ParseResult
             ThrowIfNull(readerBag)
-            ThrowIfTrue(m_parsing, "Recursive parsing is not supported.  Instead create a new Parser")
+            ThrowIfTrue(_parsing, "Recursive parsing is not supported.  Instead create a new Parser")
             Dim toReturn As ParseResult = Nothing
 
             Try
@@ -237,20 +237,20 @@ Namespace Parser
                 opts.HideNewLines = True
                 opts.HideComments = True
 
-                m_parsing = True
-                m_result = New ParseResult()
-                m_scanner = New Scanner(readerBag, opts)
-                m_scanner.ErrorProvider = m_result.ErrorProvider
+                _parsing = True
+                _result = New ParseResult()
+                _scanner = New Scanner(readerBag, opts)
+                _scanner.ErrorProvider = _result.ErrorProvider
 
                 ' Actually do the parsing
                 ParseCoreRoutine()
 
-                m_result.ErrorProvider.Append(m_errorProvider)
-                toReturn = m_result
+                _result.ErrorProvider.Append(_errorProvider)
+                toReturn = _result
             Finally
-                m_scanner = Nothing
-                m_parsing = False
-                m_result = Nothing
+                _scanner = Nothing
+                _parsing = False
+                _result = Nothing
             End Try
 
             Return toReturn
@@ -271,21 +271,21 @@ Namespace Parser
             While Not done
 
                 ' Check for the end of the stream
-                If m_scanner.EndOfStream Then
+                If _scanner.EndOfStream Then
                     done = True
                     Continue While
                 End If
 
                 ' Setup a mark.  If the routine fails to parse we want to rollback the scanner
                 ' and read past the troublesome line
-                Dim mark As ScannerMark = m_scanner.Mark()
+                Dim mark As ScannerMark = _scanner.Mark()
 
-                Dim token As Token = m_scanner.PeekNextToken()
+                Dim token As Token = _scanner.PeekNextToken()
                 Try
                     Dim ntSal As New NativeSalAttribute()
                     If token.TokenType = TokenType.DeclSpec Then
                         ntSal = ProcessSalAttribute()
-                        token = m_scanner.PeekNextToken()
+                        token = _scanner.PeekNextToken()
                     End If
 
                     If token.TokenType = TokenType.TypedefKeyword Then
@@ -296,7 +296,7 @@ Namespace Parser
 
                         ' Next try and process a type
                         Dim parsedType As NativeType = ProcessTypeNameOrType()
-                        Dim nextToken As Token = m_scanner.PeekNextToken()
+                        Dim nextToken As Token = _scanner.PeekNextToken()
                         If parsedType.Category = NativeSymbolCategory.Defined Then
 
                             ' If the next token is a semicolon we are done with this type 
@@ -312,15 +312,15 @@ Namespace Parser
                         End If
                     Else
                         ProcessGlobalTokenForUnsupportedScenario()
-                        m_scanner.GetNextToken()
+                        _scanner.GetNextToken()
                     End If
                 Catch ex As ParseException
                     If Not parseErrorTable.ContainsKey(ex.Message) Then
                         parseErrorTable.Add(ex.Message, Nothing)
                         If ex.IsError Then
-                            m_errorProvider.AddError(ex.Message)
+                            _errorProvider.AddError(ex.Message)
                         Else
-                            m_errorProvider.AddWarning(ex.Message)
+                            _errorProvider.AddWarning(ex.Message)
                         End If
 
                         ' If the thrower did not put the stream in a good place chew
@@ -332,15 +332,15 @@ Namespace Parser
                 Catch ex As EndOfStreamException
 
                     ' Rollback the scanner and process the next line
-                    m_errorProvider.AddError("Unexpectedly hit the end of the stream")
-                    m_scanner.Rollback(mark)
+                    _errorProvider.AddError("Unexpectedly hit the end of the stream")
+                    _scanner.Rollback(mark)
                     ChewThroughEndOfLine()
 
                 Catch ex As Exception
 
                     ' Rollback the scanner.  The process through this line
-                    m_errorProvider.AddError(ex.Message)
-                    m_scanner.Rollback(mark)
+                    _errorProvider.AddError(ex.Message)
+                    _scanner.Rollback(mark)
                     ChewThroughEndOfLine()
                 End Try
             End While
@@ -354,14 +354,14 @@ Namespace Parser
         Private Function ProcessTypeDef() As List(Of NativeTypeDef)
 
             ' Chew through the typedef token if it hasn't been consumed
-            Dim token As Token = m_scanner.PeekNextToken()
+            Dim token As Token = _scanner.PeekNextToken()
             If token.TokenType = TokenType.TypedefKeyword Then
-                m_scanner.GetNextToken()
+                _scanner.GetNextToken()
             End If
 
             Dim sal As NativeSalAttribute
             Dim source As NativeType
-            Dim typeMark As ScannerMark = m_scanner.Mark()
+            Dim typeMark As ScannerMark = _scanner.Mark()
             Try
                 ' Get the type name which is the source of the typedef.  This can only 
                 ' be a defined type or a type name.  Also since this could still be 
@@ -376,7 +376,7 @@ Namespace Parser
             Catch ex As ParseException
                 Throw
             Catch ex As Exception
-                m_scanner.Rollback(typeMark)
+                _scanner.Rollback(typeMark)
                 Dim msg As String = String.Format( _
                     "Error processing typedef ""{0}"": {1}", _
                     PeekLineInformation(4), _
@@ -402,8 +402,8 @@ Namespace Parser
             Contract.ThrowIfNull(nameprefix)
 
             ' If this called with a struct token still in the stream, remove it
-            If m_scanner.PeekNextToken().TokenType = TokenType.ClassKeyword Then
-                m_scanner.GetNextToken()
+            If _scanner.PeekNextToken().TokenType = TokenType.ClassKeyword Then
+                _scanner.GetNextToken()
             End If
 
             Return ProcessStruct(nameprefix)
@@ -427,13 +427,13 @@ Namespace Parser
             Contract.ThrowIfNull(namePrefix)
 
             ' If this called with a struct token still in the stream, remove it
-            If m_scanner.PeekNextToken().TokenType = TokenType.StructKeyword Then
-                m_scanner.GetNextToken()
+            If _scanner.PeekNextToken().TokenType = TokenType.StructKeyword Then
+                _scanner.GetNextToken()
             End If
 
             ' Remove any SAL attribute
             ' TODO: It may be worthwhile in a future version to add support for the __declspec attribute
-            If m_scanner.PeekNextToken().TokenType = TokenType.DeclSpec Then
+            If _scanner.PeekNextToken().TokenType = TokenType.DeclSpec Then
                 ProcessSalAttribute()
             End If
 
@@ -441,9 +441,9 @@ Namespace Parser
             ' struct and otherwise it's inline
             Dim name As String
             Dim isInline As Boolean
-            Dim nameToken As Token = m_scanner.PeekNextToken()
+            Dim nameToken As Token = _scanner.PeekNextToken()
             If nameToken.TokenType = TokenType.Word Then
-                m_scanner.GetNextToken()
+                _scanner.GetNextToken()
                 name = namePrefix & nameToken.Value
                 isInline = False
             Else
@@ -453,18 +453,18 @@ Namespace Parser
 
             ' For forward declaration structs the next token will be a ';'.  There is nothing 
             ' to add for structures of this type
-            If m_scanner.PeekNextToken().TokenType = TokenType.Semicolon Then
+            If _scanner.PeekNextToken().TokenType = TokenType.Semicolon Then
                 Return Nothing
             End If
 
             ' Check through the open brace structure
-            m_scanner.GetNextToken(TokenType.BraceOpen)
+            _scanner.GetNextToken(TokenType.BraceOpen)
 
             ' Get the members
             Dim list As List(Of NativeMember) = ProcessTypeMemberList(name)
 
             ' Move through the close brace
-            m_scanner.GetNextToken(TokenType.BraceClose)
+            _scanner.GetNextToken(TokenType.BraceClose)
 
             ' Create the struct type
             Dim ntStruct As New NativeStruct()
@@ -500,29 +500,29 @@ Namespace Parser
             Contract.ThrowIfNull(namePrefix)
 
             ' Check through the union token if it hasn't been consumed
-            Dim token As Token = m_scanner.PeekNextToken()
+            Dim token As Token = _scanner.PeekNextToken()
             If token.TokenType = TokenType.UnionKeyword Then
-                m_scanner.GetNextToken()
+                _scanner.GetNextToken()
             End If
 
             ' See if this is an inline union or a named one
             Dim isInline As Boolean = False
             Dim name As String = String.Empty
-            token = m_scanner.PeekNextToken()
+            token = _scanner.PeekNextToken()
             If token.TokenType = TokenType.Word Then
                 name = namePrefix & token.Value
-                m_scanner.GetNextToken()
+                _scanner.GetNextToken()
             Else
                 isInline = True
             End If
 
             ' Get the open brace
-            m_scanner.GetNextToken(TokenType.BraceOpen)
+            _scanner.GetNextToken(TokenType.BraceOpen)
 
             Dim list As List(Of NativeMember) = ProcessTypeMemberList(name)
 
             ' Get the close brace
-            m_scanner.GetNextToken(TokenType.BraceClose)
+            _scanner.GetNextToken(TokenType.BraceClose)
 
             ' Create the union
             Dim ntUnion As New NativeUnion()
@@ -552,17 +552,17 @@ Namespace Parser
             Contract.ThrowIfNull(namePrefix)
 
             ' Move past the enum token if it's still in the stream
-            Dim token As Token = m_scanner.PeekNextToken()
+            Dim token As Token = _scanner.PeekNextToken()
             If token.TokenType = TokenType.EnumKeyword Then
-                m_scanner.GetNextToken()
+                _scanner.GetNextToken()
             End If
 
             ' Check to see if this is an inline enum
             Dim isInline As Boolean = False
             Dim name As String = String.Empty
-            token = m_scanner.PeekNextToken()
+            token = _scanner.PeekNextToken()
             If token.TokenType = TokenType.Word Then
-                m_scanner.GetNextToken()
+                _scanner.GetNextToken()
                 isInline = False
                 name = namePrefix & token.Value
             Else
@@ -570,12 +570,12 @@ Namespace Parser
             End If
 
             ' Get the open brace
-            m_scanner.GetNextToken(TokenType.BraceOpen)
+            _scanner.GetNextToken(TokenType.BraceOpen)
 
             Dim list As List(Of NativeEnumValue) = ProcessEnumValues()
 
             ' Get the close brace
-            m_scanner.GetNextToken(TokenType.BraceClose)
+            _scanner.GetNextToken(TokenType.BraceClose)
 
             ' Create the enumeration
             Dim ntEnum As New NativeEnum()
@@ -601,34 +601,34 @@ Namespace Parser
             Dim list As New List(Of NativeEnumValue)
 
             ' Allow for an empty enum list
-            If m_scanner.PeekNextToken().TokenType = TokenType.BraceClose Then
+            If _scanner.PeekNextToken().TokenType = TokenType.BraceClose Then
                 Return list
             End If
 
             Dim done As Boolean = False
             While Not done
-                Dim nameToken As Token = m_scanner.GetNextToken(TokenType.Word)
+                Dim nameToken As Token = _scanner.GetNextToken(TokenType.Word)
 
-                Dim token As Token = m_scanner.PeekNextToken()
+                Dim token As Token = _scanner.PeekNextToken()
                 Select Case token.TokenType
                     Case TokenType.Comma
-                        m_scanner.GetNextToken()
+                        _scanner.GetNextToken()
                         list.Add(New NativeEnumValue(nameToken.Value))
                     Case TokenType.BraceClose
                         list.Add(New NativeEnumValue(nameToken.Value))
                     Case TokenType.OpAssign
-                        m_scanner.GetNextToken()
+                        _scanner.GetNextToken()
                         Dim value As String = ProcessConstantValue()
-                        If m_scanner.PeekNextToken().TokenType = TokenType.Comma Then
-                            m_scanner.GetNextToken()
+                        If _scanner.PeekNextToken().TokenType = TokenType.Comma Then
+                            _scanner.GetNextToken()
                         End If
                         list.Add(New NativeEnumValue(nameToken.Value, value))
                     Case Else
-                        m_scanner.AddWarning("Unexpected token while processing enum values: {0}", token.TokenType)
+                        _scanner.AddWarning("Unexpected token while processing enum values: {0}", token.TokenType)
                         done = True
                 End Select
 
-                token = m_scanner.PeekNextToken()
+                token = _scanner.PeekNextToken()
                 If token.TokenType = TokenType.BraceClose Then
                     done = True
                 End If
@@ -638,7 +638,7 @@ Namespace Parser
         End Function
 
         Private Function ProcessProcedure() As NativeProcedure
-            Dim mark As ScannerMark = m_scanner.Mark()
+            Dim mark As ScannerMark = _scanner.Mark()
             Dim callmod As New TriState(Of NativeCallingConvention)
             ProcessCalltypeModifier(callmod)
 
@@ -647,7 +647,7 @@ Namespace Parser
             ProcessCalltypeModifier(callmod)
             Dim retType As NativeType = ProcessTypeNameOrType()
             If retType Is Nothing Then
-                m_scanner.Rollback(mark)
+                _scanner.Rollback(mark)
                 Return Nothing
             End If
 
@@ -662,20 +662,20 @@ Namespace Parser
         ''' <remarks></remarks>
         Private Function ProcessProcedure(ByVal retType As NativeType, ByVal retTypeSal As NativeSalAttribute, ByVal callmod As TriState(Of NativeCallingConvention)) As NativeProcedure
             ThrowIfNull(callmod)
-            Dim mark As ScannerMark = m_scanner.Mark()
+            Dim mark As ScannerMark = _scanner.Mark()
 
             ProcessCalltypeModifier(callmod)
-            Dim nameToken As Token = m_scanner.PeekNextToken()
+            Dim nameToken As Token = _scanner.PeekNextToken()
             If nameToken.TokenType <> TokenType.Word Then
-                m_scanner.Rollback(mark)
+                _scanner.Rollback(mark)
                 Return Nothing
             End If
-            m_scanner.GetNextToken()
+            _scanner.GetNextToken()
 
             Try
                 Dim list As List(Of NativeParameter) = ProcessParameterList(nameToken.Value)
                 If list Is Nothing Then
-                    m_scanner.Rollback(mark)
+                    _scanner.Rollback(mark)
                     Return Nothing
                 End If
 
@@ -692,7 +692,7 @@ Namespace Parser
 
                 ' Check to see if the procedure has an inline block declared after it.  If so then process
                 ' the block away
-                If Not m_scanner.EndOfStream AndAlso m_scanner.PeekNextToken().TokenType = TokenType.BraceOpen Then
+                If Not _scanner.EndOfStream AndAlso _scanner.PeekNextToken().TokenType = TokenType.BraceOpen Then
                     ProcessBlock(TokenType.BraceOpen, TokenType.BraceClose)
                     Throw ParseException.CreateWarningStreamOk( _
                         "Ignoring Procedure {0} because it is defined inline.", _
@@ -717,8 +717,8 @@ Namespace Parser
         End Function
 
         Private Sub ProcessCalltypeModifier(ByRef value As TriState(Of NativeCallingConvention))
-            While TokenHelper.IsCallTypeModifier(m_scanner.PeekNextToken().TokenType)
-                Dim token As Token = m_scanner.GetNextToken()
+            While TokenHelper.IsCallTypeModifier(_scanner.PeekNextToken().TokenType)
+                Dim token As Token = _scanner.GetNextToken()
                 Dim callmod As NativeCallingConvention
                 Select Case token.TokenType
                     Case TokenType.WinApiCallKeyword
@@ -748,13 +748,13 @@ Namespace Parser
         ''' </summary>
         ''' <remarks></remarks>
         Private Sub ProcessAccessModifiers()
-            Dim token As Token = m_scanner.PeekNextToken()
+            Dim token As Token = _scanner.PeekNextToken()
             While token.IsAccessModifier
-                m_scanner.GetNextToken()
-                token = m_scanner.PeekNextToken()
+                _scanner.GetNextToken()
+                token = _scanner.PeekNextToken()
                 If token.TokenType = TokenType.Colon Then
-                    m_scanner.GetNextToken()
-                    token = m_scanner.PeekNextToken()
+                    _scanner.GetNextToken()
+                    token = _scanner.PeekNextToken()
                 End If
             End While
         End Sub
@@ -778,8 +778,8 @@ Namespace Parser
 
             ' It's fine for this method to be called with the scanner either immediately before or 
             ' after the opening paren
-            If m_scanner.PeekNextToken().TokenType = TokenType.ParenOpen Then
-                m_scanner.GetNextToken()
+            If _scanner.PeekNextToken().TokenType = TokenType.ParenOpen Then
+                _scanner.GetNextToken()
             End If
 
             ' Remove the calling convention
@@ -787,19 +787,19 @@ Namespace Parser
             ProcessCalltypeModifier(callmod)
 
             ' If there is a * in the name then parse that as well
-            If m_scanner.PeekNextToken().TokenType = TokenType.Asterisk Then
-                m_scanner.GetNextToken()
+            If _scanner.PeekNextToken().TokenType = TokenType.Asterisk Then
+                _scanner.GetNextToken()
             End If
 
             ' Get the acutal name from code.  Make sure to handle the anonymous function pointer case
             Dim name As String
-            If m_scanner.PeekNextToken().TokenType = TokenType.Word Then
-                name = namePrefix & m_scanner.GetNextToken().Value
+            If _scanner.PeekNextToken().TokenType = TokenType.Word Then
+                name = namePrefix & _scanner.GetNextToken().Value
             Else
                 name = NativeSymbolBag.GenerateAnonymousName()
             End If
 
-            m_scanner.GetNextToken(TokenType.ParenClose)
+            _scanner.GetNextToken(TokenType.ParenClose)
 
             Return ProcessFunctionPointerParameters(name, retType, retTypeSal, callmod)
         End Function
@@ -834,35 +834,35 @@ Namespace Parser
         Private Function ProcessParameterList(ByVal procName As String) As List(Of NativeParameter)
             Dim list As New List(Of NativeParameter)
 
-            Dim token As Token = m_scanner.GetNextToken()
+            Dim token As Token = _scanner.GetNextToken()
             If token.TokenType <> TokenType.ParenOpen Then
                 Return Nothing
             End If
 
             ' Check for the (void) signature
-            Dim voidList As List(Of Token) = m_scanner.PeekTokenList(2)
+            Dim voidList As List(Of Token) = _scanner.PeekTokenList(2)
             If voidList(1).TokenType = TokenType.ParenClose _
                 AndAlso voidList(0).TokenType = TokenType.VoidKeyword Then
 
                 ' Get the tokens for the signature off of the stream
-                m_scanner.GetNextToken(TokenType.VoidKeyword)
-                m_scanner.GetNextToken(TokenType.ParenClose)
+                _scanner.GetNextToken(TokenType.VoidKeyword)
+                _scanner.GetNextToken(TokenType.ParenClose)
                 Return list
             End If
 
             Do
-                token = m_scanner.PeekNextToken()
+                token = _scanner.PeekNextToken()
                 If token.TokenType = TokenType.ParenClose Then
-                    m_scanner.GetNextToken()
+                    _scanner.GetNextToken()
                     Exit Do
                 ElseIf token.TokenType = TokenType.Period Then
                     ' Check for variable arguments signature
-                    Dim varList As List(Of Token) = m_scanner.PeekTokenList(3)
+                    Dim varList As List(Of Token) = _scanner.PeekTokenList(3)
                     If varList(1).TokenType = TokenType.Period AndAlso varList(2).TokenType = TokenType.Period Then
                         ProcessBlockRemainder(TokenType.ParenOpen, TokenType.ParenClose)
 
                         ' Make sure to remove the { if it is both variable and inline
-                        If Not m_scanner.EndOfStream AndAlso m_scanner.PeekNextToken().TokenType = TokenType.BraceOpen Then
+                        If Not _scanner.EndOfStream AndAlso _scanner.PeekNextToken().TokenType = TokenType.BraceOpen Then
                             ProcessBlock(TokenType.BraceOpen, TokenType.BraceClose)
                         End If
 
@@ -875,8 +875,8 @@ Namespace Parser
                 ' Process the actual parameter
                 list.Add(ProcessParameter())
 
-                If m_scanner.PeekNextToken().TokenType = TokenType.Comma Then
-                    m_scanner.GetNextToken()
+                If _scanner.PeekNextToken().TokenType = TokenType.Comma Then
+                    _scanner.GetNextToken()
                 End If
             Loop
 
@@ -891,10 +891,10 @@ Namespace Parser
             Dim param As New NativeParameter()
             param.NativeType = ProcessTypeName()
 
-            If m_scanner.PeekNextToken().TokenType = TokenType.Word Then
+            If _scanner.PeekNextToken().TokenType = TokenType.Word Then
                 ' Match the name if it's present
-                param.Name = m_scanner.GetNextToken().Value
-            ElseIf m_scanner.PeekNextToken().TokenType = TokenType.ParenOpen Then
+                param.Name = _scanner.GetNextToken().Value
+            ElseIf _scanner.PeekNextToken().TokenType = TokenType.ParenOpen Then
 
                 ' It's legal to have an inline function pointer as a parameter type.  In that
                 ' case though the parameter will have no name and will instead take the name of 
@@ -911,9 +911,9 @@ Namespace Parser
 
             ' It's valid for the trailing [] to come after the parameter name and we
             ' need to process them here
-            While m_scanner.PeekNextToken().TokenType = TokenType.BracketOpen
-                m_scanner.GetNextToken()
-                m_scanner.GetNextToken(TokenType.BracketClose)
+            While _scanner.PeekNextToken().TokenType = TokenType.BracketOpen
+                _scanner.GetNextToken()
+                _scanner.GetNextToken(TokenType.BracketClose)
 
                 param.NativeType = New NativePointer(param.NativeType)
             End While
@@ -933,12 +933,12 @@ Namespace Parser
             Dim value As String = String.Empty
             Dim done As Boolean = False
             Do
-                Dim token As Token = m_scanner.PeekNextToken()
+                Dim token As Token = _scanner.PeekNextToken()
                 If token.TokenType = TokenType.Comma _
                     OrElse token.TokenType = TokenType.BraceClose Then
                     done = True
                 Else
-                    m_scanner.GetNextToken()
+                    _scanner.GetNextToken()
                     value &= token.Value
                 End If
             Loop Until done
@@ -966,18 +966,18 @@ Namespace Parser
 
             Try
                 Do
-                    If m_scanner.EndOfStream Then
+                    If _scanner.EndOfStream Then
                         Exit Do
                     End If
 
-                    Dim token As Token = m_scanner.PeekNextToken()
+                    Dim token As Token = _scanner.PeekNextToken()
                     Select Case token.TokenType
                         Case TokenType.Semicolon, TokenType.NewLine
                             ' Terminating conditions
                             done = True
                         Case TokenType.Comma
                             ' Delimiter between the type names.  Ignore it
-                            m_scanner.GetNextToken()
+                            _scanner.GetNextToken()
                         Case Else
                             Dim ntDef As NativeTypeDef = ProcessTypePostTypedefSingle(originalNt)
                             If ntDef IsNot Nothing Then
@@ -1009,7 +1009,7 @@ Namespace Parser
             Dim callmod As New TriState(Of NativeCallingConvention)
             ProcessCalltypeModifier(callmod)
 
-            Dim peekToken As Token = m_scanner.PeekNextToken()
+            Dim peekToken As Token = _scanner.PeekNextToken()
             If peekToken.TokenType = TokenType.ParenOpen Then
 
                 ' Syntax for a function pointer typedef
@@ -1018,23 +1018,23 @@ Namespace Parser
             ElseIf peekToken.TokenType = TokenType.Word Then
 
                 ' Standard typedef
-                name = m_scanner.GetNextToken(TokenType.Word).Value
+                name = _scanner.GetNextToken(TokenType.Word).Value
 
                 ' The newer function pointer syntax allows you to forgo the parens and *
-                If m_scanner.PeekNextToken().TokenType = TokenType.ParenOpen Then
+                If _scanner.PeekNextToken().TokenType = TokenType.ParenOpen Then
                     nt = ProcessFunctionPointerParameters(name, nt, New NativeSalAttribute(), callmod)
                 End If
             ElseIf peekToken.IsTypeKeyword Then
                 ' Ignore this typedef.  Some parts of the windows header files attempt to typedef out
                 ' certain items we consider kewords.
-                m_scanner.GetNextToken()
+                _scanner.GetNextToken()
                 Return Nothing
             Else
 
                 ' Unknown
                 Throw ParseException.CreateError( _
                     "Error processing typedef list.  Expected word or paren open but found '{0}'.", _
-                    m_scanner.PeekNextToken().Value)
+                    _scanner.PeekNextToken().Value)
             End If
 
             ' Now that we've processed out the type, we need to once again process modifiers because
@@ -1052,7 +1052,7 @@ Namespace Parser
         ''' <remarks></remarks>
         Private Function ProcessTypeMemberList(ByVal parentTypeName As String) As List(Of NativeMember)
             Dim list As New List(Of NativeMember)
-            Dim token As Token = m_scanner.PeekNextToken()
+            Dim token As Token = _scanner.PeekNextToken()
             If token.TokenType = TokenType.BraceClose Then
                 ' Empty struct
                 Return list
@@ -1066,10 +1066,10 @@ Namespace Parser
                 list.Add(member)
 
                 ' Get the end token.  Process any comma seperated list of members
-                Dim endToken As Token = m_scanner.GetNextToken()
+                Dim endToken As Token = _scanner.GetNextToken()
                 While endToken.TokenType = TokenType.Comma
                     list.Add(ProcessNativeMemberWithType(parentTypeName, list.Count, member.NativeType))
-                    endToken = m_scanner.GetNextToken()
+                    endToken = _scanner.GetNextToken()
                 End While
 
                 If endToken.TokenType = TokenType.ParenOpen Then
@@ -1078,22 +1078,22 @@ Namespace Parser
                     ProcessBlockRemainder(TokenType.ParenOpen, TokenType.ParenClose)
 
                     ' Remove the const qualifier if present
-                    If Not m_scanner.EndOfStream AndAlso m_scanner.PeekNextToken().TokenType = TokenType.ConstKeyword Then
-                        m_scanner.GetNextToken()
+                    If Not _scanner.EndOfStream AndAlso _scanner.PeekNextToken().TokenType = TokenType.ConstKeyword Then
+                        _scanner.GetNextToken()
                     End If
 
                     ' Remave an inline definition
-                    If Not m_scanner.EndOfStream AndAlso m_scanner.PeekNextToken().TokenType = TokenType.BraceOpen Then
+                    If Not _scanner.EndOfStream AndAlso _scanner.PeekNextToken().TokenType = TokenType.BraceOpen Then
                         ProcessBlock(TokenType.BraceOpen, TokenType.BraceClose)
                     End If
 
-                    If Not m_scanner.EndOfStream AndAlso m_scanner.PeekNextToken().TokenType = TokenType.Semicolon Then
-                        m_scanner.GetNextToken()
+                    If Not _scanner.EndOfStream AndAlso _scanner.PeekNextToken().TokenType = TokenType.Semicolon Then
+                        _scanner.GetNextToken()
                     End If
 
                     ' This is not a fatal parse problem.  Simply add a warning and continue with 
                     ' the rest of the members
-                    m_errorProvider.AddWarning( _
+                    _errorProvider.AddWarning( _
                         "Type member procedures are not supported: {0}.{1}", _
                         parentTypeName, _
                         member.Name)
@@ -1107,7 +1107,7 @@ Namespace Parser
                 End If
 
                 ' See if the next token is a close brace
-                If m_scanner.PeekNextToken().TokenType = TokenType.BraceClose Then
+                If _scanner.PeekNextToken().TokenType = TokenType.BraceClose Then
                     done = True
                 End If
 
@@ -1151,11 +1151,11 @@ Namespace Parser
         End Function
 
         Private Function ProcessNativeMemberWithType(ByVal parentTypeName As String, ByVal index As Integer, ByVal nt As NativeType) As NativeMember
-            Dim nextToken As Token = m_scanner.PeekNextToken()
+            Dim nextToken As Token = _scanner.PeekNextToken()
             Dim name As String
 
             If nextToken.TokenType = TokenType.Word Then
-                m_scanner.GetNextToken()
+                _scanner.GetNextToken()
                 name = nextToken.Value
             Else
                 ' For some reason, unions and structs can be defined with unnamed members.  
@@ -1163,15 +1163,15 @@ Namespace Parser
             End If
 
             ' Check for an array suffix on the type
-            Dim token As Token = m_scanner.PeekNextToken()
+            Dim token As Token = _scanner.PeekNextToken()
             If token.TokenType = TokenType.BracketOpen Then
                 nt = ProcessArraySuffix(nt)
             ElseIf token.TokenType = TokenType.Colon Then
                 ' This is a bitvector.  Read in the size and change the type of the 
                 ' member to be a proper bitvector
-                m_scanner.GetNextToken()
+                _scanner.GetNextToken()
                 Dim value As Object = Nothing
-                Dim sizeToken As Token = m_scanner.GetNextToken(TokenType.Number)
+                Dim sizeToken As Token = _scanner.GetNextToken(TokenType.Number)
                 If Not TokenHelper.TryConvertToNumber(sizeToken, value) Then
                     Throw ParseException.CreateError( _
                         "Expected number after bit vector specifier: {0}", _
@@ -1192,13 +1192,13 @@ Namespace Parser
         Private Function ProcessTypeName() As NativeType
 
             ' Remove type name precursors from the stream
-            Dim token As Token = m_scanner.PeekNextToken()
+            Dim token As Token = _scanner.PeekNextToken()
             If token.TokenType = TokenType.StructKeyword _
                 OrElse token.TokenType = TokenType.UnionKeyword _
                 OrElse token.TokenType = TokenType.EnumKeyword _
                 OrElse token.TokenType = TokenType.ClassKeyword Then
 
-                m_scanner.GetNextToken()
+                _scanner.GetNextToken()
             End If
 
             Dim nt As NativeType = ProcessShortTypeName()
@@ -1214,8 +1214,8 @@ Namespace Parser
         End Function
 
         Private Function ProcessDefinedTypeCore(ByVal namePrefix As String, ByVal includeFunctionPointers As Boolean) As NativeDefinedType
-            Dim mark As ScannerMark = m_scanner.Mark()
-            Dim token As Token = m_scanner.PeekNextToken()
+            Dim mark As ScannerMark = _scanner.Mark()
+            Dim token As Token = _scanner.PeekNextToken()
 
             ' Remove the SAL attribute if present
             If token.TokenType = TokenType.DeclSpec Then
@@ -1223,7 +1223,7 @@ Namespace Parser
             End If
 
             If token.TokenType = TokenType.StructKeyword Then
-                m_scanner.GetNextToken()
+                _scanner.GetNextToken()
                 ProcessSalAttribute()
 
                 ' If the type name starts with struct there are one of
@@ -1232,7 +1232,7 @@ Namespace Parser
                 '   2) Inline Type: struct { int bar; } 
                 '   3) normal Struct: struct foo { int bar; }
 
-                Dim peekList As List(Of Token) = m_scanner.PeekTokenList(2)
+                Dim peekList As List(Of Token) = _scanner.PeekTokenList(2)
                 If (peekList(0).TokenType = TokenType.Word AndAlso peekList(1).TokenType = TokenType.BraceOpen) _
                     OrElse peekList(0).TokenType = TokenType.BraceOpen Then
 
@@ -1242,10 +1242,10 @@ Namespace Parser
                 End If
 
             ElseIf token.TokenType = TokenType.UnionKeyword Then
-                m_scanner.GetNextToken()
+                _scanner.GetNextToken()
                 ProcessSalAttribute()
 
-                Dim peekList As List(Of Token) = m_scanner.PeekTokenList(2)
+                Dim peekList As List(Of Token) = _scanner.PeekTokenList(2)
                 If (peekList(0).TokenType = TokenType.Word AndAlso peekList(1).TokenType = TokenType.BraceOpen) _
                     OrElse peekList(0).TokenType = TokenType.BraceOpen Then
 
@@ -1253,17 +1253,17 @@ Namespace Parser
                 End If
 
             ElseIf token.TokenType = TokenType.EnumKeyword Then
-                m_scanner.GetNextToken()
+                _scanner.GetNextToken()
                 ProcessSalAttribute()
 
-                Dim peekList As List(Of Token) = m_scanner.PeekTokenList(2)
+                Dim peekList As List(Of Token) = _scanner.PeekTokenList(2)
                 If (peekList(0).TokenType = TokenType.Word AndAlso peekList(1).TokenType = TokenType.BraceOpen) _
                     OrElse peekList(0).TokenType = TokenType.BraceOpen Then
 
                     Return Me.ProcessEnum(namePrefix)
                 End If
             ElseIf token.TokenType = TokenType.ClassKeyword Then
-                m_scanner.GetNextToken()
+                _scanner.GetNextToken()
                 ProcessSalAttribute()
 
                 ' If the type name starts with Class there are one of
@@ -1272,7 +1272,7 @@ Namespace Parser
                 '   2) Inline Type: Class { int bar; } 
                 '   3) normal Class: Class foo { int bar; }
 
-                Dim peekList As List(Of Token) = m_scanner.PeekTokenList(2)
+                Dim peekList As List(Of Token) = _scanner.PeekTokenList(2)
                 If (peekList(0).TokenType = TokenType.Word AndAlso peekList(1).TokenType = TokenType.BraceOpen) _
                     OrElse peekList(0).TokenType = TokenType.BraceOpen Then
 
@@ -1286,13 +1286,13 @@ Namespace Parser
                 ProcessSalAttribute()
 
                 Dim retType As NativeType = ProcessTypeName()
-                If retType IsNot Nothing AndAlso m_scanner.PeekNextToken().TokenType = TokenType.ParenOpen Then
+                If retType IsNot Nothing AndAlso _scanner.PeekNextToken().TokenType = TokenType.ParenOpen Then
 
                     Return Me.ProcessFunctionPointer(namePrefix, retType)
                 End If
             End If
 
-            m_scanner.Rollback(mark)
+            _scanner.Rollback(mark)
             Return Nothing
         End Function
 
@@ -1327,16 +1327,16 @@ Namespace Parser
         ''' <remarks></remarks>
         Private Function ProcessShortTypeName() As NativeType
             Dim isConst As Boolean = False
-            Dim qualifiedToken As Token = m_scanner.PeekNextToken()
+            Dim qualifiedToken As Token = _scanner.PeekNextToken()
             If qualifiedToken.TokenType = TokenType.ConstKeyword Then
                 isConst = True
-                m_scanner.GetNextToken()
-                qualifiedToken = m_scanner.PeekNextToken()
+                _scanner.GetNextToken()
+                qualifiedToken = _scanner.PeekNextToken()
             End If
 
             ' Remove the volatile qualifier
             If qualifiedToken.TokenType = TokenType.VolatileKeyword Then
-                m_scanner.GetNextToken()
+                _scanner.GetNextToken()
             End If
 
             ' Look for any type name qualifiers 
@@ -1344,26 +1344,26 @@ Namespace Parser
                 OrElse qualifiedToken.TokenType = TokenType.UnionKeyword _
                 OrElse qualifiedToken.TokenType = TokenType.EnumKeyword _
                 OrElse qualifiedToken.TokenType = TokenType.ClassKeyword Then
-                m_scanner.GetNextToken()
+                _scanner.GetNextToken()
 
                 ' It's possible to put a __declspec here.  Go ahead and remove it
-                If m_scanner.PeekNextToken().TokenType = TokenType.DeclSpec Then
+                If _scanner.PeekNextToken().TokenType = TokenType.DeclSpec Then
                     ProcessSalAttribute()
                 End If
-                Return New NativeNamedType(qualifiedToken.Value, m_scanner.GetNextToken(TokenType.Word).Value)
+                Return New NativeNamedType(qualifiedToken.Value, _scanner.GetNextToken(TokenType.Word).Value)
             End If
 
             ' Down to simple types.  Look for any type prefixes
             Dim bt As NativeBuiltinType = Nothing
-            Dim token As Token = m_scanner.GetNextToken()
+            Dim token As Token = _scanner.GetNextToken()
             If token.TokenType = TokenType.LongKeyword _
                 OrElse token.TokenType = TokenType.SignedKeyword _
                 OrElse token.TokenType = TokenType.UnsignedKeyword Then
 
                 ' If the next token is a builtin type keyword then these are modifiers of that
                 ' keyword
-                If m_scanner.PeekNextToken().IsTypeKeyword Then
-                    NativeBuiltinType.TryConvertToBuiltinType(m_scanner.GetNextToken().TokenType, bt)
+                If _scanner.PeekNextToken().IsTypeKeyword Then
+                    NativeBuiltinType.TryConvertToBuiltinType(_scanner.GetNextToken().TokenType, bt)
                     bt.IsUnsigned = (token.TokenType = TokenType.UnsignedKeyword)
                 Else
                     NativeBuiltinType.TryConvertToBuiltinType(token.TokenType, bt)
@@ -1398,16 +1398,16 @@ Namespace Parser
         Private Function ProcessTypeNameModifiers(ByVal nt As NativeType) As NativeType
             Dim done As Boolean = False
             Do
-                Dim token As Token = m_scanner.PeekNextToken()
+                Dim token As Token = _scanner.PeekNextToken()
                 Select Case token.TokenType
                     Case TokenType.Asterisk
                         ' Wrap it in a pointer and eat the token
                         nt = New NativePointer(nt)
-                        m_scanner.GetNextToken()
+                        _scanner.GetNextToken()
 
                         ' Handle typeName * const name.
-                        If m_scanner.PeekNextToken().TokenType = TokenType.ConstKeyword Then
-                            m_scanner.GetNextToken()
+                        If _scanner.PeekNextToken().TokenType = TokenType.ConstKeyword Then
+                            _scanner.GetNextToken()
                         End If
                     Case TokenType.BracketOpen
                         ' Wrap it in an array.  Processing the array suffix will
@@ -1419,16 +1419,16 @@ Namespace Parser
                     Case TokenType.ConstKeyword
                         ' If the const modifier proceeds a pointer then allow the pointer to 
                         ' be processed.  Otherwise we are done
-                        m_scanner.GetNextToken()
-                        If m_scanner.PeekNextToken().TokenType <> TokenType.Asterisk Then
+                        _scanner.GetNextToken()
+                        If _scanner.PeekNextToken().TokenType <> TokenType.Asterisk Then
                             done = True
                         End If
                     Case TokenType.VolatileKeyword
                         ' Igore the volatile qualifier
-                        m_scanner.GetNextToken()
+                        _scanner.GetNextToken()
                     Case TokenType.Pointer32Keyword, TokenType.Pointer64Keyword
                         ' Ignore the pointer modifiers
-                        m_scanner.GetNextToken()
+                        _scanner.GetNextToken()
                     Case TokenType.ParenOpen
                         ' Hit a function pointer inside the parameter list.  Type name is completed
                         done = True
@@ -1468,20 +1468,20 @@ Namespace Parser
                 End If
             Next
 
-            m_result.NativeDefinedTypes.Add(nt)
-            m_result.ParsedTypes.Add(nt)
+            _result.NativeDefinedTypes.Add(nt)
+            _result.ParsedTypes.Add(nt)
         End Sub
 
         Private Sub ProcessParsedTypeDef(ByVal typeDef As NativeTypeDef)
             ThrowIfNull(typeDef)
 
-            m_result.NativeTypedefs.Add(typeDef)
-            m_result.ParsedTypes.Add(typeDef)
+            _result.NativeTypedefs.Add(typeDef)
+            _result.ParsedTypes.Add(typeDef)
         End Sub
 
         Private Sub ProcessParsedProcedure(ByVal proc As NativeProcedure)
             ThrowIfNull(proc)
-            m_result.NativeProcedures.Add(proc)
+            _result.NativeProcedures.Add(proc)
         End Sub
 
         ''' <summary>
@@ -1503,14 +1503,14 @@ Namespace Parser
                 Dim count As Object
 
                 ' Move past the opening [
-                Dim token As Token = m_scanner.GetNextToken()
+                Dim token As Token = _scanner.GetNextToken()
                 If token.TokenType = TokenType.BracketOpen Then
-                    token = m_scanner.GetNextToken()
+                    token = _scanner.GetNextToken()
                 End If
 
                 ' If it's a number then it's the rank of the array
                 If (token.TokenType = TokenType.Number OrElse token.TokenType = TokenType.HexNumber) _
-                    AndAlso m_scanner.PeekNextToken().TokenType = TokenType.BracketClose Then
+                    AndAlso _scanner.PeekNextToken().TokenType = TokenType.BracketClose Then
 
                     count = Nothing
                     If Not TokenHelper.TryConvertToNumber(token, count) Then
@@ -1520,7 +1520,7 @@ Namespace Parser
                     End If
 
                     ' The token should now be the closing bracket.  
-                    token = m_scanner.GetNextToken(TokenType.BracketClose)
+                    token = _scanner.GetNextToken(TokenType.BracketClose)
                 ElseIf token.TokenType = TokenType.BracketClose Then
                     count = Nothing
                 Else
@@ -1529,10 +1529,10 @@ Namespace Parser
                     Dim exprList As New List(Of Token)
                     exprList.Add(token)
 
-                    Dim nextToken As Token = m_scanner.GetNextToken()
+                    Dim nextToken As Token = _scanner.GetNextToken()
                     While nextToken.TokenType <> TokenType.BracketClose
                         exprList.Add(nextToken)
-                        nextToken = m_scanner.GetNextToken()
+                        nextToken = _scanner.GetNextToken()
                     End While
 
                     Dim ee As New ExpressionEvaluator()
@@ -1554,7 +1554,7 @@ Namespace Parser
                     End If
                 End If
 
-                If m_scanner.PeekNextToken().TokenType <> TokenType.BracketOpen Then
+                If _scanner.PeekNextToken().TokenType <> TokenType.BracketOpen Then
                     done = True
                 End If
             End While
@@ -1573,7 +1573,7 @@ Namespace Parser
         ''' <returns></returns>
         ''' <remarks></remarks>
         Private Function ProcessSalAttribute() As NativeSalAttribute
-            Dim token As Token = m_scanner.PeekNextToken()
+            Dim token As Token = _scanner.PeekNextToken()
             Dim sal As New NativeSalAttribute()
             If token.TokenType <> TokenType.DeclSpec Then
                 Return sal
@@ -1581,17 +1581,17 @@ Namespace Parser
 
             Dim done As Boolean
             Do
-                m_scanner.GetNextToken()
-                m_scanner.GetNextToken(TokenType.ParenOpen)
-                Dim directive As Token = m_scanner.GetNextToken()
+                _scanner.GetNextToken()
+                _scanner.GetNextToken(TokenType.ParenOpen)
+                Dim directive As Token = _scanner.GetNextToken()
 
                 ' It's legal for the SAL attribute to be custom defined and as such
                 ' we should process the argument
                 If Not directive.IsQuotedString Then
                     Dim depth As Integer = 0
                     Dim text As String = directive.Value
-                    While depth > 0 OrElse m_scanner.PeekNextToken().TokenType <> TokenType.ParenClose
-                        Dim cur As Token = m_scanner.GetNextToken()
+                    While depth > 0 OrElse _scanner.PeekNextToken().TokenType <> TokenType.ParenClose
+                        Dim cur As Token = _scanner.GetNextToken()
                         text &= cur.Value
                         Select Case cur.TokenType
                             Case TokenType.ParenOpen
@@ -1609,10 +1609,10 @@ Namespace Parser
                 End If
 
                 ' Get the close paren
-                m_scanner.GetNextToken()
+                _scanner.GetNextToken()
 
                 ' See if there are more declarations
-                If m_scanner.PeekNextToken().TokenType <> TokenType.DeclSpec Then
+                If _scanner.PeekNextToken().TokenType <> TokenType.DeclSpec Then
                     done = True
                 End If
             Loop Until done
@@ -1627,7 +1627,7 @@ Namespace Parser
         ''' <remarks></remarks>
         Private Function ProcessBlock(ByVal openType As TokenType, ByVal closeType As TokenType) As List(Of Token)
             Dim list As New List(Of Token)
-            list.Add(m_scanner.GetNextToken(openType))
+            list.Add(_scanner.GetNextToken(openType))
             Return ProcessBlockRemainderCore(list, openType, closeType)
         End Function
 
@@ -1639,11 +1639,11 @@ Namespace Parser
         Private Function ProcessBlockRemainderCore(ByVal list As List(Of Token), ByVal openType As TokenType, ByVal closeType As TokenType) As List(Of Token)
             Dim depth As Integer = 1
             Do
-                If m_scanner.EndOfStream Then
+                If _scanner.EndOfStream Then
                     Throw ParseException.CreateError("Encountered end of stream while attempting to process a block")
                 End If
 
-                Dim nextToken As Token = m_scanner.GetNextToken()
+                Dim nextToken As Token = _scanner.GetNextToken()
                 list.Add(nextToken)
                 Select Case nextToken.TokenType
                     Case openType
@@ -1690,7 +1690,7 @@ Namespace Parser
                 directive = directive.Substring(0, index + 1) & directive.Substring(otherIndex)
             End If
 
-            If Not m_salTable.TryGetValue(directive, entry) Then
+            If Not _salTable.TryGetValue(directive, entry) Then
                 Return Nothing
             End If
 
@@ -1703,7 +1703,7 @@ Namespace Parser
         ''' </summary>
         ''' <remarks></remarks>
         Private Sub ProcessGlobalTokenForUnsupportedScenario()
-            Dim token As Token = m_scanner.PeekNextToken()
+            Dim token As Token = _scanner.PeekNextToken()
             Select Case token.TokenType
                 Case TokenType.BracketOpen
                     Dim list As List(Of Token) = ProcessBlock(TokenType.BracketOpen, TokenType.BracketClose)
@@ -1723,40 +1723,40 @@ Namespace Parser
         Private Sub ChewThroughEndOfLine()
             Dim done As Boolean = False
 
-            Dim prevOpt As Boolean = m_scanner.Options.HideNewLines
+            Dim prevOpt As Boolean = _scanner.Options.HideNewLines
             Try
-                m_scanner.Options.HideNewLines = False
+                _scanner.Options.HideNewLines = False
                 While Not done
-                    If m_scanner.EndOfStream Then
+                    If _scanner.EndOfStream Then
                         done = True
                     Else
-                        Dim token As Token = m_scanner.GetNextToken()
+                        Dim token As Token = _scanner.GetNextToken()
                         If token.TokenType = TokenType.NewLine Then
                             done = True
                         End If
                     End If
                 End While
             Finally
-                m_scanner.Options.HideNewLines = prevOpt
+                _scanner.Options.HideNewLines = prevOpt
             End Try
         End Sub
 
 
         Private Function PeekLineInformation(ByVal count As Integer) As String
-            Dim mark As ScannerMark = m_scanner.Mark()
-            Dim old As Boolean = m_scanner.Options.HideWhitespace
+            Dim mark As ScannerMark = _scanner.Mark()
+            Dim old As Boolean = _scanner.Options.HideWhitespace
             Try
-                m_scanner.Options.HideWhitespace = False
+                _scanner.Options.HideWhitespace = False
 
                 Dim b As New Text.StringBuilder()
                 Dim found As Integer = 0
 
                 While found < count
-                    If m_scanner.EndOfStream Then
+                    If _scanner.EndOfStream Then
                         Exit While
                     End If
 
-                    Dim cur As Token = m_scanner.GetNextToken()
+                    Dim cur As Token = _scanner.GetNextToken()
                     b.Append(cur.Value)
                     If TokenType.WhiteSpace <> cur.TokenType Then
                         found += 1
@@ -1765,8 +1765,8 @@ Namespace Parser
 
                 Return b.ToString()
             Finally
-                m_scanner.Options.HideWhitespace = old
-                m_scanner.Rollback(mark)
+                _scanner.Options.HideWhitespace = old
+                _scanner.Rollback(mark)
             End Try
         End Function
 

@@ -26,23 +26,23 @@ Namespace Parser
     ''' </summary>
     ''' <remarks></remarks>
     Public Class ScannerMark
-        Private m_index As Integer
-        Private m_lineNumber As Integer
+        Private _index As Integer
+        Private _lineNumber As Integer
 
         Friend ReadOnly Property Index() As Integer
             Get
-                Return m_index
+                Return _index
             End Get
         End Property
 
         Friend ReadOnly Property LineNumber() As Integer
             Get
-                Return m_lineNumber
+                Return _lineNumber
             End Get
         End Property
 
         Friend Sub New(ByVal index As Integer, ByVal lineNumber As Integer)
-            m_index = index
+            _index = index
         End Sub
 
     End Class
@@ -58,11 +58,11 @@ Namespace Parser
         Private Class ScannerInternalException
             Inherits Exception
 
-            Sub New(ByVal msg As String)
+            Public Sub New(ByVal msg As String)
                 MyBase.New(msg)
             End Sub
 
-            Sub New(ByVal msg As String, ByVal inner As Exception)
+            Public Sub New(ByVal msg As String, ByVal inner As Exception)
                 MyBase.New(msg, inner)
             End Sub
         End Class
@@ -72,9 +72,9 @@ Namespace Parser
 
         <DebuggerDisplay("{Display}")> _
         Private Class ScannerBuffer
-            Private m_text As String
-            Private m_index As Integer
-            Private m_lineNumber As Integer
+            Private _text As String
+            Private _index As Integer
+            Private _lineNumber As Integer
 
             ''' <summary>
             ''' Used as a debugger display property.  Gives a preview of the location in the stream
@@ -84,19 +84,19 @@ Namespace Parser
             ''' <remarks></remarks>
             Public ReadOnly Property Display() As String
                 Get
-                    Dim startIndex As Integer = m_index - 10
-                    Dim endIndex As Integer = m_index + 15
+                    Dim startIndex As Integer = _index - 10
+                    Dim endIndex As Integer = _index + 15
                     If startIndex <= 0 Then
                         startIndex = 0
                     End If
 
-                    If endIndex >= m_text.Length Then
-                        endIndex = m_text.Length - 1
+                    If endIndex >= _text.Length Then
+                        endIndex = _text.Length - 1
                     End If
 
-                    Dim value As String = m_text.Substring(startIndex, m_index - startIndex)
+                    Dim value As String = _text.Substring(startIndex, _index - startIndex)
                     value &= "->"
-                    value &= m_text.Substring(m_index, endIndex - m_index)
+                    value &= _text.Substring(_index, endIndex - _index)
                     Return value
                 End Get
             End Property
@@ -109,7 +109,7 @@ Namespace Parser
             ''' <remarks></remarks>
             Public ReadOnly Property LineNumber() As Integer
                 Get
-                    Return m_lineNumber
+                    Return _lineNumber
                 End Get
             End Property
 
@@ -121,14 +121,14 @@ Namespace Parser
             ''' <remarks></remarks>
             Public ReadOnly Property EndOfStream() As Boolean
                 Get
-                    Return m_index >= m_text.Length
+                    Return _index >= _text.Length
                 End Get
             End Property
 
             Public Sub New(ByVal reader As TextReader)
-                m_text = reader.ReadToEnd()
-                m_index = 0
-                m_lineNumber = 1
+                _text = reader.ReadToEnd()
+                _index = 0
+                _lineNumber = 1
             End Sub
 
             ''' <summary>
@@ -136,7 +136,7 @@ Namespace Parser
             ''' </summary>
             ''' <remarks></remarks>
             Public Function Mark() As ScannerMark
-                Return New ScannerMark(m_index, m_lineNumber)
+                Return New ScannerMark(_index, _lineNumber)
             End Function
 
             ''' <summary>
@@ -145,8 +145,8 @@ Namespace Parser
             ''' <remarks></remarks>
             Public Sub RollBack(ByVal mark As ScannerMark)
                 ThrowIfNull(mark, "Must be passed a valid ScannerMark")
-                m_index = mark.Index
-                m_lineNumber = mark.LineNumber
+                _index = mark.Index
+                _lineNumber = mark.LineNumber
             End Sub
 
             ''' <summary>
@@ -155,15 +155,15 @@ Namespace Parser
             ''' <remarks></remarks>
             Public Function ReadChar() As Char
                 EnsureNotEndOfStream()
-                Dim ret As Char = m_text(m_index)
-                m_index += 1
+                Dim ret As Char = _text(_index)
+                _index += 1
 
                 ' Check for the end of the line
                 If ret = CChar(vbCr) Then
-                    If m_index = m_text.Length Then
-                        m_lineNumber += 1
+                    If _index = _text.Length Then
+                        _lineNumber += 1
                     ElseIf PeekChar() = CChar(vbLf) Then
-                        m_lineNumber += 1
+                        _lineNumber += 1
                     End If
                 End If
 
@@ -177,7 +177,7 @@ Namespace Parser
             ''' <remarks></remarks>
             Public Function PeekChar() As Char
                 EnsureNotEndOfStream()
-                Return m_text(m_index)
+                Return _text(_index)
             End Function
 
             ''' <summary>
@@ -187,12 +187,12 @@ Namespace Parser
             ''' <remarks></remarks>
             Public Sub EatChar()
                 EnsureNotEndOfStream()
-                m_index += 1
+                _index += 1
             End Sub
 
             Public Sub MoveBack(ByVal count As Integer)
-                m_index -= count
-                If m_index < 0 Then
+                _index -= count
+                If _index < 0 Then
                     Throw New ScannerInternalException("Moved back before the start of the Stream")
                 End If
             End Sub
@@ -205,15 +205,15 @@ Namespace Parser
         End Class
 #End Region
 
-        Private m_errorProvider As New ErrorProvider
-        Private m_options As ScannerOptions
-        Private m_readerBag As TextReaderBag
+        Private _errorProvider As New ErrorProvider
+        Private _options As ScannerOptions
+        Private _readerBag As TextReaderBag
 
         ''' <summary>
         ''' Stream we are reading from
         ''' </summary>
         ''' <remarks></remarks>
-        Private m_buffer As ScannerBuffer
+        Private _buffer As ScannerBuffer
 
         ''' <summary>
         ''' Options for the Scanner
@@ -223,7 +223,7 @@ Namespace Parser
         ''' <remarks></remarks>
         Public ReadOnly Property Options() As ScannerOptions
             Get
-                Return m_options
+                Return _options
             End Get
         End Property
 
@@ -235,7 +235,7 @@ Namespace Parser
         ''' <remarks></remarks>
         Public ReadOnly Property LineNumber() As Integer
             Get
-                Return m_buffer.LineNumber
+                Return _buffer.LineNumber
             End Get
         End Property
 
@@ -247,10 +247,10 @@ Namespace Parser
         ''' <remarks></remarks>
         Public Property ErrorProvider() As ErrorProvider
             Get
-                Return m_errorProvider
+                Return _errorProvider
             End Get
             Set(ByVal value As ErrorProvider)
-                m_errorProvider = value
+                _errorProvider = value
             End Set
         End Property
 
@@ -262,7 +262,7 @@ Namespace Parser
         ''' <remarks></remarks>
         Public ReadOnly Property Name() As String
             Get
-                Return m_readerBag.Name
+                Return _readerBag.Name
             End Get
         End Property
 
@@ -274,13 +274,13 @@ Namespace Parser
         ''' <remarks></remarks>
         Public ReadOnly Property EndOfStream() As Boolean
             Get
-                If m_options.ThrowOnEndOfStream Then
+                If _options.ThrowOnEndOfStream Then
                     Dim ret As Boolean
                     Try
-                        m_options.ThrowOnEndOfStream = False
+                        _options.ThrowOnEndOfStream = False
                         ret = Me.PeekNextToken().TokenType = TokenType.EndOfStream
                     Finally
-                        m_options.ThrowOnEndOfStream = True
+                        _options.ThrowOnEndOfStream = True
                     End Try
                     Return ret
                 Else
@@ -296,9 +296,9 @@ Namespace Parser
         Public Sub New(ByVal bag As TextReaderBag, ByVal options As ScannerOptions)
             ThrowIfNull(bag)
             ThrowIfNull(options)
-            m_readerBag = bag
-            m_buffer = New ScannerBuffer(bag.TextReader)
-            m_options = options
+            _readerBag = bag
+            _buffer = New ScannerBuffer(bag.TextReader)
+            _options = options
         End Sub
 
 
@@ -316,12 +316,12 @@ Namespace Parser
                 ' Easy cases are out of the way.  Now we need to actually go ahead and 
                 ' parse out the next token.  Mark the stream so that if scanning fails
                 ' we can send back a token of the remainder of the line
-                Dim mark As ScannerMark = m_buffer.Mark()
+                Dim mark As ScannerMark = _buffer.Mark()
                 Try
                     ret = GetNextTokenImpl()
                 Catch ex As ScannerInternalException
                     AddWarning(ex.Message)
-                    m_buffer.RollBack(mark)
+                    _buffer.RollBack(mark)
                     ret = New Token(TokenType.Text, SafeReadTillEndOfLine())
                 End Try
 
@@ -359,11 +359,11 @@ Namespace Parser
         ''' <remarks></remarks>
         Public Function PeekNextToken() As Token
             Dim token As Token
-            Dim mark As ScannerMark = m_buffer.Mark()
+            Dim mark As ScannerMark = _buffer.Mark()
             Try
                 token = GetNextToken()
             Finally
-                m_buffer.RollBack(mark)
+                _buffer.RollBack(mark)
             End Try
 
             Return token
@@ -377,8 +377,8 @@ Namespace Parser
         ''' <remarks></remarks>
         Public Function PeekTokenList(ByVal count As Integer) As List(Of Token)
             Dim mark As ScannerMark = Me.Mark()
-            Dim oldThrow As Boolean = m_options.ThrowOnEndOfStream
-            m_options.ThrowOnEndOfStream = False
+            Dim oldThrow As Boolean = _options.ThrowOnEndOfStream
+            _options.ThrowOnEndOfStream = False
             Try
                 Dim list As New List(Of Token)
                 For i As Integer = 0 To count - 1
@@ -387,7 +387,7 @@ Namespace Parser
 
                 Return list
             Finally
-                m_options.ThrowOnEndOfStream = oldThrow
+                _options.ThrowOnEndOfStream = oldThrow
                 Me.Rollback(mark)
             End Try
         End Function
@@ -416,12 +416,12 @@ Namespace Parser
         ''' <returns></returns>
         ''' <remarks></remarks>
         Public Function PeekNextTokenNotOfType(ByVal ParamArray types As TokenType()) As Token
-            Dim mark As ScannerMark = m_buffer.Mark()
+            Dim mark As ScannerMark = _buffer.Mark()
             Dim token As Token
             Try
                 token = GetNextTokenNotOfType(types)
             Finally
-                m_buffer.RollBack(mark)
+                _buffer.RollBack(mark)
             End Try
 
             Return token
@@ -450,7 +450,7 @@ Namespace Parser
         ''' <returns></returns>
         ''' <remarks></remarks>
         Public Function Mark() As ScannerMark
-            Return m_buffer.Mark()
+            Return _buffer.Mark()
         End Function
 
         ''' <summary>
@@ -459,7 +459,7 @@ Namespace Parser
         ''' <param name="mark"></param>
         ''' <remarks></remarks>
         Public Sub Rollback(ByVal mark As ScannerMark)
-            m_buffer.RollBack(mark)
+            _buffer.RollBack(mark)
         End Sub
 
         ''' <summary>
@@ -486,19 +486,19 @@ Namespace Parser
         Private Function GetNextTokenImpl() As Token
 
             ' First check and see if we're at 'EndOfStream'.  
-            If m_buffer.EndOfStream Then
+            If _buffer.EndOfStream Then
                 Return New Token(TokenType.EndOfStream, String.Empty)
             End If
 
             Dim token As Token = Nothing
-            Dim c As Char = m_buffer.ReadChar()
+            Dim c As Char = _buffer.ReadChar()
 
             ' First check for whitespace and return that
             If Char.IsWhiteSpace(c) _
                 AndAlso c <> vbCr _
                 AndAlso c <> vbLf Then
 
-                m_buffer.MoveBack(1)
+                _buffer.MoveBack(1)
                 Return ReadWhitespace()
             End If
 
@@ -523,7 +523,7 @@ Namespace Parser
                 Case "\"c
                     token = New Token(TokenType.BackSlash, "\")
 
-                    ' Operators 
+                ' Operators 
                 Case "+"c
                     token = New Token(TokenType.OpPlus, "+")
                 Case "-"c
@@ -541,8 +541,8 @@ Namespace Parser
                 Case "'"c
                     token = ReadSingleQuoteOrCharacter()
                 Case CChar(vbCr), CChar(vbLf)
-                    If Not m_buffer.EndOfStream AndAlso m_buffer.PeekChar() = vbLf Then
-                        m_buffer.EatChar()
+                    If Not _buffer.EndOfStream AndAlso _buffer.PeekChar() = vbLf Then
+                        _buffer.EatChar()
                     End If
                     Return New Token(TokenType.NewLine, vbCrLf)
             End Select
@@ -555,8 +555,8 @@ Namespace Parser
             ' We've gotten past the characters that can be determined by the first character.  Now 
             ' we need to consider the second character as well.  Do an EndOfStream check here 
             ' since there could just be a single character left in the Stream
-            If Not m_buffer.EndOfStream Then
-                Dim c2 As String = m_buffer.ReadChar()
+            If Not _buffer.EndOfStream Then
+                Dim c2 As String = _buffer.ReadChar()
                 Dim both As String = c & c2
                 Select Case both
                     Case "//"
@@ -591,7 +591,7 @@ Namespace Parser
                 End If
 
                 ' Move back the character since we didn't process it
-                m_buffer.MoveBack(1)
+                _buffer.MoveBack(1)
             End If
 
             ' There are several single character cases that are also a part of the double character 
@@ -627,7 +627,7 @@ Namespace Parser
 
             ' This isn't a special token.  It's some type of word or number so move back to 
             ' the start of this stream and read the word.
-            m_buffer.MoveBack(1)
+            _buffer.MoveBack(1)
             Return ReadWordOrNumberToken()
         End Function
 
@@ -640,17 +640,17 @@ Namespace Parser
             Dim builder As New StringBuilder()
             Dim done As Boolean = False
             Do
-                Dim c As Char = m_buffer.ReadChar()
+                Dim c As Char = _buffer.ReadChar()
                 If Not Char.IsWhiteSpace(c) Then
                     done = True
-                    m_buffer.MoveBack(1)
+                    _buffer.MoveBack(1)
                 ElseIf c = vbCr OrElse c = vbLf Then
                     done = True
-                    m_buffer.MoveBack(1)
+                    _buffer.MoveBack(1)
                 Else
                     builder.Append(c)
                 End If
-            Loop Until done OrElse m_buffer.EndOfStream
+            Loop Until done OrElse _buffer.EndOfStream
 
             Return New Token(TokenType.WhiteSpace, builder.ToString())
         End Function
@@ -668,16 +668,16 @@ Namespace Parser
             If IsNumber(word, numberType) Then
 
                 ' Loop for a floating point number literal
-                If Not m_buffer.EndOfStream AndAlso m_buffer.PeekChar() = "."c Then
-                    Dim mark As ScannerMark = m_buffer.Mark()
+                If Not _buffer.EndOfStream AndAlso _buffer.PeekChar() = "."c Then
+                    Dim mark As ScannerMark = _buffer.Mark()
 
-                    m_buffer.ReadChar()
+                    _buffer.ReadChar()
                     Dim fullWord As String = word & "." & ReadWord()
                     Dim fullNumberType As TokenType = TokenType.Ampersand
                     If IsNumber(fullWord, fullNumberType) Then
                         Return New Token(fullNumberType, fullWord)
                     Else
-                        m_buffer.RollBack(mark)
+                        _buffer.RollBack(mark)
                     End If
                 End If
 
@@ -711,13 +711,13 @@ Namespace Parser
             Dim builder As New StringBuilder()
             Dim done As Boolean = False
 
-            While Not done AndAlso Not m_buffer.EndOfStream
-                Dim c As Char = m_buffer.PeekChar()
+            While Not done AndAlso Not _buffer.EndOfStream
+                Dim c As Char = _buffer.PeekChar()
                 If c = vbCr Or c = vbLf Then
                     done = True
                 Else
                     builder.Append(c)
-                    m_buffer.ReadChar()
+                    _buffer.ReadChar()
                 End If
             End While
 
@@ -733,13 +733,13 @@ Namespace Parser
             Dim builder As New StringBuilder()
             Dim done As Boolean = False
 
-            While Not done AndAlso Not m_buffer.EndOfStream
-                Dim c As Char = m_buffer.PeekChar()
+            While Not done AndAlso Not _buffer.EndOfStream
+                Dim c As Char = _buffer.PeekChar()
                 If Char.IsLetterOrDigit(c) _
                     OrElse c = "_" _
                     OrElse c = "$" Then
                     builder.Append(c)
-                    m_buffer.EatChar()
+                    _buffer.EatChar()
                 Else
                     done = True
                 End If
@@ -787,11 +787,11 @@ Namespace Parser
             Dim done As Boolean = False
             builder.Append("/*")
 
-            While Not done AndAlso Not m_buffer.EndOfStream
-                Dim c As Char = m_buffer.ReadChar()
-                If (c = "*"c AndAlso m_buffer.PeekChar() = "/"c) Then
+            While Not done AndAlso Not _buffer.EndOfStream
+                Dim c As Char = _buffer.ReadChar()
+                If (c = "*"c AndAlso _buffer.PeekChar() = "/"c) Then
                     builder.Append("*/")
-                    m_buffer.EatChar()  ' Eat the /
+                    _buffer.EatChar()  ' Eat the /
                     done = True
                 Else
                     builder.Append(c)
@@ -808,21 +808,21 @@ Namespace Parser
         ''' <returns></returns>
         ''' <remarks></remarks>
         Private Function ReadDoubleQuoteOrString() As Token
-            Dim mark As ScannerMark = m_buffer.Mark()
+            Dim mark As ScannerMark = _buffer.Mark()
             Try
                 Dim builder As New StringBuilder
                 builder.Append(""""c)
 
                 Dim done As Boolean = False
                 While Not done
-                    Dim c As Char = m_buffer.ReadChar()
+                    Dim c As Char = _buffer.ReadChar()
                     Select Case c
                         Case """"c
                             builder.Append(""""c)
                             done = True
                         Case "\"c
                             builder.Append(c)
-                            builder.Append(m_buffer.ReadChar())
+                            builder.Append(_buffer.ReadChar())
                         Case Else
                             builder.Append(c)
                     End Select
@@ -832,7 +832,7 @@ Namespace Parser
             Catch ex As ScannerInternalException
                 ' If we get a scanner exception while trying to read the string then this
                 ' is just a simple quote.  Rollback the buffer and return the quote token
-                m_buffer.RollBack(mark)
+                _buffer.RollBack(mark)
                 Return New Token(TokenType.DoubleQuote, """"c)
             End Try
         End Function
@@ -844,16 +844,16 @@ Namespace Parser
         ''' <returns></returns>
         ''' <remarks></remarks>
         Private Function ReadSingleQuoteOrCharacter() As Token
-            If m_buffer.EndOfStream Then
+            If _buffer.EndOfStream Then
                 Return New Token(TokenType.SingleQuote, "'")
             End If
 
-            Dim mark As ScannerMark = m_buffer.Mark()
+            Dim mark As ScannerMark = _buffer.Mark()
             Dim token As Token = Nothing
             Try
-                Dim data As Char = m_buffer.ReadChar()
+                Dim data As Char = _buffer.ReadChar()
                 If data <> "\"c Then
-                    If m_buffer.ReadChar() = "'"c Then
+                    If _buffer.ReadChar() = "'"c Then
                         token = New Token(TokenType.CharacterAnsi, "'"c & data.ToString() & "'"c)
                     End If
                 Else
@@ -861,11 +861,11 @@ Namespace Parser
                     builder.Append(data)
 
                     Do
-                        data = m_buffer.ReadChar()
+                        data = _buffer.ReadChar()
                         If data = "'"c Then
                             token = New Token(TokenType.CharacterAnsi, "'"c & builder.ToString() & "'"c)
                             Exit Do
-                        ElseIf m_buffer.EndOfStream OrElse builder.Length > 5 Then
+                        ElseIf _buffer.EndOfStream OrElse builder.Length > 5 Then
                             Exit Do
                         Else
                             builder.Append(data)
@@ -877,7 +877,7 @@ Namespace Parser
             End Try
 
             If token Is Nothing Then
-                m_buffer.RollBack(mark)
+                _buffer.RollBack(mark)
                 token = New Token(TokenType.SingleQuote, "'")
             End If
 
@@ -894,7 +894,7 @@ Namespace Parser
             ' the quote and return the word "L"
             Dim token As Token = ReadSingleQuoteOrCharacter()
             If token.TokenType = TokenType.SingleQuote Then
-                m_buffer.MoveBack(1)
+                _buffer.MoveBack(1)
                 Return New Token(TokenType.Word, "L")
             Else
                 ThrowIfFalse(token.TokenType = TokenType.CharacterAnsi)
@@ -912,7 +912,7 @@ Namespace Parser
             If token.TokenType = TokenType.DoubleQuote Then
                 ' Read a double quote which means there wasn't a valid string afterwards.  Move
                 ' back over the " and return the L
-                m_buffer.MoveBack(1)
+                _buffer.MoveBack(1)
                 Return New Token(TokenType.Word, "L")
             Else
                 ThrowIfFalse(token.TokenType = TokenType.QuotedStringAnsi)
@@ -934,7 +934,7 @@ Namespace Parser
 #Region "Error Message Helpers"
 
         Public Sub AddError(ByVal msg As String)
-            m_errorProvider.AddError(GetMessagePrefix() & msg)
+            _errorProvider.AddError(GetMessagePrefix() & msg)
         End Sub
 
         Public Sub AddError(ByVal format As String, ByVal ParamArray args() As Object)
@@ -942,7 +942,7 @@ Namespace Parser
         End Sub
 
         Public Sub AddWarning(ByVal msg As String)
-            m_errorProvider.AddWarning(GetMessagePrefix() & msg)
+            _errorProvider.AddWarning(GetMessagePrefix() & msg)
         End Sub
 
         Public Sub AddWarning(ByVal format As String, ByVal ParamArray args() As Object)
@@ -950,7 +950,7 @@ Namespace Parser
         End Sub
 
         Private Function GetMessagePrefix() As String
-            Return String.Format("{0} {1}: ", m_readerBag.Name, m_buffer.LineNumber)
+            Return String.Format("{0} {1}: ", _readerBag.Name, _buffer.LineNumber)
         End Function
 
 #End Region

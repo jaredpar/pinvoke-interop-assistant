@@ -30,26 +30,26 @@ Namespace Transform
     ''' </summary>
     ''' <remarks></remarks>
     Public Class SalEntrySet
-        Private m_type As SalEntryListType
-        Private m_list As New List(Of SalEntry)
+        Private _type As SalEntryListType
+        Private _list As New List(Of SalEntry)
 
         Public Property Type() As SalEntryListType
             Get
-                Return m_type
+                Return _type
             End Get
             Set(ByVal value As SalEntryListType)
-                m_type = value
+                _type = value
             End Set
         End Property
 
         Public ReadOnly Property List() As List(Of SalEntry)
             Get
-                Return m_list
+                Return _list
             End Get
         End Property
 
         Public Sub New(ByVal type As SalEntryListType)
-            m_type = type
+            _type = type
         End Sub
 
         Public Function FindEntry(ByVal type As SalEntryType) As SalEntry
@@ -68,19 +68,19 @@ Namespace Transform
     ''' </summary>
     ''' <remarks></remarks>
     Public Class SalAnalyzer
-        Private m_sal As NativeSalAttribute
-        Private m_preList As New List(Of SalEntrySet)
-        Private m_itemList As New List(Of SalEntrySet)
-        Private m_postList As New List(Of SalEntrySet)
+        Private _sal As NativeSalAttribute
+        Private _preList As New List(Of SalEntrySet)
+        Private _itemList As New List(Of SalEntrySet)
+        Private _postList As New List(Of SalEntrySet)
 
         Public Sub New(ByVal sal As NativeSalAttribute)
-            m_sal = sal
+            _sal = sal
             BuildLists()
         End Sub
 
         Public ReadOnly Property IsEmpty() As Boolean
             Get
-                Return m_preList.Count = 0 AndAlso m_postList.Count = 0
+                Return _preList.Count = 0 AndAlso _postList.Count = 0
             End Get
         End Property
 
@@ -119,7 +119,7 @@ Namespace Transform
         ''' <returns></returns>
         ''' <remarks></remarks>
         Public Function IsIn() As Boolean
-            If m_preList.Count <> 2 OrElse m_itemList.Count <> 0 OrElse m_postList.Count <> 0 Then
+            If _preList.Count <> 2 OrElse _itemList.Count <> 0 OrElse _postList.Count <> 0 Then
                 Return False
             End If
 
@@ -139,7 +139,7 @@ Namespace Transform
         ''' <returns></returns>
         ''' <remarks></remarks>
         Public Function IsInOptional() As Boolean
-            If m_preList.Count <> 2 OrElse m_itemList.Count <> 0 OrElse m_postList.Count <> 0 Then
+            If _preList.Count <> 2 OrElse _itemList.Count <> 0 OrElse _postList.Count <> 0 Then
                 Return False
             End If
 
@@ -176,7 +176,7 @@ Namespace Transform
         ''' <remarks></remarks>
         Public Function IsInOut() As Boolean
 
-            If m_preList.Count <> 1 OrElse m_itemList.Count <> 0 OrElse m_postList.Count <> 1 Then
+            If _preList.Count <> 1 OrElse _itemList.Count <> 0 OrElse _postList.Count <> 1 Then
                 Return False
             End If
 
@@ -198,7 +198,7 @@ Namespace Transform
         ''' <returns></returns>
         ''' <remarks></remarks>
         Public Function IsInElementBuffer(ByRef sizeArg As String) As Boolean
-            If m_preList.Count <> 3 OrElse m_itemList.Count <> 0 OrElse m_postList.Count <> 0 Then
+            If _preList.Count <> 3 OrElse _itemList.Count <> 0 OrElse _postList.Count <> 0 Then
                 Return False
             End If
 
@@ -222,7 +222,7 @@ Namespace Transform
         ''' <returns></returns>
         ''' <remarks></remarks>
         Public Function IsInElementBufferOptional(ByRef sizeArg As String) As Boolean
-            If m_preList.Count <> 3 OrElse m_itemList.Count <> 0 OrElse m_postList.Count <> 0 Then
+            If _preList.Count <> 3 OrElse _itemList.Count <> 0 OrElse _postList.Count <> 0 Then
                 Return False
             End If
 
@@ -246,7 +246,7 @@ Namespace Transform
         ''' <returns></returns>
         ''' <remarks></remarks>
         Public Function IsInByteBuffer(ByRef sizeArg As String) As Boolean
-            If m_preList.Count <> 3 OrElse m_itemList.Count <> 0 OrElse m_postList.Count <> 0 Then
+            If _preList.Count <> 3 OrElse _itemList.Count <> 0 OrElse _postList.Count <> 0 Then
                 Return False
             End If
 
@@ -270,7 +270,7 @@ Namespace Transform
         ''' <returns></returns>
         ''' <remarks></remarks>
         Public Function IsInByteBufferOptional(ByRef sizeArg As String) As Boolean
-            If m_preList.Count <> 3 OrElse m_itemList.Count <> 0 OrElse m_postList.Count <> 0 Then
+            If _preList.Count <> 3 OrElse _itemList.Count <> 0 OrElse _postList.Count <> 0 Then
                 Return False
             End If
 
@@ -299,7 +299,7 @@ Namespace Transform
         ''' <returns></returns>
         ''' <remarks></remarks>
         Public Function IsOutElementBuffer(ByRef sizeArg As String) As Boolean
-            If m_preList.Count <> 0 OrElse m_itemList.Count <> 1 OrElse m_postList.Count <> 1 Then
+            If _preList.Count <> 0 OrElse _itemList.Count <> 1 OrElse _postList.Count <> 1 Then
                 Return False
             End If
 
@@ -328,7 +328,7 @@ Namespace Transform
         ''' <returns></returns>
         ''' <remarks></remarks>
         Public Function IsOutElementBufferOptional(ByRef sizeArg As String) As Boolean
-            If m_preList.Count <> 0 OrElse m_itemList.Count <> 1 OrElse m_postList.Count <> 1 Then
+            If _preList.Count <> 0 OrElse _itemList.Count <> 1 OrElse _postList.Count <> 1 Then
                 Return False
             End If
 
@@ -359,7 +359,7 @@ Namespace Transform
         ''' <returns></returns>
         ''' <remarks></remarks>
         Public Function IsOutPartElementBuffer(ByRef writableSize As String, ByRef readableSize As String) As Boolean
-            If m_preList.Count <> 0 OrElse m_itemList.Count <> 1 OrElse m_postList.Count <> 2 Then
+            If _preList.Count <> 0 OrElse _itemList.Count <> 1 OrElse _postList.Count <> 2 Then
                 Return False
             End If
 
@@ -392,7 +392,7 @@ Namespace Transform
         ''' <returns></returns>
         ''' <remarks></remarks>
         Public Function IsOutPartElementBufferOptional(ByRef writableSize As String, ByRef readableSize As String) As Boolean
-            If m_preList.Count <> 0 OrElse m_itemList.Count <> 1 OrElse m_postList.Count <> 2 Then
+            If _preList.Count <> 0 OrElse _itemList.Count <> 1 OrElse _postList.Count <> 2 Then
                 Return False
             End If
 
@@ -418,7 +418,7 @@ Namespace Transform
         ''' <returns></returns>
         ''' <remarks></remarks>
         Public Function IsOutByteBuffer(ByRef sizeArg As String) As Boolean
-            If m_preList.Count <> 0 OrElse m_itemList.Count <> 1 OrElse m_postList.Count <> 1 Then
+            If _preList.Count <> 0 OrElse _itemList.Count <> 1 OrElse _postList.Count <> 1 Then
                 Return False
             End If
 
@@ -441,7 +441,7 @@ Namespace Transform
         ''' <returns></returns>
         ''' <remarks></remarks>
         Public Function IsOutByteBufferOptional(ByRef sizeArg As String) As Boolean
-            If m_preList.Count <> 0 OrElse m_itemList.Count <> 1 OrElse m_postList.Count <> 1 Then
+            If _preList.Count <> 0 OrElse _itemList.Count <> 1 OrElse _postList.Count <> 1 Then
                 Return False
             End If
 
@@ -464,7 +464,7 @@ Namespace Transform
         ''' <returns></returns>
         ''' <remarks></remarks>
         Public Function IsOutPartByteBuffer(ByRef sizeArg As String, ByRef readableArg As String) As Boolean
-            If m_preList.Count <> 0 OrElse m_itemList.Count <> 1 OrElse m_postList.Count <> 2 Then
+            If _preList.Count <> 0 OrElse _itemList.Count <> 1 OrElse _postList.Count <> 2 Then
                 Return False
             End If
 
@@ -490,7 +490,7 @@ Namespace Transform
         ''' <returns></returns>
         ''' <remarks></remarks>
         Public Function IsOutPartByteBufferOptional(ByRef sizeArg As String, ByRef readableArg As String) As Boolean
-            If m_preList.Count <> 0 OrElse m_itemList.Count <> 1 OrElse m_postList.Count <> 2 Then
+            If _preList.Count <> 0 OrElse _itemList.Count <> 1 OrElse _postList.Count <> 2 Then
                 Return False
             End If
 
@@ -523,7 +523,7 @@ Namespace Transform
         ''' <remarks></remarks>
         Public Function IsInOutElementBuffer(ByRef sizeArg As String) As Boolean
 
-            If m_preList.Count <> 1 OrElse m_itemList.Count <> 1 OrElse m_postList.Count <> 1 Then
+            If _preList.Count <> 1 OrElse _itemList.Count <> 1 OrElse _postList.Count <> 1 Then
                 Return False
             End If
 
@@ -549,7 +549,7 @@ Namespace Transform
         ''' <remarks></remarks>
         Public Function IsInOutByteBuffer(ByRef sizeArg As String) As Boolean
 
-            If m_preList.Count <> 1 OrElse m_itemList.Count <> 1 OrElse m_postList.Count <> 1 Then
+            If _preList.Count <> 1 OrElse _itemList.Count <> 1 OrElse _postList.Count <> 1 Then
                 Return False
             End If
 
@@ -572,7 +572,7 @@ Namespace Transform
         ''' <returns></returns>
         ''' <remarks></remarks>
         Public Function IsDerefOut() As Boolean
-            If m_preList.Count <> 0 OrElse m_itemList.Count <> 1 OrElse m_postList.Count <> 4 Then
+            If _preList.Count <> 0 OrElse _itemList.Count <> 1 OrElse _postList.Count <> 4 Then
                 Return False
             End If
 
@@ -626,15 +626,15 @@ Namespace Transform
         End Function
 
         Public Function FindPost(ByVal ParamArray args As SalEntryType()) As SalEntrySet
-            Return FindSet(m_postList, args)
+            Return FindSet(_postList, args)
         End Function
 
         Public Function FindPre(ByVal ParamArray args As SalEntryType()) As SalEntrySet
-            Return FindSet(m_preList, args)
+            Return FindSet(_preList, args)
         End Function
 
         Public Function FindItem(ByVal ParamArray args As SalEntryType()) As SalEntrySet
-            Return FindSet(m_itemList, args)
+            Return FindSet(_itemList, args)
         End Function
 
         ''' <summary>
@@ -665,12 +665,12 @@ Namespace Transform
         End Function
 
         Private Sub BuildLists()
-            ThrowIfNull(m_sal)
-            If m_sal.IsEmpty() Then
+            ThrowIfNull(_sal)
+            If _sal.IsEmpty() Then
                 Return
             End If
 
-            Dim list As New List(Of NativeSalEntry)(m_sal.SalEntryList)
+            Dim list As New List(Of NativeSalEntry)(_sal.SalEntryList)
             Dim dest As New List(Of SalEntrySet)
             Dim cur As SalEntrySet
             If list(0).SalEntryType = SalEntryType.Post Then
@@ -704,11 +704,11 @@ Namespace Transform
 
                 Select Case l.Type
                     Case SalEntryListType.Post
-                        m_postList.Add(l)
+                        _postList.Add(l)
                     Case SalEntryListType.Pre
-                        m_preList.Add(l)
+                        _preList.Add(l)
                     Case SalEntryListType.Item
-                        m_itemList.Add(l)
+                        _itemList.Add(l)
                     Case Else
                         InvalidEnumValue(l.Type)
                 End Select

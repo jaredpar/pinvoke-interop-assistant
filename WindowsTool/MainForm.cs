@@ -1,8 +1,3 @@
-/* **********************************************************************************
- *
- * Copyright (c) Microsoft Corporation. All rights reserved.
- *
- * **********************************************************************************/
 
 using System;
 using System.Text;
@@ -20,7 +15,7 @@ namespace WindowsTool
 {
     public partial class MainForm : Form
     {
-        enum TabMode
+        private enum TabMode
         {
             ReversePInvoke,
             PInvokeSearch,
@@ -71,7 +66,7 @@ namespace WindowsTool
 
             private static bool IsType(ImageIndex ii)
             {
-                return(ii == ImageIndex.Class || ii == ImageIndex.Interface || ii == ImageIndex.Structure);
+                return (ii == ImageIndex.Class || ii == ImageIndex.Interface || ii == ImageIndex.Structure);
             }
         }
 
@@ -79,49 +74,48 @@ namespace WindowsTool
 
         #region Fields and Properties
 
-        private Properties.Settings userSettings = Properties.Settings.Default;
+        private Properties.Settings _userSettings = Properties.Settings.Default;
 
-        private bool firstTimeActivated;
-        private bool printing;
-        private bool printPending;
+        private bool _firstTimeActivated;
+        private bool _printing;
+        private bool _printPending;
 
-        private string lastTreePath;
-        private string lastAssemblyPath;
+        private string _lastTreePath;
+        private string _lastAssemblyPath;
 
-        private bool nativeStorageSet;
-        private NativeStorage nativeStorage;
+        private bool _nativeStorageSet;
+        private NativeStorage _nativeStorage;
 
-        private string signatureString;
+        private string _signatureString;
 
         public string SignatureString
         {
             get
-            { return signatureString; }
+            { return _signatureString; }
         }
 
         private TabMode Mode
         {
             get
             {
-                if( Object.ReferenceEquals(tabControl1.SelectedTab, reversePInvokeTabPage))
+                if (Object.ReferenceEquals(tabControl1.SelectedTab, reversePInvokeTabPage))
                 {
                     return TabMode.ReversePInvoke;
                 }
                 else if (object.ReferenceEquals(tabControl1.SelectedTab, pinvokeSearchTabPage))
                 {
-                    return TabMode.PInvokeSearch; 
+                    return TabMode.PInvokeSearch;
                 }
                 else if (object.ReferenceEquals(tabControl1.SelectedTab, pinvokeSnippetTabPage))
                 {
-                    return TabMode.PInvokeSnippet; 
+                    return TabMode.PInvokeSnippet;
                 }
                 else
                 {
                     Debug.Fail("Invalid Mode");
-                    return TabMode.ReversePInvoke; 
+                    return TabMode.ReversePInvoke;
                 }
             }
-
         }
 
         private ISignatureImportControl PInvokeControl
@@ -130,7 +124,7 @@ namespace WindowsTool
             {
                 switch (Mode)
                 {
-                    case TabMode.PInvokeSnippet: 
+                    case TabMode.PInvokeSnippet:
                         return snippetDisplay;
                     case TabMode.PInvokeSearch:
                         return symbolDisplay;
@@ -145,18 +139,18 @@ namespace WindowsTool
         {
             get
             {
-//                if (applicationVersionString == null)
-//                {
-//#if RAZZLE_BUILD
-//                    applicationVersionString = Text.Replace("n.n.nnnn.nnnnn", ThisAssembly.InformationalVersion);
-//#else // RAZZLE_BUILD
-//                AssemblyName lib_assembly_name = typeof(SignatureGenerator.NativeSignature).Assembly.GetName();
-//                applicationVersionString = lib_assembly_name.Version.ToString();
-//#endif // RAZZLE_BUILD
-//                }
-//                Debug.Assert(applicationVersionString != null);
-//                return applicationVersionString;
-                
+                //                if (applicationVersionString == null)
+                //                {
+                //#if RAZZLE_BUILD
+                //                    applicationVersionString = Text.Replace("n.n.nnnn.nnnnn", ThisAssembly.InformationalVersion);
+                //#else // RAZZLE_BUILD
+                //                AssemblyName lib_assembly_name = typeof(SignatureGenerator.NativeSignature).Assembly.GetName();
+                //                applicationVersionString = lib_assembly_name.Version.ToString();
+                //#endif // RAZZLE_BUILD
+                //                }
+                //                Debug.Assert(applicationVersionString != null);
+                //                return applicationVersionString;
+
                 // hard-coding 1.0 for the MSDN release
                 return "1.0";
             }
@@ -214,13 +208,13 @@ namespace WindowsTool
         {
             if (disposing)
             {
-                userSettings.Mode = (int)Mode; 
-                userSettings.PInvokeSnippetAutoGenerate = snippetDisplay.AutoGenerate;
-                userSettings.PInvokeSearchAutoGenerate = symbolDisplay.AutoGenerate;
-                userSettings.PInvokeLanguageType = symbolDisplay.LanguageType.ToString();
-                userSettings.PInvokeSearchKind = symbolDisplay.SearchKind.ToString();
-                userSettings.PInvokeShowAll = symbolDisplay.ShowAll;
-                userSettings.Save();
+                _userSettings.Mode = (int)Mode;
+                _userSettings.PInvokeSnippetAutoGenerate = snippetDisplay.AutoGenerate;
+                _userSettings.PInvokeSearchAutoGenerate = symbolDisplay.AutoGenerate;
+                _userSettings.PInvokeLanguageType = symbolDisplay.LanguageType.ToString();
+                _userSettings.PInvokeSearchKind = symbolDisplay.SearchKind.ToString();
+                _userSettings.PInvokeShowAll = symbolDisplay.ShowAll;
+                _userSettings.Save();
             }
         }
 
@@ -245,15 +239,15 @@ namespace WindowsTool
             ThreadPool.QueueUserWorkItem(new WaitCallback(this.LoadNativeStorage), this);
 
             // Load up the correct tab page
-            switch ((TabMode)(userSettings.Mode))
+            switch ((TabMode)(_userSettings.Mode))
             {
-                case TabMode.ReversePInvoke:  
+                case TabMode.ReversePInvoke:
                     tabControl1.SelectedTab = reversePInvokeTabPage;
                     break;
-                case TabMode.PInvokeSearch: 
+                case TabMode.PInvokeSearch:
                     tabControl1.SelectedTab = pinvokeSearchTabPage;
                     break;
-                case TabMode.PInvokeSnippet: 
+                case TabMode.PInvokeSnippet:
                     tabControl1.SelectedTab = pinvokeSnippetTabPage;
                     break;
                 default:
@@ -262,21 +256,21 @@ namespace WindowsTool
             }
 
             // Show all setting
-            showAllToolStripMenuItem.Checked = userSettings.PInvokeShowAll;
-            symbolDisplay.ShowAll = userSettings.PInvokeShowAll;
+            showAllToolStripMenuItem.Checked = _userSettings.PInvokeShowAll;
+            symbolDisplay.ShowAll = _userSettings.PInvokeShowAll;
 
             // Disable wrapper method generation
             PInvoke.Transform.TransformKindFlags transformFlags = PInvoke.Transform.TransformKindFlags.All;
             transformFlags &= ~PInvoke.Transform.TransformKindFlags.WrapperMethods;
-            symbolDisplay.TransformKindFlags = transformFlags; 
+            symbolDisplay.TransformKindFlags = transformFlags;
             snippetDisplay.TransformKindFlags = transformFlags;
 
             // Load settings
-            symbolDisplay.AutoGenerate = userSettings.PInvokeSearchAutoGenerate;
-            snippetDisplay.AutoGenerate = userSettings.PInvokeSnippetAutoGenerate;
-            symbolDisplay.SearchKind = ParseOrDefault(userSettings.PInvokeSearchKind, SearchKind.All);
-            symbolDisplay.LanguageType = ParseOrDefault(userSettings.PInvokeLanguageType, PInvoke.Transform.LanguageType.CSharp);
-            snippetDisplay.LanguageType = ParseOrDefault(userSettings.PInvokeLanguageType, PInvoke.Transform.LanguageType.CSharp);
+            symbolDisplay.AutoGenerate = _userSettings.PInvokeSearchAutoGenerate;
+            snippetDisplay.AutoGenerate = _userSettings.PInvokeSnippetAutoGenerate;
+            symbolDisplay.SearchKind = ParseOrDefault(_userSettings.PInvokeSearchKind, SearchKind.All);
+            symbolDisplay.LanguageType = ParseOrDefault(_userSettings.PInvokeLanguageType, PInvoke.Transform.LanguageType.CSharp);
+            snippetDisplay.LanguageType = ParseOrDefault(_userSettings.PInvokeLanguageType, PInvoke.Transform.LanguageType.CSharp);
             snippetDisplay.LanguageTypeChanged += new EventHandler(OnLanguageTypeChanged);
             symbolDisplay.LanguageTypeChanged += new EventHandler(OnLanguageTypeChanged);
         }
@@ -288,16 +282,16 @@ namespace WindowsTool
 
         private void MainForm_Activated(object sender, EventArgs e)
         {
-            if (!firstTimeActivated)
+            if (!_firstTimeActivated)
             {
-                firstTimeActivated = true;
+                _firstTimeActivated = true;
                 OnTabPageChanged(this, EventArgs.Empty);
             }
         }
 
         private void buttonCancel_Click(object sender, EventArgs e)
         {
-            this.signatureString = null;
+            _signatureString = null;
             this.DialogResult = DialogResult.Cancel;
             this.Close();
         }
@@ -388,7 +382,7 @@ namespace WindowsTool
             fileToolStripMenuItemExp.Available = sigexp;
             fileToolStripMenuItemImp.Available = !sigexp;
 
-            if (TabMode.ReversePInvoke == Mode) 
+            if (TabMode.ReversePInvoke == Mode)
             {
                 OnReversePInvokeTabDisplay();
             }
@@ -400,7 +394,7 @@ namespace WindowsTool
 
         private void OnPInvokeTabDisplay()
         {
-            if (this.nativeStorage == null)
+            if (_nativeStorage == null)
             {
                 Cursor = Cursors.WaitCursor;
                 symbolDisplay.Enabled = false;
@@ -418,12 +412,12 @@ namespace WindowsTool
             statusStripProgressBar.Style = ProgressBarStyle.Blocks;
             statusStripProgressBar.Visible = false;
             statusStripLabel.Text = String.Empty;
-            if (!nativeStorageSet && this.nativeStorage != null)
+            if (!_nativeStorageSet && _nativeStorage != null)
             {
                 statusStrip.Text = String.Empty;
-                this.symbolDisplay.NativeStorage = this.nativeStorage;
-                this.snippetDisplay.NativeStorage = this.nativeStorage;
-                nativeStorageSet = true;
+                symbolDisplay.NativeStorage = _nativeStorage;
+                snippetDisplay.NativeStorage = _nativeStorage;
+                _nativeStorageSet = true;
             }
         }
 
@@ -1126,7 +1120,7 @@ namespace WindowsTool
         {
             try
             {
-                nativeStorage = NativeStorage.LoadFromAssemblyPath();
+                _nativeStorage = NativeStorage.LoadFromAssemblyPath();
             }
             catch (Exception ex)
             {
@@ -1135,9 +1129,9 @@ namespace WindowsTool
             }
             finally
             {
-                if (nativeStorage == null)
+                if (_nativeStorage == null)
                 {
-                    nativeStorage = new NativeStorage();
+                    _nativeStorage = new NativeStorage();
                 }
             }
 
@@ -1145,7 +1139,7 @@ namespace WindowsTool
             ISynchronizeInvoke invoke = (ISynchronizeInvoke)invokeUntyped;
             try
             {
-                WaitCallback del = delegate(object notused) { this.OnTabPageChanged(this, EventArgs.Empty); };
+                WaitCallback del = delegate (object notused) { this.OnTabPageChanged(this, EventArgs.Empty); };
                 invoke.Invoke(del, new object[] { null });
             }
             catch (Exception)
@@ -1168,6 +1162,5 @@ namespace WindowsTool
         }
 
         #endregion
-
     }
 }

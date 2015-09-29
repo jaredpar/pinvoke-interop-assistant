@@ -7,25 +7,25 @@ Namespace Parser
     ''' </summary>
     ''' <remarks></remarks>
     Public Class ExpressionEvaluator
-        Private m_parser As New ExpressionParser()
-        Private m_opts As ScannerOptions
+        Private _parser As New ExpressionParser()
+        Private _opts As ScannerOptions
 
         Public Sub New()
-            m_opts = New ScannerOptions()
-            m_opts.HideComments = True
-            m_opts.HideNewLines = True
-            m_opts.HideWhitespace = True
-            m_opts.ThrowOnEndOfStream = False
+            _opts = New ScannerOptions()
+            _opts.HideComments = True
+            _opts.HideNewLines = True
+            _opts.HideWhitespace = True
+            _opts.ThrowOnEndOfStream = False
         End Sub
 
         Public Function TryEvaluate(ByVal expr As String, ByRef result As ExpressionValue) As Boolean
-            Dim list As List(Of Token) = Scanner.TokenizeText(expr, m_opts)
+            Dim list As List(Of Token) = Scanner.TokenizeText(expr, _opts)
             Return TryEvaluate(list, result)
         End Function
 
         Public Function TryEvaluate(ByVal list As List(Of Token), ByRef result As ExpressionValue) As Boolean
             Dim node As ExpressionNode = Nothing
-            If Not m_parser.TryParse(list, node) Then
+            If Not _parser.TryParse(list, node) Then
                 result = Nothing
                 Return False
             End If

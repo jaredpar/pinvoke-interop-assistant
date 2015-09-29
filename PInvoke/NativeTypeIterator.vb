@@ -6,24 +6,24 @@ Imports System.Collections.Generic
 ''' </summary>
 ''' <remarks></remarks>
 Public Class NativeSymbolRelationship
-    Private m_parent As NativeSymbol
-    Private m_symbol As NativeSymbol
+    Private _parent As NativeSymbol
+    Private _symbol As NativeSymbol
 
     Public ReadOnly Property Parent() As NativeSymbol
         Get
-            Return m_parent
+            Return _parent
         End Get
     End Property
 
     Public ReadOnly Property Symbol() As NativeSymbol
         Get
-            Return m_symbol
+            Return _symbol
         End Get
     End Property
 
     Public Sub New(ByVal parent As NativeSymbol, ByVal symbol As NativeSymbol)
-        m_parent = parent
-        m_symbol = symbol
+        _parent = parent
+        _symbol = symbol
     End Sub
 End Class
 

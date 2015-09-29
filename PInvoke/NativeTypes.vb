@@ -54,7 +54,7 @@ Public MustInherit Class NativeSymbol
 
     Protected Shared EmptySymbolList As New List(Of NativeSymbol)
 
-    Private m_name As String
+    Private _name As String
 
     ''' <summary>
     ''' Name of the C++ type
@@ -64,10 +64,10 @@ Public MustInherit Class NativeSymbol
     ''' <remarks></remarks>
     Public Property Name() As String
         Get
-            Return m_name
+            Return _name
         End Get
         Set(ByVal value As String)
-            m_name = value
+            _name = value
         End Set
     End Property
 
@@ -116,7 +116,7 @@ Public MustInherit Class NativeSymbol
     End Sub
 
     Protected Sub New(ByVal name As String)
-        m_name = name
+        _name = name
     End Sub
 
     ''' <summary>
@@ -298,8 +298,8 @@ End Class
 Public MustInherit Class NativeDefinedType
     Inherits NativeType
 
-    Private m_isAnonymous As Boolean
-    Private m_members As New List(Of NativeMember)
+    Private _isAnonymous As Boolean
+    Private _members As New List(Of NativeMember)
 
     ''' <summary>
     ''' Whether or not this type is anonymous
@@ -309,10 +309,10 @@ Public MustInherit Class NativeDefinedType
     ''' <remarks></remarks>
     Public Property IsAnonymous() As Boolean
         Get
-            Return m_isAnonymous
+            Return _isAnonymous
         End Get
         Set(ByVal value As Boolean)
-            m_isAnonymous = value
+            _isAnonymous = value
         End Set
     End Property
 
@@ -330,7 +330,7 @@ Public MustInherit Class NativeDefinedType
     ''' <remarks></remarks>
     Public ReadOnly Property Members() As List(Of NativeMember)
         Get
-            Return m_members
+            Return _members
         End Get
     End Property
 
@@ -352,7 +352,7 @@ Public MustInherit Class NativeDefinedType
     End Function
 
     Public Overrides Sub ReplaceChild(ByVal oldChild As NativeSymbol, ByVal newChild As NativeSymbol)
-        ReplaceChildInList(oldChild, newChild, m_members)
+        ReplaceChildInList(oldChild, newChild, _members)
     End Sub
 
 End Class
@@ -423,7 +423,7 @@ End Class
 Public Class NativeEnum
     Inherits NativeDefinedType
 
-    Private m_list As New List(Of NativeEnumValue)
+    Private _list As New List(Of NativeEnumValue)
 
     Public Overrides ReadOnly Property Kind() As NativeSymbolKind
         Get
@@ -439,7 +439,7 @@ Public Class NativeEnum
     ''' <remarks></remarks>
     Public ReadOnly Property Values() As List(Of NativeEnumValue)
         Get
-            Return m_list
+            Return _list
         End Get
     End Property
 
@@ -466,7 +466,7 @@ Public Class NativeEnum
     End Function
 
     Public Overrides Sub ReplaceChild(ByVal oldChild As NativeSymbol, ByVal newChild As NativeSymbol)
-        ReplaceChildInList(oldChild, newChild, m_list)
+        ReplaceChildInList(oldChild, newChild, _list)
     End Sub
 
 End Class
@@ -479,7 +479,7 @@ End Class
 Public Class NativeEnumValue
     Inherits NativeExtraSymbol
 
-    Private m_value As NativeValueExpression
+    Private _value As NativeValueExpression
 
     ''' <summary>
     ''' Value of the value
@@ -489,10 +489,10 @@ Public Class NativeEnumValue
     ''' <remarks></remarks>
     Public Property Value() As NativeValueExpression
         Get
-            Return m_value
+            Return _value
         End Get
         Set(ByVal value As NativeValueExpression)
-            m_value = value
+            _value = value
         End Set
     End Property
 
@@ -502,7 +502,7 @@ Public Class NativeEnumValue
 
     Public Sub New(ByVal name As String, ByVal value As String)
         Me.Name = name
-        m_value = New NativeValueExpression(value)
+        _value = New NativeValueExpression(value)
     End Sub
 
     Public Overrides ReadOnly Property Kind() As NativeSymbolKind
@@ -512,11 +512,11 @@ Public Class NativeEnumValue
     End Property
 
     Public Overrides Function GetChildren() As System.Collections.Generic.IEnumerable(Of NativeSymbol)
-        Return GetSingleChild(m_value)
+        Return GetSingleChild(_value)
     End Function
 
     Public Overrides Sub ReplaceChild(ByVal oldChild As NativeSymbol, ByVal newChild As NativeSymbol)
-        ReplaceChildSingle(oldChild, newChild, m_value)
+        ReplaceChildSingle(oldChild, newChild, _value)
     End Sub
 
 End Class
@@ -533,8 +533,8 @@ End Class
 Public Class NativeFunctionPointer
     Inherits NativeDefinedType
 
-    Private m_sig As New NativeSignature
-    Private m_conv As NativeCallingConvention = NativeCallingConvention.WinApi
+    Private _sig As New NativeSignature
+    Private _conv As NativeCallingConvention = NativeCallingConvention.WinApi
 
     ''' <summary>
     ''' Get the signature of the function pointer
@@ -544,19 +544,19 @@ Public Class NativeFunctionPointer
     ''' <remarks></remarks>
     Public Property Signature() As NativeSignature
         Get
-            Return m_sig
+            Return _sig
         End Get
         Set(ByVal value As NativeSignature)
-            m_sig = value
+            _sig = value
         End Set
     End Property
 
     Public Property CallingConvention() As NativeCallingConvention
         Get
-            Return m_conv
+            Return _conv
         End Get
         Set(ByVal value As NativeCallingConvention)
-            m_conv = value
+            _conv = value
         End Set
     End Property
 
@@ -595,7 +595,7 @@ Public Class NativeFunctionPointer
     End Function
 
     Public Overrides Sub ReplaceChild(ByVal oldChild As NativeSymbol, ByVal newChild As NativeSymbol)
-        ReplaceChildSingle(oldChild, newChild, m_sig)
+        ReplaceChildSingle(oldChild, newChild, _sig)
     End Sub
 
 End Class
@@ -615,7 +615,7 @@ End Class
 Public MustInherit Class NativeProxyType
     Inherits NativeType
 
-    Private m_realType As NativeType
+    Private _realType As NativeType
 
     ''' <summary>
     ''' Underlying type of the array
@@ -625,26 +625,26 @@ Public MustInherit Class NativeProxyType
     ''' <remarks></remarks>
     Public Property RealType() As NativeType
         Get
-            Return m_realType
+            Return _realType
         End Get
         Set(ByVal value As NativeType)
-            m_realType = value
+            _realType = value
         End Set
     End Property
 
     Public ReadOnly Property RealTypeDigged() As NativeType
         Get
-            If m_realType IsNot Nothing Then
-                Return m_realType.DigThroughTypedefAndNamedTypes()
+            If _realType IsNot Nothing Then
+                Return _realType.DigThroughTypedefAndNamedTypes()
             End If
 
-            Return m_realType
+            Return _realType
         End Get
     End Property
 
     Public Overrides ReadOnly Property IsImmediateResolved() As Boolean
         Get
-            Return m_realType IsNot Nothing
+            Return _realType IsNot Nothing
         End Get
     End Property
 
@@ -663,7 +663,7 @@ Public MustInherit Class NativeProxyType
     End Function
 
     Public Overrides Sub ReplaceChild(ByVal oldChild As NativeSymbol, ByVal newChild As NativeSymbol)
-        ReplaceChildSingle(oldChild, newChild, m_realType)
+        ReplaceChildSingle(oldChild, newChild, _realType)
     End Sub
 
 End Class
@@ -677,7 +677,7 @@ End Class
 Public Class NativeArray
     Inherits NativeProxyType
 
-    Private m_elementCount As Integer = -1
+    Private _elementCount As Integer = -1
 
     Public Overrides ReadOnly Property Kind() As NativeSymbolKind
         Get
@@ -694,10 +694,10 @@ Public Class NativeArray
     ''' <remarks></remarks>
     Public Property ElementCount() As Integer
         Get
-            Return m_elementCount
+            Return _elementCount
         End Get
         Set(ByVal value As Integer)
-            m_elementCount = value
+            _elementCount = value
         End Set
     End Property
 
@@ -710,7 +710,7 @@ Public Class NativeArray
     Public Overrides ReadOnly Property DisplayName() As String
         Get
             Dim suffix As String
-            If m_elementCount >= 0 Then
+            If _elementCount >= 0 Then
                 suffix = String.Format("[{0}]", Me.ElementCount)
             Else
                 suffix = "[]"
@@ -798,8 +798,8 @@ End Class
 Public Class NativeNamedType
     Inherits NativeProxyType
 
-    Private m_qualification As String
-    Private m_isConst As Boolean
+    Private _qualification As String
+    Private _isConst As Boolean
 
     ''' <summary>
     ''' When a type is referenced by it's full name (struct, union, enum) this holds the reference 
@@ -809,13 +809,13 @@ Public Class NativeNamedType
     ''' <remarks></remarks>
     Public Property Qualification() As String
         Get
-            If m_qualification Is Nothing Then
+            If _qualification Is Nothing Then
                 Return String.Empty
             End If
-            Return m_qualification
+            Return _qualification
         End Get
         Set(ByVal value As String)
-            m_qualification = value
+            _qualification = value
         End Set
     End Property
 
@@ -827,10 +827,10 @@ Public Class NativeNamedType
     ''' <remarks></remarks>
     Public Property IsConst() As Boolean
         Get
-            Return m_isConst
+            Return _isConst
         End Get
         Set(ByVal value As Boolean)
-            m_isConst = value
+            _isConst = value
         End Set
     End Property
 
@@ -845,10 +845,10 @@ Public Class NativeNamedType
         Get
             If RealType IsNot Nothing Then
                 Dim name As String
-                If String.IsNullOrEmpty(m_qualification) Then
+                If String.IsNullOrEmpty(_qualification) Then
                     name = RealType.DisplayName
                 Else
-                    name = m_qualification & " " & RealType.DisplayName
+                    name = _qualification & " " & RealType.DisplayName
                 End If
 
                 If IsConst Then
@@ -864,7 +864,7 @@ Public Class NativeNamedType
 
     Public Sub New(ByVal qualification As String, ByVal name As String)
         MyBase.New(name)
-        m_qualification = qualification
+        _qualification = qualification
     End Sub
 
     Public Sub New(ByVal name As String)
@@ -873,13 +873,13 @@ Public Class NativeNamedType
 
     Public Sub New(ByVal name As String, ByVal isConst As Boolean)
         MyBase.New(name)
-        m_isConst = isConst
+        _isConst = isConst
     End Sub
 
     Public Sub New(ByVal qualification As String, ByVal name As String, ByVal isConst As Boolean)
         MyBase.New(name)
-        m_qualification = qualification
-        m_isConst = isConst
+        _qualification = qualification
+        _isConst = isConst
     End Sub
 
     Public Sub New(ByVal name As String, ByVal realType As NativeType)
@@ -968,7 +968,7 @@ End Class
 Public Class NativeBitVector
     Inherits NativeSpecializedType
 
-    Private m_size As Integer
+    Private _size As Integer
 
     Public Overrides ReadOnly Property Kind() As NativeSymbolKind
         Get
@@ -984,10 +984,10 @@ Public Class NativeBitVector
     ''' <remarks></remarks>
     Public Property Size() As Integer
         Get
-            Return m_size
+            Return _size
         End Get
         Set(ByVal value As Integer)
-            m_size = value
+            _size = value
         End Set
     End Property
 
@@ -1003,7 +1003,7 @@ Public Class NativeBitVector
 
     Public Sub New(ByVal size As Integer)
         Me.Name = "<bitvector>"
-        m_size = size
+        _size = size
     End Sub
 
 End Class
@@ -1043,12 +1043,12 @@ End Enum
 Public Class NativeBuiltinType
     Inherits NativeSpecializedType
 
-    Private Shared m_lookupMap As Dictionary(Of String, NativeBuiltinType)
+    Private Shared s_lookupMap As Dictionary(Of String, NativeBuiltinType)
 
-    Private m_builtinType As BuiltinType
-    Private m_isUnsigned As Boolean
-    Private m_managedType As Type
-    Private m_unmanagedType As System.Runtime.InteropServices.UnmanagedType
+    Private _builtinType As BuiltinType
+    Private _isUnsigned As Boolean
+    Private _managedType As Type
+    Private _unmanagedType As System.Runtime.InteropServices.UnmanagedType
 
     Public Overrides ReadOnly Property Kind() As NativeSymbolKind
         Get
@@ -1058,7 +1058,7 @@ Public Class NativeBuiltinType
 
     Public Overrides ReadOnly Property DisplayName() As String
         Get
-            If m_builtinType = PInvoke.BuiltinType.NativeUnknown Then
+            If _builtinType = PInvoke.BuiltinType.NativeUnknown Then
                 Return Name
             End If
 
@@ -1079,38 +1079,38 @@ Public Class NativeBuiltinType
     ''' <remarks></remarks>
     Public Property BuiltinType() As BuiltinType
         Get
-            Return m_builtinType
+            Return _builtinType
         End Get
         Set(ByVal value As BuiltinType)
-            m_builtinType = value
+            _builtinType = value
         End Set
     End Property
 
     Public Property IsUnsigned() As Boolean
         Get
-            Return m_isUnsigned
+            Return _isUnsigned
         End Get
         Set(ByVal value As Boolean)
-            m_isUnsigned = value
+            _isUnsigned = value
             Init()
         End Set
     End Property
 
     Public ReadOnly Property ManagedType() As Type
         Get
-            Return m_managedType
+            Return _managedType
         End Get
     End Property
 
     Public ReadOnly Property UnmanagedType() As Runtime.InteropServices.UnmanagedType
         Get
-            Return m_unmanagedType
+            Return _unmanagedType
         End Get
     End Property
 
     Public Sub New(ByVal bt As BuiltinType)
         MyBase.New("")
-        m_builtinType = bt
+        _builtinType = bt
         Init()
     End Sub
 
@@ -1122,7 +1122,7 @@ Public Class NativeBuiltinType
 
     Public Sub New(ByVal name As String)
         MyBase.New(name)
-        m_builtinType = PInvoke.BuiltinType.NativeUnknown
+        _builtinType = PInvoke.BuiltinType.NativeUnknown
         Init()
     End Sub
 
@@ -1130,63 +1130,63 @@ Public Class NativeBuiltinType
         Select Case Me.BuiltinType
             Case PInvoke.BuiltinType.NativeBoolean
                 Name = "boolean"
-                m_managedType = GetType(Boolean)
-                m_unmanagedType = Runtime.InteropServices.UnmanagedType.Bool
+                _managedType = GetType(Boolean)
+                _unmanagedType = Runtime.InteropServices.UnmanagedType.Bool
             Case PInvoke.BuiltinType.NativeByte
                 Name = "byte"
-                m_managedType = GetType(Byte)
-                m_unmanagedType = Runtime.InteropServices.UnmanagedType.I1
+                _managedType = GetType(Byte)
+                _unmanagedType = Runtime.InteropServices.UnmanagedType.I1
             Case PInvoke.BuiltinType.NativeInt16
                 Name = "short"
                 If IsUnsigned Then
-                    m_managedType = GetType(UInt16)
-                    m_unmanagedType = Runtime.InteropServices.UnmanagedType.U2
+                    _managedType = GetType(UInt16)
+                    _unmanagedType = Runtime.InteropServices.UnmanagedType.U2
                 Else
-                    m_managedType = GetType(Int16)
-                    m_unmanagedType = Runtime.InteropServices.UnmanagedType.I2
+                    _managedType = GetType(Int16)
+                    _unmanagedType = Runtime.InteropServices.UnmanagedType.I2
                 End If
             Case PInvoke.BuiltinType.NativeInt32
                 Name = "int"
                 If IsUnsigned Then
-                    m_managedType = GetType(UInt32)
-                    m_unmanagedType = Runtime.InteropServices.UnmanagedType.U4
+                    _managedType = GetType(UInt32)
+                    _unmanagedType = Runtime.InteropServices.UnmanagedType.U4
                 Else
-                    m_managedType = GetType(Int32)
-                    m_unmanagedType = Runtime.InteropServices.UnmanagedType.I4
+                    _managedType = GetType(Int32)
+                    _unmanagedType = Runtime.InteropServices.UnmanagedType.I4
                 End If
             Case PInvoke.BuiltinType.NativeInt64
                 Name = "__int64"
                 If IsUnsigned Then
-                    m_managedType = GetType(UInt64)
-                    m_unmanagedType = Runtime.InteropServices.UnmanagedType.U8
+                    _managedType = GetType(UInt64)
+                    _unmanagedType = Runtime.InteropServices.UnmanagedType.U8
                 Else
-                    m_managedType = GetType(Int64)
-                    m_unmanagedType = Runtime.InteropServices.UnmanagedType.I8
+                    _managedType = GetType(Int64)
+                    _unmanagedType = Runtime.InteropServices.UnmanagedType.I8
                 End If
             Case PInvoke.BuiltinType.NativeChar
                 Name = "char"
-                m_managedType = GetType(Byte)
-                m_unmanagedType = Runtime.InteropServices.UnmanagedType.I1
+                _managedType = GetType(Byte)
+                _unmanagedType = Runtime.InteropServices.UnmanagedType.I1
             Case PInvoke.BuiltinType.NativeWChar
                 Name = "wchar"
-                m_managedType = GetType(Char)
-                m_unmanagedType = Runtime.InteropServices.UnmanagedType.I2
+                _managedType = GetType(Char)
+                _unmanagedType = Runtime.InteropServices.UnmanagedType.I2
             Case PInvoke.BuiltinType.NativeFloat
                 Name = "float"
-                m_managedType = GetType(Single)
-                m_unmanagedType = Runtime.InteropServices.UnmanagedType.R4
+                _managedType = GetType(Single)
+                _unmanagedType = Runtime.InteropServices.UnmanagedType.R4
             Case PInvoke.BuiltinType.NativeDouble
                 Name = "double"
-                m_managedType = GetType(Double)
-                m_unmanagedType = Runtime.InteropServices.UnmanagedType.R8
+                _managedType = GetType(Double)
+                _unmanagedType = Runtime.InteropServices.UnmanagedType.R8
             Case PInvoke.BuiltinType.NativeVoid
                 Name = "void"
-                m_managedType = GetType(Void)
-                m_unmanagedType = Runtime.InteropServices.UnmanagedType.AsAny
+                _managedType = GetType(Void)
+                _unmanagedType = Runtime.InteropServices.UnmanagedType.AsAny
             Case PInvoke.BuiltinType.NativeUnknown
                 Name = "unknown"
-                m_managedType = GetType(Object)
-                m_unmanagedType = Runtime.InteropServices.UnmanagedType.AsAny
+                _managedType = GetType(Object)
+                _unmanagedType = Runtime.InteropServices.UnmanagedType.AsAny
             Case Else
                 InvalidEnumValue(BuiltinType)
         End Select
@@ -1341,9 +1341,9 @@ End Enum
 Public Class NativeProcedure
     Inherits NativeSymbol
 
-    Private m_dllName As String
-    Private m_sig As New NativeSignature
-    Private m_conv As NativeCallingConvention = NativeCallingConvention.WinApi
+    Private _dllName As String
+    Private _sig As New NativeSignature
+    Private _conv As NativeCallingConvention = NativeCallingConvention.WinApi
 
     ''' <summary>
     ''' Name of the DLL this proc is in
@@ -1353,10 +1353,10 @@ Public Class NativeProcedure
     ''' <remarks></remarks>
     Public Property DllName() As String
         Get
-            Return m_dllName
+            Return _dllName
         End Get
         Set(ByVal value As String)
-            m_dllName = value
+            _dllName = value
         End Set
     End Property
 
@@ -1368,19 +1368,19 @@ Public Class NativeProcedure
     ''' <remarks></remarks>
     Public Property Signature() As NativeSignature
         Get
-            Return m_sig
+            Return _sig
         End Get
         Set(ByVal value As NativeSignature)
-            m_sig = value
+            _sig = value
         End Set
     End Property
 
     Public Property CallingConvention() As NativeCallingConvention
         Get
-            Return m_conv
+            Return _conv
         End Get
         Set(ByVal value As NativeCallingConvention)
-            m_conv = value
+            _conv = value
         End Set
     End Property
 
@@ -1415,11 +1415,11 @@ Public Class NativeProcedure
     End Sub
 
     Public Overrides Function GetChildren() As System.Collections.Generic.IEnumerable(Of NativeSymbol)
-        Return GetSingleChild(m_sig)
+        Return GetSingleChild(_sig)
     End Function
 
     Public Overrides Sub ReplaceChild(ByVal oldChild As NativeSymbol, ByVal newChild As NativeSymbol)
-        MyBase.ReplaceChildSingle(oldChild, newChild, m_sig)
+        MyBase.ReplaceChildSingle(oldChild, newChild, _sig)
     End Sub
 
 End Class
@@ -1447,8 +1447,8 @@ End Class
 Public Class NativeParameter
     Inherits NativeExtraSymbol
 
-    Private m_type As NativeType
-    Private m_salAttribute As NativeSalAttribute = New NativeSalAttribute
+    Private _type As NativeType
+    Private _salAttribute As NativeSalAttribute = New NativeSalAttribute
 
     ''' <summary>
     ''' Type of the parameter
@@ -1458,10 +1458,10 @@ Public Class NativeParameter
     ''' <remarks></remarks>
     Public Property NativeType() As NativeType
         Get
-            Return m_type
+            Return _type
         End Get
         Set(ByVal value As NativeType)
-            m_type = value
+            _type = value
         End Set
     End Property
 
@@ -1473,11 +1473,11 @@ Public Class NativeParameter
     ''' <remarks></remarks>
     Public Property SalAttribute() As NativeSalAttribute
         Get
-            Return m_salAttribute
+            Return _salAttribute
         End Get
         Set(ByVal value As NativeSalAttribute)
             ThrowIfNull(value)
-            m_salAttribute = value
+            _salAttribute = value
         End Set
     End Property
 
@@ -1489,8 +1489,8 @@ Public Class NativeParameter
     ''' <remarks></remarks>
     Public ReadOnly Property NativeTypeDigged() As NativeType
         Get
-            If m_type IsNot Nothing Then
-                Return m_type.DigThroughTypedefAndNamedTypes()
+            If _type IsNot Nothing Then
+                Return _type.DigThroughTypedefAndNamedTypes()
             End If
 
             Return Nothing
@@ -1524,7 +1524,7 @@ Public Class NativeParameter
     ''' <remarks></remarks>
     Public Overrides ReadOnly Property IsImmediateResolved() As Boolean
         Get
-            Return m_type IsNot Nothing
+            Return _type IsNot Nothing
         End Get
     End Property
 
@@ -1538,27 +1538,27 @@ Public Class NativeParameter
 
     Public Sub New(ByVal name As String, ByVal type As NativeType)
         Me.Name = name
-        m_type = type
+        _type = type
     End Sub
 
     Public Overrides Function GetChildren() As System.Collections.Generic.IEnumerable(Of NativeSymbol)
         Dim list As New List(Of NativeSymbol)
-        If m_type IsNot Nothing Then
-            list.Add(m_type)
+        If _type IsNot Nothing Then
+            list.Add(_type)
         End If
 
-        If m_salAttribute IsNot Nothing Then
-            list.Add(m_salAttribute)
+        If _salAttribute IsNot Nothing Then
+            list.Add(_salAttribute)
         End If
 
         Return list
     End Function
 
     Public Overrides Sub ReplaceChild(ByVal oldChild As NativeSymbol, ByVal newChild As NativeSymbol)
-        If Object.ReferenceEquals(oldChild, m_type) Then
-            ReplaceChildSingle(oldChild, newChild, m_type)
+        If Object.ReferenceEquals(oldChild, _type) Then
+            ReplaceChildSingle(oldChild, newChild, _type)
         Else
-            ReplaceChildSingle(oldChild, newChild, m_salAttribute)
+            ReplaceChildSingle(oldChild, newChild, _salAttribute)
         End If
     End Sub
 
@@ -1572,7 +1572,7 @@ End Class
 Public Class NativeMember
     Inherits NativeExtraSymbol
 
-    Private m_nativeType As NativeType
+    Private _nativeType As NativeType
 
     ''' <summary>
     ''' Nativetype of the member
@@ -1582,17 +1582,17 @@ Public Class NativeMember
     ''' <remarks></remarks>
     Public Property NativeType() As NativeType
         Get
-            Return m_nativeType
+            Return _nativeType
         End Get
         Set(ByVal value As NativeType)
-            m_nativeType = value
+            _nativeType = value
         End Set
     End Property
 
     Public ReadOnly Property NativeTypeDigged() As NativeType
         Get
-            If m_nativeType IsNot Nothing Then
-                Return m_nativeType.DigThroughTypedefAndNamedTypes()
+            If _nativeType IsNot Nothing Then
+                Return _nativeType.DigThroughTypedefAndNamedTypes()
             End If
 
             Return Nothing
@@ -1601,7 +1601,7 @@ Public Class NativeMember
 
     Public Overrides ReadOnly Property IsImmediateResolved() As Boolean
         Get
-            Return m_nativeType IsNot Nothing AndAlso Not String.IsNullOrEmpty(Name)
+            Return _nativeType IsNot Nothing AndAlso Not String.IsNullOrEmpty(Name)
         End Get
     End Property
 
@@ -1611,7 +1611,7 @@ Public Class NativeMember
 
     Public Sub New(ByVal name As String, ByVal nt As NativeType)
         Me.Name = name
-        m_nativeType = nt
+        _nativeType = nt
     End Sub
 
     Public Overrides ReadOnly Property Kind() As NativeSymbolKind
@@ -1621,11 +1621,11 @@ Public Class NativeMember
     End Property
 
     Public Overrides Function GetChildren() As System.Collections.Generic.IEnumerable(Of NativeSymbol)
-        Return GetSingleChild(m_nativeType)
+        Return GetSingleChild(_nativeType)
     End Function
 
     Public Overrides Sub ReplaceChild(ByVal oldChild As NativeSymbol, ByVal newChild As NativeSymbol)
-        ReplaceChildSingle(oldChild, newChild, m_nativeType)
+        ReplaceChildSingle(oldChild, newChild, _nativeType)
     End Sub
 
 End Class
@@ -1641,8 +1641,8 @@ End Enum
 ''' <remarks></remarks>
 Public Class NativeConstant
     Inherits NativeExtraSymbol
-    Private m_value As NativeValueExpression
-    Private m_constantKind As ConstantKind
+    Private _value As NativeValueExpression
+    Private _constantKind As ConstantKind
 
     ''' <summary>
     ''' What type of constant is this
@@ -1652,10 +1652,10 @@ Public Class NativeConstant
     ''' <remarks></remarks>
     Public Property ConstantKind() As ConstantKind
         Get
-            Return m_constantKind
+            Return _constantKind
         End Get
         Set(ByVal value As ConstantKind)
-            m_constantKind = value
+            _constantKind = value
         End Set
     End Property
 
@@ -1667,20 +1667,20 @@ Public Class NativeConstant
     ''' <remarks></remarks>
     Public Property Value() As NativeValueExpression
         Get
-            Return m_value
+            Return _value
         End Get
         Set(ByVal value As NativeValueExpression)
-            m_value = value
+            _value = value
         End Set
     End Property
 
     Public ReadOnly Property RawValue() As String
         Get
-            If m_value Is Nothing Then
+            If _value Is Nothing Then
                 Return String.Empty
             End If
 
-            Return m_value.Expression
+            Return _value.Expression
         End Get
     End Property
 
@@ -1706,7 +1706,7 @@ Public Class NativeConstant
         If name Is Nothing Then : Throw New ArgumentNullException("name") : End If
 
         Me.Name = name
-        m_constantKind = kind
+        _constantKind = kind
 
         ' We don't support macro methods at this point.  Instead we will just generate out the 
         ' method signature for the method and print the string out into the code
@@ -1714,15 +1714,15 @@ Public Class NativeConstant
             value = """" & value & """"
         End If
 
-        m_value = New NativeValueExpression(value)
+        _value = New NativeValueExpression(value)
     End Sub
 
     Public Overrides Function GetChildren() As System.Collections.Generic.IEnumerable(Of NativeSymbol)
-        Return GetSingleChild(m_value)
+        Return GetSingleChild(_value)
     End Function
 
     Public Overrides Sub ReplaceChild(ByVal oldChild As NativeSymbol, ByVal newChild As NativeSymbol)
-        ReplaceChildSingle(oldChild, newChild, m_value)
+        ReplaceChildSingle(oldChild, newChild, _value)
     End Sub
 
 End Class
@@ -1734,10 +1734,10 @@ End Class
 Public Class NativeValueExpression
     Inherits NativeExtraSymbol
 
-    Private m_expression As String
-    Private m_valueList As List(Of NativeValue)
-    Private m_node As Parser.ExpressionNode
-    Private m_errorParsingExpr As Boolean = False
+    Private _expression As String
+    Private _valueList As List(Of NativeValue)
+    Private _node As Parser.ExpressionNode
+    Private _errorParsingExpr As Boolean = False
 
     ''' <summary>
     ''' Value of the expression
@@ -1747,18 +1747,18 @@ Public Class NativeValueExpression
     ''' <remarks></remarks>
     Public Property Expression() As String
         Get
-            Return m_expression
+            Return _expression
         End Get
         Set(ByVal value As String)
             ResetValueList()
-            m_expression = value
+            _expression = value
         End Set
     End Property
 
     Public ReadOnly Property IsParsable() As Boolean
         Get
             EnsureValueList()
-            Return Not m_errorParsingExpr
+            Return Not _errorParsingExpr
         End Get
     End Property
 
@@ -1770,7 +1770,7 @@ Public Class NativeValueExpression
     ''' <remarks></remarks>
     Public ReadOnly Property IsEmpty() As Boolean
         Get
-            Return String.IsNullOrEmpty(m_expression)
+            Return String.IsNullOrEmpty(_expression)
         End Get
     End Property
 
@@ -1783,7 +1783,7 @@ Public Class NativeValueExpression
     Public ReadOnly Property Node() As Parser.ExpressionNode
         Get
             EnsureValueList()
-            Return m_node
+            Return _node
         End Get
     End Property
 
@@ -1796,7 +1796,7 @@ Public Class NativeValueExpression
     Public ReadOnly Property Values() As List(Of NativeValue)
         Get
             EnsureValueList()
-            Return m_valueList
+            Return _valueList
         End Get
     End Property
 
@@ -1808,37 +1808,37 @@ Public Class NativeValueExpression
 
     Public Sub New(ByVal expr As String)
         Me.Name = "Value"
-        m_expression = expr
+        _expression = expr
     End Sub
 
     Private Sub ResetValueList()
-        m_valueList = Nothing
-        m_node = Nothing
+        _valueList = Nothing
+        _node = Nothing
     End Sub
 
     Private Sub EnsureValueList()
-        If m_valueList IsNot Nothing Then
+        If _valueList IsNot Nothing Then
             Return
         End If
 
         If IsEmpty Then
-            m_valueList = New List(Of NativeValue)()
-            m_errorParsingExpr = False
+            _valueList = New List(Of NativeValue)()
+            _errorParsingExpr = False
             Return
         End If
 
         Dim parser As New Parser.ExpressionParser()
-        m_valueList = New List(Of NativeValue)()
+        _valueList = New List(Of NativeValue)()
 
         ' It's valid no have an invalid expression :)
-        If Not parser.TryParse(m_expression, m_node) Then
-            m_errorParsingExpr = True
-            m_node = Nothing
+        If Not parser.TryParse(_expression, _node) Then
+            _errorParsingExpr = True
+            _node = Nothing
         Else
-            m_errorParsingExpr = False
+            _errorParsingExpr = False
         End If
 
-        CalculateValueList(m_node)
+        CalculateValueList(_node)
     End Sub
 
     Private Sub CalculateValueList(ByVal cur As Parser.ExpressionNode)
@@ -1875,18 +1875,18 @@ Public Class NativeValueExpression
             End If
 
             If ntVal IsNot Nothing Then
-                m_valueList.Add(ntVal)
+                _valueList.Add(ntVal)
                 cur.Tag = ntVal
             Else
-                m_errorParsingExpr = True
+                _errorParsingExpr = True
             End If
         ElseIf cur.Kind = Parser.ExpressionKind.Cast Then
             ' Create nodes for the cast expressions.  The target should be a symbol
-            m_valueList.Add(NativeValue.CreateSymbolType(cur.Token.Value))
+            _valueList.Add(NativeValue.CreateSymbolType(cur.Token.Value))
         End If
 
-            CalculateValueList(cur.LeftNode)
-            CalculateValueList(cur.RightNode)
+        CalculateValueList(cur.LeftNode)
+        CalculateValueList(cur.RightNode)
     End Sub
 
     ''' <summary>
@@ -1905,12 +1905,12 @@ Public Class NativeValueExpression
 
     Public Overrides Function GetChildren() As System.Collections.Generic.IEnumerable(Of NativeSymbol)
         EnsureValueList()
-        Return MyBase.GetListChild(m_valueList)
+        Return MyBase.GetListChild(_valueList)
     End Function
 
     Public Overrides Sub ReplaceChild(ByVal oldChild As NativeSymbol, ByVal newChild As NativeSymbol)
         EnsureValueList()
-        MyBase.ReplaceChildInList(oldChild, newChild, m_valueList)
+        MyBase.ReplaceChildInList(oldChild, newChild, _valueList)
     End Sub
 
 
@@ -1944,8 +1944,8 @@ End Enum
 Public Class NativeValue
     Inherits NativeExtraSymbol
 
-    Private m_valueKind As NativeValueKind
-    Private m_value As Object
+    Private _valueKind As NativeValueKind
+    Private _value As Object
 
     ''' <summary>
     ''' The actual value
@@ -1955,17 +1955,17 @@ Public Class NativeValue
     ''' <remarks></remarks>
     Public Property Value() As Object
         Get
-            Return m_value
+            Return _value
         End Get
         Set(ByVal value As Object)
-            m_value = value
+            _value = value
         End Set
     End Property
 
     Public ReadOnly Property SymbolValue() As NativeSymbol
         Get
-            If (m_valueKind = NativeValueKind.SymbolValue) Then
-                Return DirectCast(m_value, NativeSymbol)
+            If (_valueKind = NativeValueKind.SymbolValue) Then
+                Return DirectCast(_value, NativeSymbol)
             End If
 
             Return Nothing
@@ -1974,8 +1974,8 @@ Public Class NativeValue
 
     Public ReadOnly Property SymbolType() As NativeSymbol
         Get
-            If (m_valueKind = NativeValueKind.SymbolType) Then
-                Return DirectCast(m_value, NativeSymbol)
+            If (_valueKind = NativeValueKind.SymbolType) Then
+                Return DirectCast(_value, NativeSymbol)
             End If
 
             Return Nothing
@@ -1990,7 +1990,7 @@ Public Class NativeValue
     ''' <remarks></remarks>
     Public ReadOnly Property ValueKind() As NativeValueKind
         Get
-            Return m_valueKind
+            Return _valueKind
         End Get
     End Property
 
@@ -2004,7 +2004,7 @@ Public Class NativeValue
         Get
             Select Case Me.ValueKind
                 Case NativeValueKind.Number, NativeValueKind.String, NativeValueKind.Character, NativeValueKind.Boolean
-                    Return Me.m_value IsNot Nothing
+                    Return Me._value IsNot Nothing
                 Case NativeValueKind.SymbolType
                     Return SymbolType IsNot Nothing
                 Case NativeValueKind.SymbolValue
@@ -2024,13 +2024,13 @@ Public Class NativeValue
     ''' <remarks></remarks>
     Public ReadOnly Property DisplayValue() As String
         Get
-            Select Case m_valueKind
+            Select Case _valueKind
                 Case NativeValueKind.Number
-                    Return m_value.ToString()
+                    Return _value.ToString()
                 Case NativeValueKind.String
-                    Return m_value.ToString()
+                    Return _value.ToString()
                 Case NativeValueKind.Character
-                    Return m_value.ToString()
+                    Return _value.ToString()
                 Case NativeValueKind.SymbolType
                     If SymbolType IsNot Nothing Then
                         Return SymbolType.DisplayName
@@ -2044,7 +2044,7 @@ Public Class NativeValue
 
                     Return Name
                 Case Else
-                    InvalidEnumValue(m_valueKind)
+                    InvalidEnumValue(_valueKind)
                     Return String.Empty
             End Select
         End Get
@@ -2062,14 +2062,14 @@ Public Class NativeValue
 
     Private Sub New(ByVal name As String, ByVal value As Object, ByVal kind As NativeValueKind)
         Me.Name = name
-        m_valueKind = kind
-        m_value = value
+        _valueKind = kind
+        _value = value
     End Sub
 
     Public Overrides Function GetChildren() As System.Collections.Generic.IEnumerable(Of NativeSymbol)
-        If m_valueKind = NativeValueKind.SymbolType Then
+        If _valueKind = NativeValueKind.SymbolType Then
             Return GetSingleChild(SymbolType)
-        ElseIf m_valueKind = NativeValueKind.SymbolValue Then
+        ElseIf _valueKind = NativeValueKind.SymbolValue Then
             Return GetSingleChild(SymbolValue)
         Else
             Return GetSingleChild(Of NativeSymbol)(Nothing)
@@ -2077,11 +2077,11 @@ Public Class NativeValue
     End Function
 
     Public Overrides Sub ReplaceChild(ByVal oldChild As NativeSymbol, ByVal newChild As NativeSymbol)
-        If m_valueKind = NativeValueKind.SymbolType Then
+        If _valueKind = NativeValueKind.SymbolType Then
             Dim x As NativeSymbol = Nothing
             ReplaceChildSingle(SymbolType, newChild, x)
             Value = x
-        ElseIf m_valueKind = NativeValueKind.SymbolValue Then
+        ElseIf _valueKind = NativeValueKind.SymbolValue Then
             Dim x As NativeSymbol = Nothing
             ReplaceChildSingle(SymbolValue, newChild, x)
             Value = x
@@ -2167,8 +2167,8 @@ End Enum
 Public Class NativeSalEntry
     Inherits NativeExtraSymbol
 
-    Private m_type As SalEntryType
-    Private m_text As String
+    Private _type As SalEntryType
+    Private _text As String
 
     ''' <summary>
     ''' Type of attribute
@@ -2178,10 +2178,10 @@ Public Class NativeSalEntry
     ''' <remarks></remarks>
     Public Property SalEntryType() As SalEntryType
         Get
-            Return m_type
+            Return _type
         End Get
         Set(ByVal value As SalEntryType)
-            m_type = value
+            _type = value
             Me.Name = value.ToString()
         End Set
     End Property
@@ -2194,10 +2194,10 @@ Public Class NativeSalEntry
     ''' <remarks></remarks>
     Public Property Text() As String
         Get
-            Return m_text
+            Return _text
         End Get
         Set(ByVal value As String)
-            m_text = value
+            _text = value
         End Set
     End Property
 
@@ -2228,8 +2228,8 @@ Public Class NativeSalEntry
 
     Public Sub New(ByVal type As SalEntryType, ByVal text As String)
         Me.SalEntryType = type
-        m_type = type
-        m_text = text
+        _type = type
+        _text = text
     End Sub
 
     Public Shared Function GetDirectiveForEntry(ByVal entry As SalEntryType) As String
@@ -2304,7 +2304,7 @@ End Class
 Public Class NativeSalAttribute
     Inherits NativeExtraSymbol
 
-    Private m_list As New List(Of NativeSalEntry)
+    Private _list As New List(Of NativeSalEntry)
 
     Public Overrides ReadOnly Property Kind() As NativeSymbolKind
         Get
@@ -2320,7 +2320,7 @@ Public Class NativeSalAttribute
     ''' <remarks></remarks>
     Public ReadOnly Property SalEntryList() As List(Of NativeSalEntry)
         Get
-            Return m_list
+            Return _list
         End Get
     End Property
 
@@ -2332,7 +2332,7 @@ Public Class NativeSalAttribute
     ''' <remarks></remarks>
     Public ReadOnly Property IsEmpty() As Boolean
         Get
-            Return m_list.Count = 0
+            Return _list.Count = 0
         End Get
     End Property
 
@@ -2340,7 +2340,7 @@ Public Class NativeSalAttribute
         Get
             Dim builder As New StringBuilder()
             Dim isFirst As Boolean = True
-            For Each entry As NativeSalEntry In m_list
+            For Each entry As NativeSalEntry In _list
                 If Not isFirst Then
                     builder.Append(",")
                 End If
@@ -2359,18 +2359,18 @@ Public Class NativeSalAttribute
     Public Sub New(ByVal ParamArray entryList As SalEntryType())
         MyClass.New()
         For Each entry As SalEntryType In entryList
-            m_list.Add(New NativeSalEntry(entry))
+            _list.Add(New NativeSalEntry(entry))
         Next
     End Sub
 
     Public Sub New(ByVal ParamArray entryList As NativeSalEntry())
         MyClass.New()
-        m_list.AddRange(entryList)
+        _list.AddRange(entryList)
     End Sub
 
     Public Overrides Function GetChildren() As System.Collections.Generic.IEnumerable(Of NativeSymbol)
         Dim list As New List(Of NativeSymbol)
-        For Each entry As NativeSalEntry In m_list
+        For Each entry As NativeSalEntry In _list
             list.Add(entry)
         Next
 
@@ -2378,7 +2378,7 @@ Public Class NativeSalAttribute
     End Function
 
     Public Overrides Sub ReplaceChild(ByVal oldChild As NativeSymbol, ByVal newChild As NativeSymbol)
-        MyBase.ReplaceChildInList(oldChild, newChild, m_list)
+        MyBase.ReplaceChildInList(oldChild, newChild, _list)
     End Sub
 
 End Class
@@ -2390,9 +2390,9 @@ End Class
 Public Class NativeSignature
     Inherits NativeExtraSymbol
 
-    Private m_returnType As NativeType
-    Private m_returnTypeSalAttribute As NativeSalAttribute = New NativeSalAttribute()
-    Private m_paramList As New List(Of NativeParameter)
+    Private _returnType As NativeType
+    Private _returnTypeSalAttribute As NativeSalAttribute = New NativeSalAttribute()
+    Private _paramList As New List(Of NativeParameter)
 
     ''' <summary>
     ''' Return type of the NativeProcedure
@@ -2402,10 +2402,10 @@ Public Class NativeSignature
     ''' <remarks></remarks>
     Public Property ReturnType() As NativeType
         Get
-            Return m_returnType
+            Return _returnType
         End Get
         Set(ByVal value As NativeType)
-            m_returnType = value
+            _returnType = value
         End Set
     End Property
 
@@ -2417,10 +2417,10 @@ Public Class NativeSignature
     ''' <remarks></remarks>
     Public Property ReturnTypeSalAttribute() As NativeSalAttribute
         Get
-            Return m_returnTypeSalAttribute
+            Return _returnTypeSalAttribute
         End Get
         Set(ByVal value As NativeSalAttribute)
-            m_returnTypeSalAttribute = value
+            _returnTypeSalAttribute = value
         End Set
     End Property
 
@@ -2432,7 +2432,7 @@ Public Class NativeSignature
     ''' <remarks></remarks>
     Public ReadOnly Property Parameters() As List(Of NativeParameter)
         Get
-            Return m_paramList
+            Return _paramList
         End Get
     End Property
 
@@ -2477,12 +2477,12 @@ Public Class NativeSignature
 
         builder.Append("(")
 
-        For i As Integer = 0 To m_paramList.Count - 1
+        For i As Integer = 0 To _paramList.Count - 1
             If i > 0 Then
                 builder.Append(", ")
             End If
 
-            Dim cur As NativeParameter = m_paramList(i)
+            Dim cur As NativeParameter = _paramList(i)
             If includeSal AndAlso Not cur.SalAttribute.IsEmpty Then
                 builder.Append(cur.SalAttribute.DisplayName)
                 builder.Append(" ")
@@ -2503,15 +2503,15 @@ Public Class NativeSignature
     Public Overrides Function GetChildren() As System.Collections.Generic.IEnumerable(Of NativeSymbol)
         Dim list As New List(Of NativeSymbol)
 
-        If m_returnType IsNot Nothing Then
-            list.Add(m_returnType)
+        If _returnType IsNot Nothing Then
+            list.Add(_returnType)
         End If
 
-        If m_returnTypeSalAttribute IsNot Nothing Then
-            list.Add(m_returnTypeSalAttribute)
+        If _returnTypeSalAttribute IsNot Nothing Then
+            list.Add(_returnTypeSalAttribute)
         End If
 
-        For Each param As NativeParameter In m_paramList
+        For Each param As NativeParameter In _paramList
             list.Add(param)
         Next
 
@@ -2519,12 +2519,12 @@ Public Class NativeSignature
     End Function
 
     Public Overrides Sub ReplaceChild(ByVal oldChild As NativeSymbol, ByVal newChild As NativeSymbol)
-        If Object.ReferenceEquals(oldChild, m_returnType) Then
-            ReplaceChildSingle(oldChild, newChild, m_returnType)
-        ElseIf Object.ReferenceEquals(oldChild, m_returnTypeSalAttribute) Then
-            ReplaceChildSingle(oldChild, newChild, m_returnTypeSalAttribute)
+        If Object.ReferenceEquals(oldChild, _returnType) Then
+            ReplaceChildSingle(oldChild, newChild, _returnType)
+        ElseIf Object.ReferenceEquals(oldChild, _returnTypeSalAttribute) Then
+            ReplaceChildSingle(oldChild, newChild, _returnTypeSalAttribute)
         Else
-            ReplaceChildInList(oldChild, newChild, m_paramList)
+            ReplaceChildInList(oldChild, newChild, _paramList)
         End If
     End Sub
 

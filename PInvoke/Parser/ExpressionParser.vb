@@ -42,93 +42,93 @@ Namespace Parser
     ''' <remarks></remarks>
     <DebuggerDisplay("{DisplayString}")> _
     Public Class ExpressionNode
-        Private m_kind As ExpressionKind
-        Private m_left As ExpressionNode
-        Private m_right As ExpressionNode
-        Private m_token As Token
-        Private m_parenthesized As Boolean
-        Private m_tag As Object
+        Private _kind As ExpressionKind
+        Private _left As ExpressionNode
+        Private _right As ExpressionNode
+        Private _token As Token
+        Private _parenthesized As Boolean
+        Private _tag As Object
 
         Public Property Kind() As ExpressionKind
             Get
-                Return m_kind
+                Return _kind
             End Get
             Set(ByVal value As ExpressionKind)
-                m_kind = value
+                _kind = value
             End Set
         End Property
 
         Public Property LeftNode() As ExpressionNode
             Get
-                Return m_left
+                Return _left
             End Get
             Set(ByVal value As ExpressionNode)
-                m_left = value
+                _left = value
             End Set
         End Property
 
         Public Property RightNode() As ExpressionNode
             Get
-                Return m_right
+                Return _right
             End Get
             Set(ByVal value As ExpressionNode)
-                m_right = value
+                _right = value
             End Set
         End Property
 
         Public Property Token() As Token
             Get
-                Return m_token
+                Return _token
             End Get
             Set(ByVal value As Token)
-                m_token = value
+                _token = value
             End Set
         End Property
 
         Public Property Parenthesized() As Boolean
             Get
-                Return m_parenthesized
+                Return _parenthesized
             End Get
             Set(ByVal value As Boolean)
-                m_parenthesized = True
+                _parenthesized = True
             End Set
         End Property
 
         Public Property Tag() As Object
             Get
-                Return m_tag
+                Return _tag
             End Get
             Set(ByVal value As Object)
-                m_tag = value
+                _tag = value
             End Set
         End Property
 
         Public ReadOnly Property DisplayString() As String
             Get
                 Dim str As String = String.Empty
-                If m_left IsNot Nothing Then
-                    str &= "(Left: " & m_left.DisplayString & ")"
+                If _left IsNot Nothing Then
+                    str &= "(Left: " & _left.DisplayString & ")"
                 End If
 
-                If m_right IsNot Nothing Then
-                    str &= "(Right: " & m_right.DisplayString & ")"
+                If _right IsNot Nothing Then
+                    str &= "(Right: " & _right.DisplayString & ")"
                 End If
 
                 If Not String.IsNullOrEmpty(str) Then
                     str = " " & str
                 End If
 
-                If m_token Is Nothing Then
+                If _token Is Nothing Then
                     Return "Nothing" & str
                 Else
-                    Return m_token.Value & str
+                    Return _token.Value & str
                 End If
             End Get
         End Property
 
         Public Sub New(ByVal kind As ExpressionKind, ByVal value As Token)
-            m_kind = kind
-            m_token = value
+            _kind = kind
+            _token = value
         End Sub
 
         Public Shared Function CreateLeaf(ByVal bValue As Boolean) As ExpressionNode

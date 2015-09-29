@@ -275,7 +275,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Engine\PInvoke.vbproj">
+    <ProjectReference Include="..\PInvoke\PInvoke.vbproj">
       <Project>{993F376E-970F-462F-A3BF-DD8EBEDE9319}</Project>
       <Name>PInvoke</Name>
     </ProjectReference>

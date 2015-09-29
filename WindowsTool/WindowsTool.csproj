@@ -106,12 +106,6 @@
     <Compile Include="Settings.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\UnmanagedToManaged\Engine\PInvoke.vbproj">
-      <Project>{993F376E-970F-462F-A3BF-DD8EBEDE9319}</Project>
-      <Name>PInvoke</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="app.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

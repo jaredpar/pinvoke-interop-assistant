@@ -78,12 +78,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\WindowsTool\WindowsTool.csproj">
-      <Project>{2A7478A4-2C02-47F6-89EF-1BFB5E433211}</Project>
-      <Name>WindowsTool</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="mainicon.ico" />
   </ItemGroup>
   <ItemGroup>

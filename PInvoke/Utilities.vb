@@ -5,7 +5,7 @@ Imports System.Collections.Generic
 
 Public Module Constants
 
-    Public Const ProductName As String = "P/Invoke Interop Assistant"
+    Public Const ProductName As String = "PInvoke Interop Assistant"
     Public Const Version As String = "1.0.0.0"
     Public Const FriendlyVersion As String = "1.0"
 

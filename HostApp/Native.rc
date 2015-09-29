@@ -1,6 +1,0 @@
-#include <fxver.h>
-#include <fxver.rc>
-
-#ifndef FEATURE_PAL
-#include <UacAsInvoker.rc>
-#endif

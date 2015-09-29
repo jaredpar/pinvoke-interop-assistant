@@ -100,6 +100,12 @@
   <ItemGroup>
     <None Include="app.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WindowsTool\WindowsTool.csproj">
+      <Project>{2a7478a4-2c02-47f6-89ef-1bfb5e433211}</Project>
+      <Name>WindowsTool</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
@@ -109,6 +115,6 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>copy /y $(ProjectDir)..\UnmanagedToManaged\StorageGenerator\Data\windows.xml $(TargetDir)</PostBuildEvent>
+    <PostBuildEvent>copy /y $(ProjectDir)..\StorageGenerator\Data\windows.xml $(TargetDir)</PostBuildEvent>
   </PropertyGroup>
 </Project>

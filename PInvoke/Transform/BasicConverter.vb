@@ -183,8 +183,11 @@ Namespace Transform
             Return ConvertCodeDomToPInvokeCodeImpl(col, ep)
         End Function
 
-        <SuppressMessage("Microsoft.Security", "CA2122")>
-        Private Function ConvertCodeDomToPInvokeCodeImpl(ByVal col As CodeTypeDeclarationCollection, ByVal ep As ErrorProvider) As String
+        Public Function ConvertCodeDomToPInvokeCodeImpl(ByVal col As CodeTypeDeclarationCollection, ByVal ep As ErrorProvider) As String
+            Return ConvertCodeDomToPInvokeCodeImpl(_type, col, ep)
+        End Function
+
+        Public Shared Function ConvertCodeDomToPInvokeCodeImpl(type As LanguageType, col As CodeTypeDeclarationCollection, ep As ErrorProvider) As String
             ThrowIfNull(col)
             ThrowIfNull(ep)
 
@@ -193,7 +196,7 @@ Namespace Transform
             Dim commentStart As String
 
             ' Generate based on the language
-            Select Case _type
+            Select Case type
                 Case Transform.LanguageType.VisualBasic
                     commentStart = "'"
                     provider = New Microsoft.VisualBasic.VBCodeProvider()
@@ -201,7 +204,7 @@ Namespace Transform
                     commentStart = "//"
                     provider = New Microsoft.CSharp.CSharpCodeProvider()
                 Case Else
-                    InvalidEnumValue(_type)
+                    InvalidEnumValue(type)
                     Return String.Empty
             End Select
 
@@ -217,7 +220,7 @@ Namespace Transform
                 provider.GenerateCodeFromMember(ctd, writer, New Compiler.CodeGeneratorOptions())
             Next
 
-            If _type = Transform.LanguageType.CSharp Then
+            If type = Transform.LanguageType.CSharp Then
                 ' CSharp specific fixup
                 Return FixupCSharpCode(writer.ToString())
             Else
@@ -312,7 +315,7 @@ Namespace Transform
         ''' <param name="code"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Private Function FixupCSharpCode(ByVal code As String) As String
+        Private Shared Function FixupCSharpCode(ByVal code As String) As String
             Dim builder As New Text.StringBuilder()
             Using reader As New IO.StringReader(code)
                 Dim line As String = reader.ReadLine()

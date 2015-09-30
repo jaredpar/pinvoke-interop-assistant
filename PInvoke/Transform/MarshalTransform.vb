@@ -17,7 +17,7 @@ Namespace Transform
     ''' </summary>
     ''' <remarks></remarks>
 
-    Friend Class MarshalTransform
+    Public Class MarshalTransform
 
         Private _kind As TransformKindFlags
         Private _trans As CodeTransform
@@ -32,7 +32,7 @@ Namespace Transform
             End Set
         End Property
 
-        Friend Sub New(ByVal lang As LanguageType, ByVal kind As TransformKindFlags)
+        Public Sub New(ByVal lang As LanguageType, ByVal kind As TransformKindFlags)
             _trans = New CodeTransform(lang)
             _kind = kind
 
@@ -80,7 +80,7 @@ Namespace Transform
         ''' </summary>
         ''' <param name="ctd"></param>
         ''' <remarks></remarks>
-        Friend Sub Process(ByVal ctd As CodeTypeDeclaration)
+        Public Sub Process(ByVal ctd As CodeTypeDeclaration)
 
             ' First check and see if it is a delegate type, if so run the delegate hueristics
             Dim ctdDel As CodeTypeDelegate = TryCast(ctd, CodeTypeDelegate)

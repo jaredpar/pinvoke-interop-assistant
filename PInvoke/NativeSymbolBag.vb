@@ -1,5 +1,6 @@
 ﻿' Copyright (c) Microsoft Corporation.  All rights reserved.
 Imports System.Collections.Generic
+Imports System.Runtime.InteropServices
 
 ''' <summary>
 ''' Bag for NativeType instances which is used for querying and type resolution
@@ -126,7 +127,7 @@ Public Class NativeSymbolBag
     ''' <param name="nt"></param>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Public Function TryFindDefinedType(ByVal name As String, ByRef nt As NativeDefinedType) As Boolean
+    Public Function TryFindDefinedType(ByVal name As String, <Out> ByRef nt As NativeDefinedType) As Boolean
         If name Is Nothing Then : Throw New ArgumentNullException("name") : End If
         Return _definedMap.TryGetValue(name, nt)
     End Function

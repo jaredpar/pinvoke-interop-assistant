@@ -67,6 +67,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CodeConverterTest.cs" />
     <Compile Include="CSharpExpressionGeneratorTest.cs" />
     <Compile Include="CSharpNativeFactoryTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

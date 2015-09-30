@@ -11,7 +11,7 @@ Namespace Transform
     ''' Used for creating types that help with Marshalling
     ''' </summary>
     ''' <remarks></remarks>
-    Friend Module MarshalTypeFactory
+    Public Module MarshalTypeFactory
 
 #Region "PInvokePointer"
 
@@ -25,11 +25,11 @@ Namespace Transform
             Dim ctd As New CodeTypeDeclaration(PInvokePointerTypeName)
 
             ctd.Attributes = MemberAttributes.Public
-            ctd.Members.Add(New CodeMemberField( _
-                New CodeTypeReference(GetType(IntPtr)), _
+            ctd.Members.Add(New CodeMemberField(
+                New CodeTypeReference(GetType(IntPtr)),
                 "m_ptr"))
-            ctd.Members.Add(New CodeMemberField( _
-                New CodeTypeReference(GetType(Int32)), _
+            ctd.Members.Add(New CodeMemberField(
+                New CodeTypeReference(GetType(Int32)),
                 "m_size"))
 
             ' Add the pointer property
@@ -39,7 +39,7 @@ Namespace Transform
             prop.HasSet = False
             prop.Type = New CodeTypeReference(GetType(IntPtr))
             prop.Attributes = MemberAttributes.Public
-            prop.GetStatements.Add(New CodeMethodReturnStatement( _
+            prop.GetStatements.Add(New CodeMethodReturnStatement(
                 New CodeVariableReferenceExpression("m_ptr")))
             ctd.Members.Add(prop)
 
@@ -50,40 +50,40 @@ Namespace Transform
             prop.HasSet = False
             prop.Attributes = MemberAttributes.Public
             prop.Type = New CodeTypeReference(GetType(Int32))
-            prop.GetStatements.Add(New CodeMethodReturnStatement( _
+            prop.GetStatements.Add(New CodeMethodReturnStatement(
                 New CodeVariableReferenceExpression("m_size")))
 
             ' Add the constructor
             Dim ctor As New CodeConstructor()
             ctor.Attributes = MemberAttributes.Public
-            ctor.Parameters.Add(New CodeParameterDeclarationExpression( _
-                New CodeTypeReference(GetType(IntPtr)), _
+            ctor.Parameters.Add(New CodeParameterDeclarationExpression(
+                New CodeTypeReference(GetType(IntPtr)),
                 "ptr"))
-            ctor.Parameters.Add(New CodeParameterDeclarationExpression( _
-                New CodeTypeReference(GetType(Int32)), _
+            ctor.Parameters.Add(New CodeParameterDeclarationExpression(
+                New CodeTypeReference(GetType(Int32)),
                 "size"))
-            ctor.Statements.Add(New CodeAssignStatement( _
-                New CodeVariableReferenceExpression("m_ptr"), _
+            ctor.Statements.Add(New CodeAssignStatement(
+                New CodeVariableReferenceExpression("m_ptr"),
                 New CodeVariableReferenceExpression("ptr")))
-            ctor.Statements.Add(New CodeAssignStatement( _
-                New CodeVariableReferenceExpression("m_size"), _
+            ctor.Statements.Add(New CodeAssignStatement(
+                New CodeVariableReferenceExpression("m_size"),
                 New CodeVariableReferenceExpression("size")))
             ctd.Members.Add(ctor)
 
             ' Add the other constructor
             ctor = New CodeConstructor()
             ctor.Attributes = MemberAttributes.Public
-            ctor.Parameters.Add(New CodeParameterDeclarationExpression( _
-                New CodeTypeReference(GetType(Int32)), _
+            ctor.Parameters.Add(New CodeParameterDeclarationExpression(
+                New CodeTypeReference(GetType(Int32)),
                 "size"))
-            ctor.Statements.Add(New CodeAssignStatement( _
-                New CodeVariableReferenceExpression("m_ptr"), _
-                New CodeMethodInvokeExpression( _
-                    New CodeTypeReferenceExpression(GetType(System.Runtime.InteropServices.Marshal)), _
-                    "AllocCoTaskMem", _
+            ctor.Statements.Add(New CodeAssignStatement(
+                New CodeVariableReferenceExpression("m_ptr"),
+                New CodeMethodInvokeExpression(
+                    New CodeTypeReferenceExpression(GetType(System.Runtime.InteropServices.Marshal)),
+                    "AllocCoTaskMem",
                     New CodeVariableReferenceExpression("size"))))
-            ctor.Statements.Add(New CodeAssignStatement( _
-                New CodeVariableReferenceExpression("m_size"), _
+            ctor.Statements.Add(New CodeAssignStatement(
+                New CodeVariableReferenceExpression("m_size"),
                 New CodeVariableReferenceExpression("size")))
             ctd.Members.Add(ctor)
 
@@ -91,17 +91,17 @@ Namespace Transform
             Dim method As New CodeMemberMethod()
             method.Name = "Free"
             method.Attributes = MemberAttributes.Public
-            method.Statements.Add(New CodeMethodInvokeExpression( _
-                New CodeTypeReferenceExpression(GetType(System.Runtime.InteropServices.Marshal)), _
-                "FreeCoTaskMem", _
+            method.Statements.Add(New CodeMethodInvokeExpression(
+                New CodeTypeReferenceExpression(GetType(System.Runtime.InteropServices.Marshal)),
+                "FreeCoTaskMem",
                 New CodeVariableReferenceExpression("m_ptr")))
-            method.Statements.Add(New CodeAssignStatement( _
-                New CodeVariableReferenceExpression("m_ptr"), _
-                New CodeFieldReferenceExpression( _
-                    New CodeTypeReferenceExpression(GetType(IntPtr)), _
+            method.Statements.Add(New CodeAssignStatement(
+                New CodeVariableReferenceExpression("m_ptr"),
+                New CodeFieldReferenceExpression(
+                    New CodeTypeReferenceExpression(GetType(IntPtr)),
                     "Zero")))
-            method.Statements.Add(New CodeAssignStatement( _
-                New CodeVariableReferenceExpression("m_size"), _
+            method.Statements.Add(New CodeAssignStatement(
+                New CodeVariableReferenceExpression("m_size"),
                 New CodePrimitiveExpression(0)))
             ctd.Members.Add(method)
 
@@ -109,20 +109,20 @@ Namespace Transform
             method = New CodeMemberMethod()
             method.Name = "ToByteArray"
             method.Attributes = MemberAttributes.Public
-            method.Statements.Add(New CodeVariableDeclarationStatement( _
-                New CodeTypeReference(New CodeTypeReference(GetType(Byte)), 1), _
-                "arr", _
-                New CodeArrayCreateExpression( _
-                    New CodeTypeReference(New CodeTypeReference(GetType(Byte)), 1), _
+            method.Statements.Add(New CodeVariableDeclarationStatement(
+                New CodeTypeReference(New CodeTypeReference(GetType(Byte)), 1),
+                "arr",
+                New CodeArrayCreateExpression(
+                    New CodeTypeReference(New CodeTypeReference(GetType(Byte)), 1),
                     New CodeVariableReferenceExpression("m_size"))))
-            method.Statements.Add(New CodeMethodInvokeExpression( _
-                New CodeTypeReferenceExpression(GetType(System.Runtime.InteropServices.Marshal)), _
-                "Copy", _
-                New CodeVariableReferenceExpression("m_ptr"), _
-                New CodeVariableReferenceExpression("arr"), _
-                New CodePrimitiveExpression(0), _
+            method.Statements.Add(New CodeMethodInvokeExpression(
+                New CodeTypeReferenceExpression(GetType(System.Runtime.InteropServices.Marshal)),
+                "Copy",
+                New CodeVariableReferenceExpression("m_ptr"),
+                New CodeVariableReferenceExpression("arr"),
+                New CodePrimitiveExpression(0),
                 New CodeVariableReferenceExpression("m_size")))
-            method.Statements.Add(New CodeMethodReturnStatement( _
+            method.Statements.Add(New CodeMethodReturnStatement(
                 New CodeVariableReferenceExpression("arr")))
             method.ReturnType = New CodeTypeReference(New CodeTypeReference(GetType(Byte)), 1)
             ctd.Members.Add(method)
@@ -141,8 +141,8 @@ Namespace Transform
             mem.ImplementationTypes.Add(New CodeTypeReference(GetType(IDisposable)))
 
             ' Just call the free method
-            Dim state As New CodeExpressionStatement( _
-                New CodeMethodInvokeExpression( _
+            Dim state As New CodeExpressionStatement(
+                New CodeMethodInvokeExpression(
                     New CodeMethodReferenceExpression(New CodeThisReferenceExpression(), "Free")))
             mem.Statements.Add(state)
 

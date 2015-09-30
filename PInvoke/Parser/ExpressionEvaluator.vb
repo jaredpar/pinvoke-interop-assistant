@@ -1,5 +1,7 @@
 ﻿' Copyright (c) Microsoft Corporation.  All rights reserved.
 
+Imports System.Runtime.InteropServices
+
 Namespace Parser
 
     ''' <summary>
@@ -18,12 +20,12 @@ Namespace Parser
             _opts.ThrowOnEndOfStream = False
         End Sub
 
-        Public Function TryEvaluate(ByVal expr As String, ByRef result As ExpressionValue) As Boolean
+        Public Function TryEvaluate(ByVal expr As String, <Out> ByRef result As ExpressionValue) As Boolean
             Dim list As List(Of Token) = Scanner.TokenizeText(expr, _opts)
             Return TryEvaluate(list, result)
         End Function
 
-        Public Function TryEvaluate(ByVal list As List(Of Token), ByRef result As ExpressionValue) As Boolean
+        Public Function TryEvaluate(ByVal list As List(Of Token), <Out> ByRef result As ExpressionValue) As Boolean
             Dim node As ExpressionNode = Nothing
             If Not _parser.TryParse(list, node) Then
                 result = Nothing
@@ -33,7 +35,7 @@ Namespace Parser
             Return TryEvaluate(node, result)
         End Function
 
-        Public Function TryEvaluate(ByVal node As ExpressionNode, ByRef result As ExpressionValue) As Boolean
+        Public Function TryEvaluate(ByVal node As ExpressionNode, <Out> ByRef result As ExpressionValue) As Boolean
             If Not TryEvaluateCore(node) Then
                 Return False
             End If

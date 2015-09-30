@@ -1816,7 +1816,7 @@ Public Class NativeValueExpression
         _node = Nothing
     End Sub
 
-    Private Sub EnsureValueList()
+    Public Sub EnsureValueList()
         If _valueList IsNot Nothing Then
             Return
         End If

@@ -183,7 +183,7 @@ Namespace Transform
             Return ConvertCodeDomToPInvokeCodeImpl(col, ep)
         End Function
 
-        <SuppressMessage("Microsoft.Security", "CA2122")> _
+        <SuppressMessage("Microsoft.Security", "CA2122")>
         Private Function ConvertCodeDomToPInvokeCodeImpl(ByVal col As CodeTypeDeclarationCollection, ByVal ep As ErrorProvider) As String
             ThrowIfNull(col)
             ThrowIfNull(ep)

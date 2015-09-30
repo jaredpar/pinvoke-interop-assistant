@@ -1,6 +1,7 @@
 ﻿' Copyright (c) Microsoft Corporation.  All rights reserved.
 Imports System.Collections.Generic
 Imports System.IO
+Imports System.Text
 Imports System.Text.RegularExpressions
 Imports PInvoke.Contract
 
@@ -164,7 +165,7 @@ Namespace Parser
     ''' any sort of macro processing 
     ''' </summary>
     ''' <remarks></remarks>
-    <DebuggerDisplay("{DisplayString}")> _
+    <DebuggerDisplay("{DisplayString}")>
     Public Class ParseEngine
 
 #Region "ParseEngineException"
@@ -206,23 +207,25 @@ Namespace Parser
 
             ' Build the SAL table 
             For Each e As SalEntryType In System.Enum.GetValues(GetType(SalEntryType))
-                _salTable.Add( _
-                 NativeSalEntry.GetDirectiveForEntry(e), _
+                _salTable.Add(
+                 NativeSalEntry.GetDirectiveForEntry(e),
                  e)
             Next
         End Sub
 
-#Region "Public Methods"
-
-        Public Function Parse(ByVal reader As TextReader) As ParseResult
+        Public Function Parse(reader As TextReader) As ParseResult
             Return ParseCore(New TextReaderBag(reader))
         End Function
 
-        Public Function Parse(ByVal readerbag As TextReaderBag) As ParseResult
+        Public Function Parse(readerbag As TextReaderBag) As ParseResult
             Return ParseCore(readerbag)
         End Function
 
-#End Region
+        Public Function Parse(text As String) As ParseResult
+            Dim bytes = Encoding.UTF8.GetBytes(text)
+            Dim stream As New MemoryStream(bytes)
+            Return Parse(New StreamReader(stream))
+        End Function
 
         Private Function ParseCore(ByVal readerBag As TextReaderBag) As ParseResult
             ThrowIfNull(readerBag)

@@ -17,6 +17,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsTool", "WindowsTool\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsToolLauncher", "WindowsToolLauncher\WindowsToolLauncher.csproj", "{ED55731A-AFF0-4BD0-918A-5A343F018565}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PInvoke.Roslyn", "PInvoke.Roslyn\PInvoke.Roslyn.csproj", "{99AC569F-9EDB-4B35-857A-552CD083A8DE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PInvoke.Roslyn.Test", "PInvoke.Roslyn.Test\PInvoke.Roslyn.Test.csproj", "{DDECA687-04F0-4D6F-B89C-D98D4A9566E4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +75,22 @@ Global
 		{ED55731A-AFF0-4BD0-918A-5A343F018565}.Release|Any CPU.Build.0 = Release|Any CPU
 		{ED55731A-AFF0-4BD0-918A-5A343F018565}.Release|x86.ActiveCfg = Release|Any CPU
 		{ED55731A-AFF0-4BD0-918A-5A343F018565}.Release|x86.Build.0 = Release|Any CPU
+		{99AC569F-9EDB-4B35-857A-552CD083A8DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99AC569F-9EDB-4B35-857A-552CD083A8DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99AC569F-9EDB-4B35-857A-552CD083A8DE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{99AC569F-9EDB-4B35-857A-552CD083A8DE}.Debug|x86.Build.0 = Debug|Any CPU
+		{99AC569F-9EDB-4B35-857A-552CD083A8DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99AC569F-9EDB-4B35-857A-552CD083A8DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99AC569F-9EDB-4B35-857A-552CD083A8DE}.Release|x86.ActiveCfg = Release|Any CPU
+		{99AC569F-9EDB-4B35-857A-552CD083A8DE}.Release|x86.Build.0 = Release|Any CPU
+		{DDECA687-04F0-4D6F-B89C-D98D4A9566E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DDECA687-04F0-4D6F-B89C-D98D4A9566E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DDECA687-04F0-4D6F-B89C-D98D4A9566E4}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DDECA687-04F0-4D6F-B89C-D98D4A9566E4}.Debug|x86.Build.0 = Debug|Any CPU
+		{DDECA687-04F0-4D6F-B89C-D98D4A9566E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DDECA687-04F0-4D6F-B89C-D98D4A9566E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DDECA687-04F0-4D6F-B89C-D98D4A9566E4}.Release|x86.ActiveCfg = Release|Any CPU
+		{DDECA687-04F0-4D6F-B89C-D98D4A9566E4}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

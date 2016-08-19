@@ -146,7 +146,7 @@ namespace PInvoke.Transform
             CodeTypeDeclaration ctd = new CodeTypeDeclaration();
             ctd.Name = ntEnum.Name;
             ctd.IsEnum = true;
-            ctd.UserData(TransformConstants.DefinedType) = ntEnum;
+            ctd.UserData[TransformConstants.DefinedType] = ntEnum;
 
             // Add the values
             foreach (NativeEnumValue enumValue in ntEnum.Values)
@@ -185,7 +185,7 @@ namespace PInvoke.Transform
             // Generate the core type
             CodeTypeDeclaration ctd = new CodeTypeDeclaration(ntUnion.Name);
             ctd.IsStruct = true;
-            ctd.UserData(TransformConstants.DefinedType) = ntUnion;
+            ctd.UserData[TransformConstants.DefinedType] = ntUnion;
 
             // Add the struct layout attribute
             ctd.CustomAttributes.Add(MarshalAttributeFactory.CreateStructLayoutAttribute(LayoutKind.Explicit));
@@ -233,9 +233,9 @@ namespace PInvoke.Transform
                 del.CustomAttributes.Add(MarshalAttributeFactory.CreateUnmanagedFunctionPointerAttribute(ntFuncPtr.CallingConvention));
             }
 
-            del.UserData.Item(TransformConstants.DefinedType) = ntFuncPtr;
-            del.UserData.Item(TransformConstants.ReturnType) = ntFuncPtr.Signature.ReturnType;
-            del.UserData.Item(TransformConstants.ReturnTypeSal) = ntFuncPtr.Signature.ReturnTypeSalAttribute;
+            del.UserData.Item[TransformConstants.DefinedType] = ntFuncPtr;
+            del.UserData.Item[TransformConstants.ReturnType] = ntFuncPtr.Signature.ReturnType;
+            del.UserData.Item[TransformConstants.ReturnTypeSal] = ntFuncPtr.Signature.ReturnTypeSalAttribute;
             del.Comments.Add(new CodeCommentStatement(comment, true));
 
             return del;
@@ -286,19 +286,19 @@ namespace PInvoke.Transform
             CodeMemberMethod proc = new CodeMemberMethod();
             proc.Name = ntProc.Name;
             proc.ReturnType = GenerateTypeReferenceImpl(ntSig.ReturnType, ref procComment);
-            proc.UserData.Item(TransformConstants.ReturnType) = ntSig.ReturnType;
+            proc.UserData[TransformConstants.ReturnType] = ntSig.ReturnType;
             if (ntSig.ReturnTypeSalAttribute != null)
             {
-                proc.UserData.Item(TransformConstants.ReturnTypeSal) = ntSig.ReturnTypeSalAttribute;
+                proc.UserData[TransformConstants.ReturnTypeSal] = ntSig.ReturnTypeSalAttribute;
             }
             else
             {
-                proc.UserData.Item(TransformConstants.ReturnTypeSal) = new NativeSalAttribute();
+                proc.UserData[TransformConstants.ReturnTypeSal] = new NativeSalAttribute();
             }
             proc.Attributes = MemberAttributes.Public | MemberAttributes.Static;
-            proc.UserData.Item(TransformConstants.Procedure) = ntProc;
-            proc.UserData.Item(TransformConstants.ReturnType) = ntSig.ReturnType;
-            proc.UserData.Item(TransformConstants.ReturnTypeSal) = ntSig.ReturnTypeSalAttribute;
+            proc.UserData[TransformConstants.Procedure] = ntProc;
+            proc.UserData[TransformConstants.ReturnType] = ntSig.ReturnType;
+            proc.UserData[TransformConstants.ReturnTypeSal] = ntSig.ReturnTypeSalAttribute;
 
             // Add the DLL import attribute
             string dllName = ntProc.DllName;
@@ -330,7 +330,7 @@ namespace PInvoke.Transform
                 CodeParameterDeclarationExpression param = new CodeParameterDeclarationExpression();
                 param.Name = ntParam.Name;
                 param.Type = GenerateTypeReferenceImpl(ntParam.NativeType, ref comment);
-                param.UserData.Item(TransformConstants.Param) = ntParam;
+                param.UserData[TransformConstants.Param] = ntParam;
                 col.Add(param);
 
                 if (string.IsNullOrEmpty(param.Name))
@@ -339,7 +339,7 @@ namespace PInvoke.Transform
                 }
 
                 // Add the type comment to the procedure
-                comments += Constants.vbCrLf;
+                comments += Environment.NewLine;
                 comments += param.Name + ": " + comment;
                 count += 1;
             }
@@ -420,7 +420,7 @@ namespace PInvoke.Transform
             int bitVectorCount = 0;
             for (int i = 0; i <= nt.Members.Count - 1; i++)
             {
-                NativeMember member = nt.Members(i);
+                NativeMember member = nt.Members[i];
 
                 // Don't process unnamed container members
                 if (string.IsNullOrEmpty(member.Name))
@@ -436,9 +436,9 @@ namespace PInvoke.Transform
                     List<NativeMember> list = new List<NativeMember>();
                     NativeBitVector bitVector = null;
 
-                    while ((i < nt.Members.Count && IsBitVector(nt.Members(i).NativeType, ref bitVector) && bitCount + bitVector.Size <= 32))
+                    while ((i < nt.Members.Count && IsBitVector(nt.Members[i].NativeType, ref bitVector) && bitCount + bitVector.Size <= 32))
                     {
-                        list.Add(nt.Members(i));
+                        list.Add(nt.Members[i]);
                         i += 1;
                     }
                     i -= 1;
@@ -455,12 +455,12 @@ namespace PInvoke.Transform
                     {
                         if (j > 0)
                         {
-                            comment.Text += Constants.vbCrLf;
+                            comment.Text += Environment.NewLine;
                         }
 
-                        IsBitVector(list(j).NativeType, ref bitVector);
-                        comment.Text += list(j).Name + " : " + bitVector.Size;
-                        GenerateBitVectorProperty(list(j), offset, ctd, cMember);
+                        IsBitVector(list[j].NativeType, ref bitVector);
+                        comment.Text += list[j].Name + " : " + bitVector.Size;
+                        GenerateBitVectorProperty(list[j], offset, ctd, cMember);
                         offset += bitVector.Size;
                     }
                     cMember.Comments.Add(new CodeCommentStatement(comment));
@@ -687,7 +687,7 @@ namespace PInvoke.Transform
             try
             {
                 Exception ex = null;
-                if (TryGenerateValueExpression(ntExpr, ref member.InitExpression, ref member.Type, ref ex))
+                if (TryGenerateValueExpression(ntExpr, out member.InitExpression, out member.Type, out ex))
                 {
                     return true;
                 }
@@ -705,7 +705,7 @@ namespace PInvoke.Transform
             }
         }
 
-        public bool TryGenerateValueExpression(NativeValueExpression ntExpr, ref CodeExpression expr, ref CodeTypeReference exprType, ref Exception ex)
+        public bool TryGenerateValueExpression(NativeValueExpression ntExpr, out CodeExpression expr, out CodeTypeReference exprType, out Exception ex)
         {
             try
             {
@@ -715,13 +715,15 @@ namespace PInvoke.Transform
                     throw new InvalidOperationException(msg);
                 }
 
-                expr = GenerateValueExpressionImpl(ntExpr.Node, ref exprType);
+                expr = GenerateValueExpressionImpl(ntExpr.Node, out exprType);
                 ex = null;
                 return true;
             }
             catch (Exception ex2)
             {
                 ex = ex2;
+                expr = null;
+                exprType = null;
                 return false;
             }
 

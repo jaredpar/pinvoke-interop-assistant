@@ -595,11 +595,7 @@ namespace PInvoke
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public NativeSignature Signature
-        {
-            get { return _sig; }
-            set { _sig = value; }
-        }
+        public NativeSignature Signature;
 
         public NativeCallingConvention CallingConvention
         {
@@ -1195,24 +1191,24 @@ namespace PInvoke
                 case PInvoke.BuiltinType.NativeBoolean:
                     Name = "boolean";
                     _managedType = typeof(bool);
-                    _unmanagedType = Runtime.InteropServices.UnmanagedType.Bool;
+                    _unmanagedType = System.Runtime.InteropServices.UnmanagedType.Bool;
                     break;
                 case PInvoke.BuiltinType.NativeByte:
                     Name = "byte";
                     _managedType = typeof(byte);
-                    _unmanagedType = Runtime.InteropServices.UnmanagedType.I1;
+                    _unmanagedType = System.Runtime.InteropServices.UnmanagedType.I1;
                     break;
                 case PInvoke.BuiltinType.NativeInt16:
                     Name = "short";
                     if (IsUnsigned)
                     {
                         _managedType = typeof(UInt16);
-                        _unmanagedType = Runtime.InteropServices.UnmanagedType.U2;
+                        _unmanagedType = System.Runtime.InteropServices.UnmanagedType.U2;
                     }
                     else
                     {
                         _managedType = typeof(Int16);
-                        _unmanagedType = Runtime.InteropServices.UnmanagedType.I2;
+                        _unmanagedType = System.Runtime.InteropServices.UnmanagedType.I2;
                     }
                     break;
                 case PInvoke.BuiltinType.NativeInt32:
@@ -1220,12 +1216,12 @@ namespace PInvoke
                     if (IsUnsigned)
                     {
                         _managedType = typeof(UInt32);
-                        _unmanagedType = Runtime.InteropServices.UnmanagedType.U4;
+                        _unmanagedType = System.Runtime.InteropServices.UnmanagedType.U4;
                     }
                     else
                     {
                         _managedType = typeof(Int32);
-                        _unmanagedType = Runtime.InteropServices.UnmanagedType.I4;
+                        _unmanagedType = System.Runtime.InteropServices.UnmanagedType.I4;
                     }
                     break;
                 case PInvoke.BuiltinType.NativeInt64:
@@ -1233,43 +1229,43 @@ namespace PInvoke
                     if (IsUnsigned)
                     {
                         _managedType = typeof(UInt64);
-                        _unmanagedType = Runtime.InteropServices.UnmanagedType.U8;
+                        _unmanagedType = System.Runtime.InteropServices.UnmanagedType.U8;
                     }
                     else
                     {
                         _managedType = typeof(Int64);
-                        _unmanagedType = Runtime.InteropServices.UnmanagedType.I8;
+                        _unmanagedType = System.Runtime.InteropServices.UnmanagedType.I8;
                     }
                     break;
                 case PInvoke.BuiltinType.NativeChar:
                     Name = "char";
                     _managedType = typeof(byte);
-                    _unmanagedType = Runtime.InteropServices.UnmanagedType.I1;
+                    _unmanagedType = System.Runtime.InteropServices.UnmanagedType.I1;
                     break;
                 case PInvoke.BuiltinType.NativeWChar:
                     Name = "wchar";
                     _managedType = typeof(char);
-                    _unmanagedType = Runtime.InteropServices.UnmanagedType.I2;
+                    _unmanagedType = System.Runtime.InteropServices.UnmanagedType.I2;
                     break;
                 case PInvoke.BuiltinType.NativeFloat:
                     Name = "float";
                     _managedType = typeof(float);
-                    _unmanagedType = Runtime.InteropServices.UnmanagedType.R4;
+                    _unmanagedType = System.Runtime.InteropServices.UnmanagedType.R4;
                     break;
                 case PInvoke.BuiltinType.NativeDouble:
                     Name = "double";
                     _managedType = typeof(double);
-                    _unmanagedType = Runtime.InteropServices.UnmanagedType.R8;
+                    _unmanagedType = System.Runtime.InteropServices.UnmanagedType.R8;
                     break;
                 case PInvoke.BuiltinType.NativeVoid:
                     Name = "void";
-                    _managedType = typeof(Void);
-                    _unmanagedType = Runtime.InteropServices.UnmanagedType.AsAny;
+                    _managedType = typeof(void);
+                    _unmanagedType = System.Runtime.InteropServices.UnmanagedType.AsAny;
                     break;
                 case PInvoke.BuiltinType.NativeUnknown:
                     Name = "unknown";
                     _managedType = typeof(object);
-                    _unmanagedType = Runtime.InteropServices.UnmanagedType.AsAny;
+                    _unmanagedType = System.Runtime.InteropServices.UnmanagedType.AsAny;
                     break;
                 default:
                     InvalidEnumValue(BuiltinType);
@@ -1278,21 +1274,23 @@ namespace PInvoke
 
         }
 
-        public static bool TryConvertToBuiltinType(string name, ref NativeBuiltinType nativeBt)
+        public static bool TryConvertToBuiltinType(string name, out NativeBuiltinType nativeBt)
         {
             Parser.TokenType tt = default(Parser.TokenType);
-            if (Parser.TokenHelper.KeywordMap.TryGetValue(name, tt))
+            if (Parser.TokenHelper.KeywordMap.TryGetValue(name, out tt))
             {
-                return TryConvertToBuiltinType(tt, ref nativeBt);
+                return TryConvertToBuiltinType(tt, out nativeBt);
             }
 
+            nativeBt = null;
             return false;
         }
 
-        public static bool TryConvertToBuiltinType(Parser.TokenType tt, ref NativeBuiltinType nativeBt)
+        public static bool TryConvertToBuiltinType(Parser.TokenType tt, out NativeBuiltinType nativeBt)
         {
             if (!Parser.TokenHelper.IsTypeKeyword(tt))
             {
+                nativeBt = null;
                 return false;
             }
 
@@ -1466,11 +1464,7 @@ namespace PInvoke
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public NativeSignature Signature
-        {
-            get { return _sig; }
-            set { _sig = value; }
-        }
+        public NativeSignature Signature;
 
         public NativeCallingConvention CallingConvention
         {
@@ -1550,14 +1544,7 @@ namespace PInvoke
         /// <summary>
         /// Type of the parameter
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public NativeType NativeType
-        {
-            get { return _type; }
-            set { _type = value; }
-        }
+        public NativeType NativeType;
 
         /// <summary>
         /// The SAL attribute for this parameter
@@ -1565,15 +1552,7 @@ namespace PInvoke
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public NativeSalAttribute SalAttribute
-        {
-            get { return _salAttribute; }
-            set
-            {
-                ThrowIfNull(value);
-                _salAttribute = value;
-            }
-        }
+        public NativeSalAttribute SalAttribute;
 
         /// <summary>
         /// NativeType after digging through typedef and named types
@@ -1688,11 +1667,7 @@ namespace PInvoke
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public NativeType NativeType
-        {
-            get { return _nativeType; }
-            set { _nativeType = value; }
-        }
+        public NativeType NativeType;
 
         public NativeType NativeTypeDigged
         {
@@ -1955,7 +1930,7 @@ namespace PInvoke
             _valueList = new List<NativeValue>();
 
             // It's valid no have an invalid expression :)
-            if (!parser.TryParse(_expression, _node))
+            if (!parser.TryParse(_expression, out _node))
             {
                 _errorParsingExpr = true;
                 _node = null;
@@ -1982,7 +1957,7 @@ namespace PInvoke
                 if (token.IsQuotedString)
                 {
                     string strValue = null;
-                    if (Parser.TokenHelper.TryConvertToString(token, strValue))
+                    if (Parser.TokenHelper.TryConvertToString(token, out strValue))
                     {
                         ntVal = NativeValue.CreateString(strValue);
                     }
@@ -1990,7 +1965,7 @@ namespace PInvoke
                 else if (token.IsNumber)
                 {
                     object value = null;
-                    if (Parser.TokenHelper.TryConvertToNumber(token, value))
+                    if (Parser.TokenHelper.TryConvertToNumber(token, out value))
                     {
                         ntVal = NativeValue.CreateNumber(value);
                     }
@@ -1998,7 +1973,7 @@ namespace PInvoke
                 else if (token.IsCharacter)
                 {
                     char cValue = 'c';
-                    if (Parser.TokenHelper.TryConvertToChar(token, cValue))
+                    if (Parser.TokenHelper.TryConvertToChar(token, out cValue))
                     {
                         ntVal = NativeValue.CreateCharacter(cValue);
                     }
@@ -2585,17 +2560,14 @@ namespace PInvoke
         private NativeSalAttribute _returnTypeSalAttribute = new NativeSalAttribute();
 
         private List<NativeParameter> _paramList = new List<NativeParameter>();
+
         /// <summary>
         /// Return type of the NativeProcedure
         /// </summary>
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public NativeType ReturnType
-        {
-            get { return _returnType; }
-            set { _returnType = value; }
-        }
+        public NativeType ReturnType;
 
         /// <summary>
         /// SAL attribute on the return type of the procedure
@@ -2603,11 +2575,7 @@ namespace PInvoke
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public NativeSalAttribute ReturnTypeSalAttribute
-        {
-            get { return _returnTypeSalAttribute; }
-            set { _returnTypeSalAttribute = value; }
-        }
+        public NativeSalAttribute ReturnTypeSalAttribute;
 
         /// <summary>
         /// Parameters of the procedure
@@ -2670,7 +2638,7 @@ namespace PInvoke
                     builder.Append(", ");
                 }
 
-                NativeParameter cur = _paramList(i);
+                NativeParameter cur = _paramList[i];
                 if (includeSal && !cur.SalAttribute.IsEmpty)
                 {
                     builder.Append(cur.SalAttribute.DisplayName);

@@ -76,7 +76,7 @@ namespace PInvoke
             bool inUnitTest = Contract.InUnitTest;
             StackTrace trace = new StackTrace();
             string text = message;
-            text = text + Environment.NewLine + trace.ToString;
+            text = text + Environment.NewLine + trace.ToString();
             throw new ContractException(message);
         }
     }

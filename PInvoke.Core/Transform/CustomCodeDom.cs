@@ -10,6 +10,7 @@ using System.CodeDom;
 using System.CodeDom.Compiler;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using System.IO;
 
 namespace PInvoke.Transform
 {
@@ -146,7 +147,7 @@ namespace PInvoke.Transform
             CodeDomProvider provider = base.GetProvider();
             string expr = "(";
 
-            using (IO.StringWriter writer = new IO.StringWriter())
+            using (var writer = new StringWriter())
             {
                 provider.GenerateCodeFromExpression(_leftExpr, writer, new CodeGeneratorOptions());
                 expr += writer.ToString();
@@ -162,7 +163,7 @@ namespace PInvoke.Transform
                 expr += " >> ";
             }
 
-            using (IO.StringWriter writer = new IO.StringWriter())
+            using (var writer = new StringWriter())
             {
                 provider.GenerateCodeFromExpression(_rightExpr, writer, new CodeGeneratorOptions());
                 expr += string.Format("({0})", writer.ToString());
@@ -204,7 +205,7 @@ namespace PInvoke.Transform
         protected override void UpdateValue()
         {
             CodeDomProvider provider = GetProvider();
-            using (IO.StringWriter writer = new IO.StringWriter())
+            using (var writer = new StringWriter())
             {
                 provider.GenerateCodeFromExpression(_expr, writer, new CodeGeneratorOptions());
                 Value = "-" + writer.ToString();
@@ -252,7 +253,7 @@ namespace PInvoke.Transform
                     break;
             }
 
-            using (IO.StringWriter writer = new IO.StringWriter())
+            using (var writer = new StringWriter())
             {
                 provider.GenerateCodeFromExpression(_symbolExpr, writer, new CodeGeneratorOptions());
                 expr += writer.ToString();

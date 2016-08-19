@@ -8,10 +8,10 @@ using System.Diagnostics;
 using System.ComponentModel;
 using System.Windows.Forms;
 using PInvoke;
-using ConstantRow = NativeStorage.ConstantRow;
-using ProcedureRow = NativeStorage.ProcedureRow;
-using DefinedTypeRow = NativeStorage.DefinedTypeRow;
-using TypedefTypeRow = NativeStorage.TypedefTypeRow;
+using ConstantRow = PInvoke.NativeStorage.ConstantRow;
+using ProcedureRow = PInvoke.NativeStorage.ProcedureRow;
+using DefinedTypeRow = PInvoke.NativeStorage.DefinedTypeRow;
+using TypedefTypeRow = PInvoke.NativeStorage.TypedefTypeRow;
 
 namespace PInvoke.Controls
 {
@@ -104,7 +104,7 @@ namespace PInvoke.Controls
                 foreach (DataGridViewRow row in SelectedRows)
                 {
                     NativeSymbol symbol = null;
-                    if (_info.TryConvertToSymbol(_list(row.Index), ref symbol))
+                    if (_info.TryConvertToSymbol(_list[row.Index], ref symbol))
                     {
                         list.Add(symbol);
                     }
@@ -216,7 +216,7 @@ namespace PInvoke.Controls
 
         public SearchDataGrid()
         {
-            _ns = PInvoke.NativeStorage.DefaultInstance;
+            _ns = NativeStorage.DefaultInstance;
             m_timer.Enabled = false;
             m_timer.Interval = 500;
 
@@ -270,7 +270,7 @@ namespace PInvoke.Controls
                 return;
             }
 
-            object cur = _list(e.RowIndex);
+            object cur = _list[e.RowIndex];
             if (e.ColumnIndex == _nameColumn.Index)
             {
                 e.Value = _info.GetName(cur);
@@ -409,7 +409,7 @@ namespace PInvoke.Controls
             string val = null;
             try
             {
-                val = row.Cells(_nameColumn.Index).Value as string;
+                val = row.Cells[_nameColumn.Index].Value as string;
             }
             catch (Exception ex)
             {
@@ -437,7 +437,7 @@ namespace PInvoke.Controls
             {
                 for (int i = 0; i <= _selectionList.Count - 1; i++)
                 {
-                    if (!StringComparer.Ordinal.Equals(_selectionList(i), GetHashString(SelectedRows(i))))
+                    if (!StringComparer.Ordinal.Equals(_selectionList[i], GetHashString(SelectedRows[i])))
                     {
                         changed = true;
                         break; // TODO: might not be correct. Was : Exit For
@@ -546,7 +546,7 @@ namespace PInvoke.Controls
             {
                 ConstantRow row = (ConstantRow)o;
                 NativeConstant c = null;
-                if (NativeStorage.TryLoadConstant(row.Name, c))
+                if (NativeStorage.TryLoadConstant(row.Name, out c))
                 {
                     return c.Value.Expression;
                 }
@@ -561,7 +561,7 @@ namespace PInvoke.Controls
             {
                 ConstantRow row = (ConstantRow)o;
                 NativeConstant cValue = null;
-                if (NativeStorage.TryLoadConstant(row.Name, cValue))
+                if (NativeStorage.TryLoadConstant(row.Name, out cValue))
                 {
                     symbol = cValue;
                     return true;
@@ -595,7 +595,7 @@ namespace PInvoke.Controls
 
                 Parser.ExpressionParser p = new Parser.ExpressionParser();
                 Parser.ExpressionNode node = null;
-                if (!p.TryParse(row.Value, node))
+                if (!p.TryParse(row.Value, out node))
                 {
                     return false;
                 }
@@ -640,7 +640,7 @@ namespace PInvoke.Controls
             {
                 ProcedureRow row = (ProcedureRow)o;
                 NativeProcedure proc = null;
-                if (NativeStorage.TryLoadProcedure(row.Name, proc))
+                if (NativeStorage.TryLoadProcedure(row.Name, out proc))
                 {
                     return proc.Signature.DisplayName;
                 }
@@ -652,7 +652,7 @@ namespace PInvoke.Controls
             {
                 ProcedureRow row = (ProcedureRow)o;
                 NativeProcedure proc = null;
-                if (NativeStorage.TryLoadProcedure(row.Name, proc))
+                if (NativeStorage.TryLoadProcedure(row.Name, out proc))
                 {
                     symbol = proc;
                     return true;
@@ -699,7 +699,7 @@ namespace PInvoke.Controls
             {
                 string name = GetName(o);
                 NativeType type = null;
-                if (NativeStorage.TryLoadByName(name, type))
+                if (NativeStorage.TryLoadByName(name, out type))
                 {
                     switch (type.Kind)
                     {
@@ -724,7 +724,7 @@ namespace PInvoke.Controls
             {
                 string name = GetName(o);
                 NativeType type = null;
-                if (NativeStorage.TryLoadByName(name, type))
+                if (NativeStorage.TryLoadByName(name, out type))
                 {
                     symbol = type;
                     return true;
@@ -809,7 +809,7 @@ namespace PInvoke.Controls
                 if (definedRow != null || typedefRow != null)
                 {
                     NativeType type = null;
-                    if (NativeStorage.TryLoadByName(name, type))
+                    if (NativeStorage.TryLoadByName(name, out type))
                     {
                         symbol = type;
                         switch (type.Kind)
@@ -845,7 +845,7 @@ namespace PInvoke.Controls
                 else if (constRow != null)
                 {
                     NativeConstant cValue = null;
-                    if (NativeStorage.TryLoadConstant(name, cValue))
+                    if (NativeStorage.TryLoadConstant(name, out cValue))
                     {
                         symbol = cValue;
                         value = cValue.Value.Expression;
@@ -858,7 +858,7 @@ namespace PInvoke.Controls
                 else if (procRow != null)
                 {
                     NativeProcedure proc = null;
-                    if (NativeStorage.TryLoadProcedure(name, proc))
+                    if (NativeStorage.TryLoadProcedure(name, out proc))
                     {
                         symbol = proc;
                         value = proc.Signature.DisplayName;

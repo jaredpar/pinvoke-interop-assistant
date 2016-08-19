@@ -534,7 +534,7 @@ namespace PInvoke.Parser
             return sValue;
         }
 
-        public static bool TryConvertToString(Token token, ref string str)
+        public static bool TryConvertToString(Token token, out string str)
         {
             if (!token.IsQuotedString)
             {
@@ -557,7 +557,7 @@ namespace PInvoke.Parser
             return true;
         }
 
-        public static bool TryConvertToChar(Token token, ref char retChar)
+        public static bool TryConvertToChar(Token token, out char retChar)
         {
             if (!token.IsCharacter)
             {
@@ -687,7 +687,7 @@ namespace PInvoke.Parser
         /// <param name="val"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static bool TryConvertToNumber(Token t, ref object val)
+        public static bool TryConvertToNumber(Token t, out object val)
         {
             return TryConvertToNumber(t.Value, ref val);
         }

@@ -56,14 +56,14 @@ namespace PInvoke.Controls
 
         public SymbolDisplayControl()
         {
-            _ns = PInvoke.NativeStorage.DefaultInstance;
+            _ns = NativeStorage.DefaultInstance;
             _conv = new BasicConverter(LanguageType.VisualBasic);
 
             // This call is required by the Windows Form Designer.
             InitializeComponent();
 
             // Populate the combo boxes
-            m_languageCb.Items.AddRange(PInvoke.EnumUtil.GetAllValuesObject<LanguageType>);
+            m_languageCb.Items.AddRange(EnumUtil.GetAllValuesObject<LanguageType>());
             m_languageCb.SelectedItem = LanguageType.VisualBasic;
             m_searchKindCb.Items.AddRange(PInvoke.EnumUtil.GetAllValuesObjectExcept(SearchKind.None));
             m_searchKindCb.SelectedItem = SearchKind.All;

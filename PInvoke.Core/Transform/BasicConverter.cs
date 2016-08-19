@@ -1,17 +1,21 @@
 
+// Copyright (c) Microsoft Corporation.  All rights reserved.
 using Microsoft.VisualBasic;
 using System;
+using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
-// Copyright (c) Microsoft Corporation.  All rights reserved.
 using System.CodeDom;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using PInvoke;
 using PInvoke.Parser;
 using PInvoke.Transform;
+using static PInvoke.Contract;
+using System.CodeDom.Compiler;
+using System.Text;
 
 namespace PInvoke.Transform
 {
@@ -168,6 +172,7 @@ namespace PInvoke.Transform
             {
                 throw new ArgumentNullException("code");
             }
+
             if (ep == null)
             {
                 throw new ArgumentNullException("ep");
@@ -176,7 +181,7 @@ namespace PInvoke.Transform
             NativeCodeAnalyzer analyzer = NativeCodeAnalyzerFactory.CreateForMiniParse(OsVersion.WindowsVista, _ns.LoadAllMacros());
             analyzer.IncludePathList.Add("c:\\program files (x86)\\windows kits\\8.1\\include\\shared");
             NativeSymbolBag bag = default(NativeSymbolBag);
-            using (System.IO.StringReader reader = new IO.StringReader(code))
+            using (System.IO.StringReader reader = new StringReader(code))
             {
                 NativeCodeAnalyzerResult result = analyzer.Analyze(reader);
 
@@ -220,8 +225,8 @@ namespace PInvoke.Transform
             ThrowIfNull(col);
             ThrowIfNull(ep);
 
-            IO.StringWriter writer = new IO.StringWriter();
-            CodeDom.Compiler.CodeDomProvider provider = default(CodeDom.Compiler.CodeDomProvider);
+            StringWriter writer = new StringWriter();
+            CodeDomProvider provider = default(CodeDomProvider);
             string commentStart = null;
 
             // Generate based on the language
@@ -252,7 +257,7 @@ namespace PInvoke.Transform
 
             foreach (CodeTypeDeclaration ctd in col)
             {
-                provider.GenerateCodeFromMember(ctd, writer, new Compiler.CodeGeneratorOptions());
+                provider.GenerateCodeFromMember(ctd, writer, new CodeGeneratorOptions());
             }
 
             if (type == Transform.LanguageType.CSharp)
@@ -343,7 +348,7 @@ namespace PInvoke.Transform
                 if (NativeSymbolCategory.Defined == sym.Category)
                 {
                     NativeDefinedType defined = null;
-                    if (!bag.TryFindDefinedType(sym.Name, defined))
+                    if (!bag.TryFindDefinedType(sym.Name, out defined))
                     {
                         bag.AddDefinedType((NativeDefinedType)sym);
                     }
@@ -360,12 +365,10 @@ namespace PInvoke.Transform
         /// We have to be careful though to avoid wrapper methods
         /// </summary>
         /// <param name="code"></param>
-        /// <returns></returns>
-        /// <remarks></remarks>
         private static string FixupCSharpCode(string code)
         {
-            Text.StringBuilder builder = new Text.StringBuilder();
-            using (IO.StringReader reader = new IO.StringReader(code))
+            var builder = new StringBuilder();
+            using (var reader = new StringReader(code))
             {
                 string line = reader.ReadLine();
 
@@ -377,7 +380,7 @@ namespace PInvoke.Transform
                         builder.AppendLine(line);
 
                         // Process the signature line by line
-                        Text.StringBuilder sigBuilder = new Text.StringBuilder();
+                        StringBuilder sigBuilder = new StringBuilder();
                         do
                         {
                             line = reader.ReadLine();
@@ -390,13 +393,13 @@ namespace PInvoke.Transform
                             Match match = Regex.Match(line, "^\\s*public\\s+static(.*)$");
                             if (match.Success)
                             {
-                                line = "public static extern " + match.Groups(1).Value;
+                                line = "public static extern " + match.Groups[1].Value;
                             }
 
                             match = Regex.Match(line, "(.*){\\s*$");
                             if (match.Success)
                             {
-                                line = match.Groups(1).Value + ";";
+                                line = match.Groups[1].Value + ";";
                             }
 
                             if (Regex.IsMatch(line, "\\s*}\\s*"))

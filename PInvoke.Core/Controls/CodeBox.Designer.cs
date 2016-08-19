@@ -1,12 +1,10 @@
-
-using Microsoft.VisualBasic;
+// Copyright (c) Microsoft Corporation.  All rights reserved.
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-namespace Controls
+namespace PInvoke.Controls
 {
     partial class CodeBox : System.Windows.Forms.UserControl
     {

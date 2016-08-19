@@ -9,6 +9,7 @@ using System.ComponentModel;
 using System.Windows.Forms;
 using PInvoke.Parser;
 using PInvoke.Transform;
+using System.IO;
 
 namespace PInvoke.Controls
 {
@@ -44,7 +45,7 @@ namespace PInvoke.Controls
             InitializeComponent();
 
             // Add any initialization after the InitializeComponent() call.
-            m_langTypeCb.Items.AddRange(PInvoke.EnumUtil.GetAllValuesObject<LanguageType>);
+            m_langTypeCb.Items.AddRange(EnumUtil.GetAllValuesObject<LanguageType>());
             m_langTypeCb.SelectedItem = LanguageType.VisualBasic;
         }
 
@@ -120,7 +121,7 @@ namespace PInvoke.Controls
                 string code = req.Text;
                 NativeCodeAnalyzer analyzer = NativeCodeAnalyzerFactory.CreateForMiniParse(OsVersion.WindowsVista, req.InitialMacroList);
                 analyzer.IncludePathList.Add("c:\\program files (x86)\\windows kits\\8.1\\include\\shared");
-                using (IO.StringReader reader = new IO.StringReader(code))
+                using (var reader = new StringReader(code))
                 {
                     NativeCodeAnalyzerResult parseResult = analyzer.Analyze(reader);
                     ErrorProvider ep = parseResult.ErrorProvider;

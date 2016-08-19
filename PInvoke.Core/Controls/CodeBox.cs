@@ -11,10 +11,8 @@ using System.Windows.Forms;
 
 namespace PInvoke.Controls
 {
-
-    public class CodeBox
+    public partial class CodeBox
     {
-
         public RichTextBox RichTextBox
         {
             get { return m_box; }

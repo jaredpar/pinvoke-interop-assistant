@@ -7,7 +7,7 @@ using System.Data;
 using System.Diagnostics;
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
-namespace Controls
+namespace PInvoke.Controls
 {
     partial class SelectSymbolDialog : System.Windows.Forms.Form
     {
@@ -142,10 +142,3 @@ namespace Controls
         internal System.Windows.Forms.Label Label1;
     }
 }
-
-//=======================================================
-//Service provided by Telerik (www.telerik.com)
-//Conversion powered by NRefactory.
-//Twitter: @telerik
-//Facebook: facebook.com/telerik
-//=======================================================

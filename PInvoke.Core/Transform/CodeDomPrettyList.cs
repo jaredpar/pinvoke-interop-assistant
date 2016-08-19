@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.CodeDom;
 using System.Text.RegularExpressions;
 using PInvoke;
+using static PInvoke.Contract;
 
 namespace PInvoke.Transform
 {
@@ -50,7 +51,7 @@ namespace PInvoke.Transform
                     {
                         if (!IsBadName(possible.Name))
                         {
-                            map(ctd.Name) = possible.Name;
+                            map[ctd.Name] = possible.Name;
                         }
                     }
                 }
@@ -103,7 +104,7 @@ namespace PInvoke.Transform
 
             if (ctd.UserData.Contains(TransformConstants.Type))
             {
-                return (NativeDefinedType)ctd.UserData(TransformConstants.Type);
+                return (NativeDefinedType)ctd.UserData[TransformConstants.Type];
             }
 
             return null;
@@ -120,7 +121,7 @@ namespace PInvoke.Transform
                 if (ctd != null)
                 {
                     string newName = null;
-                    if (map.TryGetValue(ctd.Name, newName))
+                    if (map.TryGetValue(ctd.Name, out newName))
                     {
                         ctd.Name = newName;
                     }
@@ -131,7 +132,7 @@ namespace PInvoke.Transform
                 if (typeRef != null)
                 {
                     string newName = null;
-                    if (map.TryGetValue(typeRef.BaseType, newName))
+                    if (map.TryGetValue(typeRef.BaseType, out newName))
                     {
                         typeRef.BaseType = newName;
                     }
@@ -197,7 +198,7 @@ namespace PInvoke.Transform
                 foreach (NativeStorage.TypedefTypeRow trow in ns.TypedefType.FindByTarget(typeRef))
                 {
                     NativeTypeDef found = null;
-                    if (_bag.TryFindOrLoadTypedef(trow.Name, found))
+                    if (_bag.TryFindOrLoadTypedef(trow.Name, out found))
                     {
                         list.Add(found);
                     }

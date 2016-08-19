@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Windows.Forms;
 using PInvoke;
 using PInvoke.Parser;
+using System.IO;
 
 namespace PInvoke.Controls
 {
@@ -80,7 +81,7 @@ namespace PInvoke.Controls
                 Data data = (Data)e.Argument;
                 string code = data.Text;
                 NativeCodeAnalyzer analyzer = NativeCodeAnalyzerFactory.CreateForMiniParse(OsVersion.WindowsVista, data.InitialMacroList);
-                using (IO.StringReader reader = new IO.StringReader(code))
+                using (var reader = new StringReader(code))
                 {
                     NativeCodeAnalyzerResult parseResult = analyzer.Analyze(reader);
                     ErrorProvider ep = parseResult.ErrorProvider;

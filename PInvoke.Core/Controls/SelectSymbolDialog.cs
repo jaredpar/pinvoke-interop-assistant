@@ -8,11 +8,11 @@ using System.Diagnostics;
 using System.ComponentModel;
 using System.Windows.Forms;
 using PInvoke;
-using ConstantRow = NativeStorage.ConstantRow;
+using ConstantRow = PInvoke.NativeStorage.ConstantRow;
 
 namespace PInvoke.Controls
 {
-    public class SelectSymbolDialog
+    public partial class SelectSymbolDialog
     {
         private NativeStorage _ns;
         private SearchKind _type;
@@ -91,7 +91,7 @@ namespace PInvoke.Controls
 
         private void m_okBtn_Click(System.Object sender, System.EventArgs e)
         {
-            this.DialogResult = Windows.Forms.DialogResult.OK;
+            this.DialogResult = System.Windows.Forms.DialogResult.OK;
             if (_searchGrid != null)
             {
                 this._bag = _searchGrid.SelectedSymbolBag;

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Text.RegularExpressions;
 using static PInvoke.Contract;
 
@@ -65,17 +66,9 @@ namespace PInvoke.Parser
             set { _kind = value; }
         }
 
-        public ExpressionNode LeftNode
-        {
-            get { return _left; }
-            set { _left = value; }
-        }
+        public ExpressionNode LeftNode;
 
-        public ExpressionNode RightNode
-        {
-            get { return _right; }
-            set { _right = value; }
-        }
+        public ExpressionNode RightNode;
 
         public Token Token
         {
@@ -195,7 +188,7 @@ namespace PInvoke.Parser
                 throw new ArgumentNullException("expression");
             }
 
-            using (IO.StringReader reader = new IO.StringReader(expression))
+            using (var reader = new StringReader(expression))
             {
                 Scanner scanner = new Scanner(reader);
                 scanner.Options.HideNewLines = true;
@@ -206,7 +199,7 @@ namespace PInvoke.Parser
             }
         }
 
-        private bool TryParseComplete(List<Token> tokens, ref ExpressionNode node)
+        private bool TryParseComplete(List<Token> tokens, out ExpressionNode node)
         {
             ExpressionNode cur = null;
             List<Token> remaining = null;
@@ -221,38 +214,40 @@ namespace PInvoke.Parser
                 return true;
 
             }
-            else if (!remaining(0).IsBinaryOperation && cur.Parenthesized && cur.Kind == ExpressionKind.Leaf && cur.Token.IsAnyWord)
+            else if (!remaining[0].IsBinaryOperation && cur.Parenthesized && cur.Kind == ExpressionKind.Leaf && cur.Token.IsAnyWord)
             {
                 // This is a cast
                 cur.Kind = ExpressionKind.Cast;
                 node = cur;
-                return TryParseComplete(remaining, ref node.LeftNode);
+                return TryParseComplete(remaining, out node.LeftNode);
             }
-            else if (remaining.Count == 1 || !remaining(0).IsBinaryOperation)
+            else if (remaining.Count == 1 || !remaining[0].IsBinaryOperation)
             {
                 return false;
             }
             else
             {
                 ExpressionNode right = null;
-                if (!TryParseComplete(remaining.GetRange(1, remaining.Count - 1), ref right))
+                if (!TryParseComplete(remaining.GetRange(1, remaining.Count - 1), out right))
                 {
                     return false;
                 }
 
-                node = new ExpressionNode(ExpressionKind.BinaryOperation, remaining(0));
+                node = new ExpressionNode(ExpressionKind.BinaryOperation, remaining[0]);
                 node.LeftNode = cur;
                 node.RightNode = right;
                 return true;
             }
         }
 
-        private bool TryParseCore(List<Token> tokens, ref ExpressionNode node, ref List<Token> remaining)
+        private bool TryParseCore(List<Token> tokens, out ExpressionNode node, out List<Token> remaining)
         {
             ThrowIfNull(tokens);
 
             if (tokens.Count == 0)
             {
+                node = null;
+                remaining = null;
                 return false;
             }
 
@@ -260,38 +255,37 @@ namespace PInvoke.Parser
             if (tokens.Count == 1)
             {
                 remaining = new List<Token>();
-                return TryConvertTokenToExpressionLeafNode(tokens(0), ref node);
+                return TryConvertTokenToExpressionLeafNode(tokens[0], ref node);
             }
 
             ExpressionNode leftNode = null;
             ExpressionNode unaryNode = null;
             int nextIndex = -1;
 
-
-            if (tokens.Count > 2 && tokens(0).IsAnyWord && tokens(1).TokenType == TokenType.ParenOpen)
+            if (tokens.Count > 2 && tokens[0].IsAnyWord && tokens[1].TokenType == TokenType.ParenOpen)
             {
                 // Function call
-                return TryParseFunctionCall(tokens, ref node, ref remaining);
+                return TryParseFunctionCall(tokens, out node, out remaining);
             }
-            else if (tokens(0).TokenType == TokenType.Bang)
+            else if (tokens[0].TokenType == TokenType.Bang)
             {
-                node = new ExpressionNode(ExpressionKind.NegationOperation, tokens(0));
-                return TryParseCore(tokens.GetRange(1, tokens.Count - 1), ref node.LeftNode, ref remaining);
+                node = new ExpressionNode(ExpressionKind.NegationOperation, tokens[0]);
+                return TryParseCore(tokens.GetRange(1, tokens.Count - 1), out node.LeftNode, out remaining);
             }
-            else if (tokens(0).TokenType == TokenType.OpMinus)
+            else if (tokens[0].TokenType == TokenType.OpMinus)
             {
-                node = new ExpressionNode(ExpressionKind.NegativeOperation, tokens(0));
-                return TryParseCore(tokens.GetRange(1, tokens.Count - 1), ref node.LeftNode, ref remaining);
+                node = new ExpressionNode(ExpressionKind.NegativeOperation, tokens[0]);
+                return TryParseCore(tokens.GetRange(1, tokens.Count - 1), out node.LeftNode, out remaining);
             }
-            else if (tokens(0).TokenType == TokenType.ParenOpen)
+            else if (tokens[0].TokenType == TokenType.ParenOpen)
             {
-                return TryParseParenExpression(tokens, ref node, ref remaining);
+                return TryParseParenExpression(tokens, out node, out remaining);
             }
             else if (tokens.Count > 2)
             {
                 // Has to be an operation so convert the left node to a leaf expression
                 remaining = tokens.GetRange(1, tokens.Count - 1);
-                return TryConvertTokenToExpressionLeafNode(tokens(0), ref node);
+                return TryConvertTokenToExpressionLeafNode(tokens[0], ref node);
             }
             else
             {
@@ -299,11 +293,11 @@ namespace PInvoke.Parser
             }
         }
 
-        private bool TryParseFunctionCall(List<Token> tokens, ref ExpressionNode node, ref List<Token> remaining)
+        private bool TryParseFunctionCall(List<Token> tokens, out ExpressionNode node, out List<Token> remaining)
         {
             ThrowIfTrue(tokens.Count < 3);
 
-            node = new ExpressionNode(ExpressionKind.FunctionCall, tokens(0));
+            node = new ExpressionNode(ExpressionKind.FunctionCall, tokens[0]);
 
             // Find the last index 
             int endIndex = FindMatchingParenIndex(tokens, 2);
@@ -340,7 +334,7 @@ namespace PInvoke.Parser
                 if (index < 0)
                 {
                     // No more separators so just parse out the rest of the tokens as an argument
-                    if (!TryParseComplete(tokens, ref cur.LeftNode))
+                    if (!TryParseComplete(tokens, out cur.LeftNode))
                     {
                         return false;
                     }
@@ -366,7 +360,7 @@ namespace PInvoke.Parser
             return true;
         }
 
-        private bool TryParseParenExpression(List<Token> tokens, ref ExpressionNode node, ref List<Token> remaining)
+        private bool TryParseParenExpression(List<Token> tokens, out ExpressionNode node, out List<Token> remaining)
         {
             int endIndex = FindMatchingParenIndex(tokens, 1);
             if (endIndex == -1)
@@ -390,7 +384,7 @@ namespace PInvoke.Parser
 
             for (int i = 0; i <= tokens.Count - 1; i++)
             {
-                if (tokens(i).TokenType == TokenType.Comma)
+                if (tokens[i].TokenType == TokenType.Comma)
                 {
                     return i;
                 }
@@ -455,7 +449,7 @@ namespace PInvoke.Parser
             int depth = 1;
             for (int i = start; i <= tokens.Count - 1; i++)
             {
-                switch (tokens(i).TokenType)
+                switch (tokens[i].TokenType)
                 {
                     case TokenType.ParenOpen:
                         depth += 1;

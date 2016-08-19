@@ -38,7 +38,7 @@ namespace PInvoke.Parser
         public bool TryEvaluate(List<Token> list, out ExpressionValue result)
         {
             ExpressionNode node = null;
-            if (!_parser.TryParse(list, node))
+            if (!_parser.TryParse(list, out node))
             {
                 result = null;
                 return false;
@@ -198,10 +198,10 @@ namespace PInvoke.Parser
                     result = left - ((left / right) * right);
                     break;
                 case TokenType.OpShiftLeft:
-                    result = left << Convert.ToInt32(right.Value);
+                    result = left << Convert.ToInt32((object)right.Value);
                     break;
                 case TokenType.OpShiftRight:
-                    result = left >> Convert.ToInt32(right.Value);
+                    result = left >> Convert.ToInt32((object)right.Value);
                     break;
                 case TokenType.OpPlus:
                     result = left + right;

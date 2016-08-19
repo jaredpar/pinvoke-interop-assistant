@@ -252,7 +252,7 @@ namespace PInvoke.Parser
             return retList;
         }
 
-        public static bool TryCreateFromDeclaration(string name, string body, ref MethodMacro method)
+        public static bool TryCreateFromDeclaration(string name, string body, out MethodMacro method)
         {
             try
             {

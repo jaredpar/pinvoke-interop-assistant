@@ -66,7 +66,7 @@ Public Class ExpressionEvaluatorTest
 
     <Fact>
     Public Sub Divide1()
-        AssertEval("10/2", 5.0R)
+        AssertEval("10/2", 5)
     End Sub
 
     <Fact>

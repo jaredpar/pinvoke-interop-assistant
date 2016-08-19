@@ -2533,9 +2533,6 @@ namespace PInvoke
 
     public class NativeSignature : NativeExtraSymbol
     {
-        private NativeType _returnType;
-        private NativeSalAttribute _returnTypeSalAttribute = new NativeSalAttribute();
-
         private List<NativeParameter> _paramList = new List<NativeParameter>();
 
         /// <summary>
@@ -2552,7 +2549,7 @@ namespace PInvoke
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public NativeSalAttribute ReturnTypeSalAttribute;
+        public NativeSalAttribute ReturnTypeSalAttribute = new NativeSalAttribute();
 
         /// <summary>
         /// Parameters of the procedure
@@ -2641,14 +2638,14 @@ namespace PInvoke
         {
             List<NativeSymbol> list = new List<NativeSymbol>();
 
-            if (_returnType != null)
+            if (ReturnType != null)
             {
-                list.Add(_returnType);
+                list.Add(ReturnType);
             }
 
-            if (_returnTypeSalAttribute != null)
+            if (ReturnTypeSalAttribute != null)
             {
-                list.Add(_returnTypeSalAttribute);
+                list.Add(ReturnTypeSalAttribute);
             }
 
             foreach (NativeParameter param in _paramList)
@@ -2661,13 +2658,13 @@ namespace PInvoke
 
         public override void ReplaceChild(NativeSymbol oldChild, NativeSymbol newChild)
         {
-            if (object.ReferenceEquals(oldChild, _returnType))
+            if (object.ReferenceEquals(oldChild, ReturnType))
             {
-                ReplaceChildSingle(oldChild, newChild, ref _returnType);
+                ReplaceChildSingle(oldChild, newChild, ref ReturnType);
             }
-            else if (object.ReferenceEquals(oldChild, _returnTypeSalAttribute))
+            else if (object.ReferenceEquals(oldChild, ReturnTypeSalAttribute))
             {
-                ReplaceChildSingle(oldChild, newChild, ref _returnTypeSalAttribute);
+                ReplaceChildSingle(oldChild, newChild, ref ReturnTypeSalAttribute);
             }
             else
             {

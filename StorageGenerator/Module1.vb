@@ -89,7 +89,7 @@ Friend Module Module1
 
         ' Run the preprocessor
         analyzer.Trace = True
-        Dim winPath As String = Path.Combine(GetPlatformSdkIncludePath(), "windows.h")
+        Dim winPath As String = Path.Combine(PInvoke.Parser.NativeCodeAnalyzerFactory.GetPlatformSdkIncludePath(), "windows.h")
         Dim tr As TextReaderBag = analyzer.RunPreProcessor(winPath)
         File.WriteAllText("d:\temp\windows.out.h", tr.TextReader.ReadToEnd())
         analyzer.Trace = False

@@ -57,17 +57,17 @@
     <Compile Include="CSharpNativeFactory.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PInvoke\PInvoke.vbproj">
-      <Project>{993f376e-970f-462f-a3bf-dd8ebede9319}</Project>
-      <Name>PInvoke</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.0.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.0.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PInvoke.Core\PInvoke.Core.csproj">
+      <Project>{7923fd4f-41a0-48c0-8783-694802f2c1b0}</Project>
+      <Name>PInvoke.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

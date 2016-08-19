@@ -113,12 +113,6 @@
     <Content Include="Data\windows.xml" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PInvoke\PInvoke.vbproj">
-      <Project>{993F376E-970F-462F-A3BF-DD8EBEDE9319}</Project>
-      <Name>PInvoke</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
       <Visible>False</Visible>
       <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
@@ -134,6 +128,12 @@
       <ProductName>.NET Framework 3.5</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PInvoke.Core\PInvoke.Core.csproj">
+      <Project>{7923fd4f-41a0-48c0-8783-694802f2c1b0}</Project>
+      <Name>PInvoke.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

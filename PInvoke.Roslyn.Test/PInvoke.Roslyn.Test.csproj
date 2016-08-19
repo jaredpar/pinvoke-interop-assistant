@@ -73,13 +73,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\PInvoke.Core\PInvoke.Core.csproj">
+      <Project>{7923fd4f-41a0-48c0-8783-694802f2c1b0}</Project>
+      <Name>PInvoke.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PInvoke.Roslyn\PInvoke.Roslyn.csproj">
       <Project>{99ac569f-9edb-4b35-857a-552cd083a8de}</Project>
       <Name>PInvoke.Roslyn</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\PInvoke\PInvoke.vbproj">
-      <Project>{993f376e-970f-462f-a3bf-dd8ebede9319}</Project>
-      <Name>PInvoke</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

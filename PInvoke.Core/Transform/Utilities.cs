@@ -80,7 +80,7 @@ namespace PInvoke.Transform
                     ut = UnmanagedType.VariantBool;
                     break;
                 default:
-                    InvalidEnumValue(type);
+                    Contract.InvalidEnumValue(type);
                     ut = UnmanagedType.AnsiBStr;
                     break;
             }
@@ -119,7 +119,7 @@ namespace PInvoke.Transform
                     field = "LPTStr";
                     break;
                 default:
-                    InvalidEnumValue(strType);
+                    Contract.InvalidEnumValue(strType);
                     field = null;
                     break;
             }
@@ -149,7 +149,7 @@ namespace PInvoke.Transform
         /// <remarks></remarks>
         static internal CodeAttributeDeclaration CreateStructLayoutAttribute(LayoutKind kind)
         {
-            CodeTypeReference attrRef = new CodeTypeReference(typeof(Runtime.InteropServices.StructLayoutAttribute));
+            CodeTypeReference attrRef = new CodeTypeReference(typeof(System.Runtime.InteropServices.StructLayoutAttribute));
             CodeAttributeDeclaration attr = new CodeAttributeDeclaration(new CodeTypeReference(typeof(StructLayoutAttribute)));
             attr.Arguments.Add(new CodeAttributeArgument(new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(typeof(LayoutKind)), kind.ToString())));
             return attr;
@@ -163,7 +163,7 @@ namespace PInvoke.Transform
         /// <remarks></remarks>
         static internal CodeAttributeDeclaration CreateFieldOffsetAttribute(Int32 value)
         {
-            CodeAttributeDeclaration attr = new CodeAttributeDeclaration(new CodeTypeReference(typeof(Runtime.InteropServices.FieldOffsetAttribute)));
+            CodeAttributeDeclaration attr = new CodeAttributeDeclaration(new CodeTypeReference(typeof(System.Runtime.InteropServices.FieldOffsetAttribute)));
             attr.Arguments.Add(new CodeAttributeArgument(new CodePrimitiveExpression(value)));
             return attr;
         }
@@ -177,7 +177,7 @@ namespace PInvoke.Transform
         /// <remarks></remarks>
         static internal CodeAttributeDeclaration CreateDllImportAttribute(string dllName, string entryPoint, NativeCallingConvention conv)
         {
-            CodeAttributeDeclaration attr = new CodeAttributeDeclaration(new CodeTypeReference(typeof(Runtime.InteropServices.DllImportAttribute)));
+            CodeAttributeDeclaration attr = new CodeAttributeDeclaration(new CodeTypeReference(typeof(System.Runtime.InteropServices.DllImportAttribute)));
             attr.Arguments.Add(new CodeAttributeArgument(new CodePrimitiveExpression(dllName)));
             attr.Arguments.Add(new CodeAttributeArgument("EntryPoint", new CodePrimitiveExpression(entryPoint)));
 
@@ -194,7 +194,7 @@ namespace PInvoke.Transform
 
         static internal CodeAttributeDeclaration CreateUnmanagedFunctionPointerAttribute(NativeCallingConvention conv)
         {
-            CodeAttributeDeclaration attr = new CodeAttributeDeclaration(new CodeTypeReference(typeof(Runtime.InteropServices.UnmanagedFunctionPointerAttribute)));
+            CodeAttributeDeclaration attr = new CodeAttributeDeclaration(new CodeTypeReference(typeof(System.Runtime.InteropServices.UnmanagedFunctionPointerAttribute)));
             CallingConvention kind = default(CallingConvention);
             if (TryConvertToInteropCallingConvention(conv, ref kind))
             {
@@ -228,7 +228,7 @@ namespace PInvoke.Transform
 
     #region "CodeDomUtil"
 
-    static internal class CodeDomUtil
+    internal static class CodeDomUtil
     {
 
         static internal bool IsStringBuilderType(CodeTypeReference typeRef)

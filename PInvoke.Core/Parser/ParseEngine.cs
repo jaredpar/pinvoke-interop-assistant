@@ -1902,14 +1902,13 @@ namespace PInvoke.Parser
 
                 Token nextToken = _scanner.GetNextToken();
                 list.Add(nextToken);
-                switch (nextToken.TokenType)
+                if (nextToken.TokenType == openType)
                 {
-                    case openType:
-                        depth += 1;
-                        break;
-                    case closeType:
-                        depth -= 1;
-                        break;
+                    depth += 1;
+                }
+                else if (nextToken.TokenType == closeType)
+                {
+                    depth -= 1;
                 }
             } while (!(depth == 0));
 

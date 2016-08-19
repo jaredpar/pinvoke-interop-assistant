@@ -1452,11 +1452,7 @@ namespace PInvoke
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public string DllName
-        {
-            get { return _dllName; }
-            set { _dllName = value; }
-        }
+        public string DllName;
 
         /// <summary>
         /// Signature of the procedure

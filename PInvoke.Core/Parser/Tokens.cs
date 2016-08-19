@@ -1,11 +1,13 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
+using Microsoft.VisualBasic;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Globalization;
+using System.Text;
 using static PInvoke.Contract;
 
 namespace PInvoke.Parser
@@ -646,23 +648,23 @@ namespace PInvoke.Parser
             }
 
             object number = null;
-            if (char.ToLower(Conversion.val(0)) == 'x')
+            if (char.ToLower(val[0]) == 'x')
             {
-                if (!TryConvertToNumber("0x" + val.Substring(1), ref number))
+                if (!TryConvertToNumber("0x" + val.Substring(1), out number))
                 {
                     return false;
                 }
             }
-            else if (char.ToLower(Conversion.val(0)) == 'u')
+            else if (char.ToLower(val[0]) == 'u')
             {
-                if (!TryConvertToNumber(val.Substring(1), ref number))
+                if (!TryConvertToNumber(val.Substring(1), out number))
                 {
                     return false;
                 }
             }
             else
             {
-                if (!TryConvertToNumber(val, ref number))
+                if (!TryConvertToNumber(val, out number))
                 {
                     return false;
                 }
@@ -701,6 +703,8 @@ namespace PInvoke.Parser
         /// <remarks></remarks>
         public static bool TryConvertToNumber(string str, out object retValue)
         {
+            retValue = null;
+
             NumberInfo info = default(NumberInfo);
             if (!ProcessNumberInfo(ref str, ref info))
             {
@@ -733,11 +737,11 @@ namespace PInvoke.Parser
 
                 float floatVal = 0;
                 double doubleVal = 0;
-                if (float.TryParse(str, info.Style, CultureInfo.CurrentCulture, floatVal))
+                if (float.TryParse(str, info.Style, CultureInfo.CurrentCulture, out floatVal))
                 {
                     val = Convert.ToSingle(floatVal * mult);
                 }
-                else if (double.TryParse(str, info.Style, CultureInfo.CurrentCulture, doubleVal))
+                else if (double.TryParse(str, info.Style, CultureInfo.CurrentCulture, out doubleVal))
                 {
                     val = Convert.ToDouble(doubleVal * mult);
                 }
@@ -750,11 +754,11 @@ namespace PInvoke.Parser
             {
                 UInt32 uint32Value = 0;
                 UInt64 uint64Value = 0;
-                if (!info.IsForced64 && UInt32.TryParse(str, info.Style, CultureInfo.CurrentCulture, uint32Value))
+                if (!info.IsForced64 && UInt32.TryParse(str, info.Style, CultureInfo.CurrentCulture, out uint32Value))
                 {
                     val = uint32Value;
                 }
-                else if (UInt64.TryParse(str, info.Style, CultureInfo.CurrentCulture, uint64Value))
+                else if (UInt64.TryParse(str, info.Style, CultureInfo.CurrentCulture, out uint64Value))
                 {
                     val = uint64Value;
                 }
@@ -767,11 +771,11 @@ namespace PInvoke.Parser
             {
                 Int32 int32Value = 0;
                 Int64 int64Value = 0;
-                if (!info.IsForced64 && Int32.TryParse(str, info.Style, CultureInfo.CurrentCulture, int32Value))
+                if (!info.IsForced64 && Int32.TryParse(str, info.Style, CultureInfo.CurrentCulture, out int32Value))
                 {
                     val = int32Value;
                 }
-                else if (Int64.TryParse(str, info.Style, CultureInfo.CurrentCulture, int64Value))
+                else if (Int64.TryParse(str, info.Style, CultureInfo.CurrentCulture, out int64Value))
                 {
                     val = int64Value;
                 }
@@ -815,7 +819,7 @@ namespace PInvoke.Parser
             // If it ends with an LUF then we need to process that suffix 
             do
             {
-                char last = char.ToLower(Conversion.str(str.Length - 1));
+                char last = char.ToLower(str[str.Length - 1]);
                 if (last == 'u')
                 {
                     info.IsUnsigned = true;
@@ -847,10 +851,10 @@ namespace PInvoke.Parser
             {
                 for (int i = 0; i <= str.Length - 1; i++)
                 {
-                    char cur = char.ToLower(Conversion.str(i));
+                    char cur = char.ToLower(str[i]);
                     if (cur == 'e')
                     {
-                        if (!Int32.TryParse(str.Substring(i + 1), info.Exponent))
+                        if (!Int32.TryParse(str.Substring(i + 1), out info.Exponent))
                         {
                             return false;
                         }
@@ -866,7 +870,7 @@ namespace PInvoke.Parser
                 }
 
                 // Check for octal
-                if (str.Length > 0 && "0" == Conversion.str(0) && !info.IsFloatingPoint)
+                if (str.Length > 0 && '0' == str[0] && !info.IsFloatingPoint)
                 {
                     info.IsOctal = true;
                 }
@@ -892,7 +896,7 @@ namespace PInvoke.Parser
             {
                 int mult = Convert.ToInt32(Math.Pow(8, exponent));
                 int digit = 0;
-                if (!Int32.TryParse(number(index), digit))
+                if (!Int32.TryParse(number[index].ToString(), out digit))
                 {
                     return false;
                 }
@@ -969,7 +973,7 @@ namespace PInvoke.Parser
 
         public static string TokenListToString(IEnumerable<Token> enumerable)
         {
-            Text.StringBuilder builder = new Text.StringBuilder();
+            var builder = new StringBuilder();
             foreach (Token cur in enumerable)
             {
                 builder.Append(cur.Value);

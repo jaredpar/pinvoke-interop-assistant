@@ -177,13 +177,13 @@ namespace PInvoke.Parser
                 _index += 1;
 
                 // Check for the end of the line
-                if (ret == Convert.ToChar(Constants.vbCr))
+                if (ret == Convert.ToChar(PortConstants.CarriageReturn))
                 {
                     if (_index == _text.Length)
                     {
                         _lineNumber += 1;
                     }
-                    else if (PeekChar() == Convert.ToChar(Constants.vbLf))
+                    else if (PeekChar() == Convert.ToChar(PortConstants.LineFeed))
                     {
                         _lineNumber += 1;
                     }
@@ -565,7 +565,7 @@ namespace PInvoke.Parser
 
             // First check for whitespace and return that
 
-            if (char.IsWhiteSpace(c) && c != Constants.vbCr && c != Constants.vbLf)
+            if (char.IsWhiteSpace(c) && c != PortConstants.CarriageReturn && c != PortConstants.LineFeed)
             {
                 _buffer.MoveBack(1);
                 return ReadWhitespace();
@@ -627,13 +627,13 @@ namespace PInvoke.Parser
                 case '\'':
                     token = ReadSingleQuoteOrCharacter();
                     break;
-                case Convert.ToChar(Constants.vbCr):
-                case Convert.ToChar(Constants.vbLf):
-                    if (!_buffer.EndOfStream && _buffer.PeekChar() == Constants.vbLf)
+                case PortConstants.CarriageReturn:
+                case PortConstants.LineFeed:
+                    if (!_buffer.EndOfStream && _buffer.PeekChar() == PortConstants.LineFeed)
                     {
                         _buffer.EatChar();
                     }
-                    return new Token(TokenType.NewLine, Constants.vbCrLf);
+                    return new Token(TokenType.NewLine, PortConstants.NewLine);
             }
 
             // If we found a token then return it
@@ -647,7 +647,7 @@ namespace PInvoke.Parser
             // since there could just be a single character left in the Stream
             if (!_buffer.EndOfStream)
             {
-                string c2 = _buffer.ReadChar();
+                string c2 = _buffer.ReadChar().ToString();
                 string both = c + c2;
                 switch (both)
                 {
@@ -764,7 +764,7 @@ namespace PInvoke.Parser
                     done = true;
                     _buffer.MoveBack(1);
                 }
-                else if (c == Constants.vbCr || c == Constants.vbLf)
+                else if (c == PortConstants.CarriageReturn || c == PortConstants.LineFeed)
                 {
                     done = true;
                     _buffer.MoveBack(1);
@@ -849,7 +849,7 @@ namespace PInvoke.Parser
             while (!done && !_buffer.EndOfStream)
             {
                 char c = _buffer.PeekChar();
-                if (c == Constants.vbCr | c == Constants.vbLf)
+                if (c == PortConstants.CarriageReturn | c == PortConstants.LineFeed)
                 {
                     done = true;
                 }
@@ -900,7 +900,7 @@ namespace PInvoke.Parser
             ScannerMark mark = this.Mark();
             string word = ReadWord();
             Token token = null;
-            if (TokenHelper.TryConvertToPoundToken(word, token))
+            if (TokenHelper.TryConvertToPoundToken(word, out token))
             {
                 return token;
             }

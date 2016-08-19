@@ -4,6 +4,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.IO;
+using static PInvoke.Contract;
 
 namespace PInvoke
 {
@@ -88,24 +90,25 @@ namespace PInvoke
             _loaded = false;
         }
 
-        public bool TryFindDllNameExact(string procName, ref string dllName)
+        public bool TryFindDllNameExact(string procName, out string dllName)
         {
             if (procName == null)
             {
                 throw new ArgumentNullException("procName");
             }
 
-            return TryFindDllNameImpl(procName, ref dllName);
+            return TryFindDllNameImpl(procName, out dllName);
         }
 
-        public bool TryFindDllName(string procName, ref string dllName)
+        public bool TryFindDllName(string procName, out string dllName)
         {
+            dllName = null;
             if (procName == null)
             {
                 throw new ArgumentNullException("procName");
             }
 
-            if (!TryFindDllNameImpl(procName, ref dllName) && !TryFindDllNameImpl(procName + "W", ref dllName))
+            if (!TryFindDllNameImpl(procName, out dllName) && !TryFindDllNameImpl(procName + "W", out dllName))
             {
                 return false;
             }
@@ -113,7 +116,7 @@ namespace PInvoke
             return true;
         }
 
-        private bool TryFindDllNameImpl(string procName, ref string dllName)
+        private bool TryFindDllNameImpl(string procName, out string dllName)
         {
             ThrowIfNull(procName);
 
@@ -132,11 +135,12 @@ namespace PInvoke
                 IntPtr procPtr = NativeMethods.GetProcAddress(pair.Value, procName);
                 if (procPtr != IntPtr.Zero)
                 {
-                    dllName = IO.Path.GetFileName(pair.Key);
+                    dllName = Path.GetFileName(pair.Key);
                     return true;
                 }
             }
 
+            dllName = null;
             return false;
         }
 
@@ -146,11 +150,11 @@ namespace PInvoke
             List<string> list = new List<string>(_dllMap.Keys);
             foreach (string name in list)
             {
-                IntPtr ptr = _dllMap(name);
+                IntPtr ptr = _dllMap[name];
                 if (ptr == IntPtr.Zero)
                 {
-                    ptr = NativeMethods.LoadLibraryEx(name, IntPtr.Zero, 0uL);
-                    _dllMap(name) = ptr;
+                    ptr = NativeMethods.LoadLibraryEx(name, IntPtr.Zero, 0u);
+                    _dllMap[name] = ptr;
                 }
             }
 

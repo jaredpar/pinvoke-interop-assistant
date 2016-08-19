@@ -11,6 +11,7 @@ using System.CodeDom.Compiler;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.IO;
+using static PInvoke.Contract;
 
 namespace PInvoke.Transform
 {
@@ -103,7 +104,7 @@ namespace PInvoke.Transform
                     return;
             }
 
-            using (IO.StringWriter writer = new IO.StringWriter())
+            using (var writer = new StringWriter())
             {
                 provider.GenerateCodeFromExpression(_expr, writer, new CodeGeneratorOptions());
                 Value = prefix + writer.ToString() + ")";

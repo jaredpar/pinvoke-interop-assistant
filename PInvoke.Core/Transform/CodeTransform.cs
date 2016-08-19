@@ -233,9 +233,9 @@ namespace PInvoke.Transform
                 del.CustomAttributes.Add(MarshalAttributeFactory.CreateUnmanagedFunctionPointerAttribute(ntFuncPtr.CallingConvention));
             }
 
-            del.UserData.Item[TransformConstants.DefinedType] = ntFuncPtr;
-            del.UserData.Item[TransformConstants.ReturnType] = ntFuncPtr.Signature.ReturnType;
-            del.UserData.Item[TransformConstants.ReturnTypeSal] = ntFuncPtr.Signature.ReturnTypeSalAttribute;
+            del.UserData[TransformConstants.DefinedType] = ntFuncPtr;
+            del.UserData[TransformConstants.ReturnType] = ntFuncPtr.Signature.ReturnType;
+            del.UserData[TransformConstants.ReturnTypeSal] = ntFuncPtr.Signature.ReturnTypeSalAttribute;
             del.Comments.Add(new CodeCommentStatement(comment, true));
 
             return del;
@@ -687,8 +687,12 @@ namespace PInvoke.Transform
             try
             {
                 Exception ex = null;
-                if (TryGenerateValueExpression(ntExpr, out member.InitExpression, out member.Type, out ex))
+                CodeExpression expr;
+                CodeTypeReference typeRef;
+                if (TryGenerateValueExpression(ntExpr, out expr, out typeRef, out ex))
                 {
+                    member.InitExpression = expr;
+                    member.Type = typeRef;
                     return true;
                 }
                 else
@@ -715,7 +719,8 @@ namespace PInvoke.Transform
                     throw new InvalidOperationException(msg);
                 }
 
-                expr = GenerateValueExpressionImpl(ntExpr.Node, out exprType);
+                exprType = null;
+                expr = GenerateValueExpressionImpl(ntExpr.Node, ref exprType);
                 ex = null;
                 return true;
             }
@@ -1050,7 +1055,7 @@ namespace PInvoke.Transform
                 CodeExpression codeExpr = null;
                 CodeTypeReference codeType = null;
                 Exception ex = null;
-                if (!TryGenerateValueExpression(nConst.Value, ref codeExpr, ref codeType, ref ex))
+                if (!TryGenerateValueExpression(nConst.Value, out codeExpr, out codeType, out ex))
                 {
                     codeType = new CodeTypeReference(typeof(int));
                 }

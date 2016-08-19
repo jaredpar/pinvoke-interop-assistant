@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using static PInvoke.Contract;
 
 namespace PInvoke
 {
@@ -173,6 +174,8 @@ namespace PInvoke
                 return true;
             }
 
+            nt = null;
+            fromStorage = false;
             return false;
         }
 
@@ -463,7 +466,7 @@ namespace PInvoke
         public bool TryFindOrLoadNativeType(NativeNamedType namedType, ref NativeType nt)
         {
             bool notUsed = false;
-            return TryFindOrLoadNativeType(namedType, ref nt, ref notUsed);
+            return TryFindOrLoadNativeType(namedType, out nt, out notUsed);
         }
 
         /// <summary>
@@ -790,7 +793,7 @@ namespace PInvoke
             {
                 if (string.IsNullOrEmpty(proc.DllName))
                 {
-                    finder.TryFindDllNameExact(proc.Name, proc.DllName);
+                    finder.TryFindDllNameExact(proc.Name, out proc.DllName);
                 }
             }
 
@@ -848,7 +851,7 @@ namespace PInvoke
 
                 NativeType nt = null;
                 bool fromStorage = false;
-                if (this.TryFindOrLoadNativeType(namedType, ref nt, ref fromStorage))
+                if (this.TryFindOrLoadNativeType(namedType, out nt, out fromStorage))
                 {
                     if (fromStorage)
                     {
@@ -891,14 +894,14 @@ namespace PInvoke
                 {
                     case NativeValueKind.SymbolValue:
                         NativeSymbol ns = null;
-                        if (this.TryFindOrLoadValue(nValue.Name, ref ns, ref fromStorage))
+                        if (this.TryFindOrLoadValue(nValue.Name, out ns, out fromStorage))
                         {
                             nValue.Value = ns;
                         }
                         break;
                     case NativeValueKind.SymbolType:
                         NativeType nt = null;
-                        if (this.TryFindOrLoadNativeType(nValue.Name, ref nt, ref fromStorage))
+                        if (this.TryFindOrLoadNativeType(nValue.Name, out nt, out fromStorage))
                         {
                             nValue.Value = nt;
                         }
@@ -927,7 +930,7 @@ namespace PInvoke
 
             // See if this has already been calculated
             Nullable<bool> ret = false;
-            if (map.TryGetValue(ns, ret))
+            if (map.TryGetValue(ns, out ret))
             {
                 if (ret.HasValue)
                 {
@@ -963,7 +966,7 @@ namespace PInvoke
             }
 
             // Save the success
-            map(ns) = ret;
+            map[ns] = ret;
             return ret.Value;
         }
 
@@ -981,7 +984,7 @@ namespace PInvoke
 
         public static bool IsAnonymousName(string name)
         {
-            return Text.RegularExpressions.Regex.IsMatch(name, "^Anonymous_((\\w+_){4})(\\w+)$");
+            return System.Text.RegularExpressions.Regex.IsMatch(name, "^Anonymous_((\\w+_){4})(\\w+)$");
         }
 
         public static NativeSymbolBag CreateFrom(Parser.NativeCodeAnalyzerResult result)

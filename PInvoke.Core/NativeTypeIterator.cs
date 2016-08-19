@@ -126,7 +126,7 @@ namespace PInvoke
                     continue;
                 }
 
-                map(cur) = true;
+                map[cur] = true;
                 foreach (NativeSymbol child in cur.GetChildren())
                 {
                     found.Add(new NativeSymbolRelationship(cur, child));

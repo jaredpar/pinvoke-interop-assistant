@@ -100,7 +100,7 @@ namespace PInvoke.Transform
             // Now run the hueristics over the actual members of the type
             if (ctd.UserData.Contains(TransformConstants.DefinedType))
             {
-                NativeDefinedType nt = ctd.UserData(TransformConstants.DefinedType) as NativeDefinedType;
+                NativeDefinedType nt = ctd.UserData[TransformConstants.DefinedType] as NativeDefinedType;
                 if (nt != null)
                 {
                     switch (nt.Kind)

@@ -12,6 +12,8 @@ using CodeParam = System.CodeDom.CodeParameterDeclarationExpression;
 using CodeParamCollection = System.CodeDom.CodeParameterDeclarationExpressionCollection;
 using CodeParamPair = System.Collections.Generic.KeyValuePair<System.CodeDom.CodeParameterDeclarationExpression, System.CodeDom.CodeParameterDeclarationExpression>;
 using static PInvoke.Contract;
+using static PInvoke.Transform.CodeDomUtil;
+using static PInvoke.Transform.MarshalAttributeFactory;
 
 namespace PInvoke.Transform
 {
@@ -223,31 +225,31 @@ namespace PInvoke.Transform
 
         static internal NativeDefinedType GetDefinedType(CodeTypeDeclaration ctd)
         {
-            object obj = ctd.UserData.Item(TransformConstants.DefinedType);
+            object obj = ctd.UserData[TransformConstants.DefinedType];
             return obj as NativeDefinedType;
         }
 
         static internal NativeParameter GetNativeParameter(CodeParameterDeclarationExpression param)
         {
-            object obj = param.UserData.Item(TransformConstants.Param);
+            object obj = param.UserData[TransformConstants.Param];
             return obj as NativeParameter;
         }
 
         static internal NativeType GetNativeReturnType(CodeMemberMethod codeMethod)
         {
-            object obj = codeMethod.UserData.Item(TransformConstants.ReturnType);
+            object obj = codeMethod.UserData[TransformConstants.ReturnType];
             return obj as NativeType;
         }
 
         static internal NativeSalAttribute GetNativeReturnTypeSal(CodeMemberMethod codeMethod)
         {
-            object obj = codeMethod.UserData.Item(TransformConstants.ReturnTypeSal);
+            object obj = codeMethod.UserData[TransformConstants.ReturnTypeSal];
             return obj as NativeSalAttribute;
         }
 
         static internal NativeType GetNativeReturnType(CodeTypeDelegate del)
         {
-            object obj = del.UserData.Item(TransformConstants.ReturnType);
+            object obj = del.UserData[TransformConstants.ReturnType];
             return obj as NativeType;
         }
 
@@ -255,7 +257,7 @@ namespace PInvoke.Transform
         {
             if (mem.UserData.Contains(TransformConstants.Member))
             {
-                return mem.UserData(TransformConstants.Member) as NativeMember;
+                return mem.UserData[TransformConstants.Member] as NativeMember;
             }
             return null;
         }
@@ -358,13 +360,13 @@ namespace PInvoke.Transform
 
             if (nt.DigThroughTypedefAndNamedTypesFor("TCHAR") != null)
             {
-                charSet = Runtime.InteropServices.CharSet.Auto;
+                charSet = System.Runtime.InteropServices.CharSet.Auto;
                 return true;
             }
 
             if (nt.DigThroughTypedefAndNamedTypesFor("WCHAR") != null || nt.DigThroughTypedefAndNamedTypesFor("wchar_t") != null)
             {
-                charSet = Runtime.InteropServices.CharSet.Unicode;
+                charSet = System.Runtime.InteropServices.CharSet.Unicode;
                 return true;
             }
 
@@ -374,12 +376,12 @@ namespace PInvoke.Transform
                 NativeBuiltinType bt = (NativeBuiltinType)digged;
                 if (bt.BuiltinType == BuiltinType.NativeChar)
                 {
-                    charSet = Runtime.InteropServices.CharSet.Ansi;
+                    charSet = System.Runtime.InteropServices.CharSet.Ansi;
                     return true;
                 }
                 else if (bt.BuiltinType == BuiltinType.NativeWChar)
                 {
-                    charSet = Runtime.InteropServices.CharSet.Unicode;
+                    charSet = System.Runtime.InteropServices.CharSet.Unicode;
                     return true;
                 }
             }
@@ -389,7 +391,7 @@ namespace PInvoke.Transform
 
         protected bool IsArrayOfCharType(NativeType nt)
         {
-            CharSet kind = Runtime.InteropServices.CharSet.None;
+            CharSet kind = System.Runtime.InteropServices.CharSet.None;
             return IsArrayOfCharType(nt, ref kind);
         }
 
@@ -569,7 +571,7 @@ namespace PInvoke.Transform
         protected void SetReturnProcessed(CodeMemberMethod co)
         {
             ThrowIfTrue(IsReturnProcessed(co));
-            co.UserData(s_processedReturnKey) = true;
+            co.UserData[s_processedReturnKey] = true;
         }
 
         protected bool IsParamProcessed(CodeParam co)
@@ -580,7 +582,7 @@ namespace PInvoke.Transform
         protected void SetParamProcessed(CodeParam co)
         {
             ThrowIfTrue(IsParamProcessed(co));
-            co.UserData(s_processedParamKey) = true;
+            co.UserData[s_processedParamKey] = true;
         }
 
         protected bool IsMemberProcessed(CodeTypeMember co)
@@ -591,7 +593,7 @@ namespace PInvoke.Transform
         protected void SetMemberProcessed(CodeTypeMember co)
         {
             ThrowIfTrue(IsMemberProcessed(co));
-            co.UserData(s_processedMemberKey) = true;
+            co.UserData[s_processedMemberKey] = true;
         }
 
         /// <summary>
@@ -789,7 +791,7 @@ namespace PInvoke.Transform
 
                 // If this is an __out buffer then we should make sure to at the OutAttribute
                 // so that marshalling is more efficient
-                if (analyzer.IsValidOutOnly)
+                if (analyzer.IsValidOutOnly())
                 {
                     codeParam.CustomAttributes.Add(CreateOutAttribute());
                 }
@@ -846,7 +848,7 @@ namespace PInvoke.Transform
             {
                 codeParam.Type = new CodeTypeReference(typeof(string));
                 codeParam.CustomAttributes.Clear();
-                codeParam.CustomAttributes.Add(MarshalAttributeFactory.CreateInAttribute);
+                codeParam.CustomAttributes.Add(MarshalAttributeFactory.CreateInAttribute());
                 codeParam.CustomAttributes.Add(CreateStringMarshalAttribute(kind));
                 SetParamProcessed(codeParam);
             }
@@ -962,8 +964,8 @@ namespace PInvoke.Transform
             CodeMemberMethod newMethod = clone.CloneMethodSignature(origMethod);
             for (int i = 0; i <= origMethod.Parameters.Count - 1; i++)
             {
-                CodeParam origParam = origMethod.Parameters(i);
-                CodeParam newParam = newMethod.Parameters(i);
+                CodeParam origParam = origMethod.Parameters[i];
+                CodeParam newParam = newMethod.Parameters[i];
                 NativeParameter ntParam = GetNativeParameter(origParam);
                 if (ntParam == null)
                 {
@@ -1131,14 +1133,14 @@ namespace PInvoke.Transform
 
             SalAnalyzer analyzer = new SalAnalyzer(ntParam.SalAttribute);
             string size = null;
-            if (!analyzer.IsInElementBuffer(size))
+            if (!analyzer.IsInElementBuffer(out size))
             {
                 return;
             }
 
             // Make sure this is not a void* element buffer.  We can't generated void[] into managed code
             // so ignore it here and let it process as a normal array
-            if (CodeDomUtil.AreEqual(typeof(Void), ct))
+            if (CodeDomUtil.AreEqual(typeof(void), ct))
             {
                 return;
             }
@@ -1163,7 +1165,7 @@ namespace PInvoke.Transform
             // Easy on is just a count
             Int32 count = 0;
 
-            if (Int32.TryParse(size, count))
+            if (Int32.TryParse(size, out count))
             {
                 // Don't process a size 1 element buffer.  That is not an array and will be handled by a 
                 // different plugin.  It will be converted to a ByRef
@@ -1179,7 +1181,7 @@ namespace PInvoke.Transform
             // Now look for a named parameter
             for (int i = 0; i <= col.Count - 1; i++)
             {
-                CodeParam cur = col(i);
+                CodeParam cur = col[i];
                 if (0 == string.CompareOrdinal(size, cur.Name))
                 {
                     arg = new CodeAttributeArgument("SizeParamIndex", new CodePrimitiveExpression(i));
@@ -1210,13 +1212,13 @@ namespace PInvoke.Transform
             else if (arr.RealTypeDigged.Kind == NativeSymbolKind.PointerType)
             {
                 elemType = new CodeTypeReference(typeof(IntPtr));
-                unmanagedType = Runtime.InteropServices.UnmanagedType.SysInt;
+                unmanagedType = System.Runtime.InteropServices.UnmanagedType.SysInt;
                 return true;
             }
             else if (arr.RealTypeDigged.Kind == NativeSymbolKind.StructType || arr.RealTypeDigged.Kind == NativeSymbolKind.UnionType)
             {
                 elemType = _trans.GenerateTypeReference(arr.RealTypeDigged);
-                unmanagedType = Runtime.InteropServices.UnmanagedType.Struct;
+                unmanagedType = System.Runtime.InteropServices.UnmanagedType.Struct;
                 return true;
             }
 
@@ -1243,14 +1245,14 @@ namespace PInvoke.Transform
             else if (ptr.RealTypeDigged.Kind == NativeSymbolKind.PointerType)
             {
                 elemType = new CodeTypeReference(typeof(IntPtr));
-                unmanagedType = Runtime.InteropServices.UnmanagedType.SysInt;
+                unmanagedType = System.Runtime.InteropServices.UnmanagedType.SysInt;
                 return true;
 
             }
             else if (ptr.RealTypeDigged.Kind == NativeSymbolKind.StructType || ptr.RealTypeDigged.Kind == NativeSymbolKind.UnionType)
             {
                 elemType = _trans.GenerateTypeReference(ptr.RealTypeDigged);
-                unmanagedType = Runtime.InteropServices.UnmanagedType.Struct;
+                unmanagedType = System.Runtime.InteropServices.UnmanagedType.Struct;
                 return true;
             }
 
@@ -1326,7 +1328,7 @@ namespace PInvoke.Transform
                 else if (analyzer.IsIn())
                 {
                     codeParam.Direction = FieldDirection.Ref;
-                    codeAttrib.Add(MarshalAttributeFactory.CreateInAttribute);
+                    codeAttrib.Add(MarshalAttributeFactory.CreateInAttribute());
                 }
                 else if (analyzer.IsOut())
                 {
@@ -1474,7 +1476,7 @@ namespace PInvoke.Transform
                     codeParam.CustomAttributes.Add(MarshalAttributeFactory.CreateOutAttribute());
                     direction = FieldDirection.Out;
                 }
-                else if (analyzer.IsInOut)
+                else if (analyzer.IsInOut())
                 {
                     isSingle = true;
                     codeParam.CustomAttributes.Clear();
@@ -1818,9 +1820,9 @@ namespace PInvoke.Transform
             }
 
             SalAnalyzer analyzer = new SalAnalyzer(ntParam.SalAttribute);
-            if (analyzer.IsValidInOnly)
+            if (analyzer.IsValidInOnly())
             {
-                codeParam.CustomAttributes.Add(CreateInAttribute);
+                codeParam.CustomAttributes.Add(CreateInAttribute());
             }
 
             SetParamProcessed(codeParam);
@@ -1887,7 +1889,7 @@ namespace PInvoke.Transform
                 // See if this is an out element buffer
                 SalAnalyzer analyzer = new SalAnalyzer(ntParam.SalAttribute);
                 string sizeParamName = null;
-                if (!analyzer.IsOutElementBuffer(sizeParamName) && !analyzer.IsOutElementBufferOptional(sizeParamName))
+                if (!analyzer.IsOutElementBuffer(out sizeParamName) && !analyzer.IsOutElementBufferOptional(out sizeParamName))
                 {
                     continue;
                 }
@@ -1921,8 +1923,8 @@ namespace PInvoke.Transform
             CodeMemberMethod newMethod = new CodeMemberMethod();
             newMethod.Name = origMethod.Name;
             newMethod.ReturnType = clone.CloneTypeReference(origMethod.ReturnType);
-            newMethod.CustomAttributes.Add(MarshalAttributeFactory.CreateDebuggerStepThroughAttribute);
-            newMethod.CustomAttributes.Add(MarshalAttributeFactory.CreateGeneratedCodeAttribute);
+            newMethod.CustomAttributes.Add(MarshalAttributeFactory.CreateDebuggerStepThroughAttribute());
+            newMethod.CustomAttributes.Add(MarshalAttributeFactory.CreateGeneratedCodeAttribute());
             newMethod.Attributes = MemberAttributes.Public | MemberAttributes.Static;
             foreach (CodeParam origParam in origMethod.Parameters)
             {
@@ -2039,7 +2041,7 @@ namespace PInvoke.Transform
                 SalAnalyzer analyzer = new SalAnalyzer(ntParam.SalAttribute);
                 string size = null;
                 string readable = null;
-                if (!analyzer.IsOutPartElementBuffer(size, readable) && !analyzer.IsOutPartElementBufferOptional(size, readable))
+                if (!analyzer.IsOutPartElementBuffer(out size, out readable) && !analyzer.IsOutPartElementBufferOptional(out size, out readable))
                 {
                     continue;
                 }
@@ -2053,7 +2055,7 @@ namespace PInvoke.Transform
                 }
 
                 string str1 = size.Substring(1);
-                string str2 = match.Groups(1).Value;
+                string str2 = match.Groups[1].Value;
                 if (0 != string.CompareOrdinal(str1, str2))
                 {
                     continue;
@@ -2080,8 +2082,8 @@ namespace PInvoke.Transform
             CodeMemberMethod newMethod = new CodeMemberMethod();
             newMethod.Name = origMethod.Name;
             newMethod.ReturnType = clone.CloneTypeReference(origMethod.ReturnType);
-            newMethod.CustomAttributes.Add(MarshalAttributeFactory.CreateDebuggerStepThroughAttribute);
-            newMethod.CustomAttributes.Add(MarshalAttributeFactory.CreateGeneratedCodeAttribute);
+            newMethod.CustomAttributes.Add(MarshalAttributeFactory.CreateDebuggerStepThroughAttribute());
+            newMethod.CustomAttributes.Add(MarshalAttributeFactory.CreateGeneratedCodeAttribute());
             newMethod.Attributes = MemberAttributes.Public | MemberAttributes.Static;
             foreach (CodeParam origParam in origMethod.Parameters)
             {
@@ -2226,7 +2228,7 @@ namespace PInvoke.Transform
                 SalAnalyzer analyzer = new SalAnalyzer(ntParam.SalAttribute);
                 string size = null;
                 string readable = null;
-                if (!analyzer.IsOutPartElementBuffer(size, readable) && !analyzer.IsOutPartElementBufferOptional(size, readable))
+                if (!analyzer.IsOutPartElementBuffer(out size, out readable) && !analyzer.IsOutPartElementBufferOptional(out size, out readable))
                 {
                     continue;
                 }
@@ -2272,8 +2274,8 @@ namespace PInvoke.Transform
             CodeMemberMethod newMethod = new CodeMemberMethod();
             newMethod.Name = origMethod.Name;
             newMethod.ReturnType = clone.CloneTypeReference(origMethod.ReturnType);
-            newMethod.CustomAttributes.Add(MarshalAttributeFactory.CreateDebuggerStepThroughAttribute);
-            newMethod.CustomAttributes.Add(MarshalAttributeFactory.CreateGeneratedCodeAttribute);
+            newMethod.CustomAttributes.Add(MarshalAttributeFactory.CreateDebuggerStepThroughAttribute());
+            newMethod.CustomAttributes.Add(MarshalAttributeFactory.CreateGeneratedCodeAttribute());
             newMethod.Attributes = MemberAttributes.Public | MemberAttributes.Static;
             foreach (CodeParam origParam in origMethod.Parameters)
             {
@@ -2414,7 +2416,7 @@ namespace PInvoke.Transform
                 SalAnalyzer analyzer = new SalAnalyzer(ntParam.SalAttribute);
                 string str1 = null;
                 string str2 = null;
-                if (!analyzer.IsOutPartByteBuffer(str1, str2))
+                if (!analyzer.IsOutPartByteBuffer(out str1, out str2))
                 {
                     continue;
                 }
@@ -2450,8 +2452,8 @@ namespace PInvoke.Transform
             CodeMemberMethod newMethod = new CodeMemberMethod();
             newMethod.Name = origMethod.Name;
             newMethod.ReturnType = clone.CloneTypeReference(origMethod.ReturnType);
-            newMethod.CustomAttributes.Add(MarshalAttributeFactory.CreateDebuggerStepThroughAttribute);
-            newMethod.CustomAttributes.Add(MarshalAttributeFactory.CreateGeneratedCodeAttribute);
+            newMethod.CustomAttributes.Add(MarshalAttributeFactory.CreateDebuggerStepThroughAttribute());
+            newMethod.CustomAttributes.Add(MarshalAttributeFactory.CreateGeneratedCodeAttribute());
             newMethod.Attributes = MemberAttributes.Public | MemberAttributes.Static;
             foreach (CodeParam origParam in origMethod.Parameters)
             {

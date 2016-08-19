@@ -31,6 +31,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -104,6 +105,7 @@
     <Compile Include="NativeSymbolBag.cs" />
     <Compile Include="Parser\ExpressionEvaluator.cs" />
     <Compile Include="Parser\ExpressionValue.cs" />
+    <Compile Include="PortConstants.cs" />
     <Compile Include="Transform\CodeDomCloner.cs" />
     <Compile Include="Transform\CodeDomIterator.cs" />
     <Compile Include="Transform\CodeDomPrettyList.cs" />

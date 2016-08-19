@@ -5,6 +5,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.IO;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace PInvoke.Parser
@@ -156,11 +158,11 @@ namespace PInvoke.Parser
         {
             get
             {
-                Text.StringBuilder b = new Text.StringBuilder();
+                var b = new StringBuilder();
                 b.Append("(");
                 for (int i = 0; i <= _paramList.Count - 1; i++)
                 {
-                    b.Append(_paramList(i));
+                    b.Append(_paramList[i]);
                     if (i + 1 < _paramList.Count)
                     {
                         b.Append(",");
@@ -206,7 +208,7 @@ namespace PInvoke.Parser
                     Int32 index = _paramList.IndexOf(item.Value);
                     if (index >= 0)
                     {
-                        retList.Add(argList(index));
+                        retList.Add(argList[index]);
                     }
                     else
                     {
@@ -219,8 +221,8 @@ namespace PInvoke.Parser
             Int32 i = 0;
             while (i < retList.Count - 1)
             {
-                Token curToken = retList(i);
-                Token nextToken = retList(i + 1);
+                Token curToken = retList[i];
+                Token nextToken = retList[i + 1];
 
                 if (curToken.TokenType == TokenType.Pound)
                 {
@@ -240,7 +242,7 @@ namespace PInvoke.Parser
                         else
                         {
                             // Quote me macro
-                            retList(i) = new Token(TokenType.QuotedStringAnsi, "\"" + nextToken.Value + "\"");
+                            retList[i] = new Token(TokenType.QuotedStringAnsi, "\"" + nextToken.Value + "\"");
                             retList.RemoveAt(i + 1);
                         }
                     }
@@ -254,14 +256,16 @@ namespace PInvoke.Parser
 
         public static bool TryCreateFromDeclaration(string name, string body, out MethodMacro method)
         {
+            method = null;
+
             try
             {
                 PreProcessorEngine engine = new PreProcessorEngine(new PreProcessorOptions());
-                using (IO.StringReader reader = new IO.StringReader("#define " + name + body))
+                using (var reader = new StringReader("#define " + name + body))
                 {
                     engine.Process(new TextReaderBag(reader));
                     Macro created = null;
-                    if (engine.MacroMap.TryGetValue(name, created) && created.IsMethod)
+                    if (engine.MacroMap.TryGetValue(name, out created) && created.IsMethod)
                     {
                         method = (MethodMacro)created;
                         return true;

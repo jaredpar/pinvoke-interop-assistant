@@ -83,7 +83,7 @@ namespace PInvoke.Parser
         {
             get
             {
-                ThrowIfFalse(HasValue);
+                Contract.ThrowIfFalse(HasValue);
                 return m_value;
             }
         }
@@ -97,7 +97,7 @@ namespace PInvoke.Parser
         public void Clear()
         {
             m_hasValue = false;
-            m_value = null;
+            m_value = default(T);
         }
     }
 

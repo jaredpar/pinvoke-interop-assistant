@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using static PInvoke.Contract;
 
 namespace PInvoke.Transform
 {
@@ -179,7 +180,7 @@ namespace PInvoke.Transform
         public bool IsOut()
         {
             string size = null;
-            if (!IsOutElementBuffer(ref size) | 0 != string.CompareOrdinal("1", size))
+            if (!IsOutElementBuffer(out size) | 0 != string.CompareOrdinal("1", size))
             {
                 return false;
             }
@@ -219,8 +220,10 @@ namespace PInvoke.Transform
         /// <param name="sizeArg"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public bool IsInElementBuffer(ref string sizeArg)
+        public bool IsInElementBuffer(out string sizeArg)
         {
+            sizeArg = null;
+
             if (_preList.Count != 3 || _itemList.Count != 0 || _postList.Count != 0)
             {
                 return false;
@@ -244,8 +247,10 @@ namespace PInvoke.Transform
         /// <param name="sizeArg"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public bool IsInElementBufferOptional(ref string sizeArg)
+        public bool IsInElementBufferOptional(out string sizeArg)
         {
+            sizeArg = null;
+
             if (_preList.Count != 3 || _itemList.Count != 0 || _postList.Count != 0)
             {
                 return false;
@@ -269,8 +274,10 @@ namespace PInvoke.Transform
         /// <param name="sizeArg"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public bool IsInByteBuffer(ref string sizeArg)
+        public bool IsInByteBuffer(out string sizeArg)
         {
+            sizeArg = null;
+
             if (_preList.Count != 3 || _itemList.Count != 0 || _postList.Count != 0)
             {
                 return false;
@@ -294,8 +301,10 @@ namespace PInvoke.Transform
         /// <param name="sizeArg"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public bool IsInByteBufferOptional(ref string sizeArg)
+        public bool IsInByteBufferOptional(out string sizeArg)
         {
+            sizeArg = null;
+
             if (_preList.Count != 3 || _itemList.Count != 0 || _postList.Count != 0)
             {
                 return false;
@@ -314,7 +323,7 @@ namespace PInvoke.Transform
         public bool IsOutElementBuffer()
         {
             string sizeArg = null;
-            return IsOutElementBuffer(ref sizeArg);
+            return IsOutElementBuffer(out sizeArg);
         }
 
         /// <summary>
@@ -325,8 +334,9 @@ namespace PInvoke.Transform
         /// <param name="sizeArg"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public bool IsOutElementBuffer(ref string sizeArg)
+        public bool IsOutElementBuffer(out string sizeArg)
         {
+                sizeArg = null;
             if (_preList.Count != 0 || _itemList.Count != 1 || _postList.Count != 1)
             {
                 return false;
@@ -346,7 +356,7 @@ namespace PInvoke.Transform
         public bool IsOutElementBufferOptional()
         {
             string sizeArg = null;
-            return IsOutElementBufferOptional(ref sizeArg);
+            return IsOutElementBufferOptional(out sizeArg);
         }
 
         /// <summary>
@@ -357,8 +367,10 @@ namespace PInvoke.Transform
         /// <param name="sizeArg"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public bool IsOutElementBufferOptional(ref string sizeArg)
+        public bool IsOutElementBufferOptional(out string sizeArg)
         {
+            sizeArg = null;
+
             if (_preList.Count != 0 || _itemList.Count != 1 || _postList.Count != 1)
             {
                 return false;
@@ -379,7 +391,7 @@ namespace PInvoke.Transform
             string sizeArg = null;
             string readableArg = null;
 
-            return IsOutPartElementBuffer(ref sizeArg, ref readableArg);
+            return IsOutPartElementBuffer(out sizeArg, out readableArg);
         }
 
         /// <summary>
@@ -391,8 +403,11 @@ namespace PInvoke.Transform
         /// <param name="readableSize"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public bool IsOutPartElementBuffer(ref string writableSize, ref string readableSize)
+        public bool IsOutPartElementBuffer(out string writableSize, out string readableSize)
         {
+            writableSize = null;
+            readableSize = null;
+
             if (_preList.Count != 0 || _itemList.Count != 1 || _postList.Count != 2)
             {
                 return false;
@@ -414,7 +429,7 @@ namespace PInvoke.Transform
         {
             string notUsed1 = null;
             string notUsed2 = null;
-            return IsOutPartElementBufferOptional(ref notUsed1, ref notUsed2);
+            return IsOutPartElementBufferOptional(out notUsed1, out notUsed2);
         }
 
         /// <summary>
@@ -426,8 +441,11 @@ namespace PInvoke.Transform
         /// <param name="readableSize"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public bool IsOutPartElementBufferOptional(ref string writableSize, ref string readableSize)
+        public bool IsOutPartElementBufferOptional(out string writableSize, out string readableSize)
         {
+            writableSize = null;
+            readableSize = null;
+
             if (_preList.Count != 0 || _itemList.Count != 1 || _postList.Count != 2)
             {
                 return false;
@@ -503,8 +521,11 @@ namespace PInvoke.Transform
         /// <param name="sizeArg"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public bool IsOutPartByteBuffer(ref string sizeArg, ref string readableArg)
+        public bool IsOutPartByteBuffer(out string sizeArg, out string readableArg)
         {
+            sizeArg = null;
+            readableArg = null;
+
             if (_preList.Count != 0 || _itemList.Count != 1 || _postList.Count != 2)
             {
                 return false;
@@ -707,7 +728,7 @@ namespace PInvoke.Transform
                     bool match = true;
                     for (Int32 i = 0; i <= args.Length - 1; i++)
                     {
-                        if (item.List(i).Type != args(i))
+                        if (item.List[i].Type != args[i])
                         {
                             match = false;
                             break; // TODO: might not be correct. Was : Exit For
@@ -727,7 +748,7 @@ namespace PInvoke.Transform
         private void BuildLists()
         {
             ThrowIfNull(_sal);
-            if (_sal.IsEmpty())
+            if (_sal.IsEmpty)
             {
                 return;
             }
@@ -735,12 +756,12 @@ namespace PInvoke.Transform
             List<NativeSalEntry> list = new List<NativeSalEntry>(_sal.SalEntryList);
             List<SalEntrySet> dest = new List<SalEntrySet>();
             SalEntrySet cur = null;
-            if (list(0).SalEntryType == SalEntryType.Post)
+            if (list[0].SalEntryType == SalEntryType.Post)
             {
                 cur = new SalEntrySet(SalEntryListType.Post);
                 list.RemoveAt(0);
             }
-            else if (list(0).SalEntryType == SalEntryType.Pre)
+            else if (list[0].SalEntryType == SalEntryType.Pre)
             {
                 cur = new SalEntrySet(SalEntryListType.Pre);
                 list.RemoveAt(0);
@@ -752,7 +773,7 @@ namespace PInvoke.Transform
 
             for (Int32 i = 0; i <= list.Count - 1; i++)
             {
-                NativeSalEntry entry = list(i);
+                NativeSalEntry entry = list[i];
                 if (entry.SalEntryType == SalEntryType.Pre)
                 {
                     dest.Add(cur);

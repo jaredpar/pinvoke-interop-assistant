@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Text;
 
 namespace PInvoke
 {
@@ -117,7 +118,7 @@ namespace PInvoke
 
         public string CreateDisplayString()
         {
-            Text.StringBuilder builder = new Text.StringBuilder();
+            var builder = new StringBuilder();
             foreach (string msg in Errors)
             {
                 builder.AppendFormat("Error: {0}", msg);

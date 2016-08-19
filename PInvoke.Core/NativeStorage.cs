@@ -262,7 +262,7 @@ namespace PInvoke
                 return true;
             }
 
-            public bool TryFindByValueName(string valName, ref List<EnumValueRow> erows)
+            public bool TryFindByValueName(string valName, out List<EnumValueRow> erows)
             {
                 DataRow[] rows = this.Select(string.Format("{0}='{1}'", NameColumn.ColumnName, valName));
                 if (rows.Length == 0)

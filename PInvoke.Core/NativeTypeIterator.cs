@@ -15,24 +15,16 @@ namespace PInvoke
     /// <remarks></remarks>
     public class NativeSymbolRelationship
     {
-        private NativeSymbol _parent;
-
-        private NativeSymbol _symbol;
-        public NativeSymbol Parent
-        {
-            get { return _parent; }
-        }
-
-        public NativeSymbol Symbol
-        {
-            get { return _symbol; }
-        }
+        public NativeSymbol Parent { get; }
+        public NativeSymbol Symbol { get; }
 
         public NativeSymbolRelationship(NativeSymbol parent, NativeSymbol symbol)
         {
-            _parent = parent;
-            _symbol = symbol;
+            Parent = parent;
+            Symbol = symbol;
         }
+
+        public override string ToString() => $"{Parent} -> {Symbol}";
     }
 
     /// <summary>

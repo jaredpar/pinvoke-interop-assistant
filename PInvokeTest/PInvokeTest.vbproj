@@ -275,12 +275,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PInvoke\PInvoke.vbproj">
-      <Project>{993F376E-970F-462F-A3BF-DD8EBEDE9319}</Project>
-      <Name>PInvoke</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0">
       <Visible>False</Visible>
       <ProductName>Microsoft .NET Framework 4 %28x86 and x64%29</ProductName>
@@ -299,6 +293,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PInvoke.Core\PInvoke.Core.csproj">
+      <Project>{7923fd4f-41a0-48c0-8783-694802f2c1b0}</Project>
+      <Name>PInvoke.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.Targets" />
   <PropertyGroup>

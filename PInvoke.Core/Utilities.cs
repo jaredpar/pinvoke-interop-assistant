@@ -30,7 +30,6 @@ namespace PInvoke
     /// <remarks></remarks>
     public class ErrorProvider
     {
-
         private List<string> _warningList = new List<string>();
 
         private List<string> _errorList = new List<string>();

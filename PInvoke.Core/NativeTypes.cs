@@ -60,8 +60,7 @@ namespace PInvoke
     [DebuggerDisplay("{DisplayName}")]
     public abstract class NativeSymbol
     {
-
-
+        // CTODO: mutable data, destroy
         protected static List<NativeSymbol> EmptySymbolList = new List<NativeSymbol>();
 
         private string _name;
@@ -585,17 +584,15 @@ namespace PInvoke
     [DebuggerDisplay("{DisplayName}")]
     public class NativeFunctionPointer : NativeDefinedType
     {
-
-        private NativeSignature _sig = new NativeSignature();
-
         private NativeCallingConvention _conv = NativeCallingConvention.WinApi;
+
         /// <summary>
         /// Get the signature of the function pointer
         /// </summary>
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public NativeSignature Signature;
+        public NativeSignature Signature = new NativeSignature();
 
         public NativeCallingConvention CallingConvention
         {
@@ -645,7 +642,7 @@ namespace PInvoke
 
         public override void ReplaceChild(NativeSymbol oldChild, NativeSymbol newChild)
         {
-            ReplaceChildSingle(oldChild, newChild, ref _sig);
+            ReplaceChildSingle(oldChild, newChild, ref Signature);
         }
 
     }
@@ -664,8 +661,6 @@ namespace PInvoke
     [DebuggerDisplay("{DisplayName}")]
     public abstract class NativeProxyType : NativeType
     {
-
-
         private NativeType _realType;
         /// <summary>
         /// Underlying type of the array
@@ -1438,9 +1433,8 @@ namespace PInvoke
     [DebuggerDisplay("{DisplayName}")]
     public class NativeProcedure : NativeSymbol
     {
-        private NativeSignature _sig = new NativeSignature();
-
         private NativeCallingConvention _conv = NativeCallingConvention.WinApi;
+
         /// <summary>
         /// Name of the DLL this proc is in
         /// </summary>
@@ -1455,7 +1449,7 @@ namespace PInvoke
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public NativeSignature Signature;
+        public NativeSignature Signature = new NativeSignature();
 
         public NativeCallingConvention CallingConvention
         {
@@ -1497,12 +1491,12 @@ namespace PInvoke
 
         public override System.Collections.Generic.IEnumerable<NativeSymbol> GetChildren()
         {
-            return GetSingleChild(_sig);
+            return GetSingleChild(Signature);
         }
 
         public override void ReplaceChild(NativeSymbol oldChild, NativeSymbol newChild)
         {
-            base.ReplaceChildSingle(oldChild, newChild, ref _sig);
+            base.ReplaceChildSingle(oldChild, newChild, ref Signature);
         }
 
     }
@@ -1528,10 +1522,6 @@ namespace PInvoke
     [DebuggerDisplay("{DisplayString}")]
     public class NativeParameter : NativeExtraSymbol
     {
-
-        private NativeType _type;
-
-        private NativeSalAttribute _salAttribute = new NativeSalAttribute();
         /// <summary>
         /// Type of the parameter
         /// </summary>
@@ -1543,7 +1533,7 @@ namespace PInvoke
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public NativeSalAttribute SalAttribute;
+        public NativeSalAttribute SalAttribute = new NativeSalAttribute();
 
         /// <summary>
         /// NativeType after digging through typedef and named types
@@ -1555,9 +1545,9 @@ namespace PInvoke
         {
             get
             {
-                if (_type != null)
+                if (NativeType != null)
                 {
-                    return _type.DigThroughTypedefAndNamedTypes();
+                    return NativeType.DigThroughTypedefAndNamedTypes();
                 }
 
                 return null;
@@ -1593,7 +1583,7 @@ namespace PInvoke
         /// <remarks></remarks>
         public override bool IsImmediateResolved
         {
-            get { return _type != null; }
+            get { return NativeType != null; }
         }
 
         public NativeParameter()
@@ -1608,21 +1598,21 @@ namespace PInvoke
 
         public NativeParameter(string name, NativeType type)
         {
-            this.Name = name;
-            _type = type;
+            Name = name;
+            NativeType = type;
         }
 
         public override System.Collections.Generic.IEnumerable<NativeSymbol> GetChildren()
         {
             List<NativeSymbol> list = new List<NativeSymbol>();
-            if (_type != null)
+            if (NativeType != null)
             {
-                list.Add(_type);
+                list.Add(NativeType);
             }
 
-            if (_salAttribute != null)
+            if (SalAttribute != null)
             {
-                list.Add(_salAttribute);
+                list.Add(SalAttribute);
             }
 
             return list;
@@ -1630,13 +1620,13 @@ namespace PInvoke
 
         public override void ReplaceChild(NativeSymbol oldChild, NativeSymbol newChild)
         {
-            if (object.ReferenceEquals(oldChild, _type))
+            if (object.ReferenceEquals(oldChild, NativeType))
             {
-                ReplaceChildSingle(oldChild, newChild, ref _type);
+                ReplaceChildSingle(oldChild, newChild, ref NativeType);
             }
             else
             {
-                ReplaceChildSingle(oldChild, newChild, ref _salAttribute);
+                ReplaceChildSingle(oldChild, newChild, ref NativeType);
             }
         }
 
@@ -1649,9 +1639,6 @@ namespace PInvoke
     [DebuggerDisplay("{NativeType.FullName} {Name}")]
     public class NativeMember : NativeExtraSymbol
     {
-
-
-        private NativeType _nativeType;
         /// <summary>
         /// Nativetype of the member
         /// </summary>
@@ -1664,9 +1651,9 @@ namespace PInvoke
         {
             get
             {
-                if (_nativeType != null)
+                if (NativeType != null)
                 {
-                    return _nativeType.DigThroughTypedefAndNamedTypes();
+                    return NativeType.DigThroughTypedefAndNamedTypes();
                 }
 
                 return null;
@@ -1675,7 +1662,7 @@ namespace PInvoke
 
         public override bool IsImmediateResolved
         {
-            get { return _nativeType != null && !string.IsNullOrEmpty(Name); }
+            get { return NativeType != null && !string.IsNullOrEmpty(Name); }
         }
 
 
@@ -1685,8 +1672,8 @@ namespace PInvoke
 
         public NativeMember(string name, NativeType nt)
         {
-            this.Name = name;
-            _nativeType = nt;
+            Name = name;
+            NativeType = nt;
         }
 
         public override NativeSymbolKind Kind
@@ -1696,12 +1683,12 @@ namespace PInvoke
 
         public override System.Collections.Generic.IEnumerable<NativeSymbol> GetChildren()
         {
-            return GetSingleChild(_nativeType);
+            return GetSingleChild(NativeType);
         }
 
         public override void ReplaceChild(NativeSymbol oldChild, NativeSymbol newChild)
         {
-            ReplaceChildSingle(oldChild, newChild, ref _nativeType);
+            ReplaceChildSingle(oldChild, newChild, ref NativeType);
         }
 
     }
@@ -2546,7 +2533,6 @@ namespace PInvoke
 
     public class NativeSignature : NativeExtraSymbol
     {
-
         private NativeType _returnType;
         private NativeSalAttribute _returnTypeSalAttribute = new NativeSalAttribute();
 

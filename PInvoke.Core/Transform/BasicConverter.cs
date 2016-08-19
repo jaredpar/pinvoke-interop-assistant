@@ -179,6 +179,7 @@ namespace PInvoke.Transform
             }
 
             NativeCodeAnalyzer analyzer = NativeCodeAnalyzerFactory.CreateForMiniParse(OsVersion.WindowsVista, _ns.LoadAllMacros());
+            // CTODO: probably should delete this 
             analyzer.IncludePathList.Add("c:\\program files (x86)\\windows kits\\8.1\\include\\shared");
             NativeSymbolBag bag = default(NativeSymbolBag);
             using (System.IO.StringReader reader = new StringReader(code))

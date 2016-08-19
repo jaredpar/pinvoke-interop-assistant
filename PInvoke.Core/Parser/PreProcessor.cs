@@ -243,8 +243,7 @@ namespace PInvoke.Parser
             protected override bool TryEvaluateNegation(ExpressionNode node)
             {
                 ExpressionValue value = (ExpressionValue)node.LeftNode.Tag;
-                value = !value.Value;
-                node.Tag = value;
+                node.Tag = value.Negate();
                 return true;
             }
 
@@ -611,10 +610,11 @@ namespace PInvoke.Parser
             // i now points to the name token.  Remove the range of tokens up until this point.  Now remove the
             // whitespace on either end of the list
             list.RemoveRange(0, i + 1);
-            while (list.Count > 0 && (list[1].TokenType == TokenType.WhiteSpace || list[1].TokenType == TokenType.NewLine))
+            while (list.Count > 0 && (list[0].TokenType == TokenType.WhiteSpace || list[0].TokenType == TokenType.NewLine))
             {
                 list.RemoveAt(0);
             }
+
             while (list.Count > 0 && (list[list.Count - 1].TokenType == TokenType.WhiteSpace || list[list.Count - 1].TokenType == TokenType.NewLine))
             {
                 list.RemoveAt(list.Count - 1);
@@ -644,13 +644,13 @@ namespace PInvoke.Parser
             list.RemoveRange(0, 3);
 
             List<string> paramList = new List<string>();
-            while ((list[1].TokenType != TokenType.ParenClose))
+            while ((list[0].TokenType != TokenType.ParenClose))
             {
-                if (list[1].TokenType == TokenType.Word)
+                if (list[0].TokenType == TokenType.Word)
                 {
-                    paramList.Add(list[1].Value);
+                    paramList.Add(list[0].Value);
                 }
-                else if (list[1].TokenType == TokenType.ParenOpen)
+                else if (list[0].TokenType == TokenType.ParenOpen)
                 {
                     // ( is not legal inside a parameter list.  This is a simple macro
                     return ProcessPoundDefineComplexMacro(line);
@@ -727,7 +727,7 @@ namespace PInvoke.Parser
         {
             // Get the none whitespace tokens
             List<Token> list = line.GetValidTokens();
-            ThrowIfFalse(list[1].TokenType == TokenType.PoundUnDef);
+            ThrowIfFalse(list[0].TokenType == TokenType.PoundUnDef);
 
             if (list.Count != 2 || list[1].TokenType != TokenType.Word)
             {
@@ -1052,7 +1052,7 @@ namespace PInvoke.Parser
                             Debug.Fail("Non-crititcal error reducing the preprocessor line");
                             return;
                         }
-                        else if (object.ReferenceEquals(newList[1], possibleToken))
+                        else if (object.ReferenceEquals(newList[0], possibleToken))
                         {
                             newList.RemoveAt(0);
                             newList.Insert(0, poundToken);
@@ -1210,10 +1210,10 @@ namespace PInvoke.Parser
             i += 1;
             // Move past the '('
 
-            Int32 depth = 0;
-            Token curArg = new Token(TokenType.Text, string.Empty);
-
-            while (i < list.Count)
+            var depth = 0;
+            var curArg = new Token(TokenType.Text, string.Empty);
+            var done = false;
+            while (i < list.Count && !done)
             {
                 Token cur = list[i];
                 bool append = false;
@@ -1234,7 +1234,7 @@ namespace PInvoke.Parser
                         if (depth == 0)
                         {
                             args.Add(curArg);
-                            break; // TODO: might not be correct. Was : Exit While
+                            done = true;
                         }
                         else
                         {
@@ -1245,6 +1245,11 @@ namespace PInvoke.Parser
                     default:
                         append = true;
                         break;
+                }
+
+                if (done)
+                {
+                    break;
                 }
 
                 if (append)

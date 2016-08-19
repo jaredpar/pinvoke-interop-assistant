@@ -633,7 +633,8 @@ namespace PInvoke.Parser
                     {
                         _buffer.EatChar();
                     }
-                    return new Token(TokenType.NewLine, PortConstants.NewLine);
+                    token = new Token(TokenType.NewLine, PortConstants.NewLine);
+                    break;
             }
 
             // If we found a token then return it

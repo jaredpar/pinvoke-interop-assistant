@@ -174,5 +174,28 @@ namespace PInvoke.Parser
 
             return other == this;
         }
+
+        public ExpressionValue Negate()
+        {
+            var value = !ConvertValueToBoolean();
+            return new ExpressionValue(value);
+        }
+
+        public bool ConvertValueToBoolean()
+        {
+            if (Value is bool)
+            {
+                return (bool)Value;
+            }
+
+            if (Value is int)
+            {
+                var v = (int)Value;
+                return v != 0;
+            }
+
+            Contract.Violation($"Type not convertable to boolean: {Value.GetType()}");
+            return false;
+        }
     }
 }

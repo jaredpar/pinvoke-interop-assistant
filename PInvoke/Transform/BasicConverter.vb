@@ -153,6 +153,7 @@ Namespace Transform
             If ep Is Nothing Then : Throw New ArgumentNullException("ep") : End If
 
             Dim analyzer As NativeCodeAnalyzer = NativeCodeAnalyzerFactory.CreateForMiniParse(OsVersion.WindowsVista, _ns.LoadAllMacros())
+            analyzer.IncludePathList.Add("c:\program files (x86)\windows kits\8.1\include\shared")
             Dim bag As NativeSymbolBag
             Using reader As New IO.StringReader(code)
                 Dim result As NativeCodeAnalyzerResult = analyzer.Analyze(reader)

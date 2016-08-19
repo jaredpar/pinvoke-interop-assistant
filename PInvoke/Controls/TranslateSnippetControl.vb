@@ -110,6 +110,7 @@ Namespace Controls
                 Dim req As RequestData = DirectCast(e.Argument, RequestData)
                 Dim code As String = req.Text
                 Dim analyzer As NativeCodeAnalyzer = NativeCodeAnalyzerFactory.CreateForMiniParse(OsVersion.WindowsVista, req.InitialMacroList)
+                analyzer.IncludePathList.Add("c:\program files (x86)\windows kits\8.1\include\shared")
                 Using reader As New IO.StringReader(code)
                     Dim parseResult As NativeCodeAnalyzerResult = analyzer.Analyze(reader)
                     Dim ep As ErrorProvider = parseResult.ErrorProvider

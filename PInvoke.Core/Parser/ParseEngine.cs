@@ -969,7 +969,7 @@ namespace PInvoke.Parser
             // Check for the (void) signature
             List<Token> voidList = _scanner.PeekTokenList(2);
 
-            if (voidList(1).TokenType == TokenType.ParenClose && voidList(0).TokenType == TokenType.VoidKeyword)
+            if (voidList[1].TokenType == TokenType.ParenClose && voidList[0].TokenType == TokenType.VoidKeyword)
             {
                 // Get the tokens for the signature off of the stream
                 _scanner.GetNextToken(TokenType.VoidKeyword);
@@ -989,7 +989,7 @@ namespace PInvoke.Parser
                 {
                     // Check for variable arguments signature
                     List<Token> varList = _scanner.PeekTokenList(3);
-                    if (varList(1).TokenType == TokenType.Period && varList(2).TokenType == TokenType.Period)
+                    if (varList[1].TokenType == TokenType.Period && varList[2].TokenType == TokenType.Period)
                     {
                         ProcessBlockRemainder(TokenType.ParenOpen, TokenType.ParenClose);
 
@@ -1346,7 +1346,7 @@ namespace PInvoke.Parser
                 _scanner.GetNextToken();
                 object value = null;
                 Token sizeToken = _scanner.GetNextToken(TokenType.Number);
-                if (!TokenHelper.TryConvertToNumber(sizeToken, value))
+                if (!TokenHelper.TryConvertToNumber(sizeToken, out value))
                 {
                     throw ParseException.CreateError("Expected number after bit vector specifier: {0}", sizeToken);
                 }
@@ -1411,7 +1411,7 @@ namespace PInvoke.Parser
 
                 List<Token> peekList = _scanner.PeekTokenList(2);
 
-                if ((peekList(0).TokenType == TokenType.Word && peekList(1).TokenType == TokenType.BraceOpen) || peekList(0).TokenType == TokenType.BraceOpen)
+                if ((peekList[0].TokenType == TokenType.Word && peekList[1].TokenType == TokenType.BraceOpen) || peekList[0].TokenType == TokenType.BraceOpen)
                 {
                     // If the struct is followed by any trailing typedefs then this function
                     // will take care of that as well
@@ -1426,7 +1426,7 @@ namespace PInvoke.Parser
 
                 List<Token> peekList = _scanner.PeekTokenList(2);
 
-                if ((peekList(0).TokenType == TokenType.Word && peekList(1).TokenType == TokenType.BraceOpen) || peekList(0).TokenType == TokenType.BraceOpen)
+                if ((peekList[0].TokenType == TokenType.Word && peekList[1].TokenType == TokenType.BraceOpen) || peekList[0].TokenType == TokenType.BraceOpen)
                 {
                     return this.ProcessUnion(namePrefix);
                 }
@@ -1439,7 +1439,7 @@ namespace PInvoke.Parser
 
                 List<Token> peekList = _scanner.PeekTokenList(2);
 
-                if ((peekList(0).TokenType == TokenType.Word && peekList(1).TokenType == TokenType.BraceOpen) || peekList(0).TokenType == TokenType.BraceOpen)
+                if ((peekList[0].TokenType == TokenType.Word && peekList[1].TokenType == TokenType.BraceOpen) || peekList[0].TokenType == TokenType.BraceOpen)
                 {
                     return this.ProcessEnum(namePrefix);
                 }
@@ -1457,7 +1457,7 @@ namespace PInvoke.Parser
 
                 List<Token> peekList = _scanner.PeekTokenList(2);
 
-                if ((peekList(0).TokenType == TokenType.Word && peekList(1).TokenType == TokenType.BraceOpen) || peekList(0).TokenType == TokenType.BraceOpen)
+                if ((peekList[0].TokenType == TokenType.Word && peekList[1].TokenType == TokenType.BraceOpen) || peekList[0].TokenType == TokenType.BraceOpen)
                 {
                     // If the Class is followed by any trailing typedefs then this function
                     // will take care of that as well
@@ -1554,17 +1554,17 @@ namespace PInvoke.Parser
                 // keyword
                 if (_scanner.PeekNextToken().IsTypeKeyword)
                 {
-                    NativeBuiltinType.TryConvertToBuiltinType(_scanner.GetNextToken().TokenType, bt);
+                    NativeBuiltinType.TryConvertToBuiltinType(_scanner.GetNextToken().TokenType, out bt);
                     bt.IsUnsigned = (token.TokenType == TokenType.UnsignedKeyword);
                 }
                 else
                 {
-                    NativeBuiltinType.TryConvertToBuiltinType(token.TokenType, bt);
+                    NativeBuiltinType.TryConvertToBuiltinType(token.TokenType, out bt);
                 }
             }
             else if (token.IsTypeKeyword)
             {
-                NativeBuiltinType.TryConvertToBuiltinType(token.TokenType, bt);
+                NativeBuiltinType.TryConvertToBuiltinType(token.TokenType, out bt);
             }
 
             // If this is a builtin type and it's not constant then just return the builtin type.  Otherwise we 
@@ -1740,7 +1740,7 @@ namespace PInvoke.Parser
                 if ((token.TokenType == TokenType.Number || token.TokenType == TokenType.HexNumber) && _scanner.PeekNextToken().TokenType == TokenType.BracketClose)
                 {
                     count = null;
-                    if (!TokenHelper.TryConvertToNumber(token, count))
+                    if (!TokenHelper.TryConvertToNumber(token, out count))
                     {
                         throw ParseException.CreateError("Could not process array length as number: {0}", token.Value);
                     }
@@ -1768,7 +1768,7 @@ namespace PInvoke.Parser
 
                     ExpressionEvaluator ee = new ExpressionEvaluator();
                     ExpressionValue result = null;
-                    if (ee.TryEvaluate(exprList, result) && object.ReferenceEquals(result.Value.GetType(), typeof(Int32)))
+                    if (ee.TryEvaluate(exprList, out result) && object.ReferenceEquals(result.Value.GetType(), typeof(Int32)))
                     {
                         count = result.Value;
                     }
@@ -1932,7 +1932,7 @@ namespace PInvoke.Parser
                 return null;
             }
 
-            if (directive(0) == '"' && directive(directive.Length - 1) == '"')
+            if (directive[0] == '"' && directive[directive.Length - 1] == '"')
             {
                 directive = directive.Substring(1, directive.Length - 2);
             }
@@ -1955,7 +1955,7 @@ namespace PInvoke.Parser
                 directive = directive.Substring(0, index + 1) + directive.Substring(otherIndex);
             }
 
-            if (!_salTable.TryGetValue(directive, entry))
+            if (!_salTable.TryGetValue(directive, out entry))
             {
                 return null;
             }
@@ -2025,7 +2025,7 @@ namespace PInvoke.Parser
             {
                 _scanner.Options.HideWhitespace = false;
 
-                Text.StringBuilder b = new Text.StringBuilder();
+                var b = new StringBuilder();
                 int found = 0;
 
                 while (found < count)

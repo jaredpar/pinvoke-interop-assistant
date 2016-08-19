@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using static PInvoke.Contract;
 
 namespace PInvoke.Parser
 {
@@ -160,7 +161,7 @@ namespace PInvoke.Parser
             /// <remarks></remarks>
             public void RollBack(ScannerMark mark)
             {
-                ThrowIfNull(mark, "Must be passed a valid ScannerMark");
+                Contract.ThrowIfNull(mark, "Must be passed a valid ScannerMark");
                 _index = mark.Index;
                 _lineNumber = mark.LineNumber;
             }
@@ -172,7 +173,7 @@ namespace PInvoke.Parser
             public char ReadChar()
             {
                 EnsureNotEndOfStream();
-                char ret = _text(_index);
+                char ret = _text[_index];
                 _index += 1;
 
                 // Check for the end of the line
@@ -199,7 +200,7 @@ namespace PInvoke.Parser
             public char PeekChar()
             {
                 EnsureNotEndOfStream();
-                return _text(_index);
+                return _text[_index];
             }
 
             /// <summary>
@@ -783,7 +784,7 @@ namespace PInvoke.Parser
 
             // First check and see if this is a keyword that we care about
             TokenType keywordType = default(TokenType);
-            if (TokenHelper.KeywordMap.TryGetValue(word, keywordType))
+            if (TokenHelper.KeywordMap.TryGetValue(word, out keywordType))
             {
                 return new Token(keywordType, word);
             }
@@ -875,7 +876,7 @@ namespace PInvoke.Parser
             while (!done && !_buffer.EndOfStream)
             {
                 char c = _buffer.PeekChar();
-                if (char.IsLetterOrDigit(c) || c == "_" || c == "$")
+                if (char.IsLetterOrDigit(c) || c == '_' || c == '$')
                 {
                     builder.Append(c);
                     _buffer.EatChar();
@@ -992,7 +993,7 @@ namespace PInvoke.Parser
                 // If we get a scanner exception while trying to read the string then this
                 // is just a simple quote.  Rollback the buffer and return the quote token
                 _buffer.RollBack(mark);
-                return new Token(TokenType.DoubleQuote, '"');
+                return new Token(TokenType.DoubleQuote, "\"");
             }
         }
 

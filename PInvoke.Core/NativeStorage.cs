@@ -1278,9 +1278,8 @@ namespace PInvoke
         /// <param name="nt"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public bool TryLoadByName(string name, ref NativeType nt)
+        public bool TryLoadByName(string name, out NativeType nt)
         {
-
             NativeDefinedType definedNt = null;
             if (TryLoadDefined(name, out definedNt))
             {
@@ -1303,6 +1302,7 @@ namespace PInvoke
                 return true;
             }
 
+            nt = null;
             return false;
         }
 

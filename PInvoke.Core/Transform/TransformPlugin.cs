@@ -1011,8 +1011,8 @@ namespace PInvoke.Transform
             CodeMemberMethod newMethod = clone.CloneMethodSignature(origMethod);
             for (int i = 0; i <= origMethod.Parameters.Count - 1; i++)
             {
-                CodeParam origParam = origMethod.Parameters(i);
-                CodeParam newParam = newMethod.Parameters(i);
+                CodeParam origParam = origMethod.Parameters[i];
+                CodeParam newParam = newMethod.Parameters[i];
                 NativeParameter ntParam = GetNativeParameter(origParam);
                 if (ntParam == null)
                 {

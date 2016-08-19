@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Globalization;
+using static PInvoke.Contract;
 
 namespace PInvoke.Parser
 {
@@ -272,34 +273,34 @@ namespace PInvoke.Parser
         private static Dictionary<string, TokenType> BuildKeywordMap()
         {
             Dictionary<string, TokenType> keywordMap = new Dictionary<string, TokenType>(StringComparer.Ordinal);
-            keywordMap("struct") = TokenType.StructKeyword;
-            keywordMap("union") = TokenType.UnionKeyword;
-            keywordMap("typedef") = TokenType.TypedefKeyword;
-            keywordMap("enum") = TokenType.EnumKeyword;
-            keywordMap("class") = TokenType.ClassKeyword;
-            keywordMap("__declspec") = TokenType.DeclSpec;
-            keywordMap("volatile") = TokenType.VolatileKeyword;
-            keywordMap("__inline") = TokenType.InlineKeyword;
-            keywordMap("__forceinline") = TokenType.InlineKeyword;
-            keywordMap("inline") = TokenType.InlineKeyword;
-            keywordMap("__clrcall") = TokenType.ClrCallKeyword;
-            keywordMap("__ptr32") = TokenType.Pointer32Keyword;
-            keywordMap("__ptr64") = TokenType.Pointer64Keyword;
-            keywordMap("const") = TokenType.ConstKeyword;
-            keywordMap("false") = TokenType.FalseKeyword;
-            keywordMap("true") = TokenType.TrueKeyword;
-            keywordMap("_cdecl") = TokenType.CDeclarationCallKeyword;
-            keywordMap("__cdecl") = TokenType.CDeclarationCallKeyword;
-            keywordMap("__stdcall") = TokenType.StandardCallKeyword;
-            keywordMap("__pascal") = TokenType.PascalCallKeyword;
-            keywordMap("__winapi") = TokenType.WinApiCallKeyword;
-            keywordMap("public") = TokenType.PublicKeyword;
-            keywordMap("private") = TokenType.PrivateKeyword;
-            keywordMap("protected") = TokenType.ProtectedKeyword;
+            keywordMap["struct"] = TokenType.StructKeyword;
+            keywordMap["union"] = TokenType.UnionKeyword;
+            keywordMap["typedef"] = TokenType.TypedefKeyword;
+            keywordMap["enum"] = TokenType.EnumKeyword;
+            keywordMap["class"] = TokenType.ClassKeyword;
+            keywordMap["__declspec"] = TokenType.DeclSpec;
+            keywordMap["volatile"] = TokenType.VolatileKeyword;
+            keywordMap["__inline"] = TokenType.InlineKeyword;
+            keywordMap["__forceinline"] = TokenType.InlineKeyword;
+            keywordMap["inline"] = TokenType.InlineKeyword;
+            keywordMap["__clrcall"] = TokenType.ClrCallKeyword;
+            keywordMap["__ptr32"] = TokenType.Pointer32Keyword;
+            keywordMap["__ptr64"] = TokenType.Pointer64Keyword;
+            keywordMap["const"] = TokenType.ConstKeyword;
+            keywordMap["false"] = TokenType.FalseKeyword;
+            keywordMap["true"] = TokenType.TrueKeyword;
+            keywordMap["_cdecl"] = TokenType.CDeclarationCallKeyword;
+            keywordMap["__cdecl"] = TokenType.CDeclarationCallKeyword;
+            keywordMap["__stdcall"] = TokenType.StandardCallKeyword;
+            keywordMap["__pascal"] = TokenType.PascalCallKeyword;
+            keywordMap["__winapi"] = TokenType.WinApiCallKeyword;
+            keywordMap["public"] = TokenType.PublicKeyword;
+            keywordMap["private"] = TokenType.PrivateKeyword;
+            keywordMap["protected"] = TokenType.ProtectedKeyword;
 
             // type information
-            keywordMap("signed") = TokenType.SignedKeyword;
-            keywordMap("unsigned") = TokenType.UnsignedKeyword;
+            keywordMap["signed"] = TokenType.SignedKeyword;
+            keywordMap["unsigned"] = TokenType.UnsignedKeyword;
 
             // Update builtin type map
             keywordMap.Add("boolean", TokenType.BooleanKeyword);
@@ -491,9 +492,6 @@ namespace PInvoke.Parser
                 case TokenType.PoundElse:
                     isValid = true;
                     break;
-                case TokenType.PoundElse:
-                    isValid = true;
-                    break;
                 case TokenType.PoundElseIf:
                     isValid = true;
                     break;
@@ -526,7 +524,7 @@ namespace PInvoke.Parser
         public static string ConvertToString(Token token)
         {
             string sValue = null;
-            if (!TryConvertToString(token, ref sValue))
+            if (!TryConvertToString(token, out sValue))
             {
                 throw new InvalidOperationException("Unable to convert to string: " + token.Value);
             }
@@ -536,6 +534,7 @@ namespace PInvoke.Parser
 
         public static bool TryConvertToString(Token token, out string str)
         {
+            str = null;
             if (!token.IsQuotedString)
             {
                 return false;
@@ -544,11 +543,11 @@ namespace PInvoke.Parser
             str = token.Value;
             if (token.TokenType == TokenType.QuotedStringUnicode)
             {
-                ThrowIfFalse(Conversion.str(0) == "L");
+                ThrowIfFalse(str[0] == 'L');
                 str = str.Substring(1);
             }
 
-            if (str.Length < 2 || Conversion.str(0) != "\"" || Conversion.str(str.Length - 1) != "\"")
+            if (str.Length < 2 || str[0] != '\"' || str[str.Length - 1] != '\"')
             {
                 return false;
             }
@@ -559,6 +558,8 @@ namespace PInvoke.Parser
 
         public static bool TryConvertToChar(Token token, out char retChar)
         {
+            retChar = ' ';
+
             if (!token.IsCharacter)
             {
                 return false;
@@ -571,16 +572,16 @@ namespace PInvoke.Parser
                 val = val.Substring(1);
             }
 
-            if (string.IsNullOrEmpty(val) || val.Length < 3 || Conversion.val(0) != '\'' || Conversion.val(val.Length - 1) != '\'')
+            if (string.IsNullOrEmpty(val) || val.Length < 3 || val[0] != '\'' || val[val.Length - 1] != '\'')
             {
                 return false;
             }
 
             val = val.Substring(1, val.Length - 2);
             // Strip the quotes
-            if (Conversion.val(0) != "\\")
+            if (val[0] != '\\')
             {
-                return char.TryParse(val, retChar);
+                return char.TryParse(val, out retChar);
             }
 
             // Look for the simple escape codes
@@ -588,7 +589,7 @@ namespace PInvoke.Parser
             if (val.Length == 2)
             {
                 found = true;
-                switch (Conversion.val(1))
+                switch (val[1])
                 {
                     case '\\':
                         retChar = '\\';
@@ -689,7 +690,7 @@ namespace PInvoke.Parser
         /// <remarks></remarks>
         public static bool TryConvertToNumber(Token t, out object val)
         {
-            return TryConvertToNumber(t.Value, ref val);
+            return TryConvertToNumber(t.Value, out val);
         }
 
         /// <summary>
@@ -698,7 +699,7 @@ namespace PInvoke.Parser
         /// <param name="str"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static bool TryConvertToNumber(string str, ref object retValue)
+        public static bool TryConvertToNumber(string str, out object retValue)
         {
             NumberInfo info = default(NumberInfo);
             if (!ProcessNumberInfo(ref str, ref info))
@@ -922,7 +923,7 @@ namespace PInvoke.Parser
         }
 
 
-        public static bool TryConvertToPoundToken(string word, ref Token token)
+        public static bool TryConvertToPoundToken(string word, out Token token)
         {
 
             token = null;

@@ -157,7 +157,7 @@ namespace PInvoke.Parser
         public ExpressionNode Parse(string expression)
         {
             ExpressionNode node = null;
-            if (!this.TryParse(expression, ref node))
+            if (!this.TryParse(expression, out node))
             {
                 throw new InvalidOperationException("Unable to parse the expression");
             }
@@ -168,20 +168,20 @@ namespace PInvoke.Parser
         public bool IsParsable(string expression)
         {
             ExpressionNode node = null;
-            return TryParse(expression, ref node);
+            return TryParse(expression, out node);
         }
 
-        public bool TryParse(List<Token> tokens, ref ExpressionNode node)
+        public bool TryParse(List<Token> tokens, out ExpressionNode node)
         {
             if (tokens == null)
             {
                 throw new ArgumentNullException("tokens");
             }
 
-            return TryParseComplete(tokens, ref node);
+            return TryParseComplete(tokens, out node);
         }
 
-        public bool TryParse(string expression, ref ExpressionNode node)
+        public bool TryParse(string expression, out ExpressionNode node)
         {
             if (expression == null)
             {
@@ -195,7 +195,7 @@ namespace PInvoke.Parser
                 scanner.Options.HideComments = true;
                 scanner.Options.HideWhitespace = true;
                 scanner.Options.ThrowOnEndOfStream = false;
-                return TryParseComplete(scanner.Tokenize(), ref node);
+                return TryParseComplete(scanner.Tokenize(), out node);
             }
         }
 
@@ -203,8 +203,9 @@ namespace PInvoke.Parser
         {
             ExpressionNode cur = null;
             List<Token> remaining = null;
-            if (!TryParseCore(tokens, ref cur, ref remaining))
+            if (!TryParseCore(tokens, out cur, out remaining))
             {
+                node = null;
                 return false;
             }
 
@@ -223,6 +224,7 @@ namespace PInvoke.Parser
             }
             else if (remaining.Count == 1 || !remaining[0].IsBinaryOperation)
             {
+                node = null;
                 return false;
             }
             else
@@ -230,6 +232,7 @@ namespace PInvoke.Parser
                 ExpressionNode right = null;
                 if (!TryParseComplete(remaining.GetRange(1, remaining.Count - 1), out right))
                 {
+                    node = null;
                     return false;
                 }
 
@@ -255,7 +258,7 @@ namespace PInvoke.Parser
             if (tokens.Count == 1)
             {
                 remaining = new List<Token>();
-                return TryConvertTokenToExpressionLeafNode(tokens[0], ref node);
+                return TryConvertTokenToExpressionLeafNode(tokens[0], out node);
             }
 
             ExpressionNode leftNode = null;
@@ -285,10 +288,12 @@ namespace PInvoke.Parser
             {
                 // Has to be an operation so convert the left node to a leaf expression
                 remaining = tokens.GetRange(1, tokens.Count - 1);
-                return TryConvertTokenToExpressionLeafNode(tokens[0], ref node);
+                return TryConvertTokenToExpressionLeafNode(tokens[0], out node);
             }
             else
             {
+                node = null;
+                remaining = null;
                 return false;
             }
         }
@@ -303,6 +308,7 @@ namespace PInvoke.Parser
             int endIndex = FindMatchingParenIndex(tokens, 2);
             if (endIndex == -1)
             {
+                remaining = null;
                 return false;
             }
 
@@ -312,6 +318,7 @@ namespace PInvoke.Parser
                 List<Token> subList = tokens.GetRange(2, endIndex - 2);
                 if (!TryParseFunctionCallArguments(subList, node))
                 {
+                    remaining = null;
                     return false;
                 }
             }
@@ -342,7 +349,7 @@ namespace PInvoke.Parser
                 }
                 else
                 {
-                    if (!TryParseComplete(tokens.GetRange(0, index), ref cur.LeftNode))
+                    if (!TryParseComplete(tokens.GetRange(0, index), out cur.LeftNode))
                     {
                         return false;
                     }
@@ -362,6 +369,9 @@ namespace PInvoke.Parser
 
         private bool TryParseParenExpression(List<Token> tokens, out ExpressionNode node, out List<Token> remaining)
         {
+            node = null;
+            remaining = null;
+
             int endIndex = FindMatchingParenIndex(tokens, 1);
             if (endIndex == -1)
             {
@@ -369,7 +379,7 @@ namespace PInvoke.Parser
             }
 
             remaining = tokens.GetRange(endIndex + 1, tokens.Count - (endIndex + 1));
-            bool success = TryParseComplete(tokens.GetRange(1, endIndex - 1), ref node);
+            bool success = TryParseComplete(tokens.GetRange(1, endIndex - 1), out node);
             if (success)
             {
                 node.Parenthesized = true;
@@ -393,7 +403,7 @@ namespace PInvoke.Parser
             return -1;
         }
 
-        private bool TryConvertTokenToExpressionBinaryOperation(Token token, ref ExpressionNode node)
+        private bool TryConvertTokenToExpressionBinaryOperation(Token token, out ExpressionNode node)
         {
             ThrowIfNull(token);
 
@@ -410,7 +420,7 @@ namespace PInvoke.Parser
             }
         }
 
-        private bool TryConvertTokenToExpressionLeafNode(Token token, ref ExpressionNode node)
+        private bool TryConvertTokenToExpressionLeafNode(Token token, out ExpressionNode node)
         {
             ThrowIfNull(token);
 

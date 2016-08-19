@@ -148,25 +148,25 @@ namespace PInvoke
             return _definedMap.TryGetValue(name, out nt);
         }
 
-        public bool TryFindOrLoadDefinedType(string name, ref NativeDefinedType nt)
+        public bool TryFindOrLoadDefinedType(string name, out NativeDefinedType nt)
         {
             bool notUsed = false;
-            return TryFindOrLoadDefinedType(name, ref nt, ref notUsed);
+            return TryFindOrLoadDefinedType(name, out nt, out notUsed);
         }
 
-        public bool TryFindOrLoadDefinedType(string name, ref NativeDefinedType nt, ref bool fromStorage)
+        public bool TryFindOrLoadDefinedType(string name, out NativeDefinedType nt, out bool fromStorage)
         {
             if (name == null)
             {
                 throw new ArgumentNullException("name");
             }
-            if (TryFindDefinedType(name, ref nt))
+            if (TryFindDefinedType(name, out nt))
             {
                 fromStorage = false;
                 return true;
             }
 
-            if (_storageLookup.TryLoadDefined(name, nt))
+            if (_storageLookup.TryLoadDefined(name, out nt))
             {
                 AddDefinedType(nt);
                 fromStorage = true;
@@ -199,28 +199,28 @@ namespace PInvoke
         /// <param name="nt"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public bool TryFindTypedef(string name, ref NativeTypeDef nt)
+        public bool TryFindTypedef(string name, out NativeTypeDef nt)
         {
             if (name == null)
             {
                 throw new ArgumentNullException("name");
             }
-            return _typeDefMap.TryGetValue(name, nt);
+            return _typeDefMap.TryGetValue(name, out nt);
         }
 
-        public bool TryFindOrLoadTypedef(string name, ref NativeTypeDef nt)
+        public bool TryFindOrLoadTypedef(string name, out NativeTypeDef nt)
         {
             if (name == null)
             {
                 throw new ArgumentNullException("name");
             }
 
-            if (TryFindTypedef(name, ref nt))
+            if (TryFindTypedef(name, out nt))
             {
                 return true;
             }
 
-            if (_storageLookup.TryLoadTypedef(name, nt))
+            if (_storageLookup.TryLoadTypedef(name, out nt))
             {
                 AddTypedef(nt);
                 return true;
@@ -251,28 +251,28 @@ namespace PInvoke
         /// <param name="proc"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public bool TryFindProcedure(string name, ref NativeProcedure proc)
+        public bool TryFindProcedure(string name, out NativeProcedure proc)
         {
             if (name == null)
             {
                 throw new ArgumentNullException("name");
             }
 
-            return _procMap.TryGetValue(name, proc);
+            return _procMap.TryGetValue(name, out proc);
         }
 
-        public bool TryFindOrLoadProcedure(string name, ref NativeProcedure proc)
+        public bool TryFindOrLoadProcedure(string name, out NativeProcedure proc)
         {
             if (name == null)
             {
                 throw new ArgumentNullException("name");
             }
-            if (TryFindProcedure(name, ref proc))
+            if (TryFindProcedure(name, out proc))
             {
                 return true;
             }
 
-            if (_storageLookup.TryLoadProcedure(name, proc))
+            if (_storageLookup.TryLoadProcedure(name, out proc))
             {
                 AddProcedure(proc);
                 return true;
@@ -309,7 +309,7 @@ namespace PInvoke
                 throw new ArgumentNullException("expr");
             }
 
-            _valueMap(name) = value;
+            _valueMap[name] = value;
         }
 
         /// <summary>
@@ -319,28 +319,28 @@ namespace PInvoke
         /// <param name="nConst"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public bool TryFindConstant(string name, ref NativeConstant nConst)
+        public bool TryFindConstant(string name, out NativeConstant nConst)
         {
             if (name == null)
             {
                 throw new ArgumentNullException("name");
             }
-            return _constMap.TryGetValue(name, nConst);
+            return _constMap.TryGetValue(name, out nConst);
         }
 
-        public bool TryFindOrLoadConstant(string name, ref NativeConstant nConst)
+        public bool TryFindOrLoadConstant(string name, out NativeConstant nConst)
         {
             if (name == null)
             {
                 throw new ArgumentNullException("name");
             }
 
-            if (TryFindConstant(name, ref nConst))
+            if (TryFindConstant(name, out nConst))
             {
                 return true;
             }
 
-            if (_storageLookup.TryLoadConstant(name, nConst))
+            if (_storageLookup.TryLoadConstant(name, out nConst))
             {
                 AddConstant(nConst);
                 return true;
@@ -474,19 +474,20 @@ namespace PInvoke
         /// <param name="loadFromStorage"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public bool TryFindOrLoadNativeType(NativeNamedType namedType, ref NativeType nt, ref bool loadFromStorage)
+        public bool TryFindOrLoadNativeType(NativeNamedType namedType, out NativeType nt, out bool loadFromStorage)
         {
             if (string.IsNullOrEmpty(namedType.Qualification))
             {
                 // If there is no qualification then just load the type by it's name
-                return TryFindOrLoadNativeType(namedType.Name, ref nt, ref loadFromStorage);
+                return TryFindOrLoadNativeType(namedType.Name, out nt, out loadFromStorage);
             }
 
             // When there is a qualification it is either struct, union or enum.  Try and load the defined type
             // for the name and then make sure that it is the correct type 
             NativeDefinedType definedNt = null;
-            if (!this.TryFindOrLoadDefinedType(namedType.Name, ref definedNt, ref loadFromStorage))
+            if (!this.TryFindOrLoadDefinedType(namedType.Name, out definedNt, out loadFromStorage))
             {
+                nt = null;
                 return false;
             }
 
@@ -503,6 +504,7 @@ namespace PInvoke
                     test = "enum";
                     break;
                 default:
+                    nt = null;
                     return false;
             }
 
@@ -514,6 +516,7 @@ namespace PInvoke
 
             if (0 != string.CompareOrdinal(test, qual))
             {
+                nt = null;
                 return false;
             }
 
@@ -532,20 +535,20 @@ namespace PInvoke
         /// <param name="nt"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public bool TryFindOrLoadNativeType(string name, ref NativeType nt)
+        public bool TryFindOrLoadNativeType(string name, out NativeType nt)
         {
             bool notUsed = false;
-            return TryFindOrLoadNativeType(name, ref nt, ref notUsed);
+            return TryFindOrLoadNativeType(name, out nt, out notUsed);
         }
 
 
-        public bool TryFindOrLoadNativeType(string name, ref NativeType nt, ref bool loadFromStorage)
+        public bool TryFindOrLoadNativeType(string name, out NativeType nt, out bool loadFromStorage)
         {
 
             // First check the defined types
             loadFromStorage = false;
             NativeDefinedType definedNt = null;
-            if (TryFindDefinedType(name, ref definedNt))
+            if (TryFindDefinedType(name, out definedNt))
             {
                 nt = definedNt;
                 return true;
@@ -553,14 +556,14 @@ namespace PInvoke
 
             // Second, check the typedefs
             NativeTypeDef typeDefNt = null;
-            if (TryFindTypedef(name, ref typeDefNt))
+            if (TryFindTypedef(name, out typeDefNt))
             {
                 nt = typeDefNt;
                 return true;
             }
 
             // Lastly try and find it in the stored file
-            if (_storageLookup.TryLoadByName(name, nt))
+            if (_storageLookup.TryLoadByName(name, out nt))
             {
                 ThrowIfNull(nt);
                 loadFromStorage = true;
@@ -591,28 +594,28 @@ namespace PInvoke
             return false;
         }
 
-        public bool TryFindValue(string valueName, ref NativeSymbol ns)
+        public bool TryFindValue(string valueName, out NativeSymbol ns)
         {
-            return _valueMap.TryGetValue(valueName, ns);
+            return _valueMap.TryGetValue(valueName, out ns);
         }
 
-        public bool TryFindOrLoadValue(string valueName, ref NativeSymbol ns)
+        public bool TryFindOrLoadValue(string valueName, out NativeSymbol ns)
         {
             bool notUsed = false;
-            return TryFindOrLoadValue(valueName, ref ns, ref notUsed);
+            return TryFindOrLoadValue(valueName, out ns, out notUsed);
         }
 
-        public bool TryFindOrLoadValue(string valueName, ref NativeSymbol ns, ref bool loaded)
+        public bool TryFindOrLoadValue(string valueName, out NativeSymbol ns, out bool loaded)
         {
             loaded = false;
-            if (TryFindValue(valueName, ref ns))
+            if (TryFindValue(valueName, out ns))
             {
                 return true;
             }
 
             // First look for a constant by this name
             NativeConstant nConst = null;
-            if (_storageLookup.TryLoadConstant(valueName, nConst))
+            if (_storageLookup.TryLoadConstant(valueName, out nConst))
             {
                 AddConstant(nConst);
                 loaded = true;
@@ -622,15 +625,15 @@ namespace PInvoke
 
             // Lastly look for enums by value 
             List<NativeStorage.EnumValueRow> erows = null;
-            if (_storageLookup.EnumValue.TryFindByValueName(valueName, erows))
+            if (_storageLookup.EnumValue.TryFindByValueName(valueName, out erows))
             {
                 // Take the first one
-                NativeStorage.EnumValueRow erow = erows(0);
+                NativeStorage.EnumValueRow erow = erows[0];
                 NativeStorage.DefinedTypeRow prow = erow.DefinedTypeRow;
                 NativeDefinedType nt = null;
                 if (prow != null)
                 {
-                    return TryFindOrLoadDefinedType(prow.Name, ref nt, ref loaded);
+                    return TryFindOrLoadDefinedType(prow.Name, out nt, out loaded);
                 }
             }
 

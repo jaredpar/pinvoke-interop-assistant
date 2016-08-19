@@ -8,6 +8,7 @@ using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using static PInvoke.Contract;
 
 namespace PInvoke.Parser
 {
@@ -137,7 +138,7 @@ namespace PInvoke.Parser
 
             public override string ToString()
             {
-                Text.StringBuilder b = new Text.StringBuilder();
+                var b = new StringBuilder();
                 foreach (Token cur in TokenList)
                 {
                     b.Append(cur.Value);
@@ -200,9 +201,9 @@ namespace PInvoke.Parser
                 Int32 i = 0;
                 while (i + 1 < list.Count)
                 {
-                    Token cur = list(i);
+                    Token cur = list[i];
 
-                    if (cur.TokenType == TokenType.Word && 0 == string.CompareOrdinal("defined", cur.Value) && list(i + 1).TokenType == TokenType.Word)
+                    if (cur.TokenType == TokenType.Word && 0 == string.CompareOrdinal("defined", cur.Value) && list[i + 1].TokenType == TokenType.Word)
                     {
                         list.Insert(i + 1, new Token(TokenType.ParenOpen, "("));
                         list.Insert(i + 3, new Token(TokenType.ParenClose, ")"));
@@ -214,7 +215,7 @@ namespace PInvoke.Parser
                 }
 
                 ExpressionValue value = null;
-                if (!base.TryEvaluate(list, value))
+                if (!base.TryEvaluate(list, out value))
                 {
                     _engine._errorProvider.AddError("Could not evaluate expression {0}", line.ToString());
                     return false;
@@ -242,7 +243,7 @@ namespace PInvoke.Parser
             protected override bool TryEvaluateNegation(ExpressionNode node)
             {
                 ExpressionValue value = (ExpressionValue)node.LeftNode.Tag;
-                value = !value;
+                value = !value.Value;
                 node.Tag = value;
                 return true;
             }
@@ -253,10 +254,10 @@ namespace PInvoke.Parser
                 {
                     ExpressionValue value = default(ExpressionValue);
                     Macro m = null;
-                    if (this._engine._macroMap.TryGetValue(node.Token.Value, m))
+                    if (this._engine._macroMap.TryGetValue(node.Token.Value, out m))
                     {
                         object numValue = null;
-                        if (TokenHelper.TryConvertToNumber(m.Value, numValue))
+                        if (TokenHelper.TryConvertToNumber(m.Value, out numValue))
                         {
                             value = new ExpressionValue(numValue);
                         }
@@ -359,7 +360,7 @@ namespace PInvoke.Parser
                 _macroMap.Clear();
                 foreach (Macro m in _options.InitialMacroList)
                 {
-                    _macroMap(m.Name) = m;
+                    _macroMap[m.Name] = m;
                 }
 
                 _outputStream = new StringWriter(builder);
@@ -506,17 +507,17 @@ namespace PInvoke.Parser
         {
             // Get the non whitespace tokens
             List<Token> list = line.GetValidTokens();
-            ThrowIfFalse(list(0).TokenType == TokenType.PoundDefine);
+            ThrowIfFalse(list[0].TokenType == TokenType.PoundDefine);
 
             Macro macro = null;
-            if (list.Count == 3 && list(1).TokenType == TokenType.Word)
+            if (list.Count == 3 && list[1].TokenType == TokenType.Word)
             {
-                string name = list(1).Value;
-                macro = new Macro(name, list(2).Value);
+                string name = list[1].Value;
+                macro = new Macro(name, list[2].Value);
             }
-            else if (list.Count == 2 && list(1).TokenType == TokenType.Word)
+            else if (list.Count == 2 && list[1].TokenType == TokenType.Word)
             {
-                string name = list(1).Value;
+                string name = list[1].Value;
                 macro = new Macro(name, string.Empty);
             }
             else if (list.Count == 1)
@@ -524,7 +525,7 @@ namespace PInvoke.Parser
                 _scanner.AddWarning("Encountered an empty #define");
 
             }
-            else if (list.Count > 3 && list(1).TokenType == TokenType.Word && list(2).TokenType == TokenType.ParenOpen)
+            else if (list.Count > 3 && list[1].TokenType == TokenType.Word && list[2].TokenType == TokenType.ParenOpen)
             {
                 macro = ProcessPoundDefineMethod(line);
             }
@@ -536,13 +537,13 @@ namespace PInvoke.Parser
             if (macro != null)
             {
                 Macro oldMacro = null;
-                if (_macroMap.TryGetValue(macro.Name, oldMacro) && oldMacro.IsPermanent)
+                if (_macroMap.TryGetValue(macro.Name, out oldMacro) && oldMacro.IsPermanent)
                 {
                     TraceToStream("Kept: {0} -> {1} Attempted Value {2}", oldMacro.Name, oldMacro.Value, macro.Value);
                 }
                 else
                 {
-                    _macroMap(macro.Name) = macro;
+                    _macroMap[macro.Name] = macro;
                     if (macro.IsMethod)
                     {
                         MethodMacro method = (MethodMacro)macro;
@@ -565,7 +566,7 @@ namespace PInvoke.Parser
             // Strip the newlines
             while (i < list.Count)
             {
-                if (list(i).TokenType == TokenType.NewLine)
+                if (list[i].TokenType == TokenType.NewLine)
                 {
                     list.RemoveAt(i);
                 }
@@ -580,9 +581,9 @@ namespace PInvoke.Parser
             Token defineToken = null;
             while (i < list.Count)
             {
-                if (list(i).TokenType == TokenType.PoundDefine)
+                if (list[i].TokenType == TokenType.PoundDefine)
                 {
-                    defineToken = list(i);
+                    defineToken = list[i];
                     break; // TODO: might not be correct. Was : Exit While
                 }
                 i += 1;
@@ -592,9 +593,9 @@ namespace PInvoke.Parser
             Token nameToken = null;
             while (i < list.Count)
             {
-                if (list(i).TokenType == TokenType.Word)
+                if (list[i].TokenType == TokenType.Word)
                 {
-                    nameToken = list(i);
+                    nameToken = list[i];
                     break; // TODO: might not be correct. Was : Exit While
                 }
 
@@ -610,17 +611,17 @@ namespace PInvoke.Parser
             // i now points to the name token.  Remove the range of tokens up until this point.  Now remove the
             // whitespace on either end of the list
             list.RemoveRange(0, i + 1);
-            while (list.Count > 0 && (list(0).TokenType == TokenType.WhiteSpace || list(0).TokenType == TokenType.NewLine))
+            while (list.Count > 0 && (list[1].TokenType == TokenType.WhiteSpace || list[1].TokenType == TokenType.NewLine))
             {
                 list.RemoveAt(0);
             }
-            while (list.Count > 0 && (list(list.Count - 1).TokenType == TokenType.WhiteSpace || list(list.Count - 1).TokenType == TokenType.NewLine))
+            while (list.Count > 0 && (list[list.Count - 1].TokenType == TokenType.WhiteSpace || list[list.Count - 1].TokenType == TokenType.NewLine))
             {
                 list.RemoveAt(list.Count - 1);
             }
 
             // Create a string for all of the tokens
-            Text.StringBuilder b = new Text.StringBuilder();
+            var b = new StringBuilder();
             foreach (Token cur in list)
             {
                 b.Append(cur.Value);
@@ -639,17 +640,17 @@ namespace PInvoke.Parser
         {
             // First step is to parse out the name and parameters
             List<Token> list = line.GetValidTokens();
-            string name = list(1).Value;
+            string name = list[1].Value;
             list.RemoveRange(0, 3);
 
             List<string> paramList = new List<string>();
-            while ((list(0).TokenType != TokenType.ParenClose))
+            while ((list[1].TokenType != TokenType.ParenClose))
             {
-                if (list(0).TokenType == TokenType.Word)
+                if (list[1].TokenType == TokenType.Word)
                 {
-                    paramList.Add(list(0).Value);
+                    paramList.Add(list[1].Value);
                 }
-                else if (list(0).TokenType == TokenType.ParenOpen)
+                else if (list[1].TokenType == TokenType.ParenOpen)
                 {
                     // ( is not legal inside a parameter list.  This is a simple macro
                     return ProcessPoundDefineComplexMacro(line);
@@ -659,7 +660,7 @@ namespace PInvoke.Parser
 
             // Now get the fullBody.  We need the actual text for the fullBody so search through the true token list
             Int32 index = 0;
-            while ((line.TokenList(index).TokenType != TokenType.ParenClose))
+            while ((line.TokenList[index].TokenType != TokenType.ParenClose))
             {
                 index += 1;
             }
@@ -668,7 +669,7 @@ namespace PInvoke.Parser
             List<Token> fullBody = line.TokenList.GetRange(index, line.TokenList.Count - index);
 
             // Strip the trailing and ending whitespace on the fullBody
-            while (fullBody.Count > 0 && (fullBody(0).TokenType == TokenType.WhiteSpace || fullBody(0).TokenType == TokenType.NewLine))
+            while (fullBody.Count > 0 && (fullBody[0].TokenType == TokenType.WhiteSpace || fullBody[0].TokenType == TokenType.NewLine))
             {
                 fullBody.RemoveAt(0);
             }
@@ -680,7 +681,7 @@ namespace PInvoke.Parser
                 return ProcessPoundDefineComplexMacro(line);
             }
 
-            while (fullBody.Count > 0 && (fullBody(fullBody.Count - 1).TokenType == TokenType.WhiteSpace || fullBody(fullBody.Count - 1).TokenType == TokenType.NewLine))
+            while (fullBody.Count > 0 && (fullBody[fullBody.Count - 1].TokenType == TokenType.WhiteSpace || fullBody[fullBody.Count - 1].TokenType == TokenType.NewLine))
             {
                 fullBody.RemoveAt(fullBody.Count - 1);
             }
@@ -692,19 +693,19 @@ namespace PInvoke.Parser
             int i = 0;
             while (i + 1 < body.Count)
             {
-                Token left = body(i);
-                Token right = body(i + 1);
+                Token left = body[i];
+                Token right = body[i + 1];
 
                 if (left.TokenType == TokenType.Pound && right.TokenType == TokenType.Pound)
                 {
                     // First look at the right
-                    if (i + 2 < body.Count && body(i + 2).TokenType == TokenType.WhiteSpace)
+                    if (i + 2 < body.Count && body[i + 2].TokenType == TokenType.WhiteSpace)
                     {
                         body.RemoveAt(i + 2);
                     }
 
                     // Now look at the left
-                    if (i > 0 && body(i - 1).TokenType == TokenType.WhiteSpace)
+                    if (i > 0 && body[i - 1].TokenType == TokenType.WhiteSpace)
                     {
                         body.RemoveAt(i - 1);
                     }
@@ -726,15 +727,15 @@ namespace PInvoke.Parser
         {
             // Get the none whitespace tokens
             List<Token> list = line.GetValidTokens();
-            ThrowIfFalse(list(0).TokenType == TokenType.PoundUnDef);
+            ThrowIfFalse(list[1].TokenType == TokenType.PoundUnDef);
 
-            if (list.Count != 2 || list(1).TokenType != TokenType.Word)
+            if (list.Count != 2 || list[1].TokenType != TokenType.Word)
             {
                 _scanner.AddWarning("Error processing #undef");
             }
             else
             {
-                string name = list(1).Value;
+                string name = list[1].Value;
                 if (_macroMap.ContainsKey(name))
                 {
                     _macroMap.Remove(name);
@@ -764,24 +765,24 @@ namespace PInvoke.Parser
             List<Token> list = new List<Token>(line.GetValidTokens());
 
             // Get rid of the #include
-            ThrowIfFalse(list(0).TokenType == TokenType.PoundInclude);
+            ThrowIfFalse(list[1].TokenType == TokenType.PoundInclude);
             list.RemoveAt(0);
 
             string name = null;
-            if (list(0).TokenType == TokenType.OpLessThan)
+            if (list[1].TokenType == TokenType.OpLessThan)
             {
                 name = string.Empty;
                 list.RemoveAt(0);
-                while (list(0).TokenType != TokenType.OpGreaterThan)
+                while (list[1].TokenType != TokenType.OpGreaterThan)
                 {
-                    name += list(0).Value;
+                    name += list[1].Value;
                     list.RemoveAt(0);
                 }
                 list.RemoveAt(0);
             }
-            else if (list(0).IsQuotedString)
+            else if (list[1].IsQuotedString)
             {
-                name = TokenHelper.ConvertToString(list(0));
+                name = TokenHelper.ConvertToString(list[1]);
             }
             else
             {
@@ -984,7 +985,7 @@ namespace PInvoke.Parser
 
                     // simulate a newline token
                     line.TokenList.RemoveAt(line.TokenList.Count - 1);
-                    line.TokenList.Add(new Token(TokenType.NewLine, Constants.vbCrLf));
+                    line.TokenList.Add(new Token(TokenType.NewLine, Environment.NewLine));
                 }
                 else if (token.TokenType != TokenType.WhiteSpace)
                 {
@@ -1037,10 +1038,10 @@ namespace PInvoke.Parser
             if (line.FirstValidToken != null && line.FirstValidToken.TokenType == TokenType.Pound)
             {
                 List<Token> list = line.GetValidTokens();
-                Token possibleToken = list(1);
+                Token possibleToken = list[1];
                 Token poundToken = null;
 
-                if (list.Count >= 2 && TokenHelper.TryConvertToPoundToken(possibleToken.Value, poundToken))
+                if (list.Count >= 2 && TokenHelper.TryConvertToPoundToken(possibleToken.Value, out poundToken))
                 {
                     // Strip out everything # -> define
                     List<Token> newList = new List<Token>(line.TokenList);
@@ -1052,7 +1053,7 @@ namespace PInvoke.Parser
                             Debug.Fail("Non-crititcal error reducing the preprocessor line");
                             return;
                         }
-                        else if (object.ReferenceEquals(newList(0), possibleToken))
+                        else if (object.ReferenceEquals(newList[1], possibleToken))
                         {
                             newList.RemoveAt(0);
                             newList.Insert(0, poundToken);
@@ -1102,7 +1103,7 @@ namespace PInvoke.Parser
             List<Token> list = line.TokenList;
             while ((i < list.Count))
             {
-                Token token = list(i);
+                Token token = list[i];
                 if (token.TokenType != TokenType.Word)
                 {
                     i += 1;
@@ -1110,7 +1111,7 @@ namespace PInvoke.Parser
                 }
 
                 Macro macro = null;
-                if (_macroMap.TryGetValue(token.Value, macro))
+                if (_macroMap.TryGetValue(token.Value, out macro))
                 {
                     // Remove the original token
                     list.RemoveAt(i);
@@ -1179,7 +1180,7 @@ namespace PInvoke.Parser
             int i = 0;
             while (i < retList.Count)
             {
-                Token cur = retList(i);
+                Token cur = retList[i];
                 if (cur.TokenType == TokenType.Text && args.IndexOf(cur) >= 0)
                 {
                     retList.RemoveAt(i);
@@ -1198,12 +1199,12 @@ namespace PInvoke.Parser
             Int32 i = start;
 
             // Search for the start paren
-            while (i < list.Count && list(i).TokenType == TokenType.WhiteSpace)
+            while (i < list.Count && list[i].TokenType == TokenType.WhiteSpace)
             {
                 i += 1;
             }
 
-            if (list(i).TokenType != TokenType.ParenOpen)
+            if (list[i].TokenType != TokenType.ParenOpen)
             {
                 return null;
             }
@@ -1215,7 +1216,7 @@ namespace PInvoke.Parser
 
             while (i < list.Count)
             {
-                Token cur = list(i);
+                Token cur = list[i];
                 bool append = false;
                 switch (cur.TokenType)
                 {
@@ -1288,7 +1289,7 @@ namespace PInvoke.Parser
 
             while (index < list.Count)
             {
-                if (!list(index).IsQuotedString)
+                if (!list[index].IsQuotedString)
                 {
                     index += 1;
                     continue;
@@ -1299,7 +1300,7 @@ namespace PInvoke.Parser
                 Token nextToken = null;
                 while (nextIndex < list.Count)
                 {
-                    switch (list(nextIndex).TokenType)
+                    switch (list[nextIndex].TokenType)
                     {
                         case TokenType.WhiteSpace:
                         case TokenType.NewLine:
@@ -1307,7 +1308,7 @@ namespace PInvoke.Parser
                             break;
                         case TokenType.QuotedStringAnsi:
                         case TokenType.QuotedStringUnicode:
-                            nextToken = list(nextIndex);
+                            nextToken = list[nextIndex];
                             break; // TODO: might not be correct. Was : Exit While
 
                             break;
@@ -1321,7 +1322,7 @@ namespace PInvoke.Parser
                 if (nextToken != null)
                 {
                     // Create the new token
-                    string first = list(index).Value;
+                    string first = list[index].Value;
                     string second = nextToken.Value;
                     string str = "\"" + first.Substring(1, first.Length - 2) + second.Substring(1, second.Length - 2) + "\"";
 
@@ -1341,10 +1342,10 @@ namespace PInvoke.Parser
             int i = 0;
             while ((i + 3) < list.Count)
             {
-                Token t1 = list(i);
-                Token t2 = list(i + 1);
-                Token t3 = list(i + 2);
-                Token t4 = list(i + 3);
+                Token t1 = list[i];
+                Token t2 = list[i + 1];
+                Token t3 = list[i + 2];
+                Token t4 = list[i + 3];
                 if (t2.TokenType == TokenType.Pound && t3.TokenType == TokenType.Pound)
                 {
                     list.RemoveRange(i, 4);

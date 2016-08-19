@@ -1,15 +1,14 @@
+// Copyright (c) Microsoft Corporation.  All rights reserved.
 
-using Microsoft.VisualBasic;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
-// Copyright (c) Microsoft Corporation.  All rights reserved.
 using System.CodeDom;
 using CodeParam = System.CodeDom.CodeParameterDeclarationExpression;
 
-namespace Transform
+namespace PInvoke.Transform
 {
 
 	public class CodeDomCloner
@@ -127,10 +126,3 @@ namespace Transform
 	}
 
 }
-
-//=======================================================
-//Service provided by Telerik (www.telerik.com)
-//Conversion powered by NRefactory.
-//Twitter: @telerik
-//Facebook: facebook.com/telerik
-//=======================================================

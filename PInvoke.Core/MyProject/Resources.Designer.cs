@@ -27,7 +27,7 @@ namespace My.Resources
 	///<summary>
 	///  A strongly-typed resource class, for looking up localized strings, etc.
 	///</summary>
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0"), System.Diagnostics.DebuggerNonUserCodeAttribute(), System.Runtime.CompilerServices.CompilerGeneratedAttribute(), Microsoft.VisualBasic.HideModuleNameAttribute()]
+	[System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0"), System.Diagnostics.DebuggerNonUserCodeAttribute(), System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
 	static internal class Resources
 	{
 

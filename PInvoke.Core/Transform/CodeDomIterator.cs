@@ -1,14 +1,13 @@
+// Copyright (c) Microsoft Corporation.  All rights reserved.
 
-using Microsoft.VisualBasic;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
-// Copyright (c) Microsoft Corporation.  All rights reserved.
 using System.CodeDom;
 
-namespace Transform
+namespace PInvoke.Transform
 {
 
 	/// <summary>

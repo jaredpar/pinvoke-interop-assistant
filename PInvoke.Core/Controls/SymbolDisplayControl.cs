@@ -11,240 +11,266 @@ using System.Windows.Forms;
 using PInvoke;
 using PInvoke.Transform;
 
-namespace Controls
+namespace PInvoke.Controls
 {
+    public partial class SymbolDisplayControl
+    {
 
-	public class SymbolDisplayControl
-	{
+        private NativeStorage _ns;
 
-		private NativeStorage _ns;
+        private BasicConverter _conv;
+        /// <summary>
+        /// Kind of search being performed
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public SearchKind SearchKind
+        {
+            get { return m_searchGrid.SearchKind; }
+            set
+            {
+                m_searchGrid.SearchKind = value;
+                if (m_searchKindCb.SelectedItem != null)
+                {
+                    m_searchKindCb.SelectedItem = value;
+                }
+            }
+        }
 
-		private BasicConverter _conv;
-		/// <summary>
-		/// Kind of search being performed
-		/// </summary>
-		/// <value></value>
-		/// <returns></returns>
-		/// <remarks></remarks>
-		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-		public SearchKind SearchKind {
-			get { return m_searchGrid.SearchKind; }
-			set {
-				m_searchGrid.SearchKind = value;
-				if (m_searchKindCb.SelectedItem != null) {
-					m_searchKindCb.SelectedItem = value;
-				}
-			}
-		}
+        public bool AutoGenerate
+        {
+            get { return m_autoGenerateCBox.Checked; }
+            set { m_autoGenerateCBox.Checked = value; }
+        }
 
-		public bool AutoGenerate {
-			get { return m_autoGenerateCBox.Checked; }
-			set { m_autoGenerateCBox.Checked = value; }
-		}
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public bool ShowAll
+        {
+            get { return m_searchGrid.ShowInvalidData; }
+            set { m_searchGrid.ShowInvalidData = value; }
+        }
 
-		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-		public bool ShowAll {
-			get { return m_searchGrid.ShowInvalidData; }
-			set { m_searchGrid.ShowInvalidData = value; }
-		}
+        public event EventHandler SearchKindChanged;
 
-		public event EventHandler SearchKindChanged;
+        public SymbolDisplayControl()
+        {
+            _ns = PInvoke.NativeStorage.DefaultInstance;
+            _conv = new BasicConverter(LanguageType.VisualBasic);
 
-		public SymbolDisplayControl()
-		{
-			_ns = PInvoke.NativeStorage.DefaultInstance;
-			_conv = new BasicConverter(LanguageType.VisualBasic);
+            // This call is required by the Windows Form Designer.
+            InitializeComponent();
 
-			// This call is required by the Windows Form Designer.
-			InitializeComponent();
+            // Populate the combo boxes
+            m_languageCb.Items.AddRange(PInvoke.EnumUtil.GetAllValuesObject<LanguageType>);
+            m_languageCb.SelectedItem = LanguageType.VisualBasic;
+            m_searchKindCb.Items.AddRange(PInvoke.EnumUtil.GetAllValuesObjectExcept(SearchKind.None));
+            m_searchKindCb.SelectedItem = SearchKind.All;
 
-			// Populate the combo boxes
-			m_languageCb.Items.AddRange(PInvoke.EnumUtil.GetAllValuesObject<LanguageType>);
-			m_languageCb.SelectedItem = LanguageType.VisualBasic;
-			m_searchKindCb.Items.AddRange(PInvoke.EnumUtil.GetAllValuesObjectExcept(SearchKind.None));
-			m_searchKindCb.SelectedItem = SearchKind.All;
+            // Initialize the values
+            OnSearchKindChanged(null, EventArgs.Empty);
+            OnLanguageChanged(null, EventArgs.Empty);
+        }
 
-			// Initialize the values
-			OnSearchKindChanged(null, EventArgs.Empty);
-			OnLanguageChanged(null, EventArgs.Empty);
-		}
+        #region "ISignatureImportControl"
 
-		#region "ISignatureImportControl"
+        /// <summary>
+        /// Language that we are displaying the generated values in
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public LanguageType LanguageType
+        {
+            get
+            {
+                if (m_languageCb.SelectedItem == null)
+                {
+                    return Transform.LanguageType.VisualBasic;
+                }
 
-		/// <summary>
-		/// Language that we are displaying the generated values in
-		/// </summary>
-		/// <value></value>
-		/// <returns></returns>
-		/// <remarks></remarks>
-		public LanguageType LanguageType {
-			get {
-				if (m_languageCb.SelectedItem == null) {
-					return Transform.LanguageType.VisualBasic;
-				}
+                return (LanguageType)m_languageCb.SelectedItem;
+            }
+            set { m_languageCb.SelectedItem = value; }
+        }
 
-				return (LanguageType)m_languageCb.SelectedItem;
-			}
-			set { m_languageCb.SelectedItem = value; }
-		}
+        /// <summary>
+        /// NativeStorage instance to use
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public NativeStorage NativeStorage
+        {
+            get { return _ns; }
+            set
+            {
+                _ns = value;
+                _conv.NativeStorage = value;
+                m_searchGrid.NativeStorage = value;
+            }
+        }
 
-		/// <summary>
-		/// NativeStorage instance to use
-		/// </summary>
-		/// <value></value>
-		/// <returns></returns>
-		/// <remarks></remarks>
-		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-		public NativeStorage NativeStorage {
-			get { return _ns; }
-			set {
-				_ns = value;
-				_conv.NativeStorage = value;
-				m_searchGrid.NativeStorage = value;
-			}
-		}
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public Transform.TransformKindFlags TransformKindFlags
+        {
+            get { return _conv.TransformKindFlags; }
+            set { _conv.TransformKindFlags = value; }
+        }
 
-		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-		public Transform.TransformKindFlags TransformKindFlags {
-			get { return _conv.TransformKindFlags; }
-			set { _conv.TransformKindFlags = value; }
-		}
+        public event EventHandler LanguageTypeChanged;
 
-		public event EventHandler ISignatureImportControl.LanguageTypeChanged;
+        /// <summary>
+        /// Current displayed managed code
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public string ManagedCode
+        {
+            get { return m_codeBox.Text; }
+        }
 
-		/// <summary>
-		/// Current displayed managed code
-		/// </summary>
-		/// <value></value>
-		/// <returns></returns>
-		/// <remarks></remarks>
-		public string ManagedCode {
-			get { return m_codeBox.Text; }
-		}
+        #endregion
 
-		#endregion
+        #region "Event Handlers"
 
-		#region "Event Handlers"
+        /// <summary>
+        /// When the search kind changes update the grid.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <remarks></remarks>
+        private void OnSearchKindChanged(System.Object sender, System.EventArgs e)
+        {
+            if (m_searchKindCb.SelectedItem != null)
+            {
+                SearchKind kind = (SearchKind)m_searchKindCb.SelectedItem;
+                if (m_searchGrid != null)
+                {
+                    m_searchGrid.SearchKind = kind;
+                }
 
-		/// <summary>
-		/// When the search kind changes update the grid.
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		/// <remarks></remarks>
-		private void OnSearchKindChanged(System.Object sender, System.EventArgs e)
-		{
-			if (m_searchKindCb.SelectedItem != null) {
-				SearchKind kind = (SearchKind)m_searchKindCb.SelectedItem;
-				if (m_searchGrid != null) {
-					m_searchGrid.SearchKind = kind;
-				}
+                if (SearchKindChanged != null)
+                {
+                    SearchKindChanged(this, EventArgs.Empty);
+                }
+            }
 
-				if (SearchKindChanged != null) {
-					SearchKindChanged(this, EventArgs.Empty);
-				}
-			}
+        }
 
-		}
+        /// <summary>
+        /// When the language changes make sure to rebuild the converter as it depends on the current language
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <remarks></remarks>
+        private void OnLanguageChanged(System.Object sender, System.EventArgs e)
+        {
+            // During initialization this can be true
+            _conv.LanguageType = this.LanguageType;
+            if (LanguageTypeChanged != null)
+            {
+                LanguageTypeChanged(this, EventArgs.Empty);
+            }
 
-		/// <summary>
-		/// When the language changes make sure to rebuild the converter as it depends on the current language
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		/// <remarks></remarks>
-		private void OnLanguageChanged(System.Object sender, System.EventArgs e)
-		{
-			// During initialization this can be true
-			_conv.LanguageType = this.LanguageType;
-			if (LanguageTypeChanged != null) {
-				LanguageTypeChanged(this, EventArgs.Empty);
-			}
+            AutoGenerateCode();
+        }
 
-			AutoGenerateCode();
-		}
+        private void OnSearchGridSelectionChanged(System.Object sender, System.EventArgs e)
+        {
+            AutoGenerateCode();
+        }
 
-		private void OnSearchGridSelectionChanged(System.Object sender, System.EventArgs e)
-		{
-			AutoGenerateCode();
-		}
-
-		private void OnNameChanged(System.Object sender, System.EventArgs e)
-		{
-			if (m_searchGrid != null) {
-				m_searchGrid.SearchText = m_nameTb.Text;
-			}
-		}
+        private void OnNameChanged(System.Object sender, System.EventArgs e)
+        {
+            if (m_searchGrid != null)
+            {
+                m_searchGrid.SearchText = m_nameTb.Text;
+            }
+        }
 
 
-		private void OnGenerateClick(System.Object sender, System.EventArgs e)
-		{
-			if (m_searchGrid.SelectedRows.Count > 400) {
-				string title = "Generation";
-				#if DEBUG
+        private void OnGenerateClick(System.Object sender, System.EventArgs e)
+        {
+            if (m_searchGrid.SelectedRows.Count > 400)
+            {
+                string title = "Generation";
+#if DEBUG
 				title += " (" + m_searchGrid.SelectedRows.Count + ")";
-				#endif
-				DialogResult result = MessageBox.Show("Generating the output might take a lot of time. Do you want to proceed?", title, MessageBoxButtons.YesNo, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
-				if (result == DialogResult.No) {
-					return;
-				}
-			}
+#endif
+                DialogResult result = MessageBox.Show("Generating the output might take a lot of time. Do you want to proceed?", title, MessageBoxButtons.YesNo, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
+                if (result == DialogResult.No)
+                {
+                    return;
+                }
+            }
 
-			Cursor oldCursor = this.Cursor;
-			try {
-				Cursor = Cursors.WaitCursor;
-				GenerateCode(true);
-			} finally {
-				this.Cursor = oldCursor;
-			}
+            Cursor oldCursor = this.Cursor;
+            try
+            {
+                Cursor = Cursors.WaitCursor;
+                GenerateCode(true);
+            }
+            finally
+            {
+                this.Cursor = oldCursor;
+            }
 
-		}
+        }
 
-		private void OnAutoGenerateClick(System.Object sender, System.EventArgs e)
-		{
-			AutoGenerateCode();
-		}
+        private void OnAutoGenerateClick(System.Object sender, System.EventArgs e)
+        {
+            AutoGenerateCode();
+        }
 
-		private void m_nameTb_KeyDown(System.Object sender, System.Windows.Forms.KeyEventArgs e)
-		{
-			if (e.KeyCode == Keys.A & e.Modifiers == Keys.Control) {
-				m_nameTb.SelectAll();
-				e.Handled = true;
-			}
-		}
+        private void m_nameTb_KeyDown(System.Object sender, System.Windows.Forms.KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.A & e.Modifiers == Keys.Control)
+            {
+                m_nameTb.SelectAll();
+                e.Handled = true;
+            }
+        }
 
-		#endregion
+        #endregion
 
-		#region "Private Helpers"
+        #region "Private Helpers"
 
-		/// <summary>
-		/// Regenerate the code if AutoGenerate is checked
-		/// </summary>
-		/// <remarks></remarks>
-		private void AutoGenerateCode()
-		{
-			if (this.AutoGenerate) {
-				GenerateCode(false);
-			}
-		}
+        /// <summary>
+        /// Regenerate the code if AutoGenerate is checked
+        /// </summary>
+        /// <remarks></remarks>
+        private void AutoGenerateCode()
+        {
+            if (this.AutoGenerate)
+            {
+                GenerateCode(false);
+            }
+        }
 
-		private void GenerateCode(bool force)
-		{
-			m_codeBox.Text = string.Empty;
+        private void GenerateCode(bool force)
+        {
+            m_codeBox.Text = string.Empty;
 
-			string text = null;
-			if (force || m_searchGrid.SelectedRows.Count <= 5) {
-				text = _conv.ConvertToPInvokeCode(m_searchGrid.SelectedSymbolBag);
-			} else {
-				text = "More than 5 rows selected.  Will not autogenerate";
-			}
+            string text = null;
+            if (force || m_searchGrid.SelectedRows.Count <= 5)
+            {
+                text = _conv.ConvertToPInvokeCode(m_searchGrid.SelectedSymbolBag);
+            }
+            else
+            {
+                text = "More than 5 rows selected.  Will not autogenerate";
+            }
 
-			m_codeBox.Code = text;
-		}
+            m_codeBox.Code = text;
+        }
 
-		#endregion
+        #endregion
 
-	}
+    }
 
 }
 

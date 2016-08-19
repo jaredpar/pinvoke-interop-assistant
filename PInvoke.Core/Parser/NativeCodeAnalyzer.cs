@@ -1,3 +1,4 @@
+// Copyright (c) Microsoft Corporation.  All rights reserved.
 
 using Microsoft.VisualBasic;
 using System;
@@ -5,12 +6,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
-// Copyright (c) Microsoft Corporation.  All rights reserved.
 using System.IO;
 using System.Text.RegularExpressions;
-using PInvoke.Contract;
+using static PInvoke.Contract;
 
-namespace Parser
+namespace PInvoke.Parser
 {
 
 	#region "NativeCodeAnalyerResult"
@@ -472,10 +472,3 @@ namespace Parser
 	#endregion
 
 }
-
-//=======================================================
-//Service provided by Telerik (www.telerik.com)
-//Conversion powered by NRefactory.
-//Twitter: @telerik
-//Facebook: facebook.com/telerik
-//=======================================================

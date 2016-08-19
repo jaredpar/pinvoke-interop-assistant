@@ -18,7 +18,6 @@ using System.Runtime.InteropServices;
 //The following GUID is for the ID of the typelib if this project is exposed to COM
 
 [assembly: Guid("40409a4a-6529-4096-b34e-5accbab81397")]
-#if Not RAZZLE_BUILD
 
 [assembly: AssemblyTitle("PInvoke")]
 [assembly: AssemblyDescription("")]
@@ -40,14 +39,6 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // <Assembly: AssemblyVersion("1.0.*")> 
 
-[assembly: AssemblyVersion(Constants.Version)]
+[assembly: AssemblyVersion(PInvoke.Constants.Version)]
 
 [assembly: AssemblyFileVersion("1.0.0.0")]
-#endif
-
-//=======================================================
-//Service provided by Telerik (www.telerik.com)
-//Conversion powered by NRefactory.
-//Twitter: @telerik
-//Facebook: facebook.com/telerik
-//=======================================================

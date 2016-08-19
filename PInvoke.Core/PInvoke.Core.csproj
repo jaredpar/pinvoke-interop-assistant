@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{7923fd4f-41a0-48c0-8783-694802f2c1b0}</ProjectGuid>
+    <ProjectGuid>{7923FD4F-41A0-48C0-8783-694802F2C1B0}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>PInvoke</RootNamespace>
     <AssemblyName>PInvoke.Core</AssemblyName>
@@ -49,9 +49,7 @@
     <Compile Include="Controls\CodeBox.Designer.cs">
       <DependentUpon>CodeBox.cs</DependentUpon>
     </Compile>
-    <Compile Include="Controls\CodeBox.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
+    <Compile Include="Controls\CodeBox.cs" />
     <Compile Include="Controls\CodeDialog.Designer.cs">
       <DependentUpon>CodeDialog.cs</DependentUpon>
     </Compile>
@@ -66,9 +64,7 @@
     <Compile Include="Controls\SelectSymbolDialog.Designer.cs">
       <DependentUpon>SelectSymbolDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="Controls\SelectSymbolDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="Controls\SelectSymbolDialog.cs" />
     <Compile Include="Controls\SymbolDisplayControl.Designer.cs">
       <DependentUpon>SymbolDisplayControl.cs</DependentUpon>
     </Compile>

@@ -1,3 +1,4 @@
+// Copyright (c) Microsoft Corporation.  All rights reserved.
 
 using Microsoft.VisualBasic;
 using System;
@@ -5,104 +6,100 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
-// Copyright (c) Microsoft Corporation.  All rights reserved.
 using System.Text.RegularExpressions;
 
-namespace Transform
+namespace PInvoke.Transform
 {
+    /// <summary>
+    /// Runs certain transformations on symbols
+    /// </summary>
+    /// <remarks></remarks>
+    public class NativeSymbolTransform
+    {
+        private NativeSymbolIterator _it = new NativeSymbolIterator();
 
-	/// <summary>
-	/// Runs certain transformations on symbols
-	/// </summary>
-	/// <remarks></remarks>
-	public class NativeSymbolTransform
-	{
+        public NativeSymbolTransform()
+        {
+        }
 
+        public void CollapseNamedTypes(NativeSymbol ns)
+        {
+            foreach (NativeSymbolRelationship rel in _it.FindAllNativeSymbolRelationships(ns))
+            {
+                CollapseNamedTypesImpl(rel.Parent, rel.Symbol);
+            }
+        }
 
-		private NativeSymbolIterator _it = new NativeSymbolIterator();
-		public NativeSymbolTransform()
-		{
-		}
+        private void CollapseNamedTypesImpl(NativeSymbol ns, NativeSymbol child)
+        {
+            if (ns == null)
+            {
+                return;
+            }
+            ThrowIfNull(child);
 
-		public void CollapseNamedTypes(NativeSymbol ns)
-		{
-			foreach (NativeSymbolRelationship rel in _it.FindAllNativeSymbolRelationships(ns)) {
-				CollapseNamedTypesImpl(rel.Parent, rel.Symbol);
-			}
-		}
+            if (child.Kind == NativeSymbolKind.NamedType)
+            {
+                NativeNamedType namedNt = (NativeNamedType)child;
+                if (namedNt.RealType != null)
+                {
+                    ns.ReplaceChild(child, namedNt.RealType);
+                }
+            }
+        }
 
-		private void CollapseNamedTypesImpl(NativeSymbol ns, NativeSymbol child)
-		{
-			if (ns == null) {
-				return;
-			}
-			ThrowIfNull(child);
+        public void CollapseTypedefs(NativeSymbol ns)
+        {
+            foreach (NativeSymbolRelationship rel in _it.FindAllNativeSymbolRelationships(ns))
+            {
+                CollapseTypedefsImpl(rel.Parent, rel.Symbol);
+            }
+        }
 
-			if (child.Kind == NativeSymbolKind.NamedType) {
-				NativeNamedType namedNt = (NativeNamedType)child;
-				if (namedNt.RealType != null) {
-					ns.ReplaceChild(child, namedNt.RealType);
-				}
-			}
-		}
+        private void CollapseTypedefsImpl(NativeSymbol ns, NativeSymbol child)
+        {
+            if (ns == null)
+            {
+                return;
+            }
+            ThrowIfNull(child);
 
-		public void CollapseTypedefs(NativeSymbol ns)
-		{
-			foreach (NativeSymbolRelationship rel in _it.FindAllNativeSymbolRelationships(ns)) {
-				CollapseTypedefsImpl(rel.Parent, rel.Symbol);
-			}
-		}
+            if (child.Kind == NativeSymbolKind.TypedefType)
+            {
+                NativeTypeDef typedef = (NativeTypeDef)child;
+                if (typedef.RealType != null)
+                {
+                    ns.ReplaceChild(child, typedef.RealType);
+                }
+            }
+        }
 
-		private void CollapseTypedefsImpl(NativeSymbol ns, NativeSymbol child)
-		{
-			if (ns == null) {
-				return;
-			}
-			ThrowIfNull(child);
+        /// <summary>
+        /// Renames matching defined types and named types to the new name
+        /// </summary>
+        /// <param name="ns"></param>
+        /// <param name="oldName"></param>
+        /// <param name="newName"></param>
+        /// <remarks></remarks>
+        public void RenameTypeSymbol(NativeSymbol ns, string oldName, string newName)
+        {
+            foreach (NativeSymbol sym in _it.FindAllNativeSymbols(ns))
+            {
+                if ((sym.Category == NativeSymbolCategory.Defined || sym.Kind == NativeSymbolKind.NamedType) && 0 == string.CompareOrdinal(sym.Name, oldName))
+                {
+                    sym.Name = newName;
+                }
+            }
+        }
 
-			if (child.Kind == NativeSymbolKind.TypedefType) {
-				NativeTypeDef typedef = (NativeTypeDef)child;
-				if (typedef.RealType != null) {
-					ns.ReplaceChild(child, typedef.RealType);
-				}
-			}
-		}
-
-		/// <summary>
-		/// Renames matching defined types and named types to the new name
-		/// </summary>
-		/// <param name="ns"></param>
-		/// <param name="oldName"></param>
-		/// <param name="newName"></param>
-		/// <remarks></remarks>
-		public void RenameTypeSymbol(NativeSymbol ns, string oldName, string newName)
-		{
-			foreach (NativeSymbol sym in _it.FindAllNativeSymbols(ns)) {
-				if ((sym.Category == NativeSymbolCategory.Defined || sym.Kind == NativeSymbolKind.NamedType) && 0 == string.CompareOrdinal(sym.Name, oldName)) {
-					sym.Name = newName;
-				}
-			}
-		}
-
-		/// <summary>
-		/// Inspect the type name and determine if there is a better name for it 
-		/// </summary>
-		/// <param name="definedNt"></param>
-		/// <remarks></remarks>
-		public void RunTypeNameHeuristics(NativeDefinedType definedNt)
-		{
-			ThrowIfNull(definedNt);
-
-
-		}
-
-	}
-
+        /// <summary>
+        /// Inspect the type name and determine if there is a better name for it 
+        /// </summary>
+        /// <param name="definedNt"></param>
+        /// <remarks></remarks>
+        public void RunTypeNameHeuristics(NativeDefinedType definedNt)
+        {
+            ThrowIfNull(definedNt);
+        }
+    }
 }
-
-//=======================================================
-//Service provided by Telerik (www.telerik.com)
-//Conversion powered by NRefactory.
-//Twitter: @telerik
-//Facebook: facebook.com/telerik
-//=======================================================

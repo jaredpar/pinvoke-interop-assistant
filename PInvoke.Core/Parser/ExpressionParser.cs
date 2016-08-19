@@ -54,8 +54,6 @@ namespace PInvoke.Parser
     public class ExpressionNode
     {
         private ExpressionKind _kind;
-        private ExpressionNode _left;
-        private ExpressionNode _right;
         private Token _token;
         private bool _parenthesized;
 
@@ -93,14 +91,14 @@ namespace PInvoke.Parser
             get
             {
                 string str = string.Empty;
-                if (_left != null)
+                if (LeftNode != null)
                 {
-                    str += "(Left: " + _left.DisplayString + ")";
+                    str += "(Left: " + LeftNode.DisplayString + ")";
                 }
 
-                if (_right != null)
+                if (RightNode != null)
                 {
-                    str += "(Right: " + _right.DisplayString + ")";
+                    str += "(Right: " + RightNode.DisplayString + ")";
                 }
 
                 if (!string.IsNullOrEmpty(str))
@@ -260,10 +258,6 @@ namespace PInvoke.Parser
                 remaining = new List<Token>();
                 return TryConvertTokenToExpressionLeafNode(tokens[0], out node);
             }
-
-            ExpressionNode leftNode = null;
-            ExpressionNode unaryNode = null;
-            int nextIndex = -1;
 
             if (tokens.Count > 2 && tokens[0].IsAnyWord && tokens[1].TokenType == TokenType.ParenOpen)
             {

@@ -675,7 +675,7 @@ namespace PInvoke.Parser
                 retChar = Strings.ChrW(Convert.ToInt32(number));
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 Debug.Fail("Error converting to integer");
                 return false;

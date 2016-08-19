@@ -1102,9 +1102,6 @@ namespace PInvoke
     [DebuggerDisplay("{DisplayName}")]
     public class NativeBuiltinType : NativeSpecializedType
     {
-
-
-        private static Dictionary<string, NativeBuiltinType> s_lookupMap;
         private BuiltinType _builtinType;
         private bool _isUnsigned;
         private Type _managedType;
@@ -1441,8 +1438,6 @@ namespace PInvoke
     [DebuggerDisplay("{DisplayName}")]
     public class NativeProcedure : NativeSymbol
     {
-
-        private string _dllName;
         private NativeSignature _sig = new NativeSignature();
 
         private NativeCallingConvention _conv = NativeCallingConvention.WinApi;

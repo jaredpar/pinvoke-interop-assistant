@@ -153,7 +153,7 @@ namespace PInvoke.Controls
                             }
                         }
                     }
-                    catch (ArgumentException ex)
+                    catch (ArgumentException)
                     {
                         // Can happen when a symbol is included in the list twice
                     }
@@ -411,7 +411,7 @@ namespace PInvoke.Controls
             {
                 val = row.Cells[_nameColumn.Index].Value as string;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 val = string.Empty;
             }

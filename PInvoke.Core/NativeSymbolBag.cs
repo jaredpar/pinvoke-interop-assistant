@@ -1054,7 +1054,7 @@ namespace PInvoke
                 {
                     bag.AddProcedure(proc);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     ep.AddError("Duplicate NativeProcedure Name: {0}", proc.Name);
                 }

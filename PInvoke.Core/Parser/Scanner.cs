@@ -38,8 +38,8 @@ namespace PInvoke.Parser
     public class ScannerMark
     {
         private int _index;
-
         private int _lineNumber;
+
         internal int Index
         {
             get { return _index; }
@@ -53,8 +53,8 @@ namespace PInvoke.Parser
         internal ScannerMark(int index, int lineNumber)
         {
             _index = index;
+            _lineNumber = lineNumber;
         }
-
     }
 
 
@@ -988,7 +988,7 @@ namespace PInvoke.Parser
 
                 return new Token(TokenType.QuotedStringAnsi, builder.ToString());
             }
-            catch (ScannerInternalException ex)
+            catch (ScannerInternalException)
             {
                 // If we get a scanner exception while trying to read the string then this
                 // is just a simple quote.  Rollback the buffer and return the quote token
@@ -1046,7 +1046,7 @@ namespace PInvoke.Parser
                     } while (true);
                 }
             }
-            catch (ScannerInternalException ex)
+            catch (ScannerInternalException)
             {
                 // Swallow the exception.  It will rollbakc when the token variable is not set
             }

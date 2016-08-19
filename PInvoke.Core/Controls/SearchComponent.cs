@@ -26,7 +26,6 @@ namespace PInvoke.Controls
     /// <remarks></remarks>
     public class IncrementalSearch
     {
-        private bool _isSearching;
         private TimeSpan _delayTime = TimeSpan.FromSeconds(0.2);
         private IEnumerator _enumerator;
         private List<object> _found = new List<object>();

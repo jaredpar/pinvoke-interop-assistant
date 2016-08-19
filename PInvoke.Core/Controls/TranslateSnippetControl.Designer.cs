@@ -36,6 +36,8 @@ namespace PInvoke.Controls
         [System.Diagnostics.DebuggerStepThrough()]
         private void InitializeComponent()
         {
+            components = null;
+
             this.TableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.FlowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.m_autoGenerateBtn = new System.Windows.Forms.CheckBox();

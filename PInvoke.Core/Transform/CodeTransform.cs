@@ -1011,7 +1011,6 @@ namespace PInvoke.Transform
                         default:
                             throw new InvalidOperationException(string.Format("Generation of {0} not supported as a value", ns.Kind));
                     }
-                    break;
                 case NativeValueKind.SymbolType:
                     throw new InvalidOperationException("Types are not supported as leaf nodes");
                 default:

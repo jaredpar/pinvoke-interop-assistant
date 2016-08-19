@@ -39,6 +39,7 @@ namespace PInvoke.Controls
         [System.Diagnostics.DebuggerStepThrough()]
         private void InitializeComponent()
         {
+            components = null;
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SelectSymbolDialog));
             this.TableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.FlowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();

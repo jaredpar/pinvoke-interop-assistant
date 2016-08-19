@@ -37,6 +37,8 @@ namespace PInvoke.Controls
         [System.Diagnostics.DebuggerStepThrough()]
         private void InitializeComponent()
         {
+            components = null;
+
             this.SplitContainer1 = new System.Windows.Forms.SplitContainer();
             this.TableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.Label1 = new System.Windows.Forms.Label();

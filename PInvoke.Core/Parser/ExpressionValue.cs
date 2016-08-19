@@ -12,6 +12,7 @@ namespace PInvoke.Parser
     public class ExpressionValue
     {
         // CTODO: get rid of dynamic
+        // CTODO: get rid of equality override as they're likely wrong.
         public dynamic Value { get; set; }
 
         public ExpressionValue(object value)
@@ -162,5 +163,16 @@ namespace PInvoke.Parser
             return new ExpressionValue(value);
         }
 
+        public override int GetHashCode() => Value?.GetHashCode() ?? 0;
+        public override bool Equals(object obj)
+        {
+            var other = obj as ExpressionValue;
+            if (other == null)
+            {
+                return false;
+            }
+
+            return other == this;
+        }
     }
 }

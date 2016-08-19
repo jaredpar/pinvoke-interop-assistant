@@ -15,7 +15,6 @@ namespace PInvoke.Controls
     public partial class SelectSymbolDialog
     {
         private NativeStorage _ns;
-        private SearchKind _type;
         private SearchDataGrid _searchGrid;
 
         private NativeSymbolBag _bag;

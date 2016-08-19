@@ -797,7 +797,6 @@ namespace PInvoke.Parser
 
             // Now actually try and find the file.  First check the custom list
             bool found = false;
-            string customPath = null;
             if (File.Exists(name))
             {
                 found = true;
@@ -1298,7 +1297,8 @@ namespace PInvoke.Parser
                 // Found a quoted string, search for a partner
                 Int32 nextIndex = index + 1;
                 Token nextToken = null;
-                while (nextIndex < list.Count)
+                bool done = false;
+                while (nextIndex < list.Count && !done)
                 {
                     switch (list[nextIndex].TokenType)
                     {
@@ -1309,12 +1309,10 @@ namespace PInvoke.Parser
                         case TokenType.QuotedStringAnsi:
                         case TokenType.QuotedStringUnicode:
                             nextToken = list[nextIndex];
-                            break; // TODO: might not be correct. Was : Exit While
-
+                            done = true;
                             break;
                         default:
-                            break; // TODO: might not be correct. Was : Exit While
-
+                            done = true;
                             break;
                     }
                 }

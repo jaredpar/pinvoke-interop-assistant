@@ -8,10 +8,10 @@ using System.Runtime.Serialization;
 
 namespace PInvoke
 {
-    internal static class Contract
+    public static class Contract
     {
-
         public static bool InUnitTest;
+
         public static void ThrowIfNull(object value)
         {
             Contract.ThrowIfNull(value, "Value should not be null");

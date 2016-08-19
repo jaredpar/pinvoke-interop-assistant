@@ -375,7 +375,7 @@ namespace PInvoke.Parser
                     }
 
                 }
-                catch (EndOfStreamException ex)
+                catch (EndOfStreamException)
                 {
                     // Rollback the scanner and process the next line
                     _errorProvider.AddError("Unexpectedly hit the end of the stream");
@@ -428,7 +428,7 @@ namespace PInvoke.Parser
                     source = ProcessShortTypeName();
                 }
             }
-            catch (ParseException ex)
+            catch (ParseException)
             {
                 throw;
             }
@@ -806,7 +806,7 @@ namespace PInvoke.Parser
                 ProcessParsedProcedure(proc);
                 return proc;
             }
-            catch (ParseException ex)
+            catch (ParseException)
             {
                 throw;
             }
@@ -1139,7 +1139,7 @@ namespace PInvoke.Parser
 
                 } while (!(done));
             }
-            catch (ParseException ex)
+            catch (ParseException)
             {
                 throw;
             }
@@ -1296,7 +1296,7 @@ namespace PInvoke.Parser
                 NativeSalAttribute sal = ProcessSalAttribute();
                 nt = ProcessTypeNameOrType(parentTypeName + "_");
             }
-            catch (ParseException ex)
+            catch (ParseException)
             {
                 throw;
             }

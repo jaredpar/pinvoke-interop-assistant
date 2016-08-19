@@ -233,7 +233,7 @@ namespace PInvoke.Parser
         {
             if (string.IsNullOrEmpty(filePath))
             {
-                throw new ArgumentNullException("path");
+                throw new ArgumentNullException("filePath");
             }
 
             using (StreamReader reader = new StreamReader(filePath))

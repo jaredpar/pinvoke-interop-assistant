@@ -478,70 +478,54 @@ namespace PInvoke.Test.Generated
         ///lpFileName: LPCWSTR->WCHAR*
         ///lpFindFileData: LPWIN32_FIND_DATAW->_WIN32_FIND_DATAW*
         [System.Runtime.InteropServices.DllImportAttribute("kernel32.dll", EntryPoint = "FindFirstFileW")]
-        public static System.IntPtr FindFirstFileW([System.Runtime.InteropServices.InAttribute(), System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.LPWStr)]
-string lpFileName, [System.Runtime.InteropServices.OutAttribute()]
-ref WIN32_FIND_DATAW lpFindFileData)
-        {
-        }
+        public static extern System.IntPtr FindFirstFileW([System.Runtime.InteropServices.InAttribute(), System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.LPWStr)]
+string lpFileName, out WIN32_FIND_DATAW lpFindFileData);
 
         ///Return Type: BOOL->int
         ///hFindFile: HANDLE->void*
         ///lpFindFileData: LPWIN32_FIND_DATAW->_WIN32_FIND_DATAW*
         [System.Runtime.InteropServices.DllImportAttribute("kernel32.dll", EntryPoint = "FindNextFileW")]
         [return: System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.Bool)]
-        public static bool FindNextFileW([System.Runtime.InteropServices.InAttribute()]
-System.IntPtr hFindFile, [System.Runtime.InteropServices.OutAttribute()]
-ref WIN32_FIND_DATAW lpFindFileData)
-        {
-        }
+        public static extern bool FindNextFileW([System.Runtime.InteropServices.InAttribute()]
+System.IntPtr hFindFile, out WIN32_FIND_DATAW lpFindFileData);
 
         ///Return Type: BOOL->int
         ///hFindFile: HANDLE->void*
         [System.Runtime.InteropServices.DllImportAttribute("kernel32.dll", EntryPoint = "FindClose")]
         [return: System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.Bool)]
-        public static bool FindClose(System.IntPtr hFindFile)
-        {
-        }
+        public static extern bool FindClose(System.IntPtr hFindFile);
 
         ///Return Type: UINT->unsigned int
         ///lpBuffer: LPWSTR->WCHAR*
         ///uSize: UINT->unsigned int
         [System.Runtime.InteropServices.DllImportAttribute("kernel32.dll", EntryPoint = "GetSystemDirectoryW")]
-        public static uint GetSystemDirectoryW([System.Runtime.InteropServices.OutAttribute(), System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.LPWStr)]
-System.Text.StringBuilder lpBuffer, uint uSize)
-        {
-        }
+        public static extern uint GetSystemDirectoryW([System.Runtime.InteropServices.OutAttribute(), System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.LPWStr)]
+System.Text.StringBuilder lpBuffer, uint uSize);
 
         ///Return Type: int
         ///hWnd: HWND->HWND__*
         ///lpString: LPWSTR->WCHAR*
         ///nMaxCount: int
         [System.Runtime.InteropServices.DllImportAttribute("user32.dll", EntryPoint = "GetWindowTextW")]
-        public static int GetWindowTextW([System.Runtime.InteropServices.InAttribute()]
+        public static extern int GetWindowTextW([System.Runtime.InteropServices.InAttribute()]
 System.IntPtr hWnd, [System.Runtime.InteropServices.OutAttribute(), System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.LPWStr)]
-System.Text.StringBuilder lpString, int nMaxCount)
-        {
-        }
+System.Text.StringBuilder lpString, int nMaxCount);
 
         ///Return Type: BOOL->int
         ///lpEnumFunc: WNDENUMPROC
         ///lParam: LPARAM->LONG_PTR->int
         [System.Runtime.InteropServices.DllImportAttribute("user32.dll", EntryPoint = "EnumWindows")]
         [return: System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.Bool)]
-        public static bool EnumWindows(WNDENUMPROC lpEnumFunc, [System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.SysInt)]
-int lParam)
-        {
-        }
+        public static extern bool EnumWindows(WNDENUMPROC lpEnumFunc, [System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.SysInt)]
+int lParam);
 
         ///Return Type: BOOL->int
         ///lpBuffer: LPWSTR->WCHAR*
         ///nSize: LPDWORD->DWORD*
         [System.Runtime.InteropServices.DllImportAttribute("kernel32.dll", EntryPoint = "GetComputerNameW")]
         [return: System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.Bool)]
-        public static bool GetComputerNameW([System.Runtime.InteropServices.OutAttribute(), System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.LPWStr)]
-System.Text.StringBuilder lpBuffer, ref uint nSize)
-        {
-        }
+        public static extern bool GetComputerNameW([System.Runtime.InteropServices.OutAttribute(), System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.LPWStr)]
+System.Text.StringBuilder lpBuffer, ref uint nSize);
 
         ///Return Type: BOOL->int
         ///WellKnownSidType: WELL_KNOWN_SID_TYPE->Anonymous_2a66b804_5814_4d7a_8190_9d15131e188a
@@ -550,10 +534,8 @@ System.Text.StringBuilder lpBuffer, ref uint nSize)
         ///cbSid: DWORD*
         [System.Runtime.InteropServices.DllImportAttribute("advapi32.dll", EntryPoint = "CreateWellKnownSid")]
         [return: System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.Bool)]
-        public static bool CreateWellKnownSid(WELL_KNOWN_SID_TYPE WellKnownSidType, [System.Runtime.InteropServices.InAttribute()]
-System.IntPtr DomainSid, System.IntPtr pSid, ref uint cbSid)
-        {
-        }
+        public static extern bool CreateWellKnownSid(WELL_KNOWN_SID_TYPE WellKnownSidType, [System.Runtime.InteropServices.InAttribute()]
+System.IntPtr DomainSid, System.IntPtr pSid, ref uint cbSid);
 
         ///Return Type: BOOL->int
         ///nDestinationSidLength: DWORD->unsigned int
@@ -561,10 +543,8 @@ System.IntPtr DomainSid, System.IntPtr pSid, ref uint cbSid)
         ///pSourceSid: PSID->PVOID->void*
         [System.Runtime.InteropServices.DllImportAttribute("advapi32.dll", EntryPoint = "CopySid")]
         [return: System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.Bool)]
-        public static bool CopySid(uint nDestinationSidLength, System.IntPtr pDestinationSid, [System.Runtime.InteropServices.InAttribute()]
-System.IntPtr pSourceSid)
-        {
-        }
+        public static extern bool CopySid(uint nDestinationSidLength, System.IntPtr pDestinationSid, [System.Runtime.InteropServices.InAttribute()]
+System.IntPtr pSourceSid);
 
         ///Return Type: DWORD_PTR->ULONG_PTR->unsigned int
         ///pszPath: LPCWSTR->WCHAR*
@@ -573,29 +553,23 @@ System.IntPtr pSourceSid)
         ///cbFileInfo: UINT->unsigned int
         ///uFlags: UINT->unsigned int
         [System.Runtime.InteropServices.DllImportAttribute("shell32.dll", EntryPoint = "SHGetFileInfoW", CallingConvention = System.Runtime.InteropServices.CallingConvention.StdCall)]
-        public static uint SHGetFileInfoW([System.Runtime.InteropServices.InAttribute(), System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.LPWStr)]
-string pszPath, uint dwFileAttributes, ref SHFILEINFOW psfi, uint cbFileInfo, uint uFlags)
-        {
-        }
+        public static extern uint SHGetFileInfoW([System.Runtime.InteropServices.InAttribute(), System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.LPWStr)]
+string pszPath, uint dwFileAttributes, ref SHFILEINFOW psfi, uint cbFileInfo, uint uFlags);
 
         ///Return Type: DWORD->unsigned int
         ///lpName: LPCWSTR->WCHAR*
         ///lpBuffer: LPWSTR->WCHAR*
         ///nSize: DWORD->unsigned int
         [System.Runtime.InteropServices.DllImportAttribute("kernel32.dll", EntryPoint = "GetEnvironmentVariableW")]
-        public static uint GetEnvironmentVariableW([System.Runtime.InteropServices.InAttribute(), System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.LPWStr)]
+        public static extern uint GetEnvironmentVariableW([System.Runtime.InteropServices.InAttribute(), System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.LPWStr)]
 string lpName, [System.Runtime.InteropServices.OutAttribute(), System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.LPWStr)]
-System.Text.StringBuilder lpBuffer, uint nSize)
-        {
-        }
+System.Text.StringBuilder lpBuffer, uint nSize);
 
         ///Return Type: int
         ///_Str: char*
         [System.Runtime.InteropServices.DllImportAttribute("ntdll.dll", EntryPoint = "atoi", CallingConvention = System.Runtime.InteropServices.CallingConvention.Cdecl)]
-        public static int atoi([System.Runtime.InteropServices.InAttribute(), System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.LPStr)]
-string _Str)
-        {
-        }
+        public static extern int atoi([System.Runtime.InteropServices.InAttribute(), System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.LPStr)]
+string _Str);
 
         [System.Diagnostics.DebuggerStepThroughAttribute(), System.CodeDom.Compiler.GeneratedCodeAttribute("P/Invoke Interop Assistant", "1.0")]
         public static uint GetSystemDirectoryW(ref string lpBuffer)
@@ -611,7 +585,7 @@ string _Str)
                 sizeVar = (retVar_ + Convert.ToUInt32(1));
                 goto PerformCall;
             }
-            lpBuffer = varlpBuffer.ToString;
+            lpBuffer = varlpBuffer.ToString();
             return retVar_;
         }
 
@@ -621,15 +595,13 @@ string _Str)
             System.Text.StringBuilder varlpString = new System.Text.StringBuilder(1024);
             int methodRetVar = 0;
             methodRetVar = NativeMethods.GetWindowTextW(hWnd, varlpString, 1024);
-            lpString = varlpString.ToString;
+            lpString = varlpString.ToString();
             return methodRetVar;
         }
 
         [System.Runtime.InteropServices.DllImportAttribute("user32.dll", EntryPoint = "EnumWindows")]
         [return: System.Runtime.InteropServices.MarshalAsAttribute(System.Runtime.InteropServices.UnmanagedType.Bool)]
-        public static bool EnumWindows(WNDENUMPROC lpEnumFunc, System.IntPtr lParam)
-        {
-        }
+        public static extern bool EnumWindows(WNDENUMPROC lpEnumFunc, System.IntPtr lParam);
 
         [System.Diagnostics.DebuggerStepThroughAttribute(), System.CodeDom.Compiler.GeneratedCodeAttribute("P/Invoke Interop Assistant", "1.0")]
         public static bool GetComputerNameW(ref string lpBuffer)
@@ -647,7 +619,7 @@ string _Str)
                 sizeVar = (sizeVar * Convert.ToUInt32(2));
                 goto PerformCall;
             }
-            lpBuffer = varlpBuffer.ToString;
+            lpBuffer = varlpBuffer.ToString();
             return retVar_;
         }
 
@@ -686,7 +658,7 @@ string _Str)
                 sizeVar = (retVar_ + Convert.ToUInt32(1));
                 goto PerformCall;
             }
-            lpBuffer = varlpBuffer.ToString;
+            lpBuffer = varlpBuffer.ToString();
             return retVar_;
         }
     }

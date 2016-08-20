@@ -309,7 +309,7 @@ namespace PInvoke
         {
             if (value == null)
             {
-                throw new ArgumentNullException("expr");
+                throw new ArgumentNullException("value");
             }
 
             _valueMap[name] = value;

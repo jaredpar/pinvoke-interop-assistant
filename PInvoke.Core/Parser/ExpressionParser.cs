@@ -77,7 +77,7 @@ namespace PInvoke.Parser
         public bool Parenthesized
         {
             get { return _parenthesized; }
-            set { _parenthesized = true; }
+            set { _parenthesized = value; }
         }
 
         public object Tag

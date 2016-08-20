@@ -10,18 +10,18 @@ using System.Runtime.InteropServices;
 
 namespace PInvoke.Parser
 {
-
     /// <summary>
-    /// Used to evaluate basic expressions encounter by the parser.  
+    /// Used to evaluate basic expressions encounter by the parser.
     /// </summary>
-    /// <remarks></remarks>
-    public class ExpressionEvaluator
+    public sealed class ExpressionEvaluator
     {
-        private ExpressionParser _parser = new ExpressionParser();
+        private readonly ExpressionParser _parser = new ExpressionParser();
+        private readonly Dictionary<string, Macro> _macroMap;
+        private readonly ScannerOptions _opts;
 
-        private ScannerOptions _opts;
-        public ExpressionEvaluator()
+        public ExpressionEvaluator(Dictionary<string, Macro> macroMap = null)
         {
+            _macroMap = macroMap ?? new Dictionary<string, Macro>();
             _opts = new ScannerOptions();
             _opts.HideComments = true;
             _opts.HideNewLines = true;
@@ -94,27 +94,40 @@ namespace PInvoke.Parser
             }
         }
 
-        protected virtual bool TryEvaluateCast(ExpressionNode node)
+        /// <summary>
+        /// For a cast just return the value of the left node
+        /// </summary>
+        private bool TryEvaluateCast(ExpressionNode node)
         {
-            return false;
+            // CTODO: why left here?  Shouldn't it be right? 
+            node.Tag = node.LeftNode.Tag;
+            return true;
         }
 
-        protected virtual bool TryEvaluateFunctionCall(ExpressionNode node)
+        private bool TryEvaluateFunctionCall(ExpressionNode node)
         {
-            return false;
+            bool value =
+                node.Token.Value == "defined" &&
+                node.LeftNode != null &&
+                _macroMap.ContainsKey(node.LeftNode.Token.Value);
+
+            node.Tag = ExpressionValue.Create(value);
+            return true;
         }
 
-        protected virtual bool TryEvaluateNegation(ExpressionNode node)
+        private bool TryEvaluateNegation(ExpressionNode node)
         {
-            return false;
+            ExpressionValue value = (ExpressionValue)node.LeftNode.Tag;
+            node.Tag = ExpressionValue.Create(!value.ConvertToBool());
+            return true;
         }
 
-        protected virtual bool TryEvaluateList(ExpressionNode node)
+        private bool TryEvaluateList(ExpressionNode node)
         {
             return true;
         }
 
-        protected virtual bool TryEvaluateNegative(ExpressionNode node)
+        private bool TryEvaluateNegative(ExpressionNode node)
         {
             var exprValue = ((ExpressionValue)node.LeftNode.Tag);
             if (exprValue.IsFloatingPoint)
@@ -131,7 +144,7 @@ namespace PInvoke.Parser
             return true;
         }
 
-        protected virtual bool TryEvaluateLeaf(ExpressionNode node)
+        private bool TryEvaluateLeaf(ExpressionNode node)
         {
             Token token = node.Token;
             if (token.IsNumber)
@@ -154,6 +167,11 @@ namespace PInvoke.Parser
                 node.Tag = ExpressionValue.Create(false);
                 return true;
             }
+            else if (token.TokenType == TokenType.Word)
+            {
+                return TryEvaluateMacro(node);
+            }
+
             else if (token.IsCharacter)
             {
                 char cValue = '0';
@@ -174,13 +192,46 @@ namespace PInvoke.Parser
                 node.Tag = ExpressionValue.Create(sValue);
                 return true;
             }
+            else if (TokenHelper.IsKeyword(node.Token.TokenType))
+            {
+                node.Tag = ExpressionValue.Create(1);
+                return true;
+            }
             else
             {
                 return false;
             }
         }
 
-        protected virtual bool TryEvaluateBinaryOperation(ExpressionNode node)
+        private bool TryEvaluateMacro(ExpressionNode node)
+        {
+            Contract.Requires(node.Kind == ExpressionKind.Leaf);
+            Contract.Requires(node.Token.TokenType == TokenType.Word);
+
+            ExpressionValue value = default(ExpressionValue);
+            Macro m = null;
+            if (_macroMap.TryGetValue(node.Token.Value, out m))
+            {
+                Number numValue;
+                if (TokenHelper.TryConvertToNumber(m.Value, out numValue))
+                {
+                    value = ExpressionValue.Create(numValue);
+                }
+                else
+                {
+                    value = ExpressionValue.Create(1);
+                }
+            }
+            else
+            {
+                value = ExpressionValue.Create(0);
+            }
+
+            node.Tag = value;
+            return true;
+        }
+
+        private bool TryEvaluateBinaryOperation(ExpressionNode node)
         {
             BinaryOperator op;
             if (!TryConvertToBinaryOperator(node.Token.TokenType, out op))
@@ -196,7 +247,7 @@ namespace PInvoke.Parser
             return succeeded;
         }
 
-        public static bool TryConvertToBinaryOperator(TokenType type,out BinaryOperator op)
+        public static bool TryConvertToBinaryOperator(TokenType type, out BinaryOperator op)
         {
             switch (type)
             {

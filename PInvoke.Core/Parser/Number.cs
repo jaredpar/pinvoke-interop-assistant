@@ -14,7 +14,6 @@ namespace PInvoke.Parser
         Double
     }
 
-    // CTODO: Add in the equality tests
     public struct Number : IEquatable<Number>
     {
         public static Number Empty => default(Number);
@@ -90,7 +89,7 @@ namespace PInvoke.Parser
 
         private T Get<T>(NumberKind kind)
         {
-            Contract.Require(kind == Kind);
+            Contract.Requires(kind == Kind);
             return (T)Value;
         }
 

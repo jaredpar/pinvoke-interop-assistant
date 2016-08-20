@@ -1,7 +1,0 @@
-/* typedefs with constant parameters */
-
-typedef const int CINT;
-typedef const WCHAR *LPCSTR;
-
-
-	

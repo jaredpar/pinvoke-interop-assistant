@@ -1,6 +1,0 @@
-/* TypeDef with multiple targets */
-typedef int foo1,foo2;
-typedef char bar1,bar2;
-
-
-	

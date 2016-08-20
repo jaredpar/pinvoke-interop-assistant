@@ -1,9 +1,0 @@
-/* Use of const struct */ 
-
-void p1(const struct s1* a1);
-void p2(const enum e1* a1);
-void p3(const union u1* a1);
-const struct s1* p4();
-const enum e1* p5();
-const union u1* p6();
-

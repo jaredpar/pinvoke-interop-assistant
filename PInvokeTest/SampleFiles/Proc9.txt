@@ -1,5 +1,0 @@
-/* Procedures with function pointer parameters that are not typedef'd beforehand */ 
-
-void p1(int (*fp1)(int));
-void p2(int* (*fp1)(int* a1));
-void p3(int* (*)());

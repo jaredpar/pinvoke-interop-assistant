@@ -1,7 +1,0 @@
-/* Typedefs with array parameters */
-
-typedef int intarray[1];
-typedef char chararray[1];
-
-
-	

@@ -1,7 +1,0 @@
-/* Simple procedures with a bit of metadata mixed in */
-
-void p1();
-void p2(int i);
-void p3(int i, int j);
-int p4(int i, int j);
-	

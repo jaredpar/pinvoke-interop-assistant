@@ -1,6 +1,0 @@
-/* Procedures with complex return types */
-
-struct s1 p1(int *i);
-union u1 p2(int **i);
-enum e1 p3(int * *i);
-	

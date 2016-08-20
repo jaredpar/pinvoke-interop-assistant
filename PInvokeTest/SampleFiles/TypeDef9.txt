@@ -1,9 +1,0 @@
-/* Trick conditions */
-
-// Don't redefine char here
-typedef signed char td1;
-typedef unsigned char td2; 
-
-
-
-	

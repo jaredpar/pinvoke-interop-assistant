@@ -1,7 +1,0 @@
-/* Procedures with complex return types */
-
-typedef int (*f1)();
-typedef int (*f2)(int);
-typedef int (*f3)(char f);
-typedef int (*f4)(char f, int j);
-typedef int* (*f5)(int j);	

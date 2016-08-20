@@ -1,9 +1,0 @@
-/* Struct with an unnamed member */
-struct s1
-{
-	int;
-	char c;
-};
-
-
-

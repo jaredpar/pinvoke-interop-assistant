@@ -1,4 +1,0 @@
-/* Alternate function pointer syntax */ 
-
-int (*f1)(int a1);
-int* (*f2)(int a1);

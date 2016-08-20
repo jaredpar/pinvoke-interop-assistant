@@ -1,6 +1,0 @@
-/* Use of the __ptr64 and __ptr32 on procedures  */
-
-void * __ptr64 p1(int* a1);
-void *p2(int * __ptr64 a1);
-void * __ptr32 p3(int* a1);
-void *p4(int* __ptr32 a1);

@@ -1,6 +1,0 @@
-/* Pointers to struct references */
-struct s1
-{
-	int i;
-	struct s1* next;
-};

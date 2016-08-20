@@ -1,6 +1,0 @@
-/* Typedefs with weird declspecs */ 
-
-typedef struct __declspec(align(5)) _s1 {int m1;} s1;
-
-
-	

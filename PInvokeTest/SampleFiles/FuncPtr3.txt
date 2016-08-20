@@ -1,4 +1,0 @@
-/* Alternate function pointer syntax */ 
-
-typedef int f1(int a1);
-typedef int* f2(int a1);

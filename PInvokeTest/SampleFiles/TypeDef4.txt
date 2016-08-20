@@ -1,6 +1,0 @@
-/* TypeDef with multiple targets some of which are pointers */
-typedef int foo1,*foo2;
-typedef wchar *LPWSTR, *FOO;
-
-
-	

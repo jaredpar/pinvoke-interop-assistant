@@ -1,7 +1,0 @@
-/* Procedures with items that confused the parser in the past */
-
-void p1(int p1[]);
-void p2(char *p1[]);
-void p3(const char *p1[]);
-void p4(int p1[][][]);
-	

@@ -1,6 +1,0 @@
-/* Mix types */
-
-typedef wchar *LPWSTR;
-
-void p1(LPWSTR foo);
-	

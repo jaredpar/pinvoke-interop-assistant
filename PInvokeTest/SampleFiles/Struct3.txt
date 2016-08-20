@@ -1,7 +1,0 @@
-/* A struct with a pointer and a struct declaration
- */
-struct bar2
-{
-	bar **i;
-	struct foo j;	
-};

@@ -1,7 +1,0 @@
-/* Procedures with more complex type names */
-
-void p1(int *i);
-void p2(int **i);
-void p3(int * *i);
-void p4(int[] i);
-	

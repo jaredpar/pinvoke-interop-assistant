@@ -1,4 +1,0 @@
-/* Procedures with various keyword modifiers */
-
-volatile int p1(int a1);
-int p2(volatile int a1);

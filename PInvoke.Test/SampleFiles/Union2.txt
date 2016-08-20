@@ -1,0 +1,13 @@
+/* Simple unions with typedefs */
+union u1
+{
+	int i;
+} t1;
+
+union u2
+{
+	char i;
+	int j;
+} t2, *t3;
+
+	

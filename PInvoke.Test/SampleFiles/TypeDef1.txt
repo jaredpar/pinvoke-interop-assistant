@@ -1,0 +1,6 @@
+/* Simple typedefs */
+typedef int foo;
+typedef char bar;
+
+
+	

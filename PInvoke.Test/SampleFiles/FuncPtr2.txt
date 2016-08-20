@@ -1,0 +1,4 @@
+/* Procedures with complex return types */
+
+typedef int (*f1)(),(*f2)();
+typedef int *(*f3)(),(*f4)();

@@ -1,0 +1,5 @@
+/* Procedures with items that confused the parser in the past */
+
+void p1(void);
+int* p2(void);
+	

@@ -1,0 +1,9 @@
+/* Struct with a function pointer member */ 
+struct s1
+{
+	int;
+	void *( *pFPtr)(int);
+};
+
+
+

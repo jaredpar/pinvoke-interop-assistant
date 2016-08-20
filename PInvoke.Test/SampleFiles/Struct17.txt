@@ -1,0 +1,20 @@
+/* Structs with complex array attributes */ 
+struct s1
+{
+	int m1[10+5];
+};
+
+struct s2
+{
+	int m1[10-5];
+};
+
+struct s3
+{
+	int m1[10][1+3];
+};
+
+
+
+
+

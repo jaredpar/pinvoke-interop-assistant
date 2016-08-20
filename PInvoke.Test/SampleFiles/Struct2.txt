@@ -1,0 +1,7 @@
+/*hello*/
+struct bar /*aoe*/
+{
+	double j
+	;
+}
+	

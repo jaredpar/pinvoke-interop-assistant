@@ -1,11 +1,9 @@
-
-using Microsoft.VisualBasic;
+// Copyright (c) Microsoft Corporation.  All rights reserved.
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
-// Copyright (c) Microsoft Corporation.  All rights reserved.
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -15,7 +13,7 @@ using System.Runtime.InteropServices;
 
 // Review the values of the assembly attributes
 
-[assembly: AssemblyTitle("PInvokeTest")]
+[assembly: AssemblyTitle("PInvoke.Test")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("PInvokeTest")]
@@ -40,10 +38,3 @@ using System.Runtime.InteropServices;
 
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
-
-//=======================================================
-//Service provided by Telerik (www.telerik.com)
-//Conversion powered by NRefactory.
-//Twitter: @telerik
-//Facebook: facebook.com/telerik
-//=======================================================

@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 namespace PInvoke
 {
     // CTODO: probably want to remove this
-    internal static class PortConstants
+    public static class PortConstants
     {
-        internal const char CarriageReturn = '\r';
-        internal const char LineFeed = '\n';
-        internal const string NewLine = "\r\n";
+        public const char CarriageReturn = '\r';
+        public const char LineFeed = '\n';
+        public const string NewLine = "\r\n";
     }
 }

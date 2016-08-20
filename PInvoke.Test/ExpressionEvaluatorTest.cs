@@ -41,7 +41,7 @@ namespace PInvoke.Test
         {
             ExpressionEvaluator ee = new ExpressionEvaluator();
             ExpressionValue actual = null;
-            Assert.True(ee.TryEvaluate(expr, actual));
+            Assert.True(ee.TryEvaluate(expr, out actual));
             Assert.Equal(result, actual.Value);
         }
 

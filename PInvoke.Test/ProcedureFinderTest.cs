@@ -22,9 +22,9 @@ namespace PInvoke.Test
             {
                 string name = null;
 
-                Assert.True(finder.TryFindDllNameExact("GetProcAddress", name));
+                Assert.True(finder.TryFindDllNameExact("GetProcAddress", out name));
                 Assert.Equal("kernel32.dll", name, true);
-                Assert.True(finder.TryFindDllNameExact("SendMessageW", name));
+                Assert.True(finder.TryFindDllNameExact("SendMessageW", out name));
                 Assert.Equal("user32.dll", name, true);
             }
         }
@@ -36,7 +36,7 @@ namespace PInvoke.Test
             {
                 string name = null;
 
-                Assert.False(finder.TryFindDllNameExact("DoesNotExistFunc", name));
+                Assert.False(finder.TryFindDllNameExact("DoesNotExistFunc", out name));
             }
         }
 
@@ -47,10 +47,10 @@ namespace PInvoke.Test
             {
                 string name = null;
 
-                Assert.False(finder.TryFindDllNameExact("SendMessage", name));
-                Assert.True(finder.TryFindDllNameExact("SendMessageW", name));
+                Assert.False(finder.TryFindDllNameExact("SendMessage", out name));
+                Assert.True(finder.TryFindDllNameExact("SendMessageW", out name));
                 Assert.Equal("user32.dll", name, true);
-                Assert.True(finder.TryFindDllName("SendMessage", name));
+                Assert.True(finder.TryFindDllName("SendMessage", out name));
                 Assert.Equal("user32.dll", name, true);
             }
         }

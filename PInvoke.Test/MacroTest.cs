@@ -23,7 +23,7 @@ namespace PInvoke.Test
         public void CreateMethod1()
         {
             MethodMacro m = null;
-            Assert.True(MethodMacro.TryCreateFromDeclaration("m1", "(x) x + 2", m));
+            Assert.True(MethodMacro.TryCreateFromDeclaration("m1", "(x) x + 2", out m));
             Assert.Equal("m1", m.Name);
         }
 
@@ -31,7 +31,7 @@ namespace PInvoke.Test
         public void CreateMethod2()
         {
             MethodMacro m = null;
-            Assert.False(MethodMacro.TryCreateFromDeclaration("m1", "2", m));
+            Assert.False(MethodMacro.TryCreateFromDeclaration("m1", "2", out m));
         }
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace PInvoke.Test
         {
             MethodMacro m = null;
             string sig = "(x) \"foo\"#x";
-            Assert.True(MethodMacro.TryCreateFromDeclaration("m1", sig, m));
+            Assert.True(MethodMacro.TryCreateFromDeclaration("m1", sig, out m));
             Assert.Equal(sig, m.MethodSignature);
         }
 
@@ -52,7 +52,7 @@ namespace PInvoke.Test
         {
             MethodMacro m = null;
             string sig = "(x) \"foo\"#x           +    5";
-            Assert.True(MethodMacro.TryCreateFromDeclaration("m1", sig, m));
+            Assert.True(MethodMacro.TryCreateFromDeclaration("m1", sig, out m));
             Assert.Equal(sig, m.MethodSignature);
         }
 

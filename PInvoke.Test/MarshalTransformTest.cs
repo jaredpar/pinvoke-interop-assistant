@@ -11,6 +11,7 @@ using System.CodeDom;
 using PInvoke.Transform;
 using PInvoke;
 using Xunit;
+using static PInvoke.Test.GeneratedCodeVerification;
 
 namespace PInvoke.Test
 {
@@ -590,7 +591,7 @@ namespace PInvoke.Test
         [Fact()]
         public void TypedefToArray1()
         {
-            VerifyProc("typedef int D[10];" + Constants.vbCrLf + "int p1(D param1);", "p1(In Int32(1)) As Int32");
+            VerifyProc("typedef int D[10];" + PortConstants.NewLine + "int p1(D param1);", "p1(In Int32(1)) As Int32");
         }
 
         /// <summary>
@@ -600,7 +601,7 @@ namespace PInvoke.Test
         [Fact()]
         public void TypedefToArray2()
         {
-            VerifyTypeMembers("typedef int D[10];" + Constants.vbCrLf + "struct s1 { D m1; };", "s1", "m1", "System.Int32(1) m1");
+            VerifyTypeMembers("typedef int D[10];" + PortConstants.NewLine + "struct s1 { D m1; };", "s1", "m1", "System.Int32(1) m1");
         }
 
         /// <summary>
@@ -610,7 +611,7 @@ namespace PInvoke.Test
         [Fact()]
         public void CallingConvention1()
         {
-            VerifyProcCallingConvention("void p1()", "p1", Runtime.InteropServices.CallingConvention.Winapi);
+            VerifyProcCallingConvention("void p1()", "p1", System.Runtime.InteropServices.CallingConvention.Winapi);
         }
 
         /// <summary>
@@ -620,9 +621,9 @@ namespace PInvoke.Test
         [Fact()]
         public void CallingConvention2()
         {
-            VerifyProcCallingConvention("void __stdcall p1()", "p1", Runtime.InteropServices.CallingConvention.StdCall);
-            VerifyProcCallingConvention("void __cdecl p1()", "p1", Runtime.InteropServices.CallingConvention.Cdecl);
-            VerifyProcCallingConvention("void __winapi p1()", "p1", Runtime.InteropServices.CallingConvention.Winapi);
+            VerifyProcCallingConvention("void __stdcall p1()", "p1", System.Runtime.InteropServices.CallingConvention.StdCall);
+            VerifyProcCallingConvention("void __cdecl p1()", "p1", System.Runtime.InteropServices.CallingConvention.Cdecl);
+            VerifyProcCallingConvention("void __winapi p1()", "p1", System.Runtime.InteropServices.CallingConvention.Winapi);
         }
 
         /// <summary>
@@ -632,10 +633,10 @@ namespace PInvoke.Test
         [Fact()]
         public void CallingConvention3()
         {
-            VerifyProcCallingConvention("void __pascal p1()", "p1", Runtime.InteropServices.CallingConvention.Winapi);
-            VerifyProcCallingConvention("void __inline p1()", "p1", Runtime.InteropServices.CallingConvention.Winapi);
-            VerifyProcCallingConvention("void inline p1()", "p1", Runtime.InteropServices.CallingConvention.Winapi);
-            VerifyProcCallingConvention("void __clrcall p1()", "p1", Runtime.InteropServices.CallingConvention.Winapi);
+            VerifyProcCallingConvention("void __pascal p1()", "p1", System.Runtime.InteropServices.CallingConvention.Winapi);
+            VerifyProcCallingConvention("void __inline p1()", "p1", System.Runtime.InteropServices.CallingConvention.Winapi);
+            VerifyProcCallingConvention("void inline p1()", "p1", System.Runtime.InteropServices.CallingConvention.Winapi);
+            VerifyProcCallingConvention("void __clrcall p1()", "p1", System.Runtime.InteropServices.CallingConvention.Winapi);
         }
 
         /// <summary>
@@ -645,7 +646,7 @@ namespace PInvoke.Test
         [Fact()]
         public void CallingConvention4()
         {
-            VerifyFPtrCallingConvention("typedef void (*f1)();", "f1", Runtime.InteropServices.CallingConvention.Winapi);
+            VerifyFPtrCallingConvention("typedef void (*f1)();", "f1", System.Runtime.InteropServices.CallingConvention.Winapi);
         }
 
         /// <summary>
@@ -655,8 +656,8 @@ namespace PInvoke.Test
         [Fact()]
         public void CallingConvention5()
         {
-            VerifyFPtrCallingConvention("typedef void (__cdecl *f1)();", "f1", Runtime.InteropServices.CallingConvention.Cdecl);
-            VerifyFPtrCallingConvention("typedef void (__stdcall *f1)();", "f1", Runtime.InteropServices.CallingConvention.StdCall);
+            VerifyFPtrCallingConvention("typedef void (__cdecl *f1)();", "f1", System.Runtime.InteropServices.CallingConvention.Cdecl);
+            VerifyFPtrCallingConvention("typedef void (__stdcall *f1)();", "f1", System.Runtime.InteropServices.CallingConvention.StdCall);
         }
 
         /// <summary>
@@ -666,7 +667,7 @@ namespace PInvoke.Test
         [Fact()]
         public void CallingConvention6()
         {
-            VerifyFPtrCallingConvention("typedef void (__pascal *f1)();", "f1", Runtime.InteropServices.CallingConvention.Winapi);
+            VerifyFPtrCallingConvention("typedef void (__pascal *f1)();", "f1", System.Runtime.InteropServices.CallingConvention.Winapi);
         }
 
         /// <summary>

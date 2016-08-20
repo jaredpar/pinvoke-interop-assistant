@@ -45,8 +45,8 @@ namespace PInvoke.Test
             Assert.True(analyzer.IsValidIn());
             Assert.True(analyzer.IsValidInOnly());
             Assert.False(analyzer.IsValidOut());
-            Assert.False(analyzer.IsValidOutOnly);
-            Assert.False(analyzer.IsValidInOut);
+            Assert.False(analyzer.IsValidOutOnly());
+            Assert.False(analyzer.IsValidInOut());
         }
 
 
@@ -58,8 +58,8 @@ namespace PInvoke.Test
             Assert.True(analyzer.IsValidIn());
             Assert.False(analyzer.IsValidInOnly());
             Assert.True(analyzer.IsValidOut());
-            Assert.False(analyzer.IsValidOutOnly);
-            Assert.True(analyzer.IsValidInOut);
+            Assert.False(analyzer.IsValidOutOnly());
+            Assert.True(analyzer.IsValidInOut());
         }
 
         [Fact()]
@@ -70,8 +70,8 @@ namespace PInvoke.Test
             Assert.False(analyzer.IsValidIn());
             Assert.False(analyzer.IsValidInOnly());
             Assert.True(analyzer.IsValidOut());
-            Assert.True(analyzer.IsValidOutOnly);
-            Assert.False(analyzer.IsValidInOut);
+            Assert.True(analyzer.IsValidOutOnly());
+            Assert.False(analyzer.IsValidInOut());
         }
 
         [Fact()]
@@ -82,8 +82,8 @@ namespace PInvoke.Test
             Assert.True(analyzer.IsValidIn());
             Assert.False(analyzer.IsValidInOnly());
             Assert.True(analyzer.IsValidOut());
-            Assert.False(analyzer.IsValidOutOnly);
-            Assert.True(analyzer.IsValidInOut);
+            Assert.False(analyzer.IsValidOutOnly());
+            Assert.True(analyzer.IsValidInOut());
         }
     }
 }

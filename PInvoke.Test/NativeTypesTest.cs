@@ -73,7 +73,7 @@ namespace PInvoke.Test
             string str = ns.Name;
             foreach (NativeSymbol child in ns.GetChildren())
             {
-                str += "(" + FileSystem.Print(child) + ")";
+                str += "(" + Print(child) + ")";
             }
 
             return str;
@@ -81,7 +81,7 @@ namespace PInvoke.Test
 
         private void VerifyTree(NativeSymbol ns, string str)
         {
-            string realStr = FileSystem.Print(ns);
+            string realStr = Print(ns);
             Assert.Equal(str, realStr);
         }
 
@@ -178,7 +178,7 @@ namespace PInvoke.Test
         {
             NativeStruct s1 = new NativeStruct("s1");
             s1.Members.Add(new NativeMember("m1", new NativeBuiltinType(BuiltinType.NativeByte)));
-            s1.ReplaceChild(s1.Members(0), new NativeMember("m2", new NativeBuiltinType(BuiltinType.NativeDouble)));
+            s1.ReplaceChild(s1.Members[0], new NativeMember("m2", new NativeBuiltinType(BuiltinType.NativeDouble)));
             VerifyTree(s1, "s1(m2(double))");
         }
 
@@ -218,7 +218,7 @@ namespace PInvoke.Test
         {
             NativeEnum e1 = new NativeEnum("e1");
             e1.Values.Add(new NativeEnumValue("n1", "v1"));
-            e1.ReplaceChild(e1.Values(0), new NativeEnumValue("n2", "v2"));
+            e1.ReplaceChild(e1.Values[0], new NativeEnumValue("n2", "v2"));
             VerifyTree(e1, "e1(n2(Value(v2)))");
         }
 
@@ -248,7 +248,7 @@ namespace PInvoke.Test
             proc.Signature.Parameters.Add(new NativeParameter("p1", new NativeBuiltinType(BuiltinType.NativeChar)));
             proc.Signature.ReplaceChild(proc.Signature.ReturnType, new NativeBuiltinType(BuiltinType.NativeFloat));
             VerifyTree(proc, "proc(Sig(float)(Sal)(p1(char)(Sal)))");
-            proc.Signature.ReplaceChild(proc.Signature.Parameters(0), new NativeParameter("p2", new NativeBuiltinType(BuiltinType.NativeChar)));
+            proc.Signature.ReplaceChild(proc.Signature.Parameters[0], new NativeParameter("p2", new NativeBuiltinType(BuiltinType.NativeChar)));
             VerifyTree(proc, "proc(Sig(float)(Sal)(p2(char)(Sal)))");
         }
 
@@ -295,7 +295,7 @@ namespace PInvoke.Test
                 if (TokenHelper.IsTypeKeyword(cur))
                 {
                     NativeBuiltinType bt = null;
-                    Assert.True(NativeBuiltinType.TryConvertToBuiltinType(cur, bt));
+                    Assert.True(NativeBuiltinType.TryConvertToBuiltinType(cur, out bt));
                 }
             }
         }
@@ -490,9 +490,9 @@ namespace PInvoke.Test
         {
             NativeValueExpression expr = new NativeValueExpression("1+1");
             Assert.Equal(2, expr.Values.Count);
-            Assert.Equal(NativeValueKind.Number, expr.Values(0).ValueKind);
-            Assert.Equal("1", expr.Values(0).DisplayValue);
-            Assert.Equal(1, Convert.ToInt32(expr.Values(0).Value));
+            Assert.Equal(NativeValueKind.Number, expr.Values[0].ValueKind);
+            Assert.Equal("1", expr.Values[0].DisplayValue);
+            Assert.Equal(1, Convert.ToInt32(expr.Values[0].Value));
         }
 
         [Fact()]
@@ -500,9 +500,9 @@ namespace PInvoke.Test
         {
             NativeValueExpression expr = new NativeValueExpression("FOO+1");
             Assert.Equal(2, expr.Values.Count);
-            Assert.Equal("FOO", expr.Values(0).DisplayValue);
-            Assert.Equal("FOO", expr.Values(0).Name);
-            Assert.Null(expr.Values(0).SymbolValue);
+            Assert.Equal("FOO", expr.Values[0].DisplayValue);
+            Assert.Equal("FOO", expr.Values[0].Name);
+            Assert.Null(expr.Values[0].SymbolValue);
         }
 
         [Fact()]
@@ -510,8 +510,8 @@ namespace PInvoke.Test
         {
             NativeValueExpression expr = new NativeValueExpression("FOO+BAR");
             Assert.Equal(2, expr.Values.Count);
-            Assert.Equal("FOO", expr.Values(0).DisplayValue);
-            Assert.Equal("BAR", expr.Values(1).DisplayValue);
+            Assert.Equal("FOO", expr.Values[0].DisplayValue);
+            Assert.Equal("BAR", expr.Values[1].DisplayValue);
         }
 
         [Fact()]
@@ -519,8 +519,8 @@ namespace PInvoke.Test
         {
             NativeValueExpression expr = new NativeValueExpression("\"bar\"+1");
             Assert.Equal(2, expr.Values.Count);
-            Assert.Equal(NativeValueKind.String, expr.Values(0).ValueKind);
-            Assert.Equal("bar", expr.Values(0).DisplayValue);
+            Assert.Equal(NativeValueKind.String, expr.Values[0].ValueKind);
+            Assert.Equal("bar", expr.Values[0].DisplayValue);
         }
 
         /// <summary>
@@ -533,11 +533,11 @@ namespace PInvoke.Test
             NativeValueExpression expr = new NativeValueExpression("(DWORD)5");
             Assert.Equal(2, expr.Values.Count);
 
-            NativeValue val = expr.Values(0);
+            NativeValue val = expr.Values[0];
             Assert.Equal(NativeValueKind.SymbolType, val.ValueKind);
             Assert.Equal("DWORD", val.DisplayValue);
 
-            val = expr.Values(1);
+            val = expr.Values[1];
             Assert.Equal(NativeValueKind.Number, val.ValueKind);
             Assert.Equal(5, Convert.ToInt32(val.Value));
         }
@@ -548,15 +548,15 @@ namespace PInvoke.Test
             NativeValueExpression expr = new NativeValueExpression("(DWORD)(5+6)");
             Assert.Equal(3, expr.Values.Count);
 
-            NativeValue val = expr.Values(0);
+            NativeValue val = expr.Values[0];
             Assert.Equal(NativeValueKind.SymbolType, val.ValueKind);
             Assert.Equal("DWORD", val.DisplayValue);
 
-            val = expr.Values(1);
+            val = expr.Values[1];
             Assert.Equal(NativeValueKind.Number, val.ValueKind);
             Assert.Equal(5, Convert.ToInt32(val.Value));
 
-            val = expr.Values(2);
+            val = expr.Values[2];
             Assert.Equal(NativeValueKind.Number, val.ValueKind);
             Assert.Equal(6, Convert.ToInt32(val.Value));
         }
@@ -661,7 +661,7 @@ namespace PInvoke.Test
         public void Resolve7()
         {
             NativeValue val = NativeValue.CreateCharacter('c');
-            Assert.Equal('c', Convert.ToString(val.Value));
+            Assert.Equal("c", Convert.ToString(val.Value));
             Assert.Equal(NativeValueKind.Character, val.ValueKind);
             Assert.True(val.IsImmediateResolved);
         }

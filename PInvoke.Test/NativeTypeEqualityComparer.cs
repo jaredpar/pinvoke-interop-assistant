@@ -10,13 +10,6 @@ using PInvoke;
 
 namespace PInvoke.Test
 {
-
-    internal class TypePair<K, V>
-    {
-        public K Key;
-        public V Value;
-    }
-
     /// <summary>
     /// Used to compare NativeType trees for equality
     /// </summary>
@@ -143,7 +136,7 @@ namespace PInvoke.Test
             foreach (NativeDefinedType leftDefined in leftMap.Values)
             {
                 NativeDefinedType rightDefined = null;
-                if (!rightMap.TryGetValue(leftDefined.Name, rightDefined) || !EqualsTopLevel(leftDefined, rightDefined))
+                if (!rightMap.TryGetValue(leftDefined.Name, out rightDefined) || !EqualsTopLevel(leftDefined, rightDefined))
                 {
                     return false;
                 }
@@ -189,8 +182,8 @@ namespace PInvoke.Test
 
                 for (int i = 0; i <= leftDefined.Members.Count - 1; i++)
                 {
-                    NativeMember leftMember = leftDefined.Members(i);
-                    NativeMember rightMember = rightDefined.Members(i);
+                    NativeMember leftMember = leftDefined.Members[i];
+                    NativeMember rightMember = rightDefined.Members[i];
 
                     if (0 != string.CompareOrdinal(leftMember.Name, rightMember.Name) || !EqualsCore(leftMember.NativeType, rightMember.NativeType))
                     {
@@ -272,8 +265,8 @@ namespace PInvoke.Test
 
                 for (int i = 0; i <= leftEnum.Values.Count - 1; i++)
                 {
-                    NativeEnumValue e1 = leftEnum.Values(i);
-                    NativeEnumValue e2 = rightEnum.Values(i);
+                    NativeEnumValue e1 = leftEnum.Values[i];
+                    NativeEnumValue e2 = rightEnum.Values[i];
 
                     if (0 != string.CompareOrdinal(e1.Name, e2.Name) || 0 != string.CompareOrdinal(e1.Value.Expression, e2.Value.Expression))
                     {

@@ -26,7 +26,7 @@ namespace PInvoke.Test
             string str = ns.Name;
             foreach (NativeSymbol child in ns.GetChildren())
             {
-                str += "(" + FileSystem.Print(child) + ")";
+                str += "(" + Print(child) + ")";
             }
 
             return str;
@@ -34,7 +34,7 @@ namespace PInvoke.Test
 
         private void VerifyTree(NativeSymbol ns, string str)
         {
-            string realStr = FileSystem.Print(ns);
+            string realStr = Print(ns);
             Assert.Equal(str, realStr);
         }
 

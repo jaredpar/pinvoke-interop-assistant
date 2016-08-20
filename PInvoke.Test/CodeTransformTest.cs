@@ -10,6 +10,7 @@ using PInvoke;
 using PInvoke.Transform;
 using System.CodeDom;
 using Xunit;
+using static PInvoke.Test.GeneratedCodeVerification;
 
 namespace PInvoke.Test
 {
@@ -247,7 +248,7 @@ namespace PInvoke.Test
         [Fact()]
         public void Invalid1()
         {
-            NativeSymbolBag bag = new NativeSymbolBag(CreateStandard());
+            NativeSymbolBag bag = new NativeSymbolBag(StorageFactory.CreateStandard());
             bag.AddConstant(new NativeConstant("c1", "(S1)5"));
             VerifyConstValue(bag, "c1", "\"(S1)5\"");
         }
@@ -259,7 +260,7 @@ namespace PInvoke.Test
         [Fact()]
         public void Invalid2()
         {
-            NativeSymbolBag bag = new NativeSymbolBag(CreateStandard());
+            NativeSymbolBag bag = new NativeSymbolBag(StorageFactory.CreateStandard());
             NativeEnum e1 = new NativeEnum("e1");
             e1.Values.Add(new NativeEnumValue("v1", "(S1)5"));
             bag.AddDefinedType(e1);

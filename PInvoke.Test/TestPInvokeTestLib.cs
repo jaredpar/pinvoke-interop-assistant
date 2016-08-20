@@ -31,7 +31,7 @@ namespace PInvoke.Test
         public void ReverseString1()
         {
             string result = null;
-            Assert.True(NativeMethods.ReverseString("foo", result));
+            Assert.True(NativeMethods.ReverseString("foo", ref result));
             Assert.Equal("oof", result);
         }
 
@@ -55,7 +55,7 @@ namespace PInvoke.Test
         public void BitVector1()
         {
             BitVector1 bt = new BitVector1();
-            Assert.True(NativeMethods.UpdateBitVector1Data(bt));
+            Assert.True(NativeMethods.UpdateBitVector1Data(ref bt));
             Assert.Equal(Convert.ToUInt32(5), bt.m1);
             Assert.Equal(Convert.ToUInt32(42), bt.m2);
         }
@@ -70,16 +70,16 @@ namespace PInvoke.Test
             BitVector1 bt = new BitVector1();
             bt.m1 = 5;
             bt.m2 = 3;
-            Assert.True(NativeMethods.IsM1GreaterThanM2(bt));
+            Assert.True(NativeMethods.IsM1GreaterThanM2(ref bt));
             bt.m2 = 7;
-            Assert.False(NativeMethods.IsM1GreaterThanM2(bt));
+            Assert.False(NativeMethods.IsM1GreaterThanM2(ref bt));
         }
 
         [Fact(Skip = "Lib not building")]
         public void CalculateStringLength1()
         {
             int len = 0;
-            Assert.True(NativeMethods.CalculateStringLength("foo", len));
+            Assert.True(NativeMethods.CalculateStringLength("foo", out len));
             Assert.Equal(3, len);
         }
 
@@ -87,7 +87,7 @@ namespace PInvoke.Test
         public void S1FakeConstructor_1()
         {
             s1 s1 = new s1();
-            Assert.True(NativeMethods.s1FakeConstructor(42, 3.5, s1));
+            Assert.True(NativeMethods.s1FakeConstructor(42, 3.5, out s1));
             Assert.Equal(42, s1.m1);
             Assert.Equal(3.5, s1.m2);
         }
@@ -104,7 +104,7 @@ namespace PInvoke.Test
         public void S2FakeConstructor()
         {
             s2 s2 = new s2();
-            Assert.True(NativeMethods.s2FakeConstructor(5, "foo", s2));
+            Assert.True(NativeMethods.s2FakeConstructor(5, "foo", out s2));
             Assert.Equal(5, s2.m1);
             Assert.Equal("foo", s2.m2);
         }
@@ -127,9 +127,9 @@ namespace PInvoke.Test
             4
         };
             s3.m2 = new double[5];
-            Assert.True(NativeMethods.CopyM1ToM2(s3));
-            Assert.Equal(Convert.ToDouble(1), s3.m2(0));
-            Assert.Equal(Convert.ToDouble(2), s3.m2(1));
+            Assert.True(NativeMethods.CopyM1ToM2(ref s3));
+            Assert.Equal(Convert.ToDouble(1), s3.m2[0]);
+            Assert.Equal(Convert.ToDouble(2), s3.m2[1]);
         }
 
         public struct TempStruct
@@ -158,12 +158,12 @@ namespace PInvoke.Test
         public void SumArray()
         {
             int[] arr = new int[4];
-            arr(0) = 1;
-            arr(1) = 2;
-            arr(2) = 3;
-            arr(3) = 15;
+            arr[0] = 1;
+            arr[1] = 2;
+            arr[2] = 3;
+            arr[3] = 15;
             int sum = 0;
-            Assert.True(NativeMethods.SumArray(arr, sum));
+            Assert.True(NativeMethods.SumArray(arr, out sum));
             Assert.Equal(21, sum);
         }
 
@@ -171,12 +171,12 @@ namespace PInvoke.Test
         public void SumArray2()
         {
             int[] arr = new int[4];
-            arr(0) = 1;
-            arr(1) = 2;
-            arr(2) = 3;
-            arr(3) = 15;
+            arr[0] = 1;
+            arr[1] = 2;
+            arr[2] = 3;
+            arr[3] = 15;
             int sum = 0;
-            Assert.True(NativeMethods.SumArray2(arr, arr.Length, sum));
+            Assert.True(NativeMethods.SumArray2(arr, arr.Length, out sum));
             Assert.Equal(21, sum);
         }
 
@@ -186,10 +186,10 @@ namespace PInvoke.Test
             s4 s = new s4();
             byte[] d = new byte[5];
             s.m1 = d;
-            s.m1(0) = 1;
-            s.m1(1) = 2;
-            s.m1(2) = 3;
-            s.m1(3) = 4;
+            s.m1[0] = 1;
+            s.m1[1] = 2;
+            s.m1[2] = 3;
+            s.m1[3] = 4;
             Assert.Equal(10, NativeMethods.s4Add(s));
 
         }
@@ -198,7 +198,7 @@ namespace PInvoke.Test
         public void GetVeryLongString()
         {
             string b = null;
-            NativeMethods.GetVeryLongString(b);
+            NativeMethods.GetVeryLongString(ref b);
             Assert.True(b.StartsWith("012012"));
         }
 
@@ -206,7 +206,7 @@ namespace PInvoke.Test
         public void GetVeryLongString2()
         {
             string b = null;
-            NativeMethods.GetVeryLongString2(b);
+            NativeMethods.GetVeryLongString2(ref b);
             Assert.True(b.StartsWith("012012"));
         }
 
@@ -214,7 +214,7 @@ namespace PInvoke.Test
         public void GetPointerPointerToChar()
         {
             IntPtr p = IntPtr.Zero;
-            Assert.True(NativeMethods.GetPointerPointerToChar('f', p));
+            Assert.True(NativeMethods.GetPointerPointerToChar('f', ref p));
             object o = Marshal.PtrToStructure(p, typeof(char));
             char c = (char)o;
             Assert.Equal('f', c);
@@ -226,7 +226,7 @@ namespace PInvoke.Test
             decimal p1 = new decimal(42);
             decimal p2 = new decimal(0);
             Assert.NotEqual(p1, p2);
-            Assert.True(NativeMethods.CopyDecimalToPoiner(p1, p2));
+            Assert.True(NativeMethods.CopyDecimalToPoiner(p1, ref p2));
             Assert.Equal(p1, p2);
         }
 
@@ -244,7 +244,7 @@ namespace PInvoke.Test
             decimal d1 = new decimal(42);
             decimal d2 = new decimal(5);
             Assert.NotEqual(d1, d2);
-            Assert.True(NativeMethods.CopyDecimalPointerToPointer(d1, d2));
+            Assert.True(NativeMethods.CopyDecimalPointerToPointer(ref d1, ref d2));
             Assert.Equal(d1, d2);
         }
 
@@ -254,7 +254,7 @@ namespace PInvoke.Test
             decimal d1 = new decimal(42);
             decimal d2 = new decimal(5);
             Assert.NotEqual(d1, d2);
-            Assert.True(NativeMethods.CopyCurrencyToPointer(d1, d2));
+            Assert.True(NativeMethods.CopyCurrencyToPointer(d1, ref d2));
             Assert.Equal(d1, d2);
         }
 
@@ -262,7 +262,7 @@ namespace PInvoke.Test
         public void CopyBstrToNormalStr()
         {
             string result = null;
-            Assert.True(NativeMethods.CopyBstrToNoramlStr("foo", result));
+            Assert.True(NativeMethods.CopyBstrToNoramlStr("foo", ref result));
             Assert.Equal("foo", result);
         }
 
@@ -270,7 +270,7 @@ namespace PInvoke.Test
         public void CopyToBstr()
         {
             string result = null;
-            Assert.True(NativeMethods.CopyToBstr("bar", result));
+            Assert.True(NativeMethods.CopyToBstr("bar", out result));
             Assert.Equal("bar", result);
         }
 
@@ -278,7 +278,7 @@ namespace PInvoke.Test
         public void CopyBothToBstr()
         {
             string result = null;
-            Assert.True(NativeMethods.CopyBothToBstr("foo", "bar", result));
+            Assert.True(NativeMethods.CopyBothToBstr("foo", "bar", ref result));
             Assert.Equal("foobar", result);
         }
 
@@ -286,7 +286,7 @@ namespace PInvoke.Test
         public void CopyBstrToBstr()
         {
             string result = null;
-            Assert.True(NativeMethods.CopyBstrToBstr("foo", result));
+            Assert.True(NativeMethods.CopyBstrToBstr("foo", ref result));
             Assert.Equal("foo", result);
         }
 
@@ -334,7 +334,7 @@ namespace PInvoke.Test
         public void GetAStructWithASimpleFunctionPointer()
         {
             structWithFunctionPointer s = new structWithFunctionPointer();
-            NativeMethods.GetAStructWithASimpleFunctionPointer(3, s);
+            NativeMethods.GetAStructWithASimpleFunctionPointer(3, ref s);
             Assert.Equal(3, s.m1);
             Assert.Equal(5, s.AnonymousMember1(2, 3));
         }
@@ -368,7 +368,7 @@ namespace PInvoke.Test
         public void StringDiffTypeInStruct()
         {
             structWithDiffStringTypes s = new structWithDiffStringTypes();
-            NativeMethods.PopulateStructWithDiffStringTypes(s, "foo", "bar");
+            NativeMethods.PopulateStructWithDiffStringTypes(ref s, "foo", "bar");
             Assert.Equal("foo", s.m1);
             Assert.Equal("bar", s.m2);
         }

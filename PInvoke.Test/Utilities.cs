@@ -11,6 +11,8 @@ using System.Text;
 using PInvoke;
 using PInvoke.Transform;
 using Xunit;
+using System.CodeDom.Compiler;
+using System.IO;
 
 namespace PInvoke.Test
 {
@@ -342,9 +344,9 @@ namespace PInvoke.Test
             CodeTypeReference codeType = null;
             Exception ex = null;
 
-            Assert.True(trans.TryGenerateValueExpression(nExpr, cExpr, codeType, ex));
+            Assert.True(trans.TryGenerateValueExpression(nExpr, out cExpr, out codeType, out ex));
 
-            Compiler.CodeDomProvider provider = default(Compiler.CodeDomProvider);
+            var provider = default(System.CodeDom.Compiler.CodeDomProvider);
             switch (lang)
             {
                 case LanguageType.CSharp:
@@ -359,9 +361,9 @@ namespace PInvoke.Test
             }
 
             Assert.NotNull(provider);
-            using (IO.StringWriter writer = new IO.StringWriter())
+            using (var writer = new StringWriter())
             {
-                provider.GenerateCodeFromExpression(cExpr, writer, new Compiler.CodeGeneratorOptions());
+                provider.GenerateCodeFromExpression(cExpr, writer, new System.CodeDom.Compiler.CodeGeneratorOptions());
                 Assert.Equal(managedExpr, writer.ToString());
             }
 
@@ -423,7 +425,7 @@ namespace PInvoke.Test
             Assert.NotNull(field);
 
             // Get the provider
-            Compiler.CodeDomProvider provider = default(Compiler.CodeDomProvider);
+            var provider = default(CodeDomProvider);
             switch (lang)
             {
                 case LanguageType.CSharp:
@@ -437,9 +439,9 @@ namespace PInvoke.Test
                     break;
             }
 
-            using (IO.StringWriter writer = new IO.StringWriter())
+            using (var writer = new StringWriter())
             {
-                provider.GenerateCodeFromExpression(field.InitExpression, writer, new Compiler.CodeGeneratorOptions());
+                provider.GenerateCodeFromExpression(field.InitExpression, writer, new CodeGeneratorOptions());
                 Assert.Equal(val, writer.ToString());
             }
 
@@ -490,7 +492,7 @@ namespace PInvoke.Test
             Assert.NotNull(field);
 
             // Get the provider
-            Compiler.CodeDomProvider provider = default(Compiler.CodeDomProvider);
+            var provider = default(CodeDomProvider);
             switch (lang)
             {
                 case LanguageType.CSharp:
@@ -504,9 +506,9 @@ namespace PInvoke.Test
                     break;
             }
 
-            using (IO.StringWriter writer = new IO.StringWriter())
+            using (var writer = new StringWriter())
             {
-                provider.GenerateCodeFromExpression(field.InitExpression, writer, new Compiler.CodeGeneratorOptions());
+                provider.GenerateCodeFromExpression(field.InitExpression, writer, new CodeGeneratorOptions());
                 Assert.Equal(val, writer.ToString());
             }
         }
@@ -604,7 +606,7 @@ namespace PInvoke.Test
             foreach (string sig in sigArray)
             {
                 bool ret = VerifyProcImpl(code, sig, ref all);
-                Assert.True(ret, "Could not find the method. Looking For :" + sig + Constants.vbCrLf + "Found:" + all);
+                Assert.True(ret, "Could not find the method. Looking For :" + sig + PortConstants.NewLine + "Found:" + all);
             }
         }
 
@@ -697,7 +699,7 @@ namespace PInvoke.Test
         public static void VerifyField(CodeTypeDeclaration ctd, string name, string value)
         {
             CodeMemberField cField = null;
-            VerifyField(ctd, name, cField);
+            VerifyField(ctd, name, ref cField);
             Assert.Equal(value, CodeDomPrinter.Convert(cField));
         }
 
@@ -709,7 +711,7 @@ namespace PInvoke.Test
 
             for (int i = 0; i <= members.Length - 1; i += 2)
             {
-                VerifyField(ctd, members(i), ref members(i + 1));
+                VerifyField(ctd, members[i], members[i + 1]);
             }
 
         }
@@ -718,8 +720,8 @@ namespace PInvoke.Test
         {
             CodeMemberMethod mem = ConvertToSingleProc(code, name);
             CodeAttributeDeclaration decl = null;
-            VerifyAttribute(mem.CustomAttributes, typeof(Runtime.InteropServices.DllImportAttribute), ref decl);
-            if (conv == Runtime.InteropServices.CallingConvention.Winapi)
+            VerifyAttribute(mem.CustomAttributes, typeof(System.Runtime.InteropServices.DllImportAttribute), ref decl);
+            if (conv == System.Runtime.InteropServices.CallingConvention.Winapi)
             {
                 VerifyNoArgument(decl, "CallingConvention");
             }
@@ -738,10 +740,10 @@ namespace PInvoke.Test
             VerifyType(col, name, ref type);
 
 
-            if (conv != Runtime.InteropServices.CallingConvention.Winapi)
+            if (conv != System.Runtime.InteropServices.CallingConvention.Winapi)
             {
                 CodeAttributeDeclaration decl = null;
-                VerifyAttribute(type.CustomAttributes, typeof(Runtime.InteropServices.UnmanagedFunctionPointerAttribute), ref decl);
+                VerifyAttribute(type.CustomAttributes, typeof(System.Runtime.InteropServices.UnmanagedFunctionPointerAttribute), ref decl);
 
                 CodeAttributeArgument arg = null;
                 VerifyArgument(decl, string.Empty, ref arg);
@@ -749,7 +751,7 @@ namespace PInvoke.Test
             }
             else
             {
-                VerifyNoAttribute(type.CustomAttributes, typeof(Runtime.InteropServices.UnmanagedFunctionPointerAttribute));
+                VerifyNoAttribute(type.CustomAttributes, typeof(System.Runtime.InteropServices.UnmanagedFunctionPointerAttribute));
             }
         }
 

@@ -37,7 +37,7 @@ namespace PInvoke.Test
         private int CaptureWindowNameCb2(IntPtr intPtr, IntPtr param2)
         {
             string name = string.Empty;
-            if (0 != NativeMethods.GetWindowTextW(intPtr, name))
+            if (0 != NativeMethods.GetWindowTextW(intPtr, ref name))
             {
                 _nameList.Add(name);
             }
@@ -54,12 +54,12 @@ namespace PInvoke.Test
         {
             string sys32Path = Environment.GetFolderPath(Environment.SpecialFolder.System);
             WIN32_FIND_DATAW data = new WIN32_FIND_DATAW();
-            IntPtr handle = NativeMethods.FindFirstFileW(Path.Combine(sys32Path, "n") + "*", data);
+            IntPtr handle = NativeMethods.FindFirstFileW(Path.Combine(sys32Path, "n") + "*", out data);
 
             Assert.NotEqual(handle, IntPtr.Zero);
             List<string> list = new List<string>();
             list.Add(data.cFileName);
-            while (NativeMethods.FindNextFileW(handle, data))
+            while (NativeMethods.FindNextFileW(handle, out data))
             {
                 list.Add(data.cFileName);
             }
@@ -95,7 +95,7 @@ namespace PInvoke.Test
         {
             StringBuilder builder = new StringBuilder(256);
             uint count = Convert.ToUInt32(builder.Capacity);
-            Assert.True(NativeMethods.GetComputerNameW(builder, count));
+            Assert.True(NativeMethods.GetComputerNameW(builder, ref count));
             Assert.Equal(Environment.MachineName, builder.ToString(), true);
         }
 
@@ -103,7 +103,7 @@ namespace PInvoke.Test
         public void GetComputerName2()
         {
             string name = null;
-            Assert.True(NativeMethods.GetComputerNameW(name));
+            Assert.True(NativeMethods.GetComputerNameW(ref name));
             Assert.Equal(Environment.MachineName, name, true);
         }
 
@@ -111,7 +111,7 @@ namespace PInvoke.Test
         public void CreateWellKnownSid2()
         {
             PInvokePointer ptr = null;
-            Assert.True(NativeMethods.CreateWellKnownSid(WELL_KNOWN_SID_TYPE.WinBuiltinAdministratorsSid, IntPtr.Zero, ptr));
+            Assert.True(NativeMethods.CreateWellKnownSid(WELL_KNOWN_SID_TYPE.WinBuiltinAdministratorsSid, IntPtr.Zero, ref ptr));
             ptr.Free();
         }
 
@@ -176,7 +176,7 @@ namespace PInvoke.Test
         public void GetEnvironmentVariable1()
         {
             string value = null;
-            NativeMethods.GetEnvironmentVariableW("USERPROFILE", value);
+            NativeMethods.GetEnvironmentVariableW("USERPROFILE", ref value);
             Assert.False(string.IsNullOrEmpty(value));
         }
 

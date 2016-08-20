@@ -26,7 +26,7 @@ namespace PInvoke.Test
             NativeStorage ns = new NativeStorage();
             ns.AddDefinedType(s1);
 
-            Assert.True(ns.TryLoadByName(s1.Name, s2));
+            Assert.True(ns.TryLoadByName(s1.Name, out s2));
         }
 
         [Fact()]
@@ -46,7 +46,7 @@ namespace PInvoke.Test
             NativeStorage ns = new NativeStorage();
             ns.AddDefinedType(s1);
 
-            Assert.True(ns.TryLoadByName(s1.Name, s2));
+            Assert.True(ns.TryLoadByName(s1.Name, out s2));
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace PInvoke.Test
             ns.AddProcedure(p1);
 
             NativeProcedure retp1 = null;
-            Assert.True(ns.TryLoadProcedure(p1.Name, retp1));
+            Assert.True(ns.TryLoadProcedure(p1.Name, out retp1));
             Assert.Equal(p1.DisplayName, retp1.DisplayName);
         }
 
@@ -82,7 +82,7 @@ namespace PInvoke.Test
             ns.AddProcedure(p1);
 
             NativeProcedure retp1 = null;
-            Assert.True(ns.TryLoadProcedure(p1.Name, retp1));
+            Assert.True(ns.TryLoadProcedure(p1.Name, out retp1));
             Assert.Equal(p1.DisplayName, retp1.DisplayName);
         }
 
@@ -101,7 +101,7 @@ namespace PInvoke.Test
             ns.AddProcedure(p1);
 
             NativeProcedure retp1 = null;
-            Assert.True(ns.TryLoadProcedure(p1.Name, retp1));
+            Assert.True(ns.TryLoadProcedure(p1.Name, out retp1));
             Assert.Equal(p1.DisplayName, retp1.DisplayName);
         }
 
@@ -122,11 +122,11 @@ namespace PInvoke.Test
             ns.AddProcedure(p1);
 
             NativeProcedure retp1 = null;
-            Assert.True(ns.TryLoadProcedure(p1.Name, retp1));
+            Assert.True(ns.TryLoadProcedure(p1.Name, out retp1));
             Assert.Equal(p1.DisplayName, retp1.DisplayName);
 
             NativeDefinedType rets1 = null;
-            Assert.False(ns.TryLoadDefined(s1.Name, rets1));
+            Assert.False(ns.TryLoadDefined(s1.Name, out rets1));
         }
 
         /// <summary>
@@ -146,7 +146,7 @@ namespace PInvoke.Test
             ns.AddDefinedType(s2);
 
             NativeDefinedType rets2 = null;
-            Assert.True(ns.TryLoadDefined(s2.Name, rets2));
+            Assert.True(ns.TryLoadDefined(s2.Name, out rets2));
             Assert.NotNull(rets2);
             Assert.False(NativeTypeEqualityComparer.AreEqualRecursive(s2, rets2));
             Assert.True(NativeTypeEqualityComparer.AreEqualTopLevel(s2, rets2));
@@ -166,7 +166,7 @@ namespace PInvoke.Test
             ns.AddDefinedType(s1);
 
             NativeType rets1 = null;
-            Assert.True(ns.TryLoadByName(s1.Name, rets1));
+            Assert.True(ns.TryLoadByName(s1.Name, out rets1));
             Assert.NotNull(rets1);
             Assert.True(NativeTypeEqualityComparer.AreEqualTopLevel(s1, rets1));
         }
@@ -185,7 +185,7 @@ namespace PInvoke.Test
             ns.AddDefinedType(s1);
 
             NativeType rets1 = null;
-            Assert.True(ns.TryLoadByName(s1.Name, rets1));
+            Assert.True(ns.TryLoadByName(s1.Name, out rets1));
             Assert.True(NativeTypeEqualityComparer.AreEqualTopLevel(s1, rets1));
         }
 
@@ -203,7 +203,7 @@ namespace PInvoke.Test
             ns.AddTypedef(t1);
 
             NativeType rett1 = null;
-            Assert.True(ns.TryLoadByName(t1.Name, rett1));
+            Assert.True(ns.TryLoadByName(t1.Name, out rett1));
             Assert.True(NativeTypeEqualityComparer.AreEqualRecursive(rett1, t1));
         }
 
@@ -221,12 +221,12 @@ namespace PInvoke.Test
             ns.AddConstant(c2);
 
             NativeConstant ret = null;
-            Assert.True(ns.TryLoadConstant("c1", ret));
+            Assert.True(ns.TryLoadConstant("c1", out ret));
             Assert.Equal("c1", ret.Name);
             Assert.Equal("v1", ret.Value.Expression);
             Assert.Equal(ConstantKind.Macro, ret.ConstantKind);
 
-            Assert.True(ns.TryLoadConstant("c2", ret));
+            Assert.True(ns.TryLoadConstant("c2", out ret));
             Assert.Equal("c2", ret.Name);
             Assert.Equal("\"v2\"", ret.Value.Expression);
             Assert.Equal(ConstantKind.MacroMethod, ret.ConstantKind);
@@ -255,12 +255,12 @@ namespace PInvoke.Test
 
             NativeDefinedType temp = null;
             NativeFunctionPointer retPtr = null;
-            Assert.True(ns.TryLoadDefined(fptr.Name, temp));
+            Assert.True(ns.TryLoadDefined(fptr.Name, out temp));
             retPtr = (NativeFunctionPointer)temp;
             Assert.Equal(NativeCallingConvention.Pascal, retPtr.CallingConvention);
 
             NativeProcedure retProc = null;
-            Assert.True(ns.TryLoadProcedure(proc.Name, retProc));
+            Assert.True(ns.TryLoadProcedure(proc.Name, out retProc));
             Assert.Equal(NativeCallingConvention.CDeclaration, retProc.CallingConvention);
 
 
@@ -283,7 +283,7 @@ namespace PInvoke.Test
 
             NativeSymbolBag bag = new NativeSymbolBag(ns);
             NativeProcedure ret1 = null;
-            Assert.True(bag.TryFindOrLoadProcedure("p1", ret1));
+            Assert.True(bag.TryFindOrLoadProcedure("p1", out ret1));
             Assert.True(bag.TryResolveSymbolsAndValues());
             Assert.Equal(SymbolPrinter.Convert(p1), SymbolPrinter.Convert(ret1));
         }
@@ -299,7 +299,7 @@ namespace PInvoke.Test
             ns.AddProcedure(p1);
 
             NativeProcedure retp1 = null;
-            Assert.True(ns.TryLoadProcedure(p1.Name, retp1));
+            Assert.True(ns.TryLoadProcedure(p1.Name, out retp1));
             Assert.Equal("ReadOnly", retp1.Signature.ReturnTypeSalAttribute.DisplayName);
         }
 
@@ -314,7 +314,7 @@ namespace PInvoke.Test
             ns.AddProcedure(p1);
 
             NativeProcedure retp1 = null;
-            Assert.True(ns.TryLoadProcedure(p1.Name, retp1));
+            Assert.True(ns.TryLoadProcedure(p1.Name, out retp1));
             Assert.Equal("Deref(foo)", retp1.Signature.ReturnTypeSalAttribute.DisplayName);
         }
 
@@ -333,8 +333,8 @@ namespace PInvoke.Test
             ns.AddProcedure(p1);
 
             NativeProcedure retp1 = null;
-            Assert.True(ns.TryLoadProcedure(p1.Name, retp1));
-            Assert.Equal("Deref", retp1.Signature.Parameters(0).SalAttribute.DisplayName);
+            Assert.True(ns.TryLoadProcedure(p1.Name, out retp1));
+            Assert.Equal("Deref", retp1.Signature.Parameters[0].SalAttribute.DisplayName);
         }
 
         [Fact()]
@@ -348,7 +348,7 @@ namespace PInvoke.Test
             ns.AddDefinedType(fptr);
 
             NativeDefinedType retFptr = null;
-            Assert.True(ns.TryLoadDefined(fptr.Name, retFptr));
+            Assert.True(ns.TryLoadDefined(fptr.Name, out retFptr));
             Assert.Equal("char (*f1)(float f)", ((NativeFunctionPointer)retFptr).DisplayName);
         }
 

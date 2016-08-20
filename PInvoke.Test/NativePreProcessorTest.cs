@@ -57,11 +57,11 @@ namespace PInvoke.Test
         {
             for (int i = 0; i <= args.Length - 1; i += 2)
             {
-                string name = args(i);
-                string value = args(i + 1);
+                string name = args[i];
+                string value = args[i + 1];
                 Assert.True(map.ContainsKey(name), "Could not find " + name + " in the macro map");
 
-                Macro macro = map(name);
+                Macro macro = map[name];
                 Assert.Equal(value, macro.Value);
             }
         }
@@ -78,7 +78,7 @@ namespace PInvoke.Test
 
         private bool EvalCond(List<Macro> list, string cond)
         {
-            string before = "#if " + cond + Constants.vbCrLf + "true" + Constants.vbCrLf + "#else" + Constants.vbCrLf + "false" + Constants.vbCrLf + "#endif";
+            string before = "#if " + cond + PortConstants.NewLine + "true" + PortConstants.NewLine + "#else" + PortConstants.NewLine + "false" + PortConstants.NewLine + "#endif";
             PreProcessorOptions opts = new PreProcessorOptions();
             opts.InitialMacroList.AddRange(list);
             PreProcessorEngine engine = new PreProcessorEngine(opts);
@@ -99,8 +99,8 @@ namespace PInvoke.Test
         [Fact()]
         public void Conditional1()
         {
-            string before = "#define foo bar" + Constants.vbCrLf + "#if foo" + Constants.vbCrLf + "hello" + Constants.vbCrLf + "#endif";
-            string after = "hello" + Constants.vbCrLf;
+            string before = "#define foo bar" + PortConstants.NewLine + "#if foo" + PortConstants.NewLine + "hello" + PortConstants.NewLine + "#endif";
+            string after = "hello" + PortConstants.NewLine;
             Dictionary<string, Macro> map = default(Dictionary<string, Macro>);
             map = VerifyNormal(before, after);
             VerifyMap(map, "foo", "bar");
@@ -109,8 +109,8 @@ namespace PInvoke.Test
         [Fact()]
         public void Conditional2()
         {
-            string before = "#define foo bar" + Constants.vbCrLf + "#if foo" + Constants.vbCrLf + "hello" + Constants.vbCrLf + "world" + Constants.vbCrLf + "#endif";
-            string after = "hello" + Constants.vbCrLf + "world" + Constants.vbCrLf;
+            string before = "#define foo bar" + PortConstants.NewLine + "#if foo" + PortConstants.NewLine + "hello" + PortConstants.NewLine + "world" + PortConstants.NewLine + "#endif";
+            string after = "hello" + PortConstants.NewLine + "world" + PortConstants.NewLine;
             Dictionary<string, Macro> map = default(Dictionary<string, Macro>);
             map = VerifyNormal(before, after);
             VerifyMap(map, "foo", "bar");
@@ -119,8 +119,8 @@ namespace PInvoke.Test
         [Fact()]
         public void Conditional3()
         {
-            string before = "#define foo bar" + Constants.vbCrLf + "#if foo" + Constants.vbCrLf + "hello" + Constants.vbCrLf + "#else" + Constants.vbCrLf + "world" + Constants.vbCrLf + "#endif";
-            string after = "hello" + Constants.vbCrLf;
+            string before = "#define foo bar" + PortConstants.NewLine + "#if foo" + PortConstants.NewLine + "hello" + PortConstants.NewLine + "#else" + PortConstants.NewLine + "world" + PortConstants.NewLine + "#endif";
+            string after = "hello" + PortConstants.NewLine;
             Dictionary<string, Macro> map = default(Dictionary<string, Macro>);
             map = VerifyNormal(before, after);
             VerifyMap(map, "foo", "bar");
@@ -133,8 +133,8 @@ namespace PInvoke.Test
         [Fact()]
         public void Conditional4()
         {
-            string before = "#if foo" + Constants.vbCrLf + "hello" + Constants.vbCrLf + "#else" + Constants.vbCrLf + "world" + Constants.vbCrLf + "#endif";
-            string after = "world" + Constants.vbCrLf;
+            string before = "#if foo" + PortConstants.NewLine + "hello" + PortConstants.NewLine + "#else" + PortConstants.NewLine + "world" + PortConstants.NewLine + "#endif";
+            string after = "world" + PortConstants.NewLine;
             Dictionary<string, Macro> map = default(Dictionary<string, Macro>);
             map = VerifyNormal(before, after);
         }
@@ -146,8 +146,8 @@ namespace PInvoke.Test
         [Fact()]
         public void Conditional5()
         {
-            string before = "#define foo bar" + Constants.vbCrLf + "#if bar" + Constants.vbCrLf + "hello" + Constants.vbCrLf + "#elseif foo" + Constants.vbCrLf + "world" + Constants.vbCrLf + "#endif";
-            string after = "world" + Constants.vbCrLf;
+            string before = "#define foo bar" + PortConstants.NewLine + "#if bar" + PortConstants.NewLine + "hello" + PortConstants.NewLine + "#elseif foo" + PortConstants.NewLine + "world" + PortConstants.NewLine + "#endif";
+            string after = "world" + PortConstants.NewLine;
             Dictionary<string, Macro> map = default(Dictionary<string, Macro>);
             map = VerifyNormal(before, after);
             VerifyMap(map, "foo", "bar");
@@ -160,8 +160,8 @@ namespace PInvoke.Test
         [Fact()]
         public void Conditional6()
         {
-            string before = "#define foo bar" + Constants.vbCrLf + "#if bar " + Constants.vbCrLf + "hello" + Constants.vbCrLf + "#elseif foo" + Constants.vbCrLf + "world" + Constants.vbCrLf + "#else" + Constants.vbCrLf + "again" + Constants.vbCrLf + "#endif";
-            string after = "world" + Constants.vbCrLf;
+            string before = "#define foo bar" + PortConstants.NewLine + "#if bar " + PortConstants.NewLine + "hello" + PortConstants.NewLine + "#elseif foo" + PortConstants.NewLine + "world" + PortConstants.NewLine + "#else" + PortConstants.NewLine + "again" + PortConstants.NewLine + "#endif";
+            string after = "world" + PortConstants.NewLine;
             Dictionary<string, Macro> map = default(Dictionary<string, Macro>);
             map = VerifyNormal(before, after);
             VerifyMap(map, "foo", "bar");
@@ -170,8 +170,8 @@ namespace PInvoke.Test
         [Fact()]
         public void Conditional7()
         {
-            string before = "#define _PREFAST_" + Constants.vbCrLf + "#if !(defined(_midl)) && defined(_PREFAST_)" + Constants.vbCrLf + "hello" + Constants.vbCrLf + "#endif";
-            string after = "hello" + Constants.vbCrLf;
+            string before = "#define _PREFAST_" + PortConstants.NewLine + "#if !(defined(_midl)) && defined(_PREFAST_)" + PortConstants.NewLine + "hello" + PortConstants.NewLine + "#endif";
+            string after = "hello" + PortConstants.NewLine;
             VerifyNormal(before, after);
         }
 
@@ -182,8 +182,8 @@ namespace PInvoke.Test
         [Fact()]
         public void Conditional8()
         {
-            string before = "#     define foo bar" + Constants.vbCrLf + "#     if bar" + Constants.vbCrLf + "hello" + Constants.vbCrLf + "#    elseif foo" + Constants.vbCrLf + "world" + Constants.vbCrLf + "#    endif";
-            string after = "world" + Constants.vbCrLf;
+            string before = "#     define foo bar" + PortConstants.NewLine + "#     if bar" + PortConstants.NewLine + "hello" + PortConstants.NewLine + "#    elseif foo" + PortConstants.NewLine + "world" + PortConstants.NewLine + "#    endif";
+            string after = "world" + PortConstants.NewLine;
             Dictionary<string, Macro> map = default(Dictionary<string, Macro>);
             map = VerifyNormal(before, after);
             VerifyMap(map, "foo", "bar");
@@ -192,8 +192,8 @@ namespace PInvoke.Test
         [Fact()]
         public void Conditional9()
         {
-            string before = "#     define foo bar" + Constants.vbCrLf + "#     if defined foo " + Constants.vbCrLf + "hello" + Constants.vbCrLf + "#    else " + Constants.vbCrLf + "world" + Constants.vbCrLf + "#    endif";
-            string after = "hello" + Constants.vbCrLf;
+            string before = "#     define foo bar" + PortConstants.NewLine + "#     if defined foo " + PortConstants.NewLine + "hello" + PortConstants.NewLine + "#    else " + PortConstants.NewLine + "world" + PortConstants.NewLine + "#    endif";
+            string after = "hello" + PortConstants.NewLine;
             Dictionary<string, Macro> map = default(Dictionary<string, Macro>);
             map = VerifyNormal(before, after);
             VerifyMap(map, "foo", "bar");
@@ -202,15 +202,15 @@ namespace PInvoke.Test
         [Fact()]
         public void Conditional10()
         {
-            string before = "#define FOO 1" + Constants.vbCrLf + "#if FOO & 1" + Constants.vbCrLf + "hello" + Constants.vbCrLf + "#endif";
-            string after = "hello" + Constants.vbCrLf;
+            string before = "#define FOO 1" + PortConstants.NewLine + "#if FOO & 1" + PortConstants.NewLine + "hello" + PortConstants.NewLine + "#endif";
+            string after = "hello" + PortConstants.NewLine;
             VerifyNormal(before, after);
         }
 
         [Fact()]
         public void Conditional11()
         {
-            string before = "#define FOO 1" + Constants.vbCrLf + "#if FOO & 2" + Constants.vbCrLf + "hello" + Constants.vbCrLf + "#endif";
+            string before = "#define FOO 1" + PortConstants.NewLine + "#if FOO & 2" + PortConstants.NewLine + "hello" + PortConstants.NewLine + "#endif";
             string after = string.Empty;
             VerifyNormal(before, after);
         }
@@ -218,8 +218,8 @@ namespace PInvoke.Test
         [Fact()]
         public void Conditional12()
         {
-            string before = "#define FOO 1" + Constants.vbCrLf + "#if FOO | 2" + Constants.vbCrLf + "hello" + Constants.vbCrLf + "#endif";
-            string after = "hello" + Constants.vbCrLf;
+            string before = "#define FOO 1" + PortConstants.NewLine + "#if FOO | 2" + PortConstants.NewLine + "hello" + PortConstants.NewLine + "#endif";
+            string after = "hello" + PortConstants.NewLine;
             VerifyNormal(before, after);
         }
 
@@ -233,8 +233,8 @@ namespace PInvoke.Test
         [Fact()]
         public void Multiline1()
         {
-            string before = "#define foo bar \\" + Constants.vbCrLf + "baz" + Constants.vbCrLf + "hello";
-            string after = "hello" + Constants.vbCrLf;
+            string before = "#define foo bar \\" + PortConstants.NewLine + "baz" + PortConstants.NewLine + "hello";
+            string after = "hello" + PortConstants.NewLine;
             Dictionary<string, Macro> map = default(Dictionary<string, Macro>);
             map = VerifyNormal(before, after);
             VerifyMap(map, "foo", "bar baz");
@@ -244,8 +244,8 @@ namespace PInvoke.Test
         [Fact()]
         public void Multiline2()
         {
-            string before = "#define foo bar \\" + Constants.vbCrLf + "baz \\" + Constants.vbCrLf + "again " + Constants.vbCrLf + "hello";
-            string after = "hello" + Constants.vbCrLf;
+            string before = "#define foo bar \\" + PortConstants.NewLine + "baz \\" + PortConstants.NewLine + "again " + PortConstants.NewLine + "hello";
+            string after = "hello" + PortConstants.NewLine;
             Dictionary<string, Macro> map = default(Dictionary<string, Macro>);
             map = VerifyNormal(before, after);
             VerifyMap(map, "foo", "bar baz again");
@@ -254,8 +254,8 @@ namespace PInvoke.Test
         [Fact()]
         public void Multiline3()
         {
-            string before = "#define foo bar \\" + Constants.vbCrLf + "baz /*foo*/\\" + Constants.vbCrLf + " " + Constants.vbCrLf + "hello";
-            string after = "hello" + Constants.vbCrLf;
+            string before = "#define foo bar \\" + PortConstants.NewLine + "baz /*foo*/\\" + PortConstants.NewLine + " " + PortConstants.NewLine + "hello";
+            string after = "hello" + PortConstants.NewLine;
             Dictionary<string, Macro> map = default(Dictionary<string, Macro>);
             map = VerifyNormal(before, after);
             VerifyMap(map, "foo", "bar baz");
@@ -264,8 +264,8 @@ namespace PInvoke.Test
         [Fact()]
         public void Multiline4()
         {
-            string before = "#define foo bar \\" + Constants.vbCrLf + "baz /*foo*/\\" + Constants.vbCrLf + " // hello " + Constants.vbCrLf + "hello";
-            string after = "hello" + Constants.vbCrLf;
+            string before = "#define foo bar \\" + PortConstants.NewLine + "baz /*foo*/\\" + PortConstants.NewLine + " // hello " + PortConstants.NewLine + "hello";
+            string after = "hello" + PortConstants.NewLine;
             Dictionary<string, Macro> map = default(Dictionary<string, Macro>);
             map = VerifyNormal(before, after);
             VerifyMap(map, "foo", "bar baz");
@@ -278,24 +278,24 @@ namespace PInvoke.Test
         [Fact()]
         public void Comment1()
         {
-            string before = "/* hello */" + Constants.vbCrLf + "world" + Constants.vbCrLf;
-            string after = Constants.vbCrLf + "world" + Constants.vbCrLf;
+            string before = "/* hello */" + PortConstants.NewLine + "world" + PortConstants.NewLine;
+            string after = PortConstants.NewLine + "world" + PortConstants.NewLine;
             VerifyNormal(before, after);
         }
 
         [Fact()]
         public void Comment2()
         {
-            string before = "hello" + Constants.vbCrLf + "/* hello */" + Constants.vbCrLf + "world" + Constants.vbCrLf;
-            string after = "hello" + Constants.vbCrLf + Constants.vbCrLf + "world" + Constants.vbCrLf;
+            string before = "hello" + PortConstants.NewLine + "/* hello */" + PortConstants.NewLine + "world" + PortConstants.NewLine;
+            string after = "hello" + PortConstants.NewLine + PortConstants.NewLine + "world" + PortConstants.NewLine;
             VerifyNormal(before, after);
         }
 
         [Fact()]
         public void Comment3()
         {
-            string before = "// hello */" + Constants.vbCrLf + "world" + Constants.vbCrLf;
-            string after = Constants.vbCrLf + "world" + Constants.vbCrLf;
+            string before = "// hello */" + PortConstants.NewLine + "world" + PortConstants.NewLine;
+            string after = PortConstants.NewLine + "world" + PortConstants.NewLine;
             VerifyNormal(before, after);
         }
 
@@ -307,8 +307,8 @@ namespace PInvoke.Test
         [Fact()]
         public void Comment4()
         {
-            string before = "/* hello */ hello" + Constants.vbCrLf + "world" + Constants.vbCrLf;
-            string after = " hello" + Constants.vbCrLf + "world" + Constants.vbCrLf;
+            string before = "/* hello */ hello" + PortConstants.NewLine + "world" + PortConstants.NewLine;
+            string after = " hello" + PortConstants.NewLine + "world" + PortConstants.NewLine;
             VerifyNormal(before, after);
         }
         /// <summary>
@@ -318,7 +318,7 @@ namespace PInvoke.Test
         [Fact()]
         public void Macro1()
         {
-            string data = "#define foo bar" + Constants.vbCrLf + "#define bar foo";
+            string data = "#define foo bar" + PortConstants.NewLine + "#define bar foo";
             VerifyMacro(data, "foo", "bar", "bar", "foo");
         }
 
@@ -329,7 +329,7 @@ namespace PInvoke.Test
         [Fact()]
         public void Macro2()
         {
-            string data = "#define foo /* hello */bar" + Constants.vbCrLf + "#define bar foo";
+            string data = "#define foo /* hello */bar" + PortConstants.NewLine + "#define bar foo";
             VerifyMacro(data, "foo", "bar", "bar", "foo");
         }
 
@@ -340,7 +340,7 @@ namespace PInvoke.Test
         [Fact()]
         public void Macro3()
         {
-            string data = "#define foo bar" + Constants.vbCrLf + "#undef foo";
+            string data = "#define foo bar" + PortConstants.NewLine + "#undef foo";
             Dictionary<string, Macro> map = VerifyMacro(data);
             Assert.Equal(0, map.Count);
         }
@@ -348,7 +348,7 @@ namespace PInvoke.Test
         [Fact()]
         public void Macro4()
         {
-            string data = "#define foo bar" + Constants.vbCrLf + "#define /* hollow */ bar foo";
+            string data = "#define foo bar" + PortConstants.NewLine + "#define /* hollow */ bar foo";
             VerifyMacro(data, "foo", "bar", "bar", "foo");
         }
 
@@ -360,16 +360,16 @@ namespace PInvoke.Test
         [Fact()]
         public void Macro5()
         {
-            string before = "#define foo   (1)" + Constants.vbCrLf + "foo" + Constants.vbCrLf;
-            string after = "(1)" + Constants.vbCrLf;
+            string before = "#define foo   (1)" + PortConstants.NewLine + "foo" + PortConstants.NewLine;
+            string after = "(1)" + PortConstants.NewLine;
             VerifyNormal(before, after);
         }
 
         [Fact()]
         public void Macro6()
         {
-            string before = "#define foo   ((2)1)" + Constants.vbCrLf + "foo" + Constants.vbCrLf;
-            string after = "((2)1)" + Constants.vbCrLf;
+            string before = "#define foo   ((2)1)" + PortConstants.NewLine + "foo" + PortConstants.NewLine;
+            string after = "((2)1)" + PortConstants.NewLine;
             VerifyNormal(before, after);
         }
 
@@ -529,16 +529,16 @@ namespace PInvoke.Test
         [Fact()]
         public void Replace1()
         {
-            string before = "#define foo bar" + Constants.vbCrLf + "foo" + Constants.vbCrLf;
-            string after = "bar" + Constants.vbCrLf;
+            string before = "#define foo bar" + PortConstants.NewLine + "foo" + PortConstants.NewLine;
+            string after = "bar" + PortConstants.NewLine;
             VerifyNormal(before, after);
         }
 
         [Fact()]
         public void Replace2()
         {
-            string before = "#define foo bar" + Constants.vbCrLf + "baz" + Constants.vbCrLf;
-            string after = "baz" + Constants.vbCrLf;
+            string before = "#define foo bar" + PortConstants.NewLine + "baz" + PortConstants.NewLine;
+            string after = "baz" + PortConstants.NewLine;
             VerifyNormal(before, after);
         }
 
@@ -549,16 +549,16 @@ namespace PInvoke.Test
         [Fact()]
         public void Replace3()
         {
-            string before = "#define foo /##/ " + Constants.vbCrLf + "foo bar" + Constants.vbCrLf;
-            string after = "// bar" + Constants.vbCrLf;
+            string before = "#define foo /##/ " + PortConstants.NewLine + "foo bar" + PortConstants.NewLine;
+            string after = "// bar" + PortConstants.NewLine;
             VerifyNormal(before, after);
         }
 
         [Fact()]
         public void Replace4()
         {
-            string before = "#define m1(x) x##1 2" + Constants.vbCrLf + "m1(5)" + Constants.vbCrLf;
-            string after = "51 2" + Constants.vbCrLf;
+            string before = "#define m1(x) x##1 2" + PortConstants.NewLine + "m1(5)" + PortConstants.NewLine;
+            string after = "51 2" + PortConstants.NewLine;
             VerifyNormal(before, after);
         }
 
@@ -569,8 +569,8 @@ namespace PInvoke.Test
         [Fact()]
         public void Method1()
         {
-            string before = "#define foo(x) x" + Constants.vbCrLf + "foo(1)";
-            string after = "1" + Constants.vbCrLf;
+            string before = "#define foo(x) x" + PortConstants.NewLine + "foo(1)";
+            string after = "1" + PortConstants.NewLine;
             VerifyNormal(before, after);
         }
 
@@ -581,8 +581,8 @@ namespace PInvoke.Test
         [Fact()]
         public void Method2()
         {
-            string before = "#define foo(x) x" + Constants.vbCrLf + "foo(1)" + Constants.vbCrLf + "foo(\"hello\")" + Constants.vbCrLf + "foo(0x5)" + Constants.vbCrLf;
-            string after = "1" + Constants.vbCrLf + "\"hello\"" + Constants.vbCrLf + "0x5" + Constants.vbCrLf;
+            string before = "#define foo(x) x" + PortConstants.NewLine + "foo(1)" + PortConstants.NewLine + "foo(\"hello\")" + PortConstants.NewLine + "foo(0x5)" + PortConstants.NewLine;
+            string after = "1" + PortConstants.NewLine + "\"hello\"" + PortConstants.NewLine + "0x5" + PortConstants.NewLine;
             VerifyNormal(before, after);
         }
 
@@ -593,8 +593,8 @@ namespace PInvoke.Test
         [Fact()]
         public void Method3()
         {
-            string before = "#define foo(x)                   x" + Constants.vbCrLf + "foo(1)" + Constants.vbCrLf;
-            string after = "1" + Constants.vbCrLf;
+            string before = "#define foo(x)                   x" + PortConstants.NewLine + "foo(1)" + PortConstants.NewLine;
+            string after = "1" + PortConstants.NewLine;
             VerifyNormal(before, after);
         }
 
@@ -605,8 +605,8 @@ namespace PInvoke.Test
         [Fact()]
         public void Method4()
         {
-            string before = "#define foo(x,y) x y" + Constants.vbCrLf + "foo(1,2)" + Constants.vbCrLf + "foo(\"h\", \"y\")" + Constants.vbCrLf;
-            string after = "1 2" + Constants.vbCrLf + "\"hy\"" + Constants.vbCrLf;
+            string before = "#define foo(x,y) x y" + PortConstants.NewLine + "foo(1,2)" + PortConstants.NewLine + "foo(\"h\", \"y\")" + PortConstants.NewLine;
+            string after = "1 2" + PortConstants.NewLine + "\"hy\"" + PortConstants.NewLine;
             VerifyNormal(before, after);
         }
 
@@ -617,8 +617,8 @@ namespace PInvoke.Test
         [Fact()]
         public void Method5()
         {
-            string before = "#define foo(x) #x" + Constants.vbCrLf + "foo(1)" + Constants.vbCrLf;
-            string after = "\"1\"" + Constants.vbCrLf;
+            string before = "#define foo(x) #x" + PortConstants.NewLine + "foo(1)" + PortConstants.NewLine;
+            string after = "\"1\"" + PortConstants.NewLine;
             VerifyNormal(before, after);
         }
 
@@ -629,8 +629,8 @@ namespace PInvoke.Test
         [Fact()]
         public void Method6()
         {
-            string before = "#define foo(x) #x" + Constants.vbCrLf + "\"h\"foo(1)\"y\"" + Constants.vbCrLf;
-            string after = "\"h1y\"" + Constants.vbCrLf;
+            string before = "#define foo(x) #x" + PortConstants.NewLine + "\"h\"foo(1)\"y\"" + PortConstants.NewLine;
+            string after = "\"h1y\"" + PortConstants.NewLine;
             VerifyNormal(before, after);
         }
 
@@ -641,16 +641,16 @@ namespace PInvoke.Test
         [Fact()]
         public void Method7()
         {
-            string before = "#define foo(x) x##__" + Constants.vbCrLf + "foo(y)" + Constants.vbCrLf;
-            string after = "y__" + Constants.vbCrLf;
+            string before = "#define foo(x) x##__" + PortConstants.NewLine + "foo(y)" + PortConstants.NewLine;
+            string after = "y__" + PortConstants.NewLine;
             VerifyNormal(before, after);
         }
 
         [Fact()]
         public void Method8()
         {
-            string before = "#define foo(x,y) x##y" + Constants.vbCrLf + "foo(y,z)" + Constants.vbCrLf;
-            string after = "yz" + Constants.vbCrLf;
+            string before = "#define foo(x,y) x##y" + PortConstants.NewLine + "foo(y,z)" + PortConstants.NewLine;
+            string after = "yz" + PortConstants.NewLine;
             VerifyNormal(before, after);
         }
 
@@ -661,16 +661,16 @@ namespace PInvoke.Test
         [Fact()]
         public void Method9()
         {
-            string before = "#define foo(x) x" + Constants.vbCrLf + "foo(y(0))" + Constants.vbCrLf;
-            string after = "y(0)" + Constants.vbCrLf;
+            string before = "#define foo(x) x" + PortConstants.NewLine + "foo(y(0))" + PortConstants.NewLine;
+            string after = "y(0)" + PortConstants.NewLine;
             VerifyNormal(before, after);
         }
 
         [Fact()]
         public void Method10()
         {
-            string before = "#define foo(x,y) x ## y" + Constants.vbCrLf + "#define foo2(x,y) x## y" + Constants.vbCrLf + "#define foo3(x,y) x ##y" + Constants.vbCrLf + "foo(1,2)" + Constants.vbCrLf + "foo2(3,4)" + Constants.vbCrLf + "foo3(5,6)" + Constants.vbCrLf;
-            string after = "12" + Constants.vbCrLf + "34" + Constants.vbCrLf + "56" + Constants.vbCrLf;
+            string before = "#define foo(x,y) x ## y" + PortConstants.NewLine + "#define foo2(x,y) x## y" + PortConstants.NewLine + "#define foo3(x,y) x ##y" + PortConstants.NewLine + "foo(1,2)" + PortConstants.NewLine + "foo2(3,4)" + PortConstants.NewLine + "foo3(5,6)" + PortConstants.NewLine;
+            string after = "12" + PortConstants.NewLine + "34" + PortConstants.NewLine + "56" + PortConstants.NewLine;
             VerifyNormal(before, after);
         }
 
@@ -681,8 +681,8 @@ namespace PInvoke.Test
         [Fact()]
         public void Method11()
         {
-            string before = "#define inner(x) x" + Constants.vbCrLf + "#define outer(x) inner(x)" + Constants.vbCrLf + "outer(5)" + Constants.vbCrLf;
-            string after = "5" + Constants.vbCrLf;
+            string before = "#define inner(x) x" + PortConstants.NewLine + "#define outer(x) inner(x)" + PortConstants.NewLine + "outer(5)" + PortConstants.NewLine;
+            string after = "5" + PortConstants.NewLine;
             VerifyNormal(before, after);
         }
 
@@ -693,8 +693,8 @@ namespace PInvoke.Test
         [Fact()]
         public void Method12()
         {
-            string before = "#define inner(x,y) x##y" + Constants.vbCrLf + "#define outer(x,y) inner(x,y)" + Constants.vbCrLf + "outer(1,2)" + Constants.vbCrLf;
-            string after = "12" + Constants.vbCrLf;
+            string before = "#define inner(x,y) x##y" + PortConstants.NewLine + "#define outer(x,y) inner(x,y)" + PortConstants.NewLine + "outer(1,2)" + PortConstants.NewLine;
+            string after = "12" + PortConstants.NewLine;
             VerifyNormal(before, after);
         }
 
@@ -706,8 +706,8 @@ namespace PInvoke.Test
         [Fact()]
         public void Method13()
         {
-            string before = "#define x(y) \"foo\" y \"bar\"" + Constants.vbCrLf + "x(\"hey\")" + Constants.vbCrLf;
-            string after = "\"fooheybar\"" + Constants.vbCrLf;
+            string before = "#define x(y) \"foo\" y \"bar\"" + PortConstants.NewLine + "x(\"hey\")" + PortConstants.NewLine;
+            string after = "\"fooheybar\"" + PortConstants.NewLine;
             VerifyNormal(before, after);
         }
 
@@ -718,8 +718,8 @@ namespace PInvoke.Test
         [Fact()]
         public void Method14()
         {
-            string before = "#define x(y) y" + Constants.vbCrLf + "x(a b)" + Constants.vbCrLf;
-            string after = "a b" + Constants.vbCrLf;
+            string before = "#define x(y) y" + PortConstants.NewLine + "x(a b)" + PortConstants.NewLine;
+            string after = "a b" + PortConstants.NewLine;
             VerifyNormal(before, after);
         }
 
@@ -731,8 +731,8 @@ namespace PInvoke.Test
         [Fact()]
         public void Method15()
         {
-            string before = "#define foo bar" + Constants.vbCrLf + "#define m1(x) x" + Constants.vbCrLf + "m1(foo 2)" + Constants.vbCrLf;
-            string after = "bar 2" + Constants.vbCrLf;
+            string before = "#define foo bar" + PortConstants.NewLine + "#define m1(x) x" + PortConstants.NewLine + "m1(foo 2)" + PortConstants.NewLine;
+            string after = "bar 2" + PortConstants.NewLine;
             VerifyNormal(before, after);
         }
 
@@ -743,8 +743,8 @@ namespace PInvoke.Test
         [Fact()]
         public void Misc1()
         {
-            string before = "\"foo\"\"bar\"" + Constants.vbCrLf;
-            string after = "\"foobar\"" + Constants.vbCrLf;
+            string before = "\"foo\"\"bar\"" + PortConstants.NewLine;
+            string after = "\"foobar\"" + PortConstants.NewLine;
             VerifyNormal(before, after);
         }
 
@@ -755,8 +755,8 @@ namespace PInvoke.Test
         [Fact()]
         public void Misc2()
         {
-            string before = "\"foo\"     \"bar\"" + Constants.vbCrLf;
-            string after = "\"foobar\"" + Constants.vbCrLf;
+            string before = "\"foo\"     \"bar\"" + PortConstants.NewLine;
+            string after = "\"foobar\"" + PortConstants.NewLine;
             VerifyNormal(before, after);
         }
 
@@ -783,7 +783,7 @@ namespace PInvoke.Test
         {
             List<Macro> list = new List<Macro>();
             list.Add(new Macro("FOO", "BAR", true));
-            VerifyNormal(list, "#define FOO BAZ" + Constants.vbCrLf + "FOO" + Constants.vbCrLf, "BAR" + Constants.vbCrLf);
+            VerifyNormal(list, "#define FOO BAZ" + PortConstants.NewLine + "FOO" + PortConstants.NewLine, "BAR" + PortConstants.NewLine);
         }
     }
 }

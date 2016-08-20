@@ -24,7 +24,7 @@ namespace PInvoke.Test
         public void VerifyParse(string str, object value)
         {
             object converted = null;
-            Assert.True(Helper.TryConvertToNumber(str, converted));
+            Assert.True(Helper.TryConvertToNumber(str, out converted));
             Assert.Equal(value, converted);
         }
 
@@ -32,11 +32,11 @@ namespace PInvoke.Test
         {
             Token token = new Token(TokenType.QuotedStringAnsi, "\"" + str + "\"");
             string converted = null;
-            Assert.True(Helper.TryConvertToString(token, converted));
+            Assert.True(Helper.TryConvertToString(token, out converted));
             Assert.Equal(str, converted);
 
             token = new Token(TokenType.QuotedStringUnicode, "L\"" + str + "\"");
-            Assert.True(Helper.TryConvertToString(token, converted));
+            Assert.True(Helper.TryConvertToString(token, out converted));
             Assert.Equal(str, converted);
         }
 
@@ -44,18 +44,18 @@ namespace PInvoke.Test
         {
             Token token = new Token(TokenType.CharacterAnsi, "'" + c + "'");
             char converted = '0';
-            Assert.True(Helper.TryConvertToChar(token, converted));
+            Assert.True(Helper.TryConvertToChar(token, out converted));
             Assert.Equal(c, converted);
 
             token = new Token(TokenType.CharacterUnicode, "L'" + c + "'");
-            Assert.True(Helper.TryConvertToChar(token, converted));
+            Assert.True(Helper.TryConvertToChar(token, out converted));
             Assert.Equal(c, converted);
         }
 
         public void VerifyNumber<T>(string str, T number)
         {
             object ret = null;
-            Assert.True(TokenHelper.TryConvertToNumber(str, ret));
+            Assert.True(TokenHelper.TryConvertToNumber(str, out ret));
             Assert.IsType<T>(ret);
             Assert.Equal(number, ret);
         }
@@ -68,11 +68,11 @@ namespace PInvoke.Test
         public void Signed1()
         {
             object val = null;
-            Assert.True(Helper.TryConvertToNumber("42", val));
+            Assert.True(Helper.TryConvertToNumber("42", out val));
             Assert.Equal(42, Convert.ToInt32(val));
-            Assert.True(Helper.TryConvertToNumber("400", val));
+            Assert.True(Helper.TryConvertToNumber("400", out val));
             Assert.Equal(400, Convert.ToInt32(val));
-            Assert.True(Helper.TryConvertToNumber("-1", val));
+            Assert.True(Helper.TryConvertToNumber("-1", out val));
             Assert.Equal(-1, Convert.ToInt32(val));
         }
 
@@ -115,7 +115,7 @@ namespace PInvoke.Test
         public void Float1()
         {
             object val = null;
-            Assert.True(Helper.TryConvertToNumber("6.5F", val));
+            Assert.True(Helper.TryConvertToNumber("6.5F", out val));
             Assert.Equal(6.5f, float.Parse(Convert.ToString(val)));
         }
 
@@ -135,7 +135,7 @@ namespace PInvoke.Test
         public void Exponent1()
         {
             object val = null;
-            Assert.True(Helper.TryConvertToNumber("6e2", val));
+            Assert.True(Helper.TryConvertToNumber("6e2", out val));
             Assert.Equal(600f, float.Parse(Convert.ToString(val)));
         }
 
@@ -143,7 +143,7 @@ namespace PInvoke.Test
         public void Exponent2()
         {
             object val = null;
-            Assert.True(Helper.TryConvertToNumber("6.5e2", val));
+            Assert.True(Helper.TryConvertToNumber("6.5e2", out val));
             Assert.Equal(650f, float.Parse(Convert.ToString(val)));
         }
 
@@ -151,7 +151,7 @@ namespace PInvoke.Test
         public void Exponent3()
         {
             object val = null;
-            Assert.True(Helper.TryConvertToNumber("6.5e2L", val));
+            Assert.True(Helper.TryConvertToNumber("6.5e2L", out val));
             Assert.Equal(650f, float.Parse(Convert.ToString(val)));
         }
 
@@ -164,7 +164,7 @@ namespace PInvoke.Test
         {
             object val = null;
             UInt32 target = 42;
-            Assert.True(Helper.TryConvertToNumber("42U", val));
+            Assert.True(Helper.TryConvertToNumber("42U", out val));
             Assert.Equal(target, UInt32.Parse(Convert.ToString(val)));
         }
 
@@ -188,7 +188,7 @@ namespace PInvoke.Test
         public void Unsigned3()
         {
             object val = null;
-            Assert.True(Helper.TryConvertToNumber("-42", val));
+            Assert.True(Helper.TryConvertToNumber("-42", out val));
             Assert.Equal(-42, Convert.ToInt32(val));
         }
 
@@ -220,7 +220,7 @@ namespace PInvoke.Test
         public void Invalid1()
         {
             object val = null;
-            Assert.False(Helper.TryConvertToNumber("aoo", val));
+            Assert.False(Helper.TryConvertToNumber("aoo", out val));
         }
 
         [Fact()]

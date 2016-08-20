@@ -1,0 +1,17 @@
+
+configuration: Debug
+
+branches:
+  only:
+    - master
+
+before_build: 
+  - nuget restore PInvoke.sln
+
+build:
+  project: PInvoke.sln
+  verbosity: minimal
+
+test:
+  assemblies:
+     - PInvokeTest\bin\Debug\PInvokeTest.dll     

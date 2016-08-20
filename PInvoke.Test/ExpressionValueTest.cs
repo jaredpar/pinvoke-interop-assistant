@@ -10,105 +10,111 @@ using System.Text;
 using System.IO;
 using PInvoke.Parser;
 using Xunit;
+
 namespace PInvoke.Test
 {
-
     public class ExpressionValueTest
     {
+        private static ExpressionValue Create(object o)
+        {
+            Number n;
+            if (Number.TryCreate(o, out n))
+            { 
+                return ExpressionValue.Create(n);
+            }
+
+            var type = o.GetType();
+            if (type == typeof(bool))
+            {
+                return ExpressionValue.Create((bool)o);
+            }
+
+            throw new Exception($"Don't know how to convert {o.GetType().Name}");
+        }
+
+        private static ExpressionValue Eval(BinaryOperator op, object x, object y)
+        {
+            var left = Create(x);
+            var right = Create(y);
+            ExpressionValue result;
+            Assert.True(ExpressionEvaluator.TryEvaluateBinaryOperation(op, left, right, out result));
+            return result;
+        }
+
+        private static bool Equals(ExpressionValue left, ExpressionValue right)
+        {
+            if (right.Kind == ExpressionValueKind.Single || right.Kind == ExpressionValueKind.Double)
+            {
+                return left.ConvertToDouble() == right.ConvertToDouble();
+            }
+
+            return left.ConvertToLong() == right.ConvertToLong();
+        }
+
+        private void Test(BinaryOperator op, object x, object y, object r)
+        {
+            var result = Eval(op, x, y);
+            Assert.True(Equals(result, Create(r)));
+        }
 
         public void TestPlus(object x, object y, object r)
         {
-            ExpressionValue left = new ExpressionValue(x);
-            ExpressionValue right = new ExpressionValue(y);
-            ExpressionValue result = left + right;
-            Assert.Equal(r, result.Value);
-            Assert.Equal(r.GetType(), result.Value.GetType());
+            Test(BinaryOperator.Add, x, y, r);
         }
-
 
         public void TestMinus(object x, object y, object r)
         {
-            ExpressionValue left = new ExpressionValue(x);
-            ExpressionValue right = new ExpressionValue(y);
-            ExpressionValue result = left - right;
-            Assert.Equal(r, result.Value);
-            Assert.Equal(r.GetType(), result.Value.GetType());
+            Test(BinaryOperator.Subtract, x, y, r);
         }
 
         public void TestDivide(object x, object y, object r)
         {
-            ExpressionValue left = new ExpressionValue(x);
-            ExpressionValue right = new ExpressionValue(y);
-            ExpressionValue result = left / right;
-            Assert.Equal(r, result.Value);
-            Assert.Equal(r.GetType(), result.Value.GetType());
+            Test(BinaryOperator.Divide, x, y, r);
         }
 
         public void TestMultiply(object x, object y, object r)
         {
-            ExpressionValue left = new ExpressionValue(x);
-            ExpressionValue right = new ExpressionValue(y);
-            ExpressionValue result = left * right;
-            Assert.Equal(r, result.Value);
-            Assert.Equal(r.GetType(), result.Value.GetType());
+            Test(BinaryOperator.Multiply, x, y, r);
         }
 
         public void TestShiftLeft(object x, int y, object r)
         {
-            ExpressionValue left = new ExpressionValue(x);
-            ExpressionValue result = left << y;
-            Assert.Equal(r, result.Value);
-            Assert.Equal(r.GetType(), result.Value.GetType());
+            Test(BinaryOperator.ShiftLeft, x, y, r);
         }
 
         public void TestShiftRight(object x, int y, object r)
         {
-            ExpressionValue left = new ExpressionValue(x);
-            ExpressionValue result = left >> y;
-            Assert.Equal(r, result.Value);
-            Assert.Equal(r.GetType(), result.Value.GetType());
+            Test(BinaryOperator.ShiftRight, x, y, r);
         }
 
-        public void TestGreaterThan(object x, object y, bool expected)
+        public void TestGreaterThan(object x, object y, bool r)
         {
-            ExpressionValue left = new ExpressionValue(x);
-            ExpressionValue right = new ExpressionValue(y);
-            Assert.Equal(expected, left > right);
+            Test(BinaryOperator.GreaterThan, x, y, r);
         }
 
-        public void TestGreaterThanOrEqualsTo(object x, object y, bool expected)
+        public void TestGreaterThanOrEqualsTo(object x, object y, bool r)
         {
-            ExpressionValue left = new ExpressionValue(x);
-            ExpressionValue right = new ExpressionValue(y);
-            Assert.Equal(expected, left >= right);
+            Test(BinaryOperator.GreaterThanOrEqualTo, x, y, r);
         }
 
-        public void TestLessThan(object x, object y, bool expected)
+        public void TestLessThan(object x, object y, bool r)
         {
-            ExpressionValue left = new ExpressionValue(x);
-            ExpressionValue right = new ExpressionValue(y);
-            Assert.Equal(expected, left < right);
+            Test(BinaryOperator.LessThan, x, y, r);
         }
 
-        public void TestLessThanOrEqualsTo(object x, object y, bool expected)
+        public void TestLessThanOrEqualsTo(object x, object y, bool r)
         {
-            ExpressionValue left = new ExpressionValue(x);
-            ExpressionValue right = new ExpressionValue(y);
-            Assert.Equal(expected, left <= right);
+            Test(BinaryOperator.LessThanOrEqualTo, x, y, r);
         }
 
-        public void TestNotEqualsTo(object x, object y, bool expected)
+        public void TestNotEqualsTo(object x, object y, bool r)
         {
-            ExpressionValue left = new ExpressionValue(x);
-            ExpressionValue right = new ExpressionValue(y);
-            Assert.Equal(expected, left != right);
+            Test(BinaryOperator.BooleanNotEquals, x, y, r);
         }
 
-        public void TestEqualsTo(object x, object y, bool expected)
+        public void TestEqualsTo(object x, object y, bool r)
         {
-            ExpressionValue left = new ExpressionValue(x);
-            ExpressionValue right = new ExpressionValue(y);
-            Assert.Equal(expected, left == right);
+            Test(BinaryOperator.BooleanEquals, x, y, r);
         }
 
         [Fact()]
@@ -170,26 +176,5 @@ namespace PInvoke.Test
             TestNotEqualsTo(1.0, 1.0, false);
             TestNotEqualsTo(1.0, 2.0, true);
         }
-
-        [Fact()]
-        public void Conversion1()
-        {
-            ExpressionValue left = 1;
-            ExpressionValue right = 5;
-            Assert.False(left == right);
-            Assert.True(left == 1);
-            Assert.True(left != 5);
-            Assert.True(right == 5);
-        }
-
-        [Fact()]
-        public void Conversion2()
-        {
-            ExpressionValue left = true;
-            ExpressionValue right = false;
-            Assert.True(left == 1);
-            Assert.True(right == 0);
-        }
-
     }
 }

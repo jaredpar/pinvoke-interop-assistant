@@ -37,12 +37,20 @@ namespace PInvoke.Test
         //
         #endregion
 
-        private void AssertEval(string expr, object result)
+        private void AssertEval(string expr, long result)
         {
             ExpressionEvaluator ee = new ExpressionEvaluator();
             ExpressionValue actual = null;
             Assert.True(ee.TryEvaluate(expr, out actual));
-            Assert.Equal(result, actual.Value);
+            Assert.Equal(result, actual.ConvertToLong());
+        }
+
+        private void AssertEval(string expr, double result)
+        {
+            ExpressionEvaluator ee = new ExpressionEvaluator();
+            ExpressionValue actual = null;
+            Assert.True(ee.TryEvaluate(expr, out actual));
+            Assert.Equal(result, actual.ConvertToDouble());
         }
 
         [Fact()]

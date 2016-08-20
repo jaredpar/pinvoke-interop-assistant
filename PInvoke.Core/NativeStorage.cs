@@ -725,7 +725,7 @@ namespace PInvoke
                             list.Add(new PInvoke.Parser.Macro(nRow.Name, nRow.Value));
                             break;
                         default:
-                            InvalidEnumValue(nRow.Kind);
+                            ThrowInvalidEnumValue(nRow.Kind);
                             break;
                     }
                 }
@@ -963,7 +963,7 @@ namespace PInvoke
                     constRow.Value = nConst.Value.Expression;
                     break;
                 default:
-                    InvalidEnumValue(nConst.ConstantKind);
+                    ThrowInvalidEnumValue(nConst.ConstantKind);
                     break;
             }
 
@@ -1436,7 +1436,7 @@ namespace PInvoke
                 case NativeSymbolCategory.Specialized:
                     return CreateTypeReferenceToSpecialized((NativeSpecializedType)nt);
                 default:
-                    InvalidEnumValue(nt.Category);
+                    ThrowInvalidEnumValue(nt.Category);
                     // Will throw
                     return null;
             }
@@ -1597,7 +1597,7 @@ namespace PInvoke
                 case NativeSymbolKind.BitVectorType:
                     return TryLoadSpecialized(typeRef, out nt);
                 default:
-                    InvalidEnumValue(typeRef.Kind);
+                    ThrowInvalidEnumValue(typeRef.Kind);
                     nt = null;
                     return false;
             }
@@ -1652,7 +1652,7 @@ namespace PInvoke
                     dt = fptr;
                     break;
                 default:
-                    InvalidEnumValue(drow.Kind);
+                    ThrowInvalidEnumValue(drow.Kind);
                     break;
             }
 
@@ -1749,7 +1749,7 @@ namespace PInvoke
             }
             else
             {
-                InvalidEnumValue(typeRef.Kind);
+                ThrowInvalidEnumValue(typeRef.Kind);
                 return false;
             }
         }
@@ -1783,7 +1783,7 @@ namespace PInvoke
                         nt = new NativeBuiltinType(srow.BuiltinType, srow.IsUnsigned);
                         break;
                     default:
-                        InvalidEnumValue(typeRef.Kind);
+                        ThrowInvalidEnumValue(typeRef.Kind);
                         return false;
                 }
 

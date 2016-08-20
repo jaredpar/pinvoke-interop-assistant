@@ -52,7 +52,7 @@ namespace PInvoke.Transform
                 case Transform.LanguageType.VisualBasic:
                     return new Microsoft.VisualBasic.VBCodeProvider();
                 default:
-                    InvalidEnumValue(_lang);
+                    ThrowInvalidEnumValue(_lang);
                     return null;
             }
         }
@@ -100,7 +100,7 @@ namespace PInvoke.Transform
                     prefix = "Not (";
                     break;
                 default:
-                    InvalidEnumValue(this.LanguageType);
+                    ThrowInvalidEnumValue(this.LanguageType);
                     return;
             }
 

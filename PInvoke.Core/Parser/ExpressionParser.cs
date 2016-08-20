@@ -80,6 +80,7 @@ namespace PInvoke.Parser
             set { _parenthesized = value; }
         }
 
+        // CTODO: Delete this.  It's a hack
         public object Tag
         {
             get { return _tag; }

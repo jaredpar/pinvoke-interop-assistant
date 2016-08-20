@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.CodeDom;
 using System.Text;
 using static PInvoke.Contract;
+using PInvoke.Parser;
 
 namespace PInvoke
 {
@@ -1260,7 +1261,7 @@ namespace PInvoke
                     _unmanagedType = System.Runtime.InteropServices.UnmanagedType.AsAny;
                     break;
                 default:
-                    InvalidEnumValue(BuiltinType);
+                    ThrowInvalidEnumValue(BuiltinType);
                     break;
             }
 
@@ -1329,7 +1330,7 @@ namespace PInvoke
                     break;
                 default:
                     bt = PInvoke.BuiltinType.NativeUnknown;
-                    InvalidEnumValue(tt);
+                    ThrowInvalidEnumValue(tt);
                     break;
             }
 
@@ -1942,8 +1943,8 @@ namespace PInvoke
                 }
                 else if (token.IsNumber)
                 {
-                    object value = null;
-                    if (Parser.TokenHelper.TryConvertToNumber(token, out value))
+                    Number value;
+                    if (TokenHelper.TryConvertToNumber(token, out value))
                     {
                         ntVal = NativeValue.CreateNumber(value);
                     }
@@ -2124,7 +2125,7 @@ namespace PInvoke
                     case NativeValueKind.SymbolValue:
                         return SymbolValue != null;
                     default:
-                        InvalidEnumValue(this.ValueKind);
+                        ThrowInvalidEnumValue(this.ValueKind);
                         return false;
                 }
             }
@@ -2163,7 +2164,7 @@ namespace PInvoke
 
                         return Name;
                     default:
-                        InvalidEnumValue(_valueKind);
+                        ThrowInvalidEnumValue(_valueKind);
                         return string.Empty;
                 }
             }
@@ -2217,9 +2218,15 @@ namespace PInvoke
             }
         }
 
-        public static NativeValue CreateNumber(object o)
+        public static NativeValue CreateNumber(int i)
         {
-            return new NativeValue(o, NativeValueKind.Number);
+            return CreateNumber(new Number(i));
+        }
+
+        public static NativeValue CreateNumber(Number n)
+        {
+            // CTODO: Consider passing Number through here.
+            return new NativeValue(n.Value, NativeValueKind.Number);
         }
 
         public static NativeValue CreateBoolean(bool b)
@@ -2427,7 +2434,7 @@ namespace PInvoke
                 case PInvoke.SalEntryType.InnerBlocksOn:
                     return "SAL_blocksOn()";
                 default:
-                    InvalidEnumValue(entry);
+                    ThrowInvalidEnumValue(entry);
                     return string.Empty;
             }
         }

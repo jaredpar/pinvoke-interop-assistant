@@ -457,7 +457,7 @@ namespace PInvoke.Parser
                     analyzer.AddInitialMacro(new Macro("_WIN32_WINNT", "0x0600"));
                     break;
                 default:
-                    InvalidEnumValue(os);
+                    ThrowInvalidEnumValue(os);
                     break;
             }
         }

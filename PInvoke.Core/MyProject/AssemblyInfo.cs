@@ -19,7 +19,7 @@ using System.Runtime.InteropServices;
 
 [assembly: Guid("40409a4a-6529-4096-b34e-5accbab81397")]
 
-[assembly: AssemblyTitle("PInvoke")]
+[assembly: AssemblyTitle("PInvoke.Core")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("PInvoke")]

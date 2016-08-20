@@ -21,7 +21,7 @@ namespace PInvoke
         {
             if ((value == null))
             {
-                Contract.ContractViolation(message);
+                Contract.Violation(message);
             }
         }
 
@@ -34,7 +34,7 @@ namespace PInvoke
         {
             if (!value)
             {
-                Contract.ContractViolation(message);
+                Contract.Violation(message);
             }
         }
 
@@ -47,37 +47,40 @@ namespace PInvoke
         {
             if (value)
             {
-                Contract.ContractViolation(message);
+                Contract.Violation(message);
             }
         }
 
-        public static void InvalidEnumValue<T>(T value) where T : struct
+        public static void ThrowInvalidEnumValue<T>(T value) where T : struct
         {
-            Contract.ThrowIfFalse(typeof(T).IsEnum, "Expected an enum type");
-            Contract.Violation("Invalid Enum value of Type {0} : {1}", new object[] {
-            typeof(T).Name,
-            value
-        });
+            Violation(CreateInvalidEnumValueException(value));
+        }
+
+        public static Exception CreateInvalidEnumValueException<T>(T value) where T : struct
+        {
+            var message = $"Invalid enum value of type {typeof(T).Name}: {value}";
+            return new ContractException(message);
+        }
+
+        public static void Require(bool b)
+        {
+            ThrowIfFalse(b);
         }
 
         public static void Violation(string message)
         {
-            Contract.ContractViolation(message);
+            Violation(new ContractException(message));
         }
 
         public static void Violation(string format, params object[] args)
         {
-            Contract.ContractViolation(string.Format(format, args));
+            Violation(string.Format(format, args));
         }
 
-        private static void ContractViolation(string message)
+        private static void Violation(Exception exception)
         {
-            Debug.Fail("Contract Violation: " + message);
-            bool inUnitTest = Contract.InUnitTest;
-            StackTrace trace = new StackTrace();
-            string text = message;
-            text = text + Environment.NewLine + trace.ToString();
-            throw new ContractException(message);
+            Debug.Fail("Contract Violation: " + exception.Message);
+            throw exception;
         }
     }
 

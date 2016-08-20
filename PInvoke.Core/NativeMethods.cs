@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 
 namespace PInvoke
 {
-    static internal class NativeMethods
+    internal static class NativeMethods
     {
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         public static extern IntPtr LoadLibraryEx([MarshalAs(UnmanagedType.LPTStr), In()] string fileName, IntPtr intPtr, UInt32 flags);

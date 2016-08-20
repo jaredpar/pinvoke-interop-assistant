@@ -846,7 +846,7 @@ namespace PInvoke.Parser
                         break;
                     default:
                         callmod = NativeCallingConvention.WinApi;
-                        InvalidEnumValue(token.TokenType);
+                        ThrowInvalidEnumValue(token.TokenType);
                         break;
                 }
 
@@ -1344,14 +1344,14 @@ namespace PInvoke.Parser
                 // This is a bitvector.  Read in the size and change the type of the 
                 // member to be a proper bitvector
                 _scanner.GetNextToken();
-                object value = null;
+                Number value;
                 Token sizeToken = _scanner.GetNextToken(TokenType.Number);
                 if (!TokenHelper.TryConvertToNumber(sizeToken, out value))
                 {
                     throw ParseException.CreateError("Expected number after bit vector specifier: {0}", sizeToken);
                 }
 
-                nt = new NativeBitVector((Int32)value);
+                nt = new NativeBitVector(value.ConvertToInteger());
             }
 
             return new NativeMember(name, nt);
@@ -1739,13 +1739,14 @@ namespace PInvoke.Parser
 
                 if ((token.TokenType == TokenType.Number || token.TokenType == TokenType.HexNumber) && _scanner.PeekNextToken().TokenType == TokenType.BracketClose)
                 {
-                    count = null;
-                    if (!TokenHelper.TryConvertToNumber(token, out count))
+                    Number number;
+                    if (!TokenHelper.TryConvertToNumber(token, out number))
                     {
                         throw ParseException.CreateError("Could not process array length as number: {0}", token.Value);
                     }
 
                     // The token should now be the closing bracket.  
+                    count = number.ConvertToInteger();
                     token = _scanner.GetNextToken(TokenType.BracketClose);
                 }
                 else if (token.TokenType == TokenType.BracketClose)
@@ -1768,9 +1769,9 @@ namespace PInvoke.Parser
 
                     ExpressionEvaluator ee = new ExpressionEvaluator();
                     ExpressionValue result = null;
-                    if (ee.TryEvaluate(exprList, out result) && object.ReferenceEquals(result.Value.GetType(), typeof(Int32)))
+                    if (ee.TryEvaluate(exprList, out result) && result.Kind != ExpressionValueKind.String)
                     {
-                        count = result.Value;
+                        count = result.ConvertToInteger();
                     }
                     else
                     {

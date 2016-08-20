@@ -10,9 +10,9 @@ using System.Text;
 using System.IO;
 using PInvoke.Parser;
 using Xunit;
+
 namespace PInvoke.Test
 {
-
     public class ExpressionValueTest
     {
         private static ExpressionValue Create(object o)
@@ -21,6 +21,12 @@ namespace PInvoke.Test
             if (Number.TryCreate(o, out n))
             { 
                 return ExpressionValue.Create(n);
+            }
+
+            var type = o.GetType();
+            if (type == typeof(bool))
+            {
+                return ExpressionValue.Create((bool)o);
             }
 
             throw new Exception($"Don't know how to convert {o.GetType().Name}");

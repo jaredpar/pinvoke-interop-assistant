@@ -25,5 +25,6 @@ namespace PInvoke.Parser
         BooleanNotEquals,
         BitwiseAnd,
         BitwiseOr,
+        Assign,
     }
 }

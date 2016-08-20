@@ -99,8 +99,8 @@ namespace PInvoke.Test
         [Fact()]
         public void Long2()
         {
-            VerifyParse("6UL", Convert.ToUInt32(6));
-            VerifyParse("26UL", Convert.ToUInt32(26));
+            VerifyParse("6UL", 6);
+            VerifyParse("26UL", 26);
         }
 
         [Fact()]
@@ -155,9 +155,8 @@ namespace PInvoke.Test
         public void Unsigned1()
         {
             Number val;
-            uint target = 42;
             Assert.True(Helper.TryConvertToNumber("42U", out val));
-            Assert.Equal(target, (uint)val.Integer);
+            Assert.Equal(42, val.Integer);
         }
 
         /// <summary>
@@ -167,9 +166,9 @@ namespace PInvoke.Test
         [Fact()]
         public void Unsigned2()
         {
-            UInt64 @base = 6000000000L;
-            VerifyParse(@base.ToString() + "U", @base);
-            VerifyParse(@base.ToString() + "u", @base);
+            Number val;
+            Assert.True(Helper.TryConvertToNumber("6000000000U", out val));
+            Assert.Equal(6000000000L, val.Long);
         }
 
         /// <summary>
@@ -203,10 +202,9 @@ namespace PInvoke.Test
         [Fact()]
         public void Octal2()
         {
-            VerifyParse("012U", Convert.ToUInt32(10));
-            VerifyParse("01u", Convert.ToUInt32(1));
+            VerifyParse("012U", 10);
+            VerifyParse("01u", 1);
         }
-
 
         [Fact()]
         public void Invalid1()

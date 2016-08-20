@@ -116,8 +116,18 @@ namespace PInvoke.Parser
 
         protected virtual bool TryEvaluateNegative(ExpressionNode node)
         {
-            var value = ((ExpressionValue)node.LeftNode.Tag).ConvertToInteger();
-            node.Tag = ExpressionValue.Create(-value);
+            var exprValue = ((ExpressionValue)node.LeftNode.Tag);
+            if (exprValue.IsFloatingPoint)
+            {
+                var value = exprValue.ConvertToDouble();
+                node.Tag = ExpressionValue.Create(-value);
+            }
+            else
+            {
+                var value = exprValue.ConvertToInteger();
+                node.Tag = ExpressionValue.Create(-value);
+            }
+
             return true;
         }
 
@@ -238,6 +248,9 @@ namespace PInvoke.Parser
                 case TokenType.Pipe:
                     op = BinaryOperator.BitwiseOr;
                     break;
+                case TokenType.OpAssign:
+                    op = BinaryOperator.Assign;
+                    break;
                 default:
                     op = BinaryOperator.Add;
                     return false;
@@ -306,6 +319,9 @@ namespace PInvoke.Parser
                 case BinaryOperator.Add:
                     result = ExpressionValue.Create(leftValue + rightValue);
                     break;
+                case BinaryOperator.Multiply:
+                    result = ExpressionValue.Create(leftValue * rightValue);
+                    break;
                 case BinaryOperator.BooleanAnd:
                     result = ExpressionValue.Create(leftBool && rightBool);
                     break;
@@ -324,7 +340,11 @@ namespace PInvoke.Parser
                 case BinaryOperator.BitwiseOr:
                     result = ExpressionValue.Create(leftValue | rightValue);
                     break;
+                case BinaryOperator.Assign:
+                    result = right;
+                    break;
                 default:
+                    Contract.ThrowInvalidEnumValue(op);
                     result = null;
                     return false;
             }

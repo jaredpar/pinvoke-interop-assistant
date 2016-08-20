@@ -22,6 +22,8 @@ namespace PInvoke.Parser
     public abstract partial class ExpressionValue
     {
         public abstract ExpressionValueKind Kind { get; }
+        public bool IsFloatingPoint => Kind == ExpressionValueKind.Single || Kind == ExpressionValueKind.Double;
+        public bool IsIntegral => Kind == ExpressionValueKind.Integer || Kind == ExpressionValueKind.Long;
 
         public abstract int ConvertToInteger();
         public abstract long ConvertToLong();
@@ -33,6 +35,8 @@ namespace PInvoke.Parser
         public static ExpressionValue Create(string s) => new StringValue(s);
         public static ExpressionValue Create(int i) => Create(new Number(i));
         public static ExpressionValue Create(long l) => Create(new Number(l));
+        public static ExpressionValue Create(float f) => Create(new Number(f));
+        public static ExpressionValue Create(double d) => Create(new Number(d));
         public static ExpressionValue Create(Number number) => new NumberValue(number);
     }
 }

@@ -64,17 +64,17 @@ namespace PInvoke
 
         public static void Require(bool b)
         {
-            ThrowIfFalse(!b);
+            ThrowIfFalse(b);
         }
 
         public static void Violation(string message)
         {
-            Contract.Violation(message);
+            Violation(new ContractException(message));
         }
 
         public static void Violation(string format, params object[] args)
         {
-            Contract.Violation(string.Format(format, args));
+            Violation(string.Format(format, args));
         }
 
         private static void Violation(Exception exception)

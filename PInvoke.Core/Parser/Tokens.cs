@@ -752,15 +752,19 @@ namespace PInvoke.Parser
             }
             else if (info.IsUnsigned)
             {
-                UInt32 uint32Value = 0;
-                UInt64 uint64Value = 0;
+                uint uint32Value = 0;
+                ulong uint64Value = 0;
                 if (!info.IsForced64 && UInt32.TryParse(str, info.Style, CultureInfo.CurrentCulture, out uint32Value))
                 {
-                    number = new Number(uint32Value);
+                    number = uint32Value <= int.MaxValue
+                        ? new Number((int)uint32Value)
+                        : new Number(uint32Value);
                 }
                 else if (UInt64.TryParse(str, info.Style, CultureInfo.CurrentCulture, out uint64Value))
                 {
-                    number = new Number(uint64Value);
+                    number = uint64Value <= long.MaxValue
+                        ? new Number((long)uint64Value)
+                        : new Number(uint64Value);
                 }
                 else
                 {
@@ -769,8 +773,8 @@ namespace PInvoke.Parser
             }
             else
             {
-                Int32 int32Value = 0;
-                Int64 int64Value = 0;
+                int int32Value = 0;
+                long int64Value = 0;
                 if (!info.IsForced64 && Int32.TryParse(str, info.Style, CultureInfo.CurrentCulture, out int32Value))
                 {
                     number = new Number(int32Value);

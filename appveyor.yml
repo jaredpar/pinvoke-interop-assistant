@@ -14,4 +14,4 @@ build:
 
 test:
   assemblies:
-     - PInvokeTest\bin\Debug\PInvokeTest.dll     
+     - PInvoke.Test\bin\Debug\PInvoke.Test.dll     

@@ -23,9 +23,9 @@ namespace PInvoke.Test
 
         public void VerifyParse(string str, object value)
         {
-            object converted = null;
+            Number converted;
             Assert.True(Helper.TryConvertToNumber(str, out converted));
-            Assert.Equal(value, converted);
+            Assert.Equal(value, converted.Value);
         }
 
         public void VerifyString(string str)
@@ -52,14 +52,6 @@ namespace PInvoke.Test
             Assert.Equal(c, converted);
         }
 
-        public void VerifyNumber<T>(string str, T number)
-        {
-            object ret = null;
-            Assert.True(TokenHelper.TryConvertToNumber(str, out ret));
-            Assert.IsType<T>(ret);
-            Assert.Equal(number, ret);
-        }
-
         /// <summary>
         /// Simple 32 bit numbers
         /// </summary>
@@ -67,13 +59,13 @@ namespace PInvoke.Test
         [Fact()]
         public void Signed1()
         {
-            object val = null;
+            Number val;
             Assert.True(Helper.TryConvertToNumber("42", out val));
-            Assert.Equal(42, Convert.ToInt32(val));
+            Assert.Equal(42, val.Integer);
             Assert.True(Helper.TryConvertToNumber("400", out val));
-            Assert.Equal(400, Convert.ToInt32(val));
+            Assert.Equal(400, val.Integer);
             Assert.True(Helper.TryConvertToNumber("-1", out val));
-            Assert.Equal(-1, Convert.ToInt32(val));
+            Assert.Equal(-1, val.Integer);
         }
 
         /// <summary>
@@ -114,9 +106,9 @@ namespace PInvoke.Test
         [Fact()]
         public void Float1()
         {
-            object val = null;
+            Number val;
             Assert.True(Helper.TryConvertToNumber("6.5F", out val));
-            Assert.Equal(6.5f, float.Parse(Convert.ToString(val)));
+            Assert.Equal(6.5f, val.Single);
         }
 
         /// <summary>
@@ -134,25 +126,25 @@ namespace PInvoke.Test
         [Fact()]
         public void Exponent1()
         {
-            object val = null;
+            Number val;
             Assert.True(Helper.TryConvertToNumber("6e2", out val));
-            Assert.Equal(600f, float.Parse(Convert.ToString(val)));
+            Assert.Equal(600f, val.Single);
         }
 
         [Fact()]
         public void Exponent2()
         {
-            object val = null;
+            Number val;
             Assert.True(Helper.TryConvertToNumber("6.5e2", out val));
-            Assert.Equal(650f, float.Parse(Convert.ToString(val)));
+            Assert.Equal(650f, val.Single);
         }
 
         [Fact()]
         public void Exponent3()
         {
-            object val = null;
+            Number val;
             Assert.True(Helper.TryConvertToNumber("6.5e2L", out val));
-            Assert.Equal(650f, float.Parse(Convert.ToString(val)));
+            Assert.Equal(650f, val.Single);
         }
 
         /// <summary>
@@ -162,10 +154,10 @@ namespace PInvoke.Test
         [Fact()]
         public void Unsigned1()
         {
-            object val = null;
-            UInt32 target = 42;
+            Number val;
+            uint target = 42;
             Assert.True(Helper.TryConvertToNumber("42U", out val));
-            Assert.Equal(target, UInt32.Parse(Convert.ToString(val)));
+            Assert.Equal(target, (uint)val.Integer);
         }
 
         /// <summary>
@@ -187,9 +179,9 @@ namespace PInvoke.Test
         [Fact()]
         public void Unsigned3()
         {
-            object val = null;
+            Number val;
             Assert.True(Helper.TryConvertToNumber("-42", out val));
-            Assert.Equal(-42, Convert.ToInt32(val));
+            Assert.Equal(-42, val.Integer);
         }
 
         /// <summary>
@@ -219,7 +211,7 @@ namespace PInvoke.Test
         [Fact()]
         public void Invalid1()
         {
-            object val = null;
+            Number val;
             Assert.False(Helper.TryConvertToNumber("aoo", out val));
         }
 
@@ -253,15 +245,11 @@ namespace PInvoke.Test
         [Fact()]
         public void Force64_1()
         {
-            VerifyNumber("4i64", 4L);
-            VerifyNumber("999999999999999999i64", 999999999999999999L);
-        }
-
-        [Fact()]
-        public void Force64_2()
-        {
-            VerifyNumber("4ui64", Convert.ToUInt64(4L));
-            VerifyNumber("999999999999999999ui64", Convert.ToUInt64(999999999999999999L));
+            Number val;
+            Assert.True(TokenHelper.TryConvertToNumber("4i64", out val));
+            Assert.Equal(4L, val.Long);
+            Assert.True(TokenHelper.TryConvertToNumber("999999999999999999i64", out val));
+            Assert.Equal(999999999999999999L, val.Long);
         }
     }
 }

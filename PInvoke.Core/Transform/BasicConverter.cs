@@ -242,7 +242,7 @@ namespace PInvoke.Transform
                     provider = new Microsoft.CSharp.CSharpCodeProvider();
                     break;
                 default:
-                    InvalidEnumValue(type);
+                    ThrowInvalidEnumValue(type);
                     return string.Empty;
             }
 

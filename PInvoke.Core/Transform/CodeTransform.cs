@@ -94,7 +94,7 @@ namespace PInvoke.Transform
                     ctd = GenerateDelegate((NativeFunctionPointer)nt);
                     break;
                 default:
-                    Contract.InvalidEnumValue(nt.Kind);
+                    Contract.ThrowInvalidEnumValue(nt.Kind);
                     return null;
             }
 
@@ -794,7 +794,7 @@ namespace PInvoke.Transform
                     NativeNamedType namedNt = (NativeNamedType)proxyNt;
                     return GenerateTypeReferenceImpl(namedNt.RealType, ref comment);
                 default:
-                    Contract.InvalidEnumValue(proxyNt.Kind);
+                    Contract.ThrowInvalidEnumValue(proxyNt.Kind);
                     return null;
             }
         }
@@ -815,7 +815,7 @@ namespace PInvoke.Transform
                     comment += builtNt.DisplayName;
                     return new CodeTypeReference(realType);
                 default:
-                    Contract.InvalidEnumValue(specialNt.Kind);
+                    Contract.ThrowInvalidEnumValue(specialNt.Kind);
                     return null;
             }
         }
@@ -846,7 +846,7 @@ namespace PInvoke.Transform
                 case ExpressionKind.Cast:
                     return GenerateValueExpressionCast(node, ref type);
                 default:
-                    InvalidEnumValue(node.Kind);
+                    ThrowInvalidEnumValue(node.Kind);
                     return null;
             }
         }
@@ -950,7 +950,7 @@ namespace PInvoke.Transform
                     isLeft = false;
                     break;
                 default:
-                    InvalidEnumValue(node.Token.TokenType);
+                    ThrowInvalidEnumValue(node.Token.TokenType);
                     return null;
             }
 
@@ -1014,7 +1014,7 @@ namespace PInvoke.Transform
                 case NativeValueKind.SymbolType:
                     throw new InvalidOperationException("Types are not supported as leaf nodes");
                 default:
-                    InvalidEnumValue(ntVal.ValueKind);
+                    ThrowInvalidEnumValue(ntVal.ValueKind);
                     return null;
             }
         }

@@ -221,29 +221,24 @@ namespace PInvoke.Parser
                     return false;
                 }
 
-                return value != new ExpressionValue(0);
+                return value.ConvertToBool();
             }
 
             protected override bool TryEvaluateFunctionCall(ExpressionNode node)
             {
-                ExpressionValue value = default(ExpressionValue);
-                if (node.Token.Value == "defined" && node.LeftNode != null && _engine._macroMap.ContainsKey(node.LeftNode.Token.Value))
-                {
-                    value = true;
-                }
-                else
-                {
-                    value = false;
-                }
+                bool value =
+                    node.Token.Value == "defined" && 
+                    node.LeftNode != null && 
+                    _engine._macroMap.ContainsKey(node.LeftNode.Token.Value);
 
-                node.Tag = value;
+                node.Tag = ExpressionValue.Create(value);
                 return true;
             }
 
             protected override bool TryEvaluateNegation(ExpressionNode node)
             {
                 ExpressionValue value = (ExpressionValue)node.LeftNode.Tag;
-                node.Tag = value.Negate();
+                node.Tag = ExpressionValue.Create(!value.ConvertToBool());
                 return true;
             }
 
@@ -255,19 +250,19 @@ namespace PInvoke.Parser
                     Macro m = null;
                     if (this._engine._macroMap.TryGetValue(node.Token.Value, out m))
                     {
-                        object numValue = null;
+                        Number numValue;
                         if (TokenHelper.TryConvertToNumber(m.Value, out numValue))
                         {
-                            value = new ExpressionValue(numValue);
+                            value = ExpressionValue.Create(numValue);
                         }
                         else
                         {
-                            value = 1;
+                            value = ExpressionValue.Create(1);
                         }
                     }
                     else
                     {
-                        value = 0;
+                        value = ExpressionValue.Create(0);
                     }
 
                     node.Tag = value;
@@ -275,7 +270,7 @@ namespace PInvoke.Parser
                 }
                 else if (TokenHelper.IsKeyword(node.Token.TokenType))
                 {
-                    node.Tag = new ExpressionValue(1);
+                    node.Tag = ExpressionValue.Create(1);
                     return true;
                 }
                 else

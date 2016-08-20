@@ -89,7 +89,7 @@ namespace PInvoke.Parser
                 case ExpressionKind.List:
                     return TryEvaluateList(node);
                 default:
-                    Contract.InvalidEnumValue(node.Kind);
+                    Contract.ThrowInvalidEnumValue(node.Kind);
                     return false;
             }
         }
@@ -116,7 +116,8 @@ namespace PInvoke.Parser
 
         protected virtual bool TryEvaluateNegative(ExpressionNode node)
         {
-            node.Tag = -((ExpressionValue)node.LeftNode.Tag);
+            var value = ((ExpressionValue)node.LeftNode.Tag).ConvertToInteger();
+            node.Tag = ExpressionValue.Create(-value);
             return true;
         }
 
@@ -125,22 +126,22 @@ namespace PInvoke.Parser
             Token token = node.Token;
             if (token.IsNumber)
             {
-                object value = null;
+                Number value;
                 if (!TokenHelper.TryConvertToNumber(node.Token, out value))
                 {
                     return false;
                 }
-                node.Tag = new ExpressionValue(value);
+                node.Tag = ExpressionValue.Create(value);
                 return true;
             }
             else if (token.TokenType == TokenType.TrueKeyword)
             {
-                node.Tag = new ExpressionValue(true);
+                node.Tag = ExpressionValue.Create(true);
                 return true;
             }
             else if (token.TokenType == TokenType.FalseKeyword)
             {
-                node.Tag = new ExpressionValue(false);
+                node.Tag = ExpressionValue.Create(false);
                 return true;
             }
             else if (token.IsCharacter)
@@ -150,7 +151,7 @@ namespace PInvoke.Parser
                 {
                     return false;
                 }
-                node.Tag = new ExpressionValue(cValue);
+                node.Tag = ExpressionValue.Create(cValue);
                 return true;
             }
             else if (token.IsQuotedString)
@@ -160,7 +161,7 @@ namespace PInvoke.Parser
                 {
                     return false;
                 }
-                node.Tag = new ExpressionValue(sValue);
+                node.Tag = ExpressionValue.Create(sValue);
                 return true;
             }
             else
@@ -171,69 +172,164 @@ namespace PInvoke.Parser
 
         protected virtual bool TryEvaluateBinaryOperation(ExpressionNode node)
         {
+            BinaryOperator op;
+            if (!TryConvertToBinaryOperator(node.Token.TokenType, out op))
+            {
+                return false;
+            }
+
             ExpressionValue left = (ExpressionValue)node.LeftNode.Tag;
             ExpressionValue right = (ExpressionValue)node.RightNode.Tag;
-            ExpressionValue result = null;
-            switch (node.Token.TokenType)
+            ExpressionValue result;
+            var succeeded = TryEvaluateBinaryOperation(op, left, right, out result);
+            node.Tag = result;
+            return succeeded;
+        }
+
+        public static bool TryConvertToBinaryOperator(TokenType type,out BinaryOperator op)
+        {
+            switch (type)
             {
                 case TokenType.OpDivide:
-                    result = left / right;
+                    op = BinaryOperator.Divide;
                     break;
                 case TokenType.OpGreaterThan:
-                    result = new ExpressionValue(left > right);
+                    op = BinaryOperator.GreaterThan;
                     break;
                 case TokenType.OpGreaterThanOrEqual:
-                    result = new ExpressionValue(left >= right);
+                    op = BinaryOperator.GreaterThanOrEqualTo;
                     break;
                 case TokenType.OpLessThan:
-                    result = new ExpressionValue(left < right);
+                    op = BinaryOperator.LessThan;
                     break;
                 case TokenType.OpLessThanOrEqual:
-                    result = new ExpressionValue(left <= right);
+                    op = BinaryOperator.LessThanOrEqualTo;
                     break;
                 case TokenType.OpMinus:
-                    result = left - right;
+                    op = BinaryOperator.Subtract;
                     break;
                 case TokenType.OpModulus:
-                    result = left - ((left / right) * right);
+                    op = BinaryOperator.Modulus;
                     break;
                 case TokenType.OpShiftLeft:
-                    result = left << Convert.ToInt32((object)right.Value);
+                    op = BinaryOperator.ShiftLeft;
                     break;
                 case TokenType.OpShiftRight:
-                    result = left >> Convert.ToInt32((object)right.Value);
+                    op = BinaryOperator.ShiftRight;
                     break;
                 case TokenType.OpPlus:
-                    result = left + right;
+                    op = BinaryOperator.Add;
                     break;
                 case TokenType.OpBoolAnd:
-                    result = left && right;
+                    op = BinaryOperator.BooleanAnd;
                     break;
                 case TokenType.OpBoolOr:
-                    result = left || right;
+                    op = BinaryOperator.BooleanOr;
                     break;
                 case TokenType.OpEquals:
-                    result = new ExpressionValue(left.Value.Equals(right.Value));
+                    op = BinaryOperator.BooleanEquals;
                     break;
                 case TokenType.OpNotEquals:
-                    result = new ExpressionValue(!(left.Value.Equals(right.Value)));
-                    break;
-                case TokenType.OpAssign:
-                    result = right;
+                    op = BinaryOperator.BooleanNotEquals;
                     break;
                 case TokenType.Ampersand:
-                    result = left & right;
+                    op = BinaryOperator.BitwiseAnd;
                     break;
                 case TokenType.Pipe:
-                    result = left | right;
+                    op = BinaryOperator.BitwiseOr;
                     break;
                 default:
-                    Debug.Fail("Unrecognized binary operation");
+                    op = BinaryOperator.Add;
                     return false;
             }
 
-            node.Tag = result;
-            return node.Tag != null;
+            return true;
+        }
+
+        /// <summary>
+        /// Reference used for this implementation
+        /// 
+        /// https://gcc.gnu.org/onlinedocs/cpp/If.html#If
+        /// 
+        /// In summary calculations done using the widest type known to compiler which is long for 
+        /// our implementation.
+        /// </summary>
+        public static bool TryEvaluateBinaryOperation(BinaryOperator op, ExpressionValue left, ExpressionValue right, out ExpressionValue result)
+        {
+            long leftValue;
+            bool leftBool;
+            long rightValue;
+            bool rightBool;
+
+            try
+            {
+                leftValue = left.ConvertToLong();
+                leftBool = left.ConvertToBool();
+                rightValue = right.ConvertToLong();
+                rightBool = right.ConvertToBool();
+            }
+            catch
+            {
+                result = null;
+                return false;
+            }
+
+            switch (op)
+            {
+                case BinaryOperator.Divide:
+                    result = ExpressionValue.Create(leftValue / rightValue);
+                    break;
+                case BinaryOperator.GreaterThan:
+                    result = ExpressionValue.Create(leftValue > rightValue);
+                    break;
+                case BinaryOperator.GreaterThanOrEqualTo:
+                    result = ExpressionValue.Create(leftValue >= rightValue);
+                    break;
+                case BinaryOperator.LessThan:
+                    result = ExpressionValue.Create(leftValue < rightValue);
+                    break;
+                case BinaryOperator.LessThanOrEqualTo:
+                    result = ExpressionValue.Create(leftValue <= rightValue);
+                    break;
+                case BinaryOperator.Subtract:
+                    result = ExpressionValue.Create(leftValue - rightValue);
+                    break;
+                case BinaryOperator.Modulus:
+                    result = ExpressionValue.Create(leftValue % rightValue);
+                    break;
+                case BinaryOperator.ShiftLeft:
+                    result = ExpressionValue.Create(leftValue << (int)rightValue);
+                    break;
+                case BinaryOperator.ShiftRight:
+                    result = ExpressionValue.Create(leftValue >> (int)rightValue);
+                    break;
+                case BinaryOperator.Add:
+                    result = ExpressionValue.Create(leftValue + rightValue);
+                    break;
+                case BinaryOperator.BooleanAnd:
+                    result = ExpressionValue.Create(leftBool && rightBool);
+                    break;
+                case BinaryOperator.BooleanOr:
+                    result = ExpressionValue.Create(leftBool || rightBool);
+                    break;
+                case BinaryOperator.BooleanEquals:
+                    result = ExpressionValue.Create(leftValue == rightValue);
+                    break;
+                case BinaryOperator.BooleanNotEquals:
+                    result = ExpressionValue.Create(leftValue != rightValue);
+                    break;
+                case BinaryOperator.BitwiseAnd:
+                    result = ExpressionValue.Create(leftValue & rightValue);
+                    break;
+                case BinaryOperator.BitwiseOr:
+                    result = ExpressionValue.Create(leftValue | rightValue);
+                    break;
+                default:
+                    result = null;
+                    return false;
+            }
+
+            return true;
         }
     }
 }

@@ -647,7 +647,7 @@ namespace PInvoke.Parser
                 return false;
             }
 
-            object number = null;
+            Number number;
             if (char.ToLower(val[0]) == 'x')
             {
                 if (!TryConvertToNumber("0x" + val.Substring(1), out number))
@@ -672,7 +672,8 @@ namespace PInvoke.Parser
 
             try
             {
-                retChar = Strings.ChrW(Convert.ToInt32(number));
+                // CTODO: Possible make this a function of Number
+                retChar = Strings.ChrW(Convert.ToInt32(number.Value));
                 return true;
             }
             catch (Exception)
@@ -690,9 +691,9 @@ namespace PInvoke.Parser
         /// <param name="val"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static bool TryConvertToNumber(Token t, out object val)
+        public static bool TryConvertToNumber(Token t, out Number number)
         {
-            return TryConvertToNumber(t.Value, out val);
+            return TryConvertToNumber(t.Value, out number);
         }
 
         /// <summary>
@@ -701,9 +702,9 @@ namespace PInvoke.Parser
         /// <param name="str"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static bool TryConvertToNumber(string str, out object retValue)
+        public static bool TryConvertToNumber(string str, out Number number)
         {
-            retValue = null;
+            number = default(Number);
 
             NumberInfo info = default(NumberInfo);
             if (!ProcessNumberInfo(ref str, ref info))
@@ -725,7 +726,6 @@ namespace PInvoke.Parser
             }
 
             bool ret = true;
-            object val = null;
             if (info.IsFloatingPoint)
             {
                 // Mulitiplier is only valid for floating point numbers
@@ -739,11 +739,11 @@ namespace PInvoke.Parser
                 double doubleVal = 0;
                 if (float.TryParse(str, info.Style, CultureInfo.CurrentCulture, out floatVal))
                 {
-                    val = Convert.ToSingle(floatVal * mult);
+                    number = new Number(Convert.ToSingle(floatVal * mult));
                 }
                 else if (double.TryParse(str, info.Style, CultureInfo.CurrentCulture, out doubleVal))
                 {
-                    val = Convert.ToDouble(doubleVal * mult);
+                    number = new Number(Convert.ToDouble(doubleVal * mult));
                 }
                 else
                 {
@@ -756,11 +756,11 @@ namespace PInvoke.Parser
                 UInt64 uint64Value = 0;
                 if (!info.IsForced64 && UInt32.TryParse(str, info.Style, CultureInfo.CurrentCulture, out uint32Value))
                 {
-                    val = uint32Value;
+                    number = new Number(uint32Value);
                 }
                 else if (UInt64.TryParse(str, info.Style, CultureInfo.CurrentCulture, out uint64Value))
                 {
-                    val = uint64Value;
+                    number = new Number(uint64Value);
                 }
                 else
                 {
@@ -773,11 +773,11 @@ namespace PInvoke.Parser
                 Int64 int64Value = 0;
                 if (!info.IsForced64 && Int32.TryParse(str, info.Style, CultureInfo.CurrentCulture, out int32Value))
                 {
-                    val = int32Value;
+                    number = new Number(int32Value);
                 }
                 else if (Int64.TryParse(str, info.Style, CultureInfo.CurrentCulture, out int64Value))
                 {
-                    val = int64Value;
+                    number = new Number(int64Value);
                 }
                 else
                 {
@@ -785,7 +785,6 @@ namespace PInvoke.Parser
                 }
             }
 
-            retValue = val;
             return ret;
         }
 

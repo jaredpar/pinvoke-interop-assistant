@@ -80,7 +80,7 @@ namespace PInvoke.Transform
                     ut = UnmanagedType.VariantBool;
                     break;
                 default:
-                    Contract.InvalidEnumValue(type);
+                    Contract.ThrowInvalidEnumValue(type);
                     ut = UnmanagedType.AnsiBStr;
                     break;
             }
@@ -119,7 +119,7 @@ namespace PInvoke.Transform
                     field = "LPTStr";
                     break;
                 default:
-                    Contract.InvalidEnumValue(strType);
+                    Contract.ThrowInvalidEnumValue(strType);
                     field = null;
                     break;
             }

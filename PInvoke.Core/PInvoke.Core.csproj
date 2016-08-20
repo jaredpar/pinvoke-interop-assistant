@@ -81,10 +81,6 @@
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="MyProject\AssemblyInfo.cs" />
-    <Compile Include="MyProject\Application.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Application.myapp</DependentUpon>
-    </Compile>
     <Compile Include="MyProject\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -100,8 +96,14 @@
       <DependentUpon>NativeStorage.xsd</DependentUpon>
     </Compile>
     <Compile Include="NativeSymbolBag.cs" />
+    <Compile Include="Parser\BinaryOperator.cs" />
     <Compile Include="Parser\ExpressionEvaluator.cs" />
+    <Compile Include="Parser\ExpressionValue.StringValue.cs" />
+    <Compile Include="Parser\ExpressionValue.CharValue.cs" />
+    <Compile Include="Parser\ExpressionValue.NumberValue.cs" />
+    <Compile Include="Parser\ExpressionValue.BooleanValue.cs" />
     <Compile Include="Parser\ExpressionValue.cs" />
+    <Compile Include="Parser\Number.cs" />
     <Compile Include="PortConstants.cs" />
     <Compile Include="Transform\CodeDomCloner.cs" />
     <Compile Include="Transform\CodeDomIterator.cs" />
@@ -157,10 +159,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="MyProject\Application.myapp">
-      <Generator>MyApplicationCodeGenerator</Generator>
-      <LastGenOutput>Application.Designer.cs</LastGenOutput>
-    </None>
     <None Include="NativeStorage.xsc">
       <DependentUpon>NativeStorage.xsd</DependentUpon>
     </None>

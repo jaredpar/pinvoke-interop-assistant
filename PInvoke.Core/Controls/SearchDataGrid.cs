@@ -148,7 +148,7 @@ namespace PInvoke.Controls
                                     bag.AddTypedef((NativeTypeDef)cur);
                                     break;
                                 default:
-                                    Contract.InvalidEnumValue(cur.Kind);
+                                    Contract.ThrowInvalidEnumValue(cur.Kind);
                                     break;
                             }
                         }
@@ -189,7 +189,7 @@ namespace PInvoke.Controls
                         break;
                     default:
                         _info = new SearchDataGridInfo.EmptyInfo();
-                        Contract.InvalidEnumValue(_kind);
+                        Contract.ThrowInvalidEnumValue(_kind);
                         break;
                 }
 

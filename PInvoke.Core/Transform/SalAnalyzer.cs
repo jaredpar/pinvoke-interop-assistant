@@ -692,7 +692,7 @@ namespace PInvoke.Transform
                 case SalEntryListType.Post:
                     return FindPost(args);
                 default:
-                    InvalidEnumValue(type);
+                    ThrowInvalidEnumValue(type);
                     return null;
             }
         }
@@ -810,7 +810,7 @@ namespace PInvoke.Transform
                         _itemList.Add(l);
                         break;
                     default:
-                        InvalidEnumValue(l.Type);
+                        ThrowInvalidEnumValue(l.Type);
                         break;
                 }
             }

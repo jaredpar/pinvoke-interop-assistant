@@ -1,6 +1,5 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
-using Microsoft.VisualBasic;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -236,8 +235,8 @@ namespace PInvoke.Test
         {
             VerifyChar('a');
             VerifyChar('b');
-            VerifyChar(ControlChars.Lf);
-            VerifyChar(Strings.ChrW(55));
+            VerifyChar('\n');
+            VerifyChar(Convert.ToChar(55));
         }
 
         [Fact()]

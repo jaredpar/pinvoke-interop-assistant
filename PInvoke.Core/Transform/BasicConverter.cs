@@ -1,6 +1,5 @@
 
 // Copyright (c) Microsoft Corporation.  All rights reserved.
-using Microsoft.VisualBasic;
 using System;
 using System.IO;
 using System.Collections;

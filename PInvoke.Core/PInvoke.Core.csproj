@@ -5,6 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{7923FD4F-41A0-48C0-8783-694802F2C1B0}</ProjectGuid>
     <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>PInvoke</RootNamespace>
     <AssemblyName>PInvoke.Core</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
@@ -28,7 +29,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -80,12 +80,7 @@
     <Compile Include="Controls\TranslateSnippetControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="MyProject\AssemblyInfo.cs" />
-    <Compile Include="MyProject\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="NativeStorage.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -150,12 +145,6 @@
     <EmbeddedResource Include="Controls\TranslateSnippetControl.resx">
       <SubType>Designer</SubType>
       <DependentUpon>TranslateSnippetControl.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="MyProject\Resources.resx">
-      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <CustomToolNamespace>My.Resources</CustomToolNamespace>
-      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

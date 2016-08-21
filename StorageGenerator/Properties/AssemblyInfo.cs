@@ -1,5 +1,3 @@
-
-using Microsoft.VisualBasic;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -17,9 +15,9 @@ using System.Runtime.InteropServices;
 
 //The following GUID is for the ID of the typelib if this project is exposed to COM
 
-[assembly: Guid("40409a4a-6529-4096-b34e-5accbab81397")]
+[assembly: Guid("7d27b6fe-ea66-4187-b202-da50c8a927de")]
 
-[assembly: AssemblyTitle("PInvoke.Core")]
+[assembly: AssemblyTitle("StorageGenerator")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("PInvoke")]

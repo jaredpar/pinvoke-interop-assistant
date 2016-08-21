@@ -1,6 +1,5 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
-using Microsoft.VisualBasic;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -606,28 +605,28 @@ namespace PInvoke.Parser
                         retChar = '?';
                         break;
                     case '0':
-                        retChar = ControlChars.NullChar;
+                        retChar = '\0';
                         break;
                     case 'a':
-                        retChar = Strings.ChrW(7);
+                        retChar = Convert.ToChar(7);
                         break;
                     case 'b':
-                        retChar = ControlChars.Back;
+                        retChar = '\b';
                         break;
                     case 'f':
-                        retChar = ControlChars.FormFeed;
+                        retChar = '\f';
                         break;
                     case 'n':
-                        retChar = Strings.ChrW(10);
+                        retChar = Convert.ToChar(10);
                         break;
                     case 'r':
-                        retChar = ControlChars.Cr;
+                        retChar = '\r';
                         break;
                     case 't':
-                        retChar = ControlChars.Tab;
+                        retChar = '\t';
                         break;
                     case 'v':
-                        retChar = ControlChars.VerticalTab;
+                        retChar = '\v';
                         break;
                     default:
                         found = false;
@@ -673,7 +672,7 @@ namespace PInvoke.Parser
             try
             {
                 // CTODO: Possible make this a function of Number
-                retChar = Strings.ChrW(Convert.ToInt32(number.Value));
+                retChar = Convert.ToChar(Convert.ToInt32(number.Value));
                 return true;
             }
             catch (Exception)

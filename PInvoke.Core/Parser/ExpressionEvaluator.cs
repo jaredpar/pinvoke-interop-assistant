@@ -49,102 +49,94 @@ namespace PInvoke.Parser
 
         public bool TryEvaluate(ExpressionNode node, out ExpressionValue result)
         {
-            if (!TryEvaluateCore(node))
+            try
+            {
+                result = EvaluateCore(node);
+                return true;
+            }
+            catch
             {
                 result = null;
                 return false;
             }
-
-            result = (ExpressionValue)node.Tag;
-            return true;
         }
 
-        private bool TryEvaluateCore(ExpressionNode node)
+        public ExpressionValue Evalaute(ExpressionNode node)
         {
-            if (node == null)
-            {
-                return true;
-            }
+            return EvaluateCore(node);
+        }
 
-            // Make sure that the left and right are evaluated appropriately
-            if (!TryEvaluateCore(node.LeftNode) || !TryEvaluateCore(node.RightNode))
-            {
-                return false;
-            }
+        private ExpressionValue EvaluateCore(ExpressionNode node)
+        {
+            Contract.ThrowIfNull(node);
 
             switch (node.Kind)
             {
                 case ExpressionKind.BinaryOperation:
-                    return TryEvaluateBinaryOperation(node);
+                    return EvaluateBinaryOperation(node);
                 case ExpressionKind.Leaf:
-                    return TryEvaluateLeaf(node);
+                    return EvaluateLeaf(node);
                 case ExpressionKind.NegativeOperation:
-                    return TryEvaluateNegative(node);
+                    return EvaluateNegative(node);
                 case ExpressionKind.Cast:
-                    return TryEvaluateCast(node);
+                    return EvaluateCast(node);
                 case ExpressionKind.FunctionCall:
-                    return TryEvaluateFunctionCall(node);
+                    return EvaluateFunctionCall(node);
                 case ExpressionKind.NegationOperation:
-                    return TryEvaluateNegation(node);
+                    return EvaluateNegation(node);
                 case ExpressionKind.List:
                     return TryEvaluateList(node);
                 default:
-                    Contract.ThrowInvalidEnumValue(node.Kind);
-                    return false;
+                    throw Contract.CreateInvalidEnumValueException(node.Kind);
             }
         }
 
         /// <summary>
         /// For a cast just return the value of the left node
         /// </summary>
-        private bool TryEvaluateCast(ExpressionNode node)
+        private ExpressionValue EvaluateCast(ExpressionNode node)
         {
             // CTODO: why left here?  Shouldn't it be right? 
-            node.Tag = node.LeftNode.Tag;
-            return true;
+            return EvaluateCore(node.LeftNode);
         }
 
-        private bool TryEvaluateFunctionCall(ExpressionNode node)
+        private ExpressionValue EvaluateFunctionCall(ExpressionNode node)
         {
             bool value =
                 node.Token.Value == "defined" &&
                 node.LeftNode != null &&
                 _macroMap.ContainsKey(node.LeftNode.Token.Value);
 
-            node.Tag = ExpressionValue.Create(value);
-            return true;
+            return ExpressionValue.Create(value);
         }
 
-        private bool TryEvaluateNegation(ExpressionNode node)
+        private ExpressionValue EvaluateNegation(ExpressionNode node)
         {
-            ExpressionValue value = (ExpressionValue)node.LeftNode.Tag;
-            node.Tag = ExpressionValue.Create(!value.ConvertToBool());
-            return true;
+            var value = EvaluateCore(node.LeftNode);
+            return ExpressionValue.Create(!value.ConvertToBool());
         }
 
-        private bool TryEvaluateList(ExpressionNode node)
+        private ExpressionValue TryEvaluateList(ExpressionNode node)
         {
-            return true;
+            throw new Exception($"Cannot evaluate list");
         }
 
-        private bool TryEvaluateNegative(ExpressionNode node)
+        private ExpressionValue EvaluateNegative(ExpressionNode node)
         {
-            var exprValue = ((ExpressionValue)node.LeftNode.Tag);
+            var exprValue = EvaluateCore(node.LeftNode);
             if (exprValue.IsFloatingPoint)
             {
                 var value = exprValue.ConvertToDouble();
-                node.Tag = ExpressionValue.Create(-value);
+                return ExpressionValue.Create(-value);
             }
             else
             {
                 var value = exprValue.ConvertToInteger();
-                node.Tag = ExpressionValue.Create(-value);
+                return ExpressionValue.Create(-value);
             }
-
-            return true;
         }
 
-        private bool TryEvaluateLeaf(ExpressionNode node)
+        private ExpressionValue EvaluateLeaf(ExpressionNode node)
         {
             Token token = node.Token;
             if (token.IsNumber)
@@ -152,58 +144,52 @@ namespace PInvoke.Parser
                 Number value;
                 if (!TokenHelper.TryConvertToNumber(node.Token, out value))
                 {
-                    return false;
+                    throw new Exception($"Can't convert token to number {node.Token}");
                 }
-                node.Tag = ExpressionValue.Create(value);
-                return true;
+
+                return ExpressionValue.Create(value);
             }
             else if (token.TokenType == TokenType.TrueKeyword)
             {
-                node.Tag = ExpressionValue.Create(true);
-                return true;
+                return ExpressionValue.Create(true);
             }
             else if (token.TokenType == TokenType.FalseKeyword)
             {
-                node.Tag = ExpressionValue.Create(false);
-                return true;
+                return ExpressionValue.Create(false);
             }
             else if (token.TokenType == TokenType.Word)
             {
-                return TryEvaluateMacro(node);
+                return EvaluateMacro(node);
             }
-
             else if (token.IsCharacter)
             {
                 char cValue = '0';
                 if (!TokenHelper.TryConvertToChar(node.Token, out cValue))
                 {
-                    return false;
+                    throw new Exception($"Can't convert token to char {node.Token}");
                 }
-                node.Tag = ExpressionValue.Create(cValue);
-                return true;
+                return ExpressionValue.Create(cValue);
             }
             else if (token.IsQuotedString)
             {
                 string sValue = null;
                 if (!TokenHelper.TryConvertToString(token, out sValue))
                 {
-                    return false;
+                    throw new Exception($"Can't convert token to string {node.Token}");
                 }
-                node.Tag = ExpressionValue.Create(sValue);
-                return true;
+                return ExpressionValue.Create(sValue);
             }
             else if (TokenHelper.IsKeyword(node.Token.TokenType))
             {
-                node.Tag = ExpressionValue.Create(1);
-                return true;
+                return ExpressionValue.Create(1);
             }
             else
             {
-                return false;
+                throw new Exception($"Unexpected leaf token {node.Token}");
             }
         }
 
-        private bool TryEvaluateMacro(ExpressionNode node)
+        private ExpressionValue EvaluateMacro(ExpressionNode node)
         {
             Contract.Requires(node.Kind == ExpressionKind.Leaf);
             Contract.Requires(node.Token.TokenType == TokenType.Word);
@@ -227,24 +213,20 @@ namespace PInvoke.Parser
                 value = ExpressionValue.Create(0);
             }
 
-            node.Tag = value;
-            return true;
+            return value;
         }
 
-        private bool TryEvaluateBinaryOperation(ExpressionNode node)
+        private ExpressionValue EvaluateBinaryOperation(ExpressionNode node)
         {
             BinaryOperator op;
             if (!TryConvertToBinaryOperator(node.Token.TokenType, out op))
             {
-                return false;
+                throw new Exception($"Invalid binary node {node.Token.TokenType}");
             }
 
-            ExpressionValue left = (ExpressionValue)node.LeftNode.Tag;
-            ExpressionValue right = (ExpressionValue)node.RightNode.Tag;
-            ExpressionValue result;
-            var succeeded = TryEvaluateBinaryOperation(op, left, right, out result);
-            node.Tag = result;
-            return succeeded;
+            var left = EvaluateCore(node.LeftNode);
+            var right = EvaluateCore(node.RightNode);
+            return EvaluateBinaryOperation(op, left, right);
         }
 
         public static bool TryConvertToBinaryOperator(TokenType type, out BinaryOperator op)
@@ -318,7 +300,7 @@ namespace PInvoke.Parser
         /// In summary calculations done using the widest type known to compiler which is long for 
         /// our implementation.
         /// </summary>
-        public static bool TryEvaluateBinaryOperation(BinaryOperator op, ExpressionValue left, ExpressionValue right, out ExpressionValue result)
+        public static ExpressionValue EvaluateBinaryOperation(BinaryOperator op, ExpressionValue left, ExpressionValue right)
         {
             long leftValue;
             bool leftBool;
@@ -332,12 +314,12 @@ namespace PInvoke.Parser
                 rightValue = right.ConvertToLong();
                 rightBool = right.ConvertToBool();
             }
-            catch
+            catch (Exception ex)
             {
-                result = null;
-                return false;
+                throw new Exception($"Unable to convert binary operands: {ex.Message}", ex);
             }
 
+            ExpressionValue result;
             switch (op)
             {
                 case BinaryOperator.Divide:
@@ -395,12 +377,10 @@ namespace PInvoke.Parser
                     result = right;
                     break;
                 default:
-                    Contract.ThrowInvalidEnumValue(op);
-                    result = null;
-                    return false;
+                    throw Contract.CreateInvalidEnumValueException(op);
             }
 
-            return true;
+            return result;
         }
     }
 }

@@ -36,9 +36,7 @@ namespace PInvoke.Test
         {
             var left = Create(x);
             var right = Create(y);
-            ExpressionValue result;
-            Assert.True(ExpressionEvaluator.TryEvaluateBinaryOperation(op, left, right, out result));
-            return result;
+            return ExpressionEvaluator.EvaluateBinaryOperation(op, left, right);
         }
 
         private static bool Equals(ExpressionValue left, ExpressionValue right)

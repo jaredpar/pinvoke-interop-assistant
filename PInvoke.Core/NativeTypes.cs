@@ -1802,10 +1802,9 @@ namespace PInvoke
     /// <remarks></remarks>
     public class NativeValueExpression : NativeExtraSymbol
     {
-
         private string _expression;
         private List<NativeValue> _valueList;
-        private Parser.ExpressionNode _node;
+        private ExpressionNode _node;
 
         private bool _errorParsingExpr = false;
         /// <summary>
@@ -1850,7 +1849,7 @@ namespace PInvoke
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public Parser.ExpressionNode Node
+        public ExpressionNode Node
         {
             get
             {
@@ -1862,9 +1861,6 @@ namespace PInvoke
         /// <summary>
         /// List of values in the expression
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
         public List<NativeValue> Values
         {
             get
@@ -1905,7 +1901,7 @@ namespace PInvoke
                 return;
             }
 
-            Parser.ExpressionParser parser = new Parser.ExpressionParser();
+            var parser = new ExpressionParser();
             _valueList = new List<NativeValue>();
 
             // It's valid no have an invalid expression :)
@@ -1922,7 +1918,7 @@ namespace PInvoke
             CalculateValueList(_node);
         }
 
-        private void CalculateValueList(Parser.ExpressionNode cur)
+        private void CalculateValueList(ExpressionNode cur)
         {
             if (cur == null)
             {
@@ -1931,53 +1927,11 @@ namespace PInvoke
 
             if (cur.Kind == Parser.ExpressionKind.Leaf)
             {
-                Parser.Token token = cur.Token;
-                NativeValue ntVal = null;
-                if (token.IsQuotedString)
-                {
-                    string strValue = null;
-                    if (Parser.TokenHelper.TryConvertToString(token, out strValue))
-                    {
-                        ntVal = NativeValue.CreateString(strValue);
-                    }
-                }
-                else if (token.IsNumber)
-                {
-                    Number value;
-                    if (TokenHelper.TryConvertToNumber(token, out value))
-                    {
-                        ntVal = NativeValue.CreateNumber(value);
-                    }
-                }
-                else if (token.IsCharacter)
-                {
-                    char cValue = 'c';
-                    if (Parser.TokenHelper.TryConvertToChar(token, out cValue))
-                    {
-                        ntVal = NativeValue.CreateCharacter(cValue);
-                    }
-                    else
-                    {
-                        ntVal = NativeValue.CreateString(token.Value);
-                    }
-                }
-                else if (token.TokenType == Parser.TokenType.TrueKeyword)
-                {
-                    ntVal = NativeValue.CreateBoolean(true);
-                }
-                else if (token.TokenType == Parser.TokenType.FalseKeyword)
-                {
-                    ntVal = NativeValue.CreateBoolean(false);
-                }
-                else if (token.IsAnyWord)
-                {
-                    ntVal = NativeValue.CreateSymbolValue(token.Value);
-                }
+                var ntVal = NativeValue.TryCreateForLeaf(cur, bag: null);
 
                 if (ntVal != null)
                 {
                     _valueList.Add(ntVal);
-                    cur.Tag = ntVal;
                 }
                 else
                 {
@@ -2018,8 +1972,6 @@ namespace PInvoke
             EnsureValueList();
             base.ReplaceChildInList(oldChild, newChild, _valueList);
         }
-
-
     }
 
     public enum NativeValueKind
@@ -2050,7 +2002,6 @@ namespace PInvoke
     [DebuggerDisplay("{Value} ({ValueKind})")]
     public class NativeValue : NativeExtraSymbol
     {
-
         private NativeValueKind _valueKind;
 
         private object _value;
@@ -2264,6 +2215,64 @@ namespace PInvoke
             return new NativeValue(name, ns, NativeValueKind.SymbolType);
         }
 
+        public static NativeValue TryCreateForLeaf(ExpressionNode cur, NativeSymbolBag bag)
+        {
+            ThrowIfNull(cur);
+            ThrowIfFalse(cur.Kind == ExpressionKind.Leaf);
+
+            Token token = cur.Token;
+            NativeValue ntVal = null;
+            if (token.IsQuotedString)
+            {
+                string strValue = null;
+                if (TokenHelper.TryConvertToString(token, out strValue))
+                {
+                    ntVal = NativeValue.CreateString(strValue);
+                }
+            }
+            else if (token.IsNumber)
+            {
+                Number value;
+                if (TokenHelper.TryConvertToNumber(token, out value))
+                {
+                    ntVal = NativeValue.CreateNumber(value);
+                }
+            }
+            else if (token.IsCharacter)
+            {
+                char cValue = 'c';
+                if (TokenHelper.TryConvertToChar(token, out cValue))
+                {
+                    ntVal = NativeValue.CreateCharacter(cValue);
+                }
+                else
+                {
+                    ntVal = NativeValue.CreateString(token.Value);
+                }
+            }
+            else if (token.TokenType == TokenType.TrueKeyword)
+            {
+                ntVal = NativeValue.CreateBoolean(true);
+            }
+            else if (token.TokenType == Parser.TokenType.FalseKeyword)
+            {
+                ntVal = NativeValue.CreateBoolean(false);
+            }
+            else if (token.IsAnyWord)
+            {
+                NativeSymbol symbol;
+                if (bag != null && bag.TryFindValue(token.Value, out symbol))
+                {
+                    ntVal = NativeValue.CreateSymbolValue(token.Value, symbol);
+                }
+                else
+                {
+                    ntVal = NativeValue.CreateSymbolValue(token.Value);
+                }
+            }
+
+            return ntVal;
+        }
     }
 
     #region "SAL attributes"

@@ -316,29 +316,30 @@ namespace PInvoke.Test
     public static class GeneratedCodeVerification
     {
 
-        public static void VerifyExpression(string nativeExpr, string managedExpr)
+        public static void VerifyExpression(string nativeExpr, string managedExpr, NativeSymbolBag bag = null)
         {
-            VerifyExpression(LanguageType.VisualBasic, nativeExpr, managedExpr);
+            VerifyExpression(LanguageType.VisualBasic, nativeExpr, managedExpr, bag);
         }
 
-        public static void VerifyExpression(string nativeExpr, string managedExpr, string managedType)
+        public static void VerifyExpression(string nativeExpr, string managedExpr, string managedType, NativeSymbolBag bag = null)
         {
-            VerifyExpression(LanguageType.VisualBasic, nativeExpr, managedExpr, managedType);
+            VerifyExpression(LanguageType.VisualBasic, nativeExpr, managedExpr, managedType, bag);
         }
 
-        public static void VerifyCSharpExpression(string nativeExpr, string managedExpr, string managedType)
+        public static void VerifyCSharpExpression(string nativeExpr, string managedExpr, string managedType, NativeSymbolBag bag = null)
         {
-            VerifyExpression(LanguageType.CSharp, nativeExpr, managedExpr, managedType);
+            VerifyExpression(LanguageType.CSharp, nativeExpr, managedExpr, managedType, bag);
         }
 
-        public static void VerifyExpression(LanguageType lang, string nativeExpr, string managedExpr)
+        public static void VerifyExpression(LanguageType lang, string nativeExpr, string managedExpr, NativeSymbolBag bag = null)
         {
-            VerifyExpression(lang, nativeExpr, managedExpr, null);
+            VerifyExpression(lang, nativeExpr, managedExpr, null, bag);
         }
 
-        public static void VerifyExpression(LanguageType lang, string nativeExpr, string managedExpr, string managedType)
+        public static void VerifyExpression(LanguageType lang, string nativeExpr, string managedExpr, string managedType, NativeSymbolBag bag)
         {
-            CodeTransform trans = new CodeTransform(lang);
+            bag = bag ?? new NativeSymbolBag();
+            CodeTransform trans = new CodeTransform(lang, bag);
             NativeValueExpression nExpr = new NativeValueExpression(nativeExpr);
             CodeExpression cExpr = null;
             CodeTypeReference codeType = null;
@@ -470,7 +471,7 @@ namespace PInvoke.Test
                 if (0 == string.CompareOrdinal(e.Name, cur.Name))
                 {
                     ctd = cur;
-                    break; // TODO: might not be correct. Was : Exit For
+                    break;
                 }
             }
             Assert.NotNull(ctd);
@@ -482,7 +483,7 @@ namespace PInvoke.Test
                 if (0 == string.CompareOrdinal(name, mem.Name))
                 {
                     cMem = mem;
-                    break; // TODO: might not be correct. Was : Exit For
+                    break;
                 }
             }
             Assert.NotNull(cMem);

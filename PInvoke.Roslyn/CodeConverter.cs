@@ -24,8 +24,8 @@ namespace PInvoke.Roslyn
             bag.TryResolveSymbolsAndValues(ep);
 
             // Create the codedom transform
-            var transform = new CodeTransform(_langaugeType);
-            var marshalUtil = new MarshalTransform(_langaugeType, TransformKindFlags.All);
+            var transform = new CodeTransform(_langaugeType, bag);
+            var marshalUtil = new MarshalTransform(_langaugeType, bag, TransformKindFlags.All);
             var col = new CodeTypeDeclarationCollection();
 
             // Only output the constants if there are actually any

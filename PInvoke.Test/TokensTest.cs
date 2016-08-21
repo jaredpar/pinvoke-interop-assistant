@@ -236,8 +236,8 @@ namespace PInvoke.Test
         {
             VerifyChar('a');
             VerifyChar('b');
-            VerifyChar(ControlChars.Lf);
-            VerifyChar(Strings.ChrW(55));
+            VerifyChar('\n');
+            VerifyChar(Convert.ToChar(55));
         }
 
         [Fact()]

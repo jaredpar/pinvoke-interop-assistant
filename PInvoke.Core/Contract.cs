@@ -62,7 +62,7 @@ namespace PInvoke
             return new ContractException(message);
         }
 
-        public static void Require(bool b)
+        public static void Requires(bool b)
         {
             ThrowIfFalse(b);
         }

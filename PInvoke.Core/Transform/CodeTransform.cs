@@ -37,14 +37,15 @@ namespace PInvoke.Transform
     /// <remarks></remarks>
     public class CodeTransform
     {
-
         private LanguageType _lang;
+        private NativeSymbolBag _bag;
         private Dictionary<string, NativeSymbol> _typeMap = new Dictionary<string, NativeSymbol>(StringComparer.Ordinal);
-
         private Dictionary<string, NativeSymbol> _symbolValueMap = new Dictionary<string, NativeSymbol>(StringComparer.Ordinal);
-        public CodeTransform(LanguageType lang)
+
+        public CodeTransform(LanguageType lang, NativeSymbolBag bag)
         {
             _lang = lang;
+            _bag = bag;
         }
 
         /// <summary>
@@ -964,7 +965,7 @@ namespace PInvoke.Transform
         {
             ThrowIfNull(node);
 
-            NativeValue ntVal = (NativeValue)node.Tag;
+            var ntVal = NativeValue.TryCreateForLeaf(node, _bag);
             if (ntVal == null)
             {
                 throw new InvalidOperationException("Expected a NativeValue");

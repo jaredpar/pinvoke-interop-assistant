@@ -84,9 +84,8 @@ namespace PInvoke.Parser
     /// or preprocessor junk
     /// </summary>
     /// <remarks></remarks>
-    public class PreProcessorEngine
+    public partial class PreProcessorEngine
     {
-
         [DebuggerDisplay("{DisplayLine}")]
         private class PreprocessorLine
         {
@@ -172,134 +171,15 @@ namespace PInvoke.Parser
 
         }
 
-        private class PreProcessorEvaluator : ExpressionEvaluator
-        {
-
-
-            private PreProcessorEngine _engine;
-            public PreProcessorEvaluator(PreProcessorEngine engine)
-            {
-                _engine = engine;
-            }
-
-            /// <summary>
-            /// Evaluate a preprocessor conditional statement and return whether or not it is true
-            /// </summary>
-            /// <param name="line"></param>
-            /// <returns></returns>
-            /// <remarks></remarks>
-            public bool EvalauteConditional(PreprocessorLine line)
-            {
-                List<Token> list = line.GetValidTokens();
-
-                // Remove the #pound token.  We don't care what type of conditional this is, this just serves
-                // to evaluate it and let the caller interpret the result
-                list.RemoveAt(0);
-
-                // Make sure that all "defined" expressions wrap the next value in ()
-                Int32 i = 0;
-                while (i + 1 < list.Count)
-                {
-                    Token cur = list[i];
-
-                    if (cur.TokenType == TokenType.Word && 0 == string.CompareOrdinal("defined", cur.Value) && list[i + 1].TokenType == TokenType.Word)
-                    {
-                        list.Insert(i + 1, new Token(TokenType.ParenOpen, "("));
-                        list.Insert(i + 3, new Token(TokenType.ParenClose, ")"));
-
-                        i += 3;
-                    }
-
-                    i += 1;
-                }
-
-                ExpressionValue value = null;
-                if (!base.TryEvaluate(list, out value))
-                {
-                    _engine._errorProvider.AddError("Could not evaluate expression {0}", line.ToString());
-                    return false;
-                }
-
-                return value.ConvertToBool();
-            }
-
-            protected override bool TryEvaluateFunctionCall(ExpressionNode node)
-            {
-                bool value =
-                    node.Token.Value == "defined" && 
-                    node.LeftNode != null && 
-                    _engine._macroMap.ContainsKey(node.LeftNode.Token.Value);
-
-                node.Tag = ExpressionValue.Create(value);
-                return true;
-            }
-
-            protected override bool TryEvaluateNegation(ExpressionNode node)
-            {
-                ExpressionValue value = (ExpressionValue)node.LeftNode.Tag;
-                node.Tag = ExpressionValue.Create(!value.ConvertToBool());
-                return true;
-            }
-
-            protected override bool TryEvaluateLeaf(ExpressionNode node)
-            {
-                if (node.Kind == ExpressionKind.Leaf && node.Token.TokenType == TokenType.Word)
-                {
-                    ExpressionValue value = default(ExpressionValue);
-                    Macro m = null;
-                    if (this._engine._macroMap.TryGetValue(node.Token.Value, out m))
-                    {
-                        Number numValue;
-                        if (TokenHelper.TryConvertToNumber(m.Value, out numValue))
-                        {
-                            value = ExpressionValue.Create(numValue);
-                        }
-                        else
-                        {
-                            value = ExpressionValue.Create(1);
-                        }
-                    }
-                    else
-                    {
-                        value = ExpressionValue.Create(0);
-                    }
-
-                    node.Tag = value;
-                    return true;
-                }
-                else if (TokenHelper.IsKeyword(node.Token.TokenType))
-                {
-                    node.Tag = ExpressionValue.Create(1);
-                    return true;
-                }
-                else
-                {
-                    return base.TryEvaluateLeaf(node);
-                }
-            }
-
-            /// <summary>
-            /// For a cast just return the value of thhe left node
-            /// </summary>
-            /// <param name="node"></param>
-            /// <returns></returns>
-            /// <remarks></remarks>
-            protected override bool TryEvaluateCast(ExpressionNode node)
-            {
-                node.Tag = node.LeftNode.Tag;
-                return true;
-            }
-        }
-
-        private PreProcessorOptions _options;
-        private Dictionary<string, Macro> _macroMap = new Dictionary<string, Macro>();
+        private readonly PreProcessorOptions _options;
+        private readonly Dictionary<string, Macro> _macroMap = new Dictionary<string, Macro>();
         private bool _processing;
         private Scanner _scanner;
         private TextWriter _outputStream;
         private ErrorProvider _errorProvider = new ErrorProvider();
-        private PreProcessorEvaluator _eval;
-
+        private ExpressionEvaluator _eval;
         private Dictionary<string, string> _metadataMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
         /// <summary>
         /// Options of the NativePreProcessor
         /// </summary>
@@ -309,7 +189,6 @@ namespace PInvoke.Parser
         public PreProcessorOptions Options
         {
             get { return _options; }
-            set { _options = value; }
         }
 
         /// <summary>
@@ -331,7 +210,7 @@ namespace PInvoke.Parser
 
         public PreProcessorEngine(PreProcessorOptions options)
         {
-            _eval = new PreProcessorEvaluator(this);
+            _eval = new ExpressionEvaluator(_macroMap);
             _options = options;
         }
 
@@ -858,7 +737,7 @@ namespace PInvoke.Parser
         {
             // The object here is to find the branch of the conditional that should
             // be processed
-            bool isCondTrue = _eval.EvalauteConditional(line);
+            bool isCondTrue = EvalauteConditional(line);
             TraceToStream("{0}: {1}", isCondTrue, line.DisplayLine);
             if (isCondTrue)
             {
@@ -878,7 +757,7 @@ namespace PInvoke.Parser
         /// <remarks></remarks>
         private void ProcessPoundIfndef(PreprocessorLine line)
         {
-            bool isCondTrue = _eval.EvalauteConditional(line);
+            bool isCondTrue = EvalauteConditional(line);
             TraceToStream("{0}: {1}", isCondTrue, line.DisplayLine);
             if (!isCondTrue)
             {
@@ -921,7 +800,7 @@ namespace PInvoke.Parser
                         done = true;
                         break;
                     case TokenType.PoundElseIf:
-                        if (_eval.EvalauteConditional(cur))
+                        if (EvalauteConditional(cur))
                         {
                             this.ProcessLoop();
                             done = true;
@@ -1513,6 +1392,46 @@ namespace PInvoke.Parser
             return builder.ToString();
         }
 
+        /// <summary>
+        /// Evaluate a preprocessor conditional statement and return whether or not it is true
+        /// </summary>
+        /// <param name="line"></param>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        private bool EvalauteConditional(PreprocessorLine line)
+        {
+            List<Token> list = line.GetValidTokens();
+
+            // Remove the #pound token.  We don't care what type of conditional this is, this just serves
+            // to evaluate it and let the caller interpret the result
+            list.RemoveAt(0);
+
+            // Make sure that all "defined" expressions wrap the next value in ()
+            Int32 i = 0;
+            while (i + 1 < list.Count)
+            {
+                Token cur = list[i];
+
+                if (cur.TokenType == TokenType.Word && 0 == string.CompareOrdinal("defined", cur.Value) && list[i + 1].TokenType == TokenType.Word)
+                {
+                    list.Insert(i + 1, new Token(TokenType.ParenOpen, "("));
+                    list.Insert(i + 3, new Token(TokenType.ParenClose, ")"));
+
+                    i += 3;
+                }
+
+                i += 1;
+            }
+
+            ExpressionValue value = null;
+            if (!_eval.TryEvaluate(list, out value))
+            {
+                _errorProvider.AddError("Could not evaluate expression {0}", line.ToString());
+                return false;
+            }
+
+            return value.ConvertToBool();
+        }
     }
 
 }

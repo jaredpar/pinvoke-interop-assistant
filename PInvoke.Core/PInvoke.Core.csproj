@@ -93,6 +93,7 @@
     <Compile Include="NativeSymbolBag.cs" />
     <Compile Include="Parser\BinaryOperator.cs" />
     <Compile Include="Parser\ExpressionEvaluator.cs" />
+    <Compile Include="Parser\ExpressionNode.cs" />
     <Compile Include="Parser\ExpressionValue.StringValue.cs" />
     <Compile Include="Parser\ExpressionValue.CharValue.cs" />
     <Compile Include="Parser\ExpressionValue.NumberValue.cs" />

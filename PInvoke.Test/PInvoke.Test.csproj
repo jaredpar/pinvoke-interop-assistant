@@ -54,6 +54,7 @@
   <ItemGroup>
     <Compile Include="CodeDomIteratorTest.cs" />
     <Compile Include="CodeTransformTest.cs" />
+    <Compile Include="EqualityUtil.cs" />
     <Compile Include="ExpressionEvaluatorTest.cs" />
     <Compile Include="ExpressionParserTest.cs" />
     <Compile Include="ExpressionValueTest.cs" />
@@ -70,6 +71,7 @@
     <Compile Include="NativeTypeEqualityComparerTest.cs" />
     <Compile Include="NativeTypeIteratorTest.cs" />
     <Compile Include="NativeTypesTest.cs" />
+    <Compile Include="NumberTest.cs" />
     <Compile Include="PInvokeTestLib.cs" />
     <Compile Include="ProcedureFinderTest.cs" />
     <Compile Include="SalAnalyzerTest.cs" />

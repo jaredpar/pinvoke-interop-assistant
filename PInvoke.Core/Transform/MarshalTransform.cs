@@ -24,7 +24,6 @@ namespace PInvoke.Transform
 
     public class MarshalTransform
     {
-
         private TransformKindFlags _kind;
         private CodeTransform _trans;
 
@@ -35,9 +34,9 @@ namespace PInvoke.Transform
             set { _kind = value; }
         }
 
-        public MarshalTransform(LanguageType lang, TransformKindFlags kind)
+        public MarshalTransform(LanguageType lang, NativeSymbolBag bag, TransformKindFlags kind)
         {
-            _trans = new CodeTransform(lang);
+            _trans = new CodeTransform(lang, bag);
             _kind = kind;
 
             // Method Parameters

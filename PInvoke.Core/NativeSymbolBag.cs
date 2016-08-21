@@ -16,14 +16,15 @@ namespace PInvoke
     /// <remarks></remarks>
     public class NativeSymbolBag
     {
+        private readonly Dictionary<string, NativeConstant> _constMap = new Dictionary<string, NativeConstant>(StringComparer.Ordinal);
+        private readonly Dictionary<string, NativeDefinedType> _definedMap = new Dictionary<string, NativeDefinedType>(StringComparer.Ordinal);
+        private readonly Dictionary<string, NativeTypeDef> _typeDefMap = new Dictionary<string, NativeTypeDef>(StringComparer.Ordinal);
+        private readonly Dictionary<string, NativeProcedure> _procMap = new Dictionary<string, NativeProcedure>(StringComparer.Ordinal);
+        private readonly Dictionary<string, NativeSymbol> _valueMap = new Dictionary<string, NativeSymbol>(StringComparer.Ordinal);
 
-        private Dictionary<string, NativeConstant> _constMap = new Dictionary<string, NativeConstant>(StringComparer.Ordinal);
-        private Dictionary<string, NativeDefinedType> _definedMap = new Dictionary<string, NativeDefinedType>(StringComparer.Ordinal);
-        private Dictionary<string, NativeTypeDef> _typeDefMap = new Dictionary<string, NativeTypeDef>(StringComparer.Ordinal);
-        private Dictionary<string, NativeProcedure> _procMap = new Dictionary<string, NativeProcedure>(StringComparer.Ordinal);
-        private Dictionary<string, NativeSymbol> _valueMap = new Dictionary<string, NativeSymbol>(StringComparer.Ordinal);
-
+        // CTOD: need to abstract this away and think about how storage should work. 
         private NativeStorage _storageLookup;
+
         public int Count
         {
             get { return _constMap.Count + _definedMap.Count + _typeDefMap.Count + _procMap.Count + _valueMap.Count; }
@@ -884,7 +885,6 @@ namespace PInvoke
         /// <remarks></remarks>
         private bool ResolveCoreValues(ErrorProvider ep, ref bool loadedSomethingFromStorage)
         {
-
             bool allResolved = true;
             foreach (NativeValue nValue in this.FindUnresolvedNativeValues())
             {
@@ -923,13 +923,13 @@ namespace PInvoke
             return allResolved;
         }
 
-        private bool IsResolved(NativeSymbol ns, Dictionary<NativeSymbol, Nullable<bool>> map)
+        private bool IsResolved(NativeSymbol ns, Dictionary<NativeSymbol, bool?> map)
         {
             ThrowIfNull(ns);
             ThrowIfNull(map);
 
             // See if this has already been calculated
-            Nullable<bool> ret = false;
+            bool? ret = false;
             if (map.TryGetValue(ns, out ret))
             {
                 if (ret.HasValue)
@@ -953,7 +953,7 @@ namespace PInvoke
             }
 
             // Add an entry into the map to indicate that we are exploring this type
-            map.Add(ns, new Nullable<bool>());
+            map.Add(ns, null);
 
             ret = true;
             foreach (NativeSymbol child in children)
@@ -961,7 +961,7 @@ namespace PInvoke
                 if (!child.IsImmediateResolved || !IsResolved(child, map))
                 {
                     ret = false;
-                    break; // TODO: might not be correct. Was : Exit For
+                    break;
                 }
             }
 

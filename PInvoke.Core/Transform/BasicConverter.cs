@@ -292,8 +292,8 @@ namespace PInvoke.Transform
             bag.TryResolveSymbolsAndValues(ep);
 
             // Create the codedom transform
-            CodeTransform transform = new CodeTransform(this._type);
-            MarshalTransform marshalUtil = new MarshalTransform(this._type, _transformKind);
+            CodeTransform transform = new CodeTransform(this._type, bag);
+            MarshalTransform marshalUtil = new MarshalTransform(this._type, bag, _transformKind);
             CodeTypeDeclarationCollection col = new CodeTypeDeclarationCollection();
 
             // Only output the constants if there are actually any

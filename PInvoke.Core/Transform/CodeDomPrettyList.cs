@@ -190,7 +190,8 @@ namespace PInvoke.Transform
             }
 
             // Next look in the native storage for more types  
-            NativeStorage ns = _bag.NativeStorageLookup;
+            // CTODO: this cast is bad.
+            NativeStorage ns = (NativeStorage)_bag.NextSymbolBag;
             NativeStorage.TypeReference typeRef = ns.CreateTypeReference(target);
             if (typeRef != null)
             {

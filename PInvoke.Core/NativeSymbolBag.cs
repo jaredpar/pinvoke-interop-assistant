@@ -9,7 +9,6 @@ using static PInvoke.Contract;
 
 namespace PInvoke
 {
-
     /// <summary>
     /// Bag for NativeType instances which is used for querying and type resolution
     /// </summary>
@@ -22,8 +21,8 @@ namespace PInvoke
         private readonly Dictionary<string, NativeProcedure> _procMap = new Dictionary<string, NativeProcedure>(StringComparer.Ordinal);
         private readonly Dictionary<string, NativeSymbol> _valueMap = new Dictionary<string, NativeSymbol>(StringComparer.Ordinal);
 
-        // CTOD: need to abstract this away and think about how storage should work. 
-        private NativeStorage _storageLookup;
+        // CTODO: make this readonly
+        private INativeSymbolBag _nextSymbolBag;
 
         public int Count
         {
@@ -55,9 +54,6 @@ namespace PInvoke
         /// <summary>
         /// Procedures in the bag
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
         public IEnumerable<NativeProcedure> NativeProcedures
         {
             get { return _procMap.Values; }
@@ -66,9 +62,6 @@ namespace PInvoke
         /// <summary>
         /// List of NativeConstant instances
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
         public IEnumerable<NativeConstant> NativeConstants
         {
             get { return _constMap.Values; }
@@ -77,31 +70,27 @@ namespace PInvoke
         /// <summary>
         /// Backing NativeStorage for this bag.  Used to resolve NativeNamedType instances
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public NativeStorage NativeStorageLookup
+        public INativeSymbolBag NextSymbolBag
         {
-            get { return _storageLookup; }
-            set { _storageLookup = value; }
+            get { return _nextSymbolBag; }
+            set { _nextSymbolBag = value; }
         }
 
         /// <summary>
         /// Create a new instance
         /// </summary>
-        /// <remarks></remarks>
         public NativeSymbolBag() : this(NativeStorage.DefaultInstance)
         {
         }
 
-        public NativeSymbolBag(NativeStorage ns)
+        public NativeSymbolBag(INativeSymbolBag nextSymbolBag)
         {
-            if (ns == null)
+            if (nextSymbolBag == null)
             {
-                throw new ArgumentNullException("ns");
+                throw new ArgumentNullException(nameof(nextSymbolBag));
             }
 
-            _storageLookup = ns;
+            _nextSymbolBag = nextSymbolBag;
         }
 
         /// <summary>
@@ -168,7 +157,7 @@ namespace PInvoke
                 return true;
             }
 
-            if (_storageLookup.TryLoadDefined(name, out nt))
+            if (_nextSymbolBag.TryLoadDefined(name, out nt))
             {
                 AddDefinedType(nt);
                 fromStorage = true;
@@ -224,7 +213,7 @@ namespace PInvoke
                 return true;
             }
 
-            if (_storageLookup.TryLoadTypedef(name, out nt))
+            if (_nextSymbolBag.TryLoadTypedef(name, out nt))
             {
                 AddTypedef(nt);
                 return true;
@@ -276,7 +265,7 @@ namespace PInvoke
                 return true;
             }
 
-            if (_storageLookup.TryLoadProcedure(name, out proc))
+            if (_nextSymbolBag.TryLoadProcedure(name, out proc))
             {
                 AddProcedure(proc);
                 return true;
@@ -344,7 +333,7 @@ namespace PInvoke
                 return true;
             }
 
-            if (_storageLookup.TryLoadConstant(name, out nConst))
+            if (_nextSymbolBag.TryLoadConstant(name, out nConst))
             {
                 AddConstant(nConst);
                 return true;
@@ -567,7 +556,7 @@ namespace PInvoke
             }
 
             // Lastly try and find it in the stored file
-            if (_storageLookup.TryLoadByName(name, out nt))
+            if (_nextSymbolBag.TryLoadByName(name, out nt))
             {
                 ThrowIfNull(nt);
                 loadFromStorage = true;
@@ -619,7 +608,7 @@ namespace PInvoke
 
             // First look for a constant by this name
             NativeConstant nConst = null;
-            if (_storageLookup.TryLoadConstant(valueName, out nConst))
+            if (_nextSymbolBag.TryLoadConstant(valueName, out nConst))
             {
                 AddConstant(nConst);
                 loaded = true;
@@ -628,17 +617,12 @@ namespace PInvoke
             }
 
             // Lastly look for enums by value 
-            List<NativeStorage.EnumValueRow> erows = null;
-            if (_storageLookup.EnumValue.TryFindByValueName(valueName, out erows))
+            List<NativeDefinedType> enumTypes;
+            if (_nextSymbolBag.TryLoadEnumByValueName(valueName, out enumTypes))
             {
-                // Take the first one
-                NativeStorage.EnumValueRow erow = erows[0];
-                NativeStorage.DefinedTypeRow prow = erow.DefinedTypeRow;
-                NativeDefinedType nt = null;
-                if (prow != null)
-                {
-                    return TryFindOrLoadDefinedType(prow.Name, out nt, out loaded);
-                }
+                loaded = true;
+                ns = enumTypes[0];
+                return true;
             }
 
             return false;

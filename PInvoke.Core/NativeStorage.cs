@@ -14,7 +14,7 @@ using System.IO;
 
 namespace PInvoke
 {
-    public partial class NativeStorage
+    public partial class NativeStorage : INativeSymbolBag
     {
         [DebuggerDisplay("Id={Id} Kind={Kind}")]
         public class TypeReference
@@ -1409,6 +1409,27 @@ namespace PInvoke
 
             retSig = sig;
             return true;
+        }
+
+        public bool TryLoadEnumByValueName(string enumValueName, out List<NativeDefinedType> enumTypes)
+        {
+            enumTypes = new List<NativeDefinedType>();
+
+            List<EnumValueRow> erows = null;
+            if (EnumValue.TryFindByValueName(enumValueName, out erows))
+            {
+                foreach (var erow in erows)
+                {
+                    var prow = erow.DefinedTypeRow;
+                    NativeDefinedType nt;
+                    if (prow != null && TryLoadDefined(prow.Name, out nt))
+                    {
+                        enumTypes.Add(nt);
+                    }
+                }
+            }
+
+            return enumTypes.Count > 0;
         }
 
         #region "Private Methods"

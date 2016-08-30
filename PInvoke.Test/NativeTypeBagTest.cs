@@ -433,7 +433,7 @@ namespace PInvoke.Test
         public void Storage1()
         {
             NativeSymbolBag bag = new NativeSymbolBag();
-            bag.NativeStorageLookup = StorageFactory.CreateStandard();
+            bag.NextSymbolBag = StorageFactory.CreateStandard();
 
             NativeType nt = null;
             Assert.True(bag.TryFindOrLoadNativeType("RecursiveStruct", out nt));
@@ -512,10 +512,10 @@ namespace PInvoke.Test
         [Fact()]
         public void ValueFromStorage1()
         {
-            NativeSymbolBag bag = new NativeSymbolBag(new NativeStorage());
-            bag.NativeStorageLookup.AddConstant(new NativeConstant("c1", "1"));
-            NativeConstant ntConst2 = new NativeConstant("c2", "5+c1");
-            bag.AddConstant(ntConst2);
+            var ns = new NativeStorage();
+            ns.AddConstant(new NativeConstant("c1", "1"));
+            var bag = new NativeSymbolBag(ns);
+            bag.AddConstant(new NativeConstant("c2", "5+c1"));
 
             Assert.Equal(1, bag.FindUnresolvedNativeValues().Count);
             Assert.True(bag.TryResolveSymbolsAndValues());
@@ -528,11 +528,12 @@ namespace PInvoke.Test
         [Fact()]
         public void ValueFromStorage2()
         {
-            NativeSymbolBag bag = new NativeSymbolBag();
+            var ns = new NativeStorage();
+            var bag = new NativeSymbolBag(ns);
 
             NativeEnum ntEnum = new NativeEnum("e1");
             ntEnum.Values.Add(new NativeEnumValue("v1", "5"));
-            bag.NativeStorageLookup.AddDefinedType(ntEnum);
+            bag.AddDefinedType(ntEnum);
 
             NativeConstant ntConst1 = new NativeConstant("c1", "5+v1");
             bag.AddConstant(ntConst1);
@@ -548,8 +549,9 @@ namespace PInvoke.Test
         [Fact()]
         public void ValueFromStorage3()
         {
-            NativeSymbolBag bag = new NativeSymbolBag(new NativeStorage());
-            bag.NativeStorageLookup.AddDefinedType(new NativeStruct("s1"));
+            var ns = new NativeStorage();
+            NativeSymbolBag bag = new NativeSymbolBag(ns);
+            ns.AddDefinedType(new NativeStruct("s1"));
 
             NativeConstant ntConst1 = new NativeConstant("c1", "(s1)1");
             bag.AddConstant(ntConst1);

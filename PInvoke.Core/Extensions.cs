@@ -9,7 +9,7 @@ namespace PInvoke
     public static class Extensions
     {
         /// <summary>
-        /// Try and load a type by it's name
+        /// Try and load a type by it's name in this lookup.
         /// </summary>
         public static bool TryFindByName(this INativeSymbolLookup lookup, string name, out NativeType nt)
         {
@@ -37,6 +37,23 @@ namespace PInvoke
 
             nt = null;
             return false;
+        }
+
+        /// <summary>
+        /// Find all NativeEnum which have a value of this name in this lookup.
+        /// </summary>
+        public static bool TryFindEnumByValueName(this INativeSymbolLookup lookup, string enumValueName, out List<NativeDefinedType> enumTypes)
+        {
+            enumTypes = new List<NativeDefinedType>();
+            foreach (var nt in lookup.NativeEnums)
+            {
+                if (nt.Values.Any(x => x.Name == enumValueName))
+                {
+                    enumTypes.Add(nt);
+                }
+            }
+
+            return enumTypes.Count > 0;
         }
     }
 }

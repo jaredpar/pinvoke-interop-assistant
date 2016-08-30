@@ -29,6 +29,7 @@ namespace PInvoke
             }
         }
 
+        // CTODO: delete this
         [ThreadStatic()]
 
         private static NativeStorage t_default;
@@ -939,6 +940,24 @@ namespace PInvoke
             }
         }
 
+        public IEnumerable<NativeEnum> NativeEnums
+        {
+            get
+            {
+                var list = new List<NativeEnum>();
+                foreach (EnumValueRow erow in EnumValue.Rows)
+                {
+                    NativeDefinedType nt;
+                    if (TryFindDefined(erow.Name, out nt) && nt.Kind == NativeSymbolKind.EnumType)
+                    {
+                        list.Add((NativeEnum)nt);
+                    }
+                }
+
+                return list;
+            }
+        }
+
         public void AddConstant(NativeConstant nConst)
         {
             if (nConst == null)
@@ -1374,27 +1393,6 @@ namespace PInvoke
 
             retSig = sig;
             return true;
-        }
-
-        public bool TryFindEnumByValueName(string enumValueName, out List<NativeDefinedType> enumTypes)
-        {
-            enumTypes = new List<NativeDefinedType>();
-
-            List<EnumValueRow> erows = null;
-            if (EnumValue.TryFindByValueName(enumValueName, out erows))
-            {
-                foreach (var erow in erows)
-                {
-                    var prow = erow.DefinedTypeRow;
-                    NativeDefinedType nt;
-                    if (prow != null && TryFindDefined(prow.Name, out nt))
-                    {
-                        enumTypes.Add(nt);
-                    }
-                }
-            }
-
-            return enumTypes.Count > 0;
         }
 
         #region "Private Methods"

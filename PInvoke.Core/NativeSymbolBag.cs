@@ -16,6 +16,7 @@ namespace PInvoke
     /// <remarks></remarks>
     public class NativeSymbolBag : INativeSymbolBag
     {
+        // CTODO: Remove all the storage and replace with INativeSymbolStorage or INativeSymbolBag
         private readonly Dictionary<string, NativeConstant> _constMap = new Dictionary<string, NativeConstant>(StringComparer.Ordinal);
         private readonly Dictionary<string, NativeDefinedType> _definedMap = new Dictionary<string, NativeDefinedType>(StringComparer.Ordinal);
         private readonly Dictionary<string, NativeTypeDef> _typeDefMap = new Dictionary<string, NativeTypeDef>(StringComparer.Ordinal);
@@ -68,6 +69,11 @@ namespace PInvoke
         public IEnumerable<NativeConstant> NativeConstants
         {
             get { return _constMap.Values; }
+        }
+
+        public IEnumerable<NativeEnum> NativeEnums
+        {
+            get { return _definedMap.Values.Where(x => x.Kind == NativeSymbolKind.EnumType).Cast<NativeEnum>(); }
         }
 
         /// <summary>
@@ -1027,20 +1033,6 @@ namespace PInvoke
             }
 
             return bag;
-        }
-
-        public bool TryFindEnumByValueName(string enumValueName, out List<NativeDefinedType> enumTypes)
-        {
-            enumTypes = new List<NativeDefinedType>();
-            foreach (var nt in _definedMap.Values.Where(x => x.Kind == NativeSymbolKind.EnumType).Cast<NativeEnum>())
-            {
-                if (nt.Values.Any(x => x.Name == enumValueName))
-                {
-                    enumTypes.Add(nt);
-                }
-            }
-
-            return enumTypes.Count > 0;
         }
 
         #endregion

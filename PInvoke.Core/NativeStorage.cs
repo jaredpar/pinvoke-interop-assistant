@@ -14,7 +14,7 @@ using System.IO;
 
 namespace PInvoke
 {
-    public partial class NativeStorage : INativeSymbolBag
+    public partial class NativeStorage : INativeSymbolBag, INativeStorage
     {
         [DebuggerDisplay("Id={Id} Kind={Kind}")]
         public class TypeReference

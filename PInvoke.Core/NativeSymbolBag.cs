@@ -534,7 +534,6 @@ namespace PInvoke
             return TryFindOrLoadNativeType(name, out nt, out notUsed);
         }
 
-
         public bool TryFindOrLoadNativeType(string name, out NativeType nt, out bool loadFromStorage)
         {
 
@@ -631,36 +630,27 @@ namespace PInvoke
         /// <summary>
         /// Save all of the information into a NativeStorage database that is completely resolved
         /// </summary>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public NativeStorage SaveToNativeStorage()
+        public void SaveToNativeStorage(INativeStorage nativeStorage)
         {
-            NativeStorage ns = new NativeStorage();
-            ns.CacheLookup = true;
-
             foreach (NativeConstant nConst in this.FindResolvedConstants())
             {
-                ns.AddConstant(nConst);
+                nativeStorage.AddConstant(nConst);
             }
 
             foreach (NativeDefinedType definedNt in this.FindResolvedDefinedTypes())
             {
-                ns.AddDefinedType(definedNt);
+                nativeStorage.AddDefinedType(definedNt);
             }
 
             foreach (NativeTypeDef typeDef in this.FindResolvedTypedefs())
             {
-                ns.AddTypedef(typeDef);
+                nativeStorage.AddTypedef(typeDef);
             }
 
             foreach (NativeProcedure proc in this.FindResolvedProcedures())
             {
-                ns.AddProcedure(proc);
+                nativeStorage.AddProcedure(proc);
             }
-
-            ns.CacheLookup = false;
-            ns.AcceptChanges();
-            return ns;
         }
 
         /// <summary>

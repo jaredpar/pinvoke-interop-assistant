@@ -130,7 +130,11 @@ internal static class Program
         // GenerateCode(writer, bag)
 
         // Now write out the file
-        NativeStorage ns = bag.SaveToNativeStorage();
+        var ns = new NativeStorage();
+        ns.CacheLookup = true;
+        bag.SaveToNativeStorage(ns);
+        ns.CacheLookup = false;
+        ns.AcceptChanges();
         VerifyGeneratedStorage(ns);
         ns.WriteXml("windows.xml");
 

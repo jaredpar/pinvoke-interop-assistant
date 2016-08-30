@@ -65,6 +65,7 @@ namespace PInvoke
         protected static List<NativeSymbol> EmptySymbolList = new List<NativeSymbol>();
 
         private string _name;
+
         /// <summary>
         /// Name of the C++ type
         /// </summary>
@@ -962,7 +963,6 @@ namespace PInvoke
     [DebuggerDisplay("{FullName} -> {RealTypeFullname}")]
     public class NativeTypeDef : NativeProxyType
     {
-
         public override NativeSymbolKind Kind
         {
             get { return NativeSymbolKind.TypedefType; }

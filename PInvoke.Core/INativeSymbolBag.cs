@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace PInvoke
 {
-    public interface INativeSymbolBag : INativeSymbolLookup, INativeSymbolStorage
+    public interface INativeSymbolBag : INativeSymbolStorage
     {
-
+        bool TryResolveSymbolsAndValues(ErrorProvider ep = null);
     }
 }

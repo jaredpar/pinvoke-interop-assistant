@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PInvoke
 {
-    public interface INativeSymbolStorage
+    public interface INativeSymbolStorage : INativeSymbolLookup
     {
         void AddConstant(NativeConstant nConst);
         void AddDefinedType(NativeDefinedType definedNt);

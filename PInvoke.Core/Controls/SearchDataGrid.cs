@@ -546,7 +546,7 @@ namespace PInvoke.Controls
             {
                 ConstantRow row = (ConstantRow)o;
                 NativeConstant c = null;
-                if (NativeStorage.TryLoadConstant(row.Name, out c))
+                if (NativeStorage.TryFindConstant(row.Name, out c))
                 {
                     return c.Value.Expression;
                 }
@@ -561,7 +561,7 @@ namespace PInvoke.Controls
             {
                 ConstantRow row = (ConstantRow)o;
                 NativeConstant cValue = null;
-                if (NativeStorage.TryLoadConstant(row.Name, out cValue))
+                if (NativeStorage.TryFindConstant(row.Name, out cValue))
                 {
                     symbol = cValue;
                     return true;
@@ -640,7 +640,7 @@ namespace PInvoke.Controls
             {
                 ProcedureRow row = (ProcedureRow)o;
                 NativeProcedure proc = null;
-                if (NativeStorage.TryLoadProcedure(row.Name, out proc))
+                if (NativeStorage.TryFindProcedure(row.Name, out proc))
                 {
                     return proc.Signature.DisplayName;
                 }
@@ -652,7 +652,7 @@ namespace PInvoke.Controls
             {
                 ProcedureRow row = (ProcedureRow)o;
                 NativeProcedure proc = null;
-                if (NativeStorage.TryLoadProcedure(row.Name, out proc))
+                if (NativeStorage.TryFindProcedure(row.Name, out proc))
                 {
                     symbol = proc;
                     return true;
@@ -699,7 +699,7 @@ namespace PInvoke.Controls
             {
                 string name = GetName(o);
                 NativeType type = null;
-                if (NativeStorage.TryLoadByName(name, out type))
+                if (NativeStorage.TryFindByName(name, out type))
                 {
                     switch (type.Kind)
                     {
@@ -724,7 +724,7 @@ namespace PInvoke.Controls
             {
                 string name = GetName(o);
                 NativeType type = null;
-                if (NativeStorage.TryLoadByName(name, out type))
+                if (NativeStorage.TryFindByName(name, out type))
                 {
                     symbol = type;
                     return true;
@@ -809,7 +809,7 @@ namespace PInvoke.Controls
                 if (definedRow != null || typedefRow != null)
                 {
                     NativeType type = null;
-                    if (NativeStorage.TryLoadByName(name, out type))
+                    if (NativeStorage.TryFindByName(name, out type))
                     {
                         symbol = type;
                         switch (type.Kind)
@@ -845,7 +845,7 @@ namespace PInvoke.Controls
                 else if (constRow != null)
                 {
                     NativeConstant cValue = null;
-                    if (NativeStorage.TryLoadConstant(name, out cValue))
+                    if (NativeStorage.TryFindConstant(name, out cValue))
                     {
                         symbol = cValue;
                         value = cValue.Value.Expression;
@@ -858,7 +858,7 @@ namespace PInvoke.Controls
                 else if (procRow != null)
                 {
                     NativeProcedure proc = null;
-                    if (NativeStorage.TryLoadProcedure(name, out proc))
+                    if (NativeStorage.TryFindProcedure(name, out proc))
                     {
                         symbol = proc;
                         value = proc.Signature.DisplayName;

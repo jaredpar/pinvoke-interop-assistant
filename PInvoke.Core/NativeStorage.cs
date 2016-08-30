@@ -14,7 +14,7 @@ using System.IO;
 
 namespace PInvoke
 {
-    public partial class NativeStorage : INativeSymbolBag, INativeStorage
+    public partial class NativeStorage : INativeSymbolLookup, INativeSymbolStorage
     {
         [DebuggerDisplay("Id={Id} Kind={Kind}")]
         public class TypeReference
@@ -1041,7 +1041,7 @@ namespace PInvoke
             TypedefType.Add(nt.Name, typeRef);
         }
 
-        public bool TryLoadTypedef(string name, out NativeTypeDef typedefNt)
+        public bool TryFindTypedef(string name, out NativeTypeDef typedefNt)
         {
             typedefNt = null;
 
@@ -1191,7 +1191,7 @@ namespace PInvoke
             foreach (DefinedTypeRow nRow in DefinedType.FindByNamePattern(namePattern))
             {
                 NativeDefinedType definedNt = null;
-                if (TryLoadDefined(nRow.Name, out definedNt))
+                if (TryFindDefined(nRow.Name, out definedNt))
                 {
                     list.Add(definedNt);
                 }
@@ -1206,7 +1206,7 @@ namespace PInvoke
             foreach (TypedefTypeRow nRow in TypedefType.FindByNamePattern(namePattern))
             {
                 NativeTypeDef typeDef = null;
-                if (TryLoadTypedef(nRow.Name, out typeDef))
+                if (TryFindTypedef(nRow.Name, out typeDef))
                 {
                     list.Add(typeDef);
                 }
@@ -1221,7 +1221,7 @@ namespace PInvoke
             foreach (ProcedureRow nRow in Procedure.FindByNamePattern(namePattern))
             {
                 NativeProcedure proc = null;
-                if (TryLoadProcedure(nRow.Name, out proc))
+                if (TryFindProcedure(nRow.Name, out proc))
                 {
                     list.Add(proc);
                 }
@@ -1236,7 +1236,7 @@ namespace PInvoke
             foreach (ConstantRow nRow in this.Constant.FindByNamePattern(namePattern))
             {
                 NativeConstant c = null;
-                if (TryLoadConstant(nRow.Name, out c))
+                if (TryFindConstant(nRow.Name, out c))
                 {
                     list.Add(c);
                 }
@@ -1245,7 +1245,7 @@ namespace PInvoke
             return list;
         }
 
-        public bool TryLoadDefined(string name, out NativeDefinedType definedNt)
+        public bool TryFindDefined(string name, out NativeDefinedType definedNt)
         {
             definedNt = null;
 
@@ -1270,42 +1270,7 @@ namespace PInvoke
             return true;
         }
 
-        /// <summary>
-        /// Try and load a type by it's name
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="nt"></param>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public bool TryLoadByName(string name, out NativeType nt)
-        {
-            NativeDefinedType definedNt = null;
-            if (TryLoadDefined(name, out definedNt))
-            {
-                nt = definedNt;
-                return true;
-            }
-
-            NativeTypeDef typedef = null;
-            if (TryLoadTypedef(name, out typedef))
-            {
-                nt = typedef;
-                return true;
-            }
-
-            // Lastly try and load the Builtin types
-            NativeBuiltinType bt = null;
-            if (NativeBuiltinType.TryConvertToBuiltinType(name, out bt))
-            {
-                nt = bt;
-                return true;
-            }
-
-            nt = null;
-            return false;
-        }
-
-        public bool TryLoadConstant(string name, out NativeConstant nConst)
+        public bool TryFindConstant(string name, out NativeConstant nConst)
         {
             ConstantRow constRow = null;
             if (!Constant.TryFindByName(name, out constRow))
@@ -1324,7 +1289,7 @@ namespace PInvoke
         /// <param name="retProc"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public bool TryLoadProcedure(string name, out NativeProcedure retProc)
+        public bool TryFindProcedure(string name, out NativeProcedure retProc)
         {
             retProc = null;
 
@@ -1411,7 +1376,7 @@ namespace PInvoke
             return true;
         }
 
-        public bool TryLoadEnumByValueName(string enumValueName, out List<NativeDefinedType> enumTypes)
+        public bool TryFindEnumByValueName(string enumValueName, out List<NativeDefinedType> enumTypes)
         {
             enumTypes = new List<NativeDefinedType>();
 
@@ -1422,7 +1387,7 @@ namespace PInvoke
                 {
                     var prow = erow.DefinedTypeRow;
                     NativeDefinedType nt;
-                    if (prow != null && TryLoadDefined(prow.Name, out nt))
+                    if (prow != null && TryFindDefined(prow.Name, out nt))
                     {
                         enumTypes.Add(nt);
                     }

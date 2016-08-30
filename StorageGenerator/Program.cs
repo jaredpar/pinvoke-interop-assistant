@@ -67,24 +67,24 @@ internal static class Program
     private static void VerifyGeneratedStorage(NativeStorage ns)
     {
         NativeProcedure proc = null;
-        VerifyTrue(ns.TryLoadProcedure("SendMessageA", out proc));
-        VerifyTrue(ns.TryLoadProcedure("SendMessageW", out proc));
-        VerifyTrue(ns.TryLoadProcedure("GetForegroundWindow", out proc));
-        VerifyTrue(ns.TryLoadProcedure("CreateWellKnownSid", out proc));
+        VerifyTrue(ns.TryFindProcedure("SendMessageA", out proc));
+        VerifyTrue(ns.TryFindProcedure("SendMessageW", out proc));
+        VerifyTrue(ns.TryFindProcedure("GetForegroundWindow", out proc));
+        VerifyTrue(ns.TryFindProcedure("CreateWellKnownSid", out proc));
 
         NativeTypeDef typedef = null;
-        VerifyTrue(ns.TryLoadTypedef("LPCSTR", out typedef));
-        VerifyTrue(ns.TryLoadTypedef("LPWSTR", out typedef));
+        VerifyTrue(ns.TryFindTypedef("LPCSTR", out typedef));
+        VerifyTrue(ns.TryFindTypedef("LPWSTR", out typedef));
 
         NativeType defined = null;
-        VerifyTrue(ns.TryLoadByName("WNDPROC", out defined));
-        VerifyTrue(ns.TryLoadByName("HOOKPROC", out defined));
-        VerifyTrue(ns.TryLoadByName("tagPOINT", out defined));
-        VerifyTrue(ns.TryLoadByName("_SYSTEM_INFO", out defined));
+        VerifyTrue(ns.TryFindByName("WNDPROC", out defined));
+        VerifyTrue(ns.TryFindByName("HOOKPROC", out defined));
+        VerifyTrue(ns.TryFindByName("tagPOINT", out defined));
+        VerifyTrue(ns.TryFindByName("_SYSTEM_INFO", out defined));
 
         NativeConstant c = null;
-        VerifyTrue(ns.TryLoadConstant("WM_PAINT", out c));
-        VerifyTrue(ns.TryLoadConstant("WM_LBUTTONDOWN", out c));
+        VerifyTrue(ns.TryFindConstant("WM_PAINT", out c));
+        VerifyTrue(ns.TryFindConstant("WM_LBUTTONDOWN", out c));
 
     }
 

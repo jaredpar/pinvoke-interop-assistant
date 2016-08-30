@@ -80,8 +80,11 @@
     <Compile Include="Controls\TranslateSnippetControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="INativeStorage.cs" />
+    <Compile Include="EmptyNativeSymbolBag.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="INativeSymbolBag.cs" />
+    <Compile Include="INativeSymbolStorage.cs" />
+    <Compile Include="INativeSymbolLookup.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="NativeStorage.Designer.cs">

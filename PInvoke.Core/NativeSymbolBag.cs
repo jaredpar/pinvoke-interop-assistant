@@ -1,5 +1,6 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
@@ -13,7 +14,7 @@ namespace PInvoke
     /// Bag for NativeType instances which is used for querying and type resolution
     /// </summary>
     /// <remarks></remarks>
-    public class NativeSymbolBag
+    public class NativeSymbolBag : INativeSymbolBag
     {
         private readonly Dictionary<string, NativeConstant> _constMap = new Dictionary<string, NativeConstant>(StringComparer.Ordinal);
         private readonly Dictionary<string, NativeDefinedType> _definedMap = new Dictionary<string, NativeDefinedType>(StringComparer.Ordinal);
@@ -22,7 +23,9 @@ namespace PInvoke
         private readonly Dictionary<string, NativeSymbol> _valueMap = new Dictionary<string, NativeSymbol>(StringComparer.Ordinal);
 
         // CTODO: make this readonly
-        private INativeSymbolBag _nextSymbolBag;
+        private INativeSymbolLookup _nextSymbolLookup;
+
+        public static INativeSymbolLookup EmptyLookup => EmptyNativeSymbolBag.Instance;
 
         public int Count
         {
@@ -68,29 +71,17 @@ namespace PInvoke
         }
 
         /// <summary>
-        /// Backing NativeStorage for this bag.  Used to resolve NativeNamedType instances
+        /// Backing INativeSymbolBag for this bag.  Used to resolve NativeNamedType instances
         /// </summary>
-        public INativeSymbolBag NextSymbolBag
+        public INativeSymbolLookup NextSymbolBag
         {
-            get { return _nextSymbolBag; }
-            set { _nextSymbolBag = value; }
+            get { return _nextSymbolLookup; }
+            set { _nextSymbolLookup = value; }
         }
 
-        /// <summary>
-        /// Create a new instance
-        /// </summary>
-        public NativeSymbolBag() : this(NativeStorage.DefaultInstance)
+        public NativeSymbolBag(INativeSymbolLookup nextSymbolBag = null)
         {
-        }
-
-        public NativeSymbolBag(INativeSymbolBag nextSymbolBag)
-        {
-            if (nextSymbolBag == null)
-            {
-                throw new ArgumentNullException(nameof(nextSymbolBag));
-            }
-
-            _nextSymbolBag = nextSymbolBag;
+            _nextSymbolLookup = nextSymbolBag ?? EmptyLookup;
         }
 
         /// <summary>
@@ -139,6 +130,11 @@ namespace PInvoke
             return _definedMap.TryGetValue(name, out nt);
         }
 
+        public bool TryFindDefined(string name, out NativeDefinedType nt)
+        {
+            return TryFindOrLoadDefinedType(name, out nt);
+        }
+
         public bool TryFindOrLoadDefinedType(string name, out NativeDefinedType nt)
         {
             bool notUsed = false;
@@ -157,7 +153,7 @@ namespace PInvoke
                 return true;
             }
 
-            if (_nextSymbolBag.TryLoadDefined(name, out nt))
+            if (_nextSymbolLookup.TryFindDefined(name, out nt))
             {
                 AddDefinedType(nt);
                 fromStorage = true;
@@ -213,7 +209,7 @@ namespace PInvoke
                 return true;
             }
 
-            if (_nextSymbolBag.TryLoadTypedef(name, out nt))
+            if (_nextSymbolLookup.TryFindTypedef(name, out nt))
             {
                 AddTypedef(nt);
                 return true;
@@ -265,7 +261,7 @@ namespace PInvoke
                 return true;
             }
 
-            if (_nextSymbolBag.TryLoadProcedure(name, out proc))
+            if (_nextSymbolLookup.TryFindProcedure(name, out proc))
             {
                 AddProcedure(proc);
                 return true;
@@ -333,7 +329,7 @@ namespace PInvoke
                 return true;
             }
 
-            if (_nextSymbolBag.TryLoadConstant(name, out nConst))
+            if (_nextSymbolLookup.TryFindConstant(name, out nConst))
             {
                 AddConstant(nConst);
                 return true;
@@ -555,7 +551,7 @@ namespace PInvoke
             }
 
             // Lastly try and find it in the stored file
-            if (_nextSymbolBag.TryLoadByName(name, out nt))
+            if (_nextSymbolLookup.TryFindByName(name, out nt))
             {
                 ThrowIfNull(nt);
                 loadFromStorage = true;
@@ -607,7 +603,7 @@ namespace PInvoke
 
             // First look for a constant by this name
             NativeConstant nConst = null;
-            if (_nextSymbolBag.TryLoadConstant(valueName, out nConst))
+            if (_nextSymbolLookup.TryFindConstant(valueName, out nConst))
             {
                 AddConstant(nConst);
                 loaded = true;
@@ -617,7 +613,7 @@ namespace PInvoke
 
             // Lastly look for enums by value 
             List<NativeDefinedType> enumTypes;
-            if (_nextSymbolBag.TryLoadEnumByValueName(valueName, out enumTypes))
+            if (_nextSymbolLookup.TryFindEnumByValueName(valueName, out enumTypes))
             {
                 loaded = true;
                 ns = enumTypes[0];
@@ -630,7 +626,7 @@ namespace PInvoke
         /// <summary>
         /// Save all of the information into a NativeStorage database that is completely resolved
         /// </summary>
-        public void SaveToNativeStorage(INativeStorage nativeStorage)
+        public void SaveToNativeStorage(INativeSymbolStorage nativeStorage)
         {
             foreach (NativeConstant nConst in this.FindResolvedConstants())
             {
@@ -974,18 +970,14 @@ namespace PInvoke
         /// <summary>
         /// Create a NativeTypeBag from the result of a code analysis
         /// </summary>
-        /// <param name="result"></param>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public static NativeSymbolBag CreateFrom(Parser.NativeCodeAnalyzerResult result, NativeStorage ns, ErrorProvider ep)
+        public static NativeSymbolBag CreateFrom(Parser.NativeCodeAnalyzerResult result, INativeSymbolLookup nextSymbolBag, ErrorProvider ep)
         {
             if (ep == null)
             {
                 throw new ArgumentNullException("ep");
             }
 
-            NativeSymbolBag bag = new NativeSymbolBag(ns);
-
+            NativeSymbolBag bag = new NativeSymbolBag(nextSymbolBag);
             foreach (NativeConstant nConst in result.AllNativeConstants)
             {
                 try
@@ -1036,6 +1028,21 @@ namespace PInvoke
 
             return bag;
         }
+
+        public bool TryFindEnumByValueName(string enumValueName, out List<NativeDefinedType> enumTypes)
+        {
+            enumTypes = new List<NativeDefinedType>();
+            foreach (var nt in _definedMap.Values.Where(x => x.Kind == NativeSymbolKind.EnumType).Cast<NativeEnum>())
+            {
+                if (nt.Values.Any(x => x.Name == enumValueName))
+                {
+                    enumTypes.Add(nt);
+                }
+            }
+
+            return enumTypes.Count > 0;
+        }
+
         #endregion
 
     }

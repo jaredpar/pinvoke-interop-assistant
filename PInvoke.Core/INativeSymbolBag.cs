@@ -6,13 +6,8 @@ using System.Threading.Tasks;
 
 namespace PInvoke
 {
-    public interface INativeSymbolBag
+    public interface INativeSymbolBag : INativeSymbolLookup, INativeSymbolStorage
     {
-        bool TryLoadDefined(string name, out NativeDefinedType nt);
-        bool TryLoadTypedef(string name, out NativeTypeDef nt);
-        bool TryLoadProcedure(string name, out NativeProcedure proc);
-        bool TryLoadConstant(string name, out NativeConstant nConst);
-        bool TryLoadByName(string name, out NativeType nt);
-        bool TryLoadEnumByValueName(string enumValueName, out List<NativeDefinedType> enumTypes);
+
     }
 }

@@ -14,7 +14,6 @@ namespace PInvoke.Controls
 {
     public partial class CodeDialog
     {
-
         private class Data
         {
             public string Text;

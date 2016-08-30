@@ -13,7 +13,6 @@ namespace PInvoke
     /// <summary>
     /// Bag for NativeType instances which is used for querying and type resolution
     /// </summary>
-    /// <remarks></remarks>
     public class NativeSymbolBag : INativeSymbolBag
     {
         // CTODO: Remove all the storage and replace with INativeSymbolStorage or INativeSymbolBag

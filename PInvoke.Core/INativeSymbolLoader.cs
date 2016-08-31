@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace PInvoke
 {
+    // CTOD: Rename to INativeSymbolImporter
     internal interface INativeSymbolLoader
     {
         bool TryLoadDefined(string name, out NativeDefinedType nt);

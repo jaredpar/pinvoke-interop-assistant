@@ -88,6 +88,12 @@
     <Compile Include="INativeSymbolLoader.cs" />
     <Compile Include="INativeSymbolStorage.cs" />
     <Compile Include="INativeSymbolLookup.cs" />
+    <Compile Include="Primitive\IPrimitiveReader.cs" />
+    <Compile Include="Primitive\IPrimitiveWriter.cs" />
+    <Compile Include="Primitive\NativeMemberId.cs" />
+    <Compile Include="Primitive\NativeTypeId.cs" />
+    <Compile Include="Primitive\PrimitiveExporter.cs" />
+    <Compile Include="Primitive\PrimitiveImporter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="NativeStorage.Designer.cs">

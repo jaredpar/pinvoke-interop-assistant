@@ -116,7 +116,6 @@ namespace PInvoke
             get { return true; }
         }
 
-
         protected NativeSymbol()
         {
         }
@@ -349,6 +348,7 @@ namespace PInvoke
         private bool _isAnonymous;
 
         private List<NativeMember> _members = new List<NativeMember>();
+
         /// <summary>
         /// Whether or not this type is anonymous
         /// </summary>
@@ -470,9 +470,8 @@ namespace PInvoke
     /// <remarks></remarks>
     public class NativeEnum : NativeDefinedType
     {
-
-
         private List<NativeEnumValue> _list = new List<NativeEnumValue>();
+
         public override NativeSymbolKind Kind
         {
             get { return NativeSymbolKind.EnumType; }
@@ -597,7 +596,6 @@ namespace PInvoke
             get { return _conv; }
             set { _conv = value; }
         }
-
 
         public override NativeSymbolKind Kind
         {
@@ -1632,14 +1630,11 @@ namespace PInvoke
     /// </summary>
     /// <remarks></remarks>
     [DebuggerDisplay("{NativeType.FullName} {Name}")]
-    public class NativeMember : NativeExtraSymbol
+    public sealed class NativeMember : NativeExtraSymbol
     {
         /// <summary>
         /// Nativetype of the member
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
         public NativeType NativeType;
 
         public NativeType NativeTypeDigged

@@ -14,7 +14,8 @@ using System.IO;
 
 namespace PInvoke
 {
-    public partial class NativeStorage : INativeSymbolLookup, INativeSymbolStorage, INativeSymbolLoader
+    // CTODO: needs to implement IPrimitiveReader, IPrimitiveWriter.  Not the current APIs
+    public partial class NativeStorage : INativeSymbolLookup, INativeSymbolStorage
     {
         [DebuggerDisplay("Id={Id} Kind={Kind}")]
         public class TypeReference

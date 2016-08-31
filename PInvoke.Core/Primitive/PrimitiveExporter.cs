@@ -67,6 +67,9 @@ namespace PInvoke.Primitive
                 case NativeSymbolKind.FunctionPointer:
                     DoExportFunctionPointer((NativeFunctionPointer)symbol);
                     break;
+                case NativeSymbolKind.TypedefType:
+                    DoExportTypeDef((NativeTypeDef)symbol);
+                    break;
                 case NativeSymbolKind.Procedure:
                     DoExportProcedure((NativeProcedure)symbol);
                     break;
@@ -205,6 +208,15 @@ namespace PInvoke.Primitive
                 id,
                 ptr.CallingConvention,
                 sigId);
+            _writer.Write(data);
+        }
+
+        private void DoExportTypeDef(NativeTypeDef typeDef)
+        {
+            var id = new NativeSymbolId(typeDef.Name, typeDef.Kind);
+            _writer.Write(id);
+
+            var data = new NativeTypeDefData(id, DoExportType(typeDef.RealType));
             _writer.Write(data);
         }
 

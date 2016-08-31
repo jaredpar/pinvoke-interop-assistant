@@ -938,7 +938,6 @@ namespace PInvoke
     /// NativeProxyTypes aren't really types.  They are just references or modifiers to a type.  A
     /// Typedef is itself a type and accessible by name
     /// </summary>
-    /// <remarks></remarks>
     [DebuggerDisplay("{FullName} -> {RealTypeFullname}")]
     public class NativeTypeDef : NativeProxyType
     {

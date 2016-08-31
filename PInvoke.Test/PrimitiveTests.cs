@@ -95,6 +95,13 @@ namespace PInvoke.Test
                 p.Signature.ReturnType = new NativeBuiltinType(BuiltinType.NativeInt32);
                 TestRoundTrip(p);
             }
+
+            [Fact]
+            public void TypeDefSimple()
+            {
+                var td = new NativeTypeDef("a", BuiltinType.NativeByte);
+                TestRoundTrip(td);
+            }
         }
     }
 }

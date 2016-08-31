@@ -40,6 +40,8 @@ namespace PInvoke.Primitive
                     return ImportFunctionPointer(id);
                 case NativeSymbolKind.Procedure:
                     return ImportProcedure(id);
+                case NativeSymbolKind.TypedefType:
+                    return ImportTypeDef(id);
                 default:
                     Contract.ThrowInvalidEnumValue(id.Kind);
                     return null;
@@ -74,6 +76,12 @@ namespace PInvoke.Primitive
                     Contract.ThrowInvalidEnumValue(data.Kind);
                     return null;
             }
+        }
+
+        private NativeTypeDef ImportTypeDef(NativeSymbolId id)
+        {
+            var data = _reader.ReadTypeDefData(id);
+            return new NativeTypeDef(id.Name, ImportType(data.TargetTypeId));
         }
 
         private NativeDefinedType ImportStructOrUnion(NativeSymbolId id)

@@ -61,6 +61,17 @@ namespace PInvoke.Primitive
             }
         }
 
+        private NativeType ImportType(NativeTypeId id)
+        {
+            if (id.Kind == NativeSymbolKind.BuiltinType)
+            {
+                var bt = (BuiltinType)Enum.Parse(typeof(BuiltinType), id.Name);
+                return new NativeBuiltinType(bt);
+            }
+
+            return new NativeNamedType(id.Name);
+        }
+
         private NativeDefinedType ImportStructOrUnion(NativeTypeId id)
         {
             Contract.Requires(id.Kind == NativeSymbolKind.StructType || id.Kind == NativeSymbolKind.UnionType);
@@ -70,7 +81,7 @@ namespace PInvoke.Primitive
 
             foreach (var memberData in _reader.ReadMembers(id))
             {
-                var memberType = new NativeNamedType(memberData.MemberTypeId.Name);
+                var memberType = ImportType(memberData.MemberTypeId);
                 var member = new NativeMember(memberData.Name, memberType);
                 nt.Members.Add(member);
             }
@@ -90,9 +101,45 @@ namespace PInvoke.Primitive
             return e;
         }
 
+        private NativeSalAttribute ImportSalAttribute(NativeSimpleId id)
+        {
+            if (id.IsNil)
+            {
+                return new NativeSalAttribute();
+            }
+
+            var sal = new NativeSalAttribute();
+            foreach (var data in _reader.ReadSalEntries(id).OrderBy(x => x.Index))
+            {
+                var entry = new NativeSalEntry(data.SalEntryType, data.Text);
+                sal.SalEntryList.Add(entry);
+            }
+            return sal;
+        }
+
+        private NativeSignature ImportSignature(NativeSimpleId id)
+        {
+            var data = _reader.ReadSignatureData(id);
+            var sig = new NativeSignature();
+            sig.ReturnType = ImportType(data.ReturnTypeId);
+            sig.ReturnTypeSalAttribute = ImportSalAttribute(data.ReturnTypeSalId);
+
+            foreach (var pData in _reader.ReadParameters(id).OrderBy(x => x.Index))
+            {
+                var p = new NativeParameter(pData.Name, ImportType(pData.TypeId));
+                sig.Parameters.Add(p);
+            }
+
+            return sig;
+        }
+
         private NativeFunctionPointer ImportFunctionPointer(NativeTypeId id)
         {
-            throw new NotImplementedException();
+            var data = _reader.ReadFuntionPointerData(id);
+            var ptr = new NativeFunctionPointer(id.Name);
+            ptr.CallingConvention = data.CallingConvention;
+            ptr.Signature = ImportSignature(data.SignatureId);
+            return ptr;
         }
 
         public bool TryLoadProcedure(string name, out NativeProcedure proc)

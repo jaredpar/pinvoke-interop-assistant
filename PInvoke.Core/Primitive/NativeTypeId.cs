@@ -17,6 +17,12 @@ namespace PInvoke.Primitive
             Kind = kind;
         }
 
+        public NativeTypeId(NativeType nt)
+        {
+            Name = nt.Name;
+            Kind = nt.Kind;
+        }
+
         public static bool operator ==(NativeTypeId left, NativeTypeId right) => left.Name == right.Name && left.Kind == right.Kind;
         public static bool operator !=(NativeTypeId left, NativeTypeId right) => !(left == right);
         public bool Equals(NativeTypeId other) => this == other;

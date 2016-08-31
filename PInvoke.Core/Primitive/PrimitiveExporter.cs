@@ -16,6 +16,8 @@ namespace PInvoke.Primitive
         /// </summary>
         private readonly Dictionary<NativeSymbol, bool?> _exportedMap = new Dictionary<NativeSymbol, bool?>();
 
+        private int _nextSimpleId = NativeSimpleId.Nil.Id + 1;
+
         public PrimitiveExporter(IPrimitiveWriter writer)
         {
             _writer = writer;
@@ -62,11 +64,18 @@ namespace PInvoke.Primitive
                 case NativeSymbolKind.EnumType:
                     DoExportEnum((NativeEnum)symbol);
                     break;
+                case NativeSymbolKind.FunctionPointer:
+                    DoExportFunctionPointer((NativeFunctionPointer)symbol);
+                    break;
                 case NativeSymbolKind.EnumNameValue:
+                case NativeSymbolKind.SalAttribute:
+                case NativeSymbolKind.SalEntry:
+                case NativeSymbolKind.BuiltinType:
                     // Must be handled elsewhere
                     Contract.ThrowIfFalse(false);
                     break;
                 default:
+                    // Member missed by developer
                     Contract.ThrowInvalidEnumValue(symbol.Kind);
                     break;
             }
@@ -82,7 +91,7 @@ namespace PInvoke.Primitive
             {
                 var data = new NativeMemberData(
                     member.Name,
-                    new NativeTypeId(member.NativeType.Name, member.NativeType.Kind),
+                    DoExportType(member.NativeType),
                     typeId);
                 _writer.Write(data);
                 MaybeExport(member.NativeType);
@@ -98,6 +107,80 @@ namespace PInvoke.Primitive
                 var data = new NativeEnumValueData(value.Name, value.Value.Expression, typeId);
                 _writer.Write(data);
             }
+        }
+
+        private NativeTypeId DoExportType(NativeType nt)
+        {
+            if (nt.Kind == NativeSymbolKind.BuiltinType)
+            {
+                var b = (NativeBuiltinType)nt;
+                return new NativeTypeId(b.BuiltinType.ToString(), NativeSymbolKind.BuiltinType);
+            }
+
+            MaybeExport(nt);
+            return new NativeTypeId(nt.Name, nt.Kind);
+        }
+
+        private NativeSimpleId DoExportSal(NativeSalAttribute sal)
+        {
+            if (sal.IsEmpty)
+            {
+                return NativeSimpleId.Nil;
+            }
+
+            var id = GetNextSimpleId();
+            var list = sal.SalEntryList;
+            for (var i = 0; i < list.Count; i++)
+            {
+                var entry = list[i];
+                var data = new NativeSalEntryData(id, i, entry.SalEntryType, entry.Text);
+                _writer.Write(data);
+            }
+
+            return id;
+        }
+
+        private NativeSimpleId DoExportSignature(NativeSignature sig)
+        {
+            var id = GetNextSimpleId();
+            var returnTypeSalId = DoExportSal(sig.ReturnTypeSalAttribute);
+            var sigData = new NativeSignatureData(
+                id,
+                DoExportType(sig.ReturnType),
+                DoExportSal(sig.ReturnTypeSalAttribute));
+            _writer.Write(sigData);
+
+            var list = sig.Parameters;
+            for (var i = 0; i < list.Count; i++)
+            {
+                var p = list[i];
+                var data = new NativeParameterData(
+                    id,
+                    i,
+                    p.Name,
+                    DoExportType(p.NativeType));
+                _writer.Write(data);
+            }
+
+            return id;
+        }
+
+        private void DoExportFunctionPointer(NativeFunctionPointer ptr)
+        {
+            var id = new NativeTypeId(ptr.Name, ptr.Kind);
+            _writer.Write(id);
+
+            var sigId = DoExportSignature(ptr.Signature);
+            var data = new NativeFunctionPointerData(
+                id,
+                ptr.CallingConvention,
+                sigId);
+            _writer.Write(data);
+        }
+
+        private NativeSimpleId GetNextSimpleId()
+        {
+            return new NativeSimpleId(_nextSimpleId++);
         }
 
         private bool IsExporting(NativeSymbol symbol)

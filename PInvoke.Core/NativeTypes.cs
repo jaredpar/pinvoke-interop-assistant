@@ -1055,7 +1055,6 @@ namespace PInvoke
     /// <summary>
     /// Enumeration of the common C++ builtin types
     /// </summary>
-    /// <remarks></remarks>
     public enum BuiltinType
     {
         NativeInt16,
@@ -1072,7 +1071,6 @@ namespace PInvoke
         /// <summary>
         /// Used for BuiltinTypes initially missed
         /// </summary>
-        /// <remarks></remarks>
         NativeUnknown
     }
 
@@ -1115,9 +1113,6 @@ namespace PInvoke
         /// <summary>
         /// Bulitin Type
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
         public BuiltinType BuiltinType
         {
             get { return _builtinType; }
@@ -2258,7 +2253,6 @@ namespace PInvoke
 
     #region "SAL attributes"
 
-    [Flags()]
     public enum SalEntryType
     {
         Null,
@@ -2295,12 +2289,12 @@ namespace PInvoke
     /// </summary>
     /// <remarks></remarks>
     [DebuggerDisplay("{DisplayName}")]
-    public class NativeSalEntry : NativeExtraSymbol
+    public sealed class NativeSalEntry : NativeExtraSymbol
     {
-
         private SalEntryType _type;
 
         private string _text;
+
         /// <summary>
         /// Type of attribute
         /// </summary>
@@ -2369,59 +2363,59 @@ namespace PInvoke
         {
             switch (entry)
             {
-                case PInvoke.SalEntryType.Null:
+                case SalEntryType.Null:
                     return "SAL_null";
-                case PInvoke.SalEntryType.NotNull:
+                case SalEntryType.NotNull:
                     return "SAL_notnull";
-                case PInvoke.SalEntryType.MaybeNull:
+                case SalEntryType.MaybeNull:
                     return "SAL_maybenull";
-                case PInvoke.SalEntryType.ReadOnly:
+                case SalEntryType.ReadOnly:
                     return "SAL_readonly";
-                case PInvoke.SalEntryType.NotReadOnly:
+                case SalEntryType.NotReadOnly:
                     return "SAL_notreadonly";
-                case PInvoke.SalEntryType.MaybeReadOnly:
+                case SalEntryType.MaybeReadOnly:
                     return "SAL_maybereadonly";
-                case PInvoke.SalEntryType.Valid:
+                case SalEntryType.Valid:
                     return "SAL_valid";
-                case PInvoke.SalEntryType.NotValid:
+                case SalEntryType.NotValid:
                     return "SAL_notvalid";
-                case PInvoke.SalEntryType.MaybeValid:
+                case SalEntryType.MaybeValid:
                     return "SAL_maybevalid";
-                case PInvoke.SalEntryType.ReadableTo:
+                case SalEntryType.ReadableTo:
                     return "SAL_readableTo()";
-                case PInvoke.SalEntryType.ElemReadableTo:
+                case SalEntryType.ElemReadableTo:
                     return "SAL_readableTo(elementCount())";
-                case PInvoke.SalEntryType.ByteReadableTo:
+                case SalEntryType.ByteReadableTo:
                     return "SAL_readableTo(byteCount())";
-                case PInvoke.SalEntryType.WritableTo:
+                case SalEntryType.WritableTo:
                     return "SAL_writableTo()";
-                case PInvoke.SalEntryType.ElemWritableTo:
+                case SalEntryType.ElemWritableTo:
                     return "SAL_writableTo(elementCount())";
-                case PInvoke.SalEntryType.ByteWritableTo:
+                case SalEntryType.ByteWritableTo:
                     return "SAL_writableTo(byteCount())";
-                case PInvoke.SalEntryType.Deref:
+                case SalEntryType.Deref:
                     return "SAL_deref";
-                case PInvoke.SalEntryType.Pre:
+                case SalEntryType.Pre:
                     return "SAL_pre";
-                case PInvoke.SalEntryType.Post:
+                case SalEntryType.Post:
                     return "SAL_post";
-                case PInvoke.SalEntryType.ExceptThat:
+                case SalEntryType.ExceptThat:
                     return "SAL_except";
-                case PInvoke.SalEntryType.InnerControlEntryPoint:
+                case SalEntryType.InnerControlEntryPoint:
                     return "SAL_entrypoint(controlEntry, )";
-                case PInvoke.SalEntryType.InnerDataEntryPoint:
+                case SalEntryType.InnerDataEntryPoint:
                     return "SAL_entrypoint(dataEntry, )";
-                case PInvoke.SalEntryType.InnerSucces:
+                case SalEntryType.InnerSucces:
                     return "SAL_success()";
-                case PInvoke.SalEntryType.InnerCheckReturn:
+                case SalEntryType.InnerCheckReturn:
                     return "SAL_checkReturn";
-                case PInvoke.SalEntryType.InnerTypefix:
+                case SalEntryType.InnerTypefix:
                     return "SAL_typefix";
-                case PInvoke.SalEntryType.InnerOverride:
+                case SalEntryType.InnerOverride:
                     return "__override";
-                case PInvoke.SalEntryType.InnerCallBack:
+                case SalEntryType.InnerCallBack:
                     return "__callback";
-                case PInvoke.SalEntryType.InnerBlocksOn:
+                case SalEntryType.InnerBlocksOn:
                     return "SAL_blocksOn()";
                 default:
                     ThrowInvalidEnumValue(entry);
@@ -2434,13 +2428,11 @@ namespace PInvoke
     /// <summary>
     /// Represents the collection of SAL attributes
     /// </summary>
-    /// <remarks></remarks>
     [DebuggerDisplay("{DisplayName}")]
     public class NativeSalAttribute : NativeExtraSymbol
     {
-
-
         private List<NativeSalEntry> _list = new List<NativeSalEntry>();
+
         public override NativeSymbolKind Kind
         {
             get { return NativeSymbolKind.SalAttribute; }
@@ -2449,9 +2441,6 @@ namespace PInvoke
         /// <summary>
         /// List of attribute entries
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
         public List<NativeSalEntry> SalEntryList
         {
             get { return _list; }
@@ -2460,9 +2449,6 @@ namespace PInvoke
         /// <summary>
         /// True if there are no entries in the attribute
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
         public bool IsEmpty
         {
             get { return _list.Count == 0; }
@@ -2535,25 +2521,16 @@ namespace PInvoke
         /// <summary>
         /// Return type of the NativeProcedure
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
         public NativeType ReturnType;
 
         /// <summary>
         /// SAL attribute on the return type of the procedure
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
         public NativeSalAttribute ReturnTypeSalAttribute = new NativeSalAttribute();
 
         /// <summary>
         /// Parameters of the procedure
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
         public List<NativeParameter> Parameters
         {
             get { return _paramList; }

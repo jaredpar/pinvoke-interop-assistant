@@ -52,6 +52,16 @@ namespace PInvoke.Test
                 var u = new NativeUnion("u1");
                 TestRoundTrip(u);
             }
+
+            [Fact]
+            public void FunctionPointerSimple()
+            {
+                var p = new NativeFunctionPointer("ptr");
+                p.CallingConvention = NativeCallingConvention.CDeclaration;
+                p.Signature = new NativeSignature();
+                p.Signature.ReturnType = new NativeBuiltinType(BuiltinType.NativeInt32);
+                TestRoundTrip(p);
+            }
         }
     }
 }

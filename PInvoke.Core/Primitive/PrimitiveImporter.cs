@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace PInvoke.Primitive
 {
+    // CTODO: Get rid of try.  JUst load the values here.  Either you can or can't load. 
     public sealed class PrimitiveImporter : INativeSymbolLoader
     {
         private readonly IPrimitiveReader _reader;

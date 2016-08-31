@@ -708,9 +708,8 @@ namespace PInvoke
 
     public class NativeArray : NativeProxyType
     {
-
-
         private int _elementCount = -1;
+
         public override NativeSymbolKind Kind
         {
             get { return NativeSymbolKind.ArrayType; }
@@ -719,10 +718,8 @@ namespace PInvoke
         /// <summary>
         /// Element count of the array.  If the array is not bound then this will
         /// be -1
+        /// CTODO: use a nullable here
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
         public int ElementCount
         {
             get { return _elementCount; }
@@ -732,9 +729,6 @@ namespace PInvoke
         /// <summary>
         /// Create the display name of the array
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
         public override string DisplayName
         {
             get

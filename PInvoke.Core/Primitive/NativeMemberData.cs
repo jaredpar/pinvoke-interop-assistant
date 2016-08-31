@@ -9,10 +9,10 @@ namespace PInvoke.Primitive
     public struct NativeMemberData
     {
         public NativeSymbolId ContainingTypeId {get;}
-        public NativeSymbolId MemberTypeId { get; }
+        public NativeTypeId MemberTypeId { get; }
         public string Name { get; }
 
-        public NativeMemberData(string name, NativeSymbolId memberTypeId, NativeSymbolId containingTypeId)
+        public NativeMemberData(string name, NativeTypeId memberTypeId, NativeSymbolId containingTypeId)
         {
             ContainingTypeId = containingTypeId;
             MemberTypeId = memberTypeId;

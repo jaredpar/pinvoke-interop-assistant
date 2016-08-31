@@ -8,8 +8,11 @@ namespace PInvoke.Primitive
 {
     public struct NativeSymbolId : IEquatable<NativeSymbolId>
     {
+        public static NativeSymbolId Nil => default(NativeSymbolId);
+
         public string Name { get; }
         public NativeSymbolKind Kind { get; }
+        public bool IsNil => this == Nil;
 
         public NativeSymbolId(string name, NativeSymbolKind kind)
         {

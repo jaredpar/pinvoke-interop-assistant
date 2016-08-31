@@ -9,10 +9,10 @@ namespace PInvoke.Primitive
     public struct NativeSignatureData
     {
         public NativeSimpleId SignatureId { get; }
-        public NativeSymbolId ReturnTypeId { get; }
+        public NativeTypeId ReturnTypeId { get; }
         public NativeSimpleId ReturnTypeSalId { get; }
 
-        public NativeSignatureData(NativeSimpleId id, NativeSymbolId returnTypeId, NativeSimpleId returnTypeSalId)
+        public NativeSignatureData(NativeSimpleId id, NativeTypeId returnTypeId, NativeSimpleId returnTypeSalId)
         {
             SignatureId = id;
             ReturnTypeId = returnTypeId;
@@ -25,9 +25,9 @@ namespace PInvoke.Primitive
         public NativeSimpleId SignatureId { get; }
         public int Index { get; }
         public string Name { get; }
-        public NativeSymbolId TypeId { get; }
+        public NativeTypeId TypeId { get; }
 
-        public NativeParameterData(NativeSimpleId signatureId, int index, string name, NativeSymbolId typeId)
+        public NativeParameterData(NativeSimpleId signatureId, int index, string name, NativeTypeId typeId)
         {
             SignatureId = signatureId;
             Index = index;

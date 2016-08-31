@@ -113,16 +113,42 @@ namespace PInvoke.Primitive
             }
         }
 
-        private NativeSymbolId DoExportType(NativeType nt)
+        private NativeTypeId DoExportType(NativeType nt)
         {
-            if (nt.Kind == NativeSymbolKind.BuiltinType)
+            switch (nt.Kind)
             {
-                var b = (NativeBuiltinType)nt;
-                return new NativeSymbolId(b.BuiltinType.ToString(), NativeSymbolKind.BuiltinType);
+                case NativeSymbolKind.BuiltinType:
+                    {
+                        // CTODO: shoud cache builtins
+                        var id = GetNextSimpleId();
+                        var b = (NativeBuiltinType)nt;
+                        _writer.Write(new NativeTypeData(id, nt.Kind, builtinType: b.BuiltinType));
+                        return new NativeTypeId(id);
+                    }
+                case NativeSymbolKind.ArrayType:
+                    {
+                        var id = GetNextSimpleId();
+                        var array = (NativeArray)nt;
+                        _writer.Write(new NativeTypeData(id, nt.Kind, elementCount: array.ElementCount, elementTypeId: DoExportType(array.RealType)));
+                        return new NativeTypeId(id);
+                    }
+                case NativeSymbolKind.PointerType:
+                    {
+                        var id = GetNextSimpleId();
+                        var pointer = (NativePointer)nt;
+                        _writer.Write(new NativeTypeData(id, nt.Kind, elementTypeId: DoExportType(pointer.RealType)));
+                        return new NativeTypeId(id);
+                    }
+                case NativeSymbolKind.StructType:
+                case NativeSymbolKind.UnionType:
+                case NativeSymbolKind.EnumType:
+                case NativeSymbolKind.FunctionPointer:
+                    MaybeExport(nt);
+                    return new NativeTypeId(new NativeSymbolId(nt.Name, nt.Kind));
+                default:
+                    Contract.ThrowInvalidEnumValue(nt.Kind);
+                    return NativeTypeId.Nil;
             }
-
-            MaybeExport(nt);
-            return new NativeSymbolId(nt.Name, nt.Kind);
         }
 
         private NativeSimpleId DoExportSal(NativeSalAttribute sal)

@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace PInvoke.Primitive
 {
-    // CTODO: Get rid of try.  JUst load the values here.  Either you can or can't load. 
     public sealed class PrimitiveImporter : INativeSymbolImporter
     {
         private readonly IPrimitiveReader _reader;
@@ -47,15 +46,34 @@ namespace PInvoke.Primitive
             }
         }
 
-        private NativeType ImportType(NativeSymbolId id)
+        private NativeType ImportType(NativeTypeId id)
         {
-            if (id.Kind == NativeSymbolKind.BuiltinType)
+            // When importing symbols as types don't dig deep.  Just return as a named
+            // type and let the higher layers do the resolution process.  It's not appropriate
+            // at this layer.
+            if (id.IsSymbolId)
             {
-                var bt = (BuiltinType)Enum.Parse(typeof(BuiltinType), id.Name);
-                return new NativeBuiltinType(bt);
+                return new NativeNamedType(id.SymbolId.Name);
             }
 
-            return new NativeNamedType(id.Name);
+            return ImportType(id.SimpleId);
+        }
+
+        private NativeType ImportType(NativeSimpleId id)
+        {
+            var data = _reader.ReadTypeData(id);
+            switch (data.Kind)
+            {
+                case NativeSymbolKind.ArrayType:
+                    return new NativeArray(ImportType(data.ElementTypeId), data.ElementCount);
+                case NativeSymbolKind.PointerType:
+                    return new NativePointer(ImportType(data.ElementTypeId));
+                case NativeSymbolKind.BuiltinType:
+                    return new NativeBuiltinType(data.BuiltinType);
+                default:
+                    Contract.ThrowInvalidEnumValue(data.Kind);
+                    return null;
+            }
         }
 
         private NativeDefinedType ImportStructOrUnion(NativeSymbolId id)

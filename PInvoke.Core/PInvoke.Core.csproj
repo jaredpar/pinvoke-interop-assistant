@@ -85,7 +85,7 @@
     <Compile Include="EmptyNativeSymbolBag.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="INativeSymbolBag.cs" />
-    <Compile Include="INativeSymbolLoader.cs" />
+    <Compile Include="INativeSymbolImporter.cs" />
     <Compile Include="INativeSymbolStorage.cs" />
     <Compile Include="INativeSymbolLookup.cs" />
     <Compile Include="Primitive\IPrimitiveReader.cs" />

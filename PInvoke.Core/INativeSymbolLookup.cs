@@ -10,7 +10,7 @@ namespace PInvoke
     /// Interface for looking up symbols. 
     ///
     /// Successive calls to TryFindDefined must produce objects which are reference equals.  If an 
-    /// implementation cannot guarantee that it must implement <see cref="INativeSymbolLoader"/>.
+    /// implementation cannot guarantee that it must implement <see cref="INativeSymbolImporter"/>.
     /// </summary>
     public interface INativeSymbolLookup
     {

@@ -12,15 +12,15 @@ namespace PInvoke.Test
     {
         public sealed class RoundTrip : PrimitiveTests
         {
-            private void TestRoundTrip(NativeDefinedType nt)
+            private void TestRoundTrip(NativeSymbol symbol)
             {
                 var storage = new PrimitiveStorage();
                 var exporter = new PrimitiveExporter(storage);
-                exporter.Export(nt);
+                exporter.Export(symbol);
                 var importer = new PrimitiveImporter(storage);
-                NativeDefinedType other;
-                Assert.True(importer.TryLoadDefined(nt.Name, out other));
-                Assert.Equal(SymbolPrinter.Convert(nt), SymbolPrinter.Convert(other));
+                NativeSymbol other;
+                Assert.True(importer.TryImport(symbol.Name, out other));
+                Assert.Equal(SymbolPrinter.Convert(symbol), SymbolPrinter.Convert(other));
             }
 
             private void TestRoundTrip(NativeProcedure p)
@@ -30,7 +30,7 @@ namespace PInvoke.Test
                 exporter.Export(p);
                 var importer = new PrimitiveImporter(storage);
                 NativeProcedure other;
-                Assert.True(importer.TryLoadProcedure(p.Name, out other));
+                Assert.True(importer.TryImportProcedure(p.Name, out other));
                 Assert.Equal(SymbolPrinter.Convert(p), SymbolPrinter.Convert(other));
             }
 

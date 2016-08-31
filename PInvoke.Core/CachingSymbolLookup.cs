@@ -9,7 +9,7 @@ namespace PInvoke
     public class CachingSymbolLookup : INativeSymbolLookup
     {
         private readonly BasicSymbolStorage _storage;
-        private readonly INativeSymbolLoader _loader;
+        private readonly INativeSymbolImporter _loader;
 
         public IEnumerable<NativeEnum> NativeEnums
         {
@@ -26,7 +26,7 @@ namespace PInvoke
                 return true;
             }
 
-            if (_loader.TryLoadConstant(name, out nConst))
+            if (_loader.TryImportConstant(name, out nConst))
             {
                 _storage.AddConstant(nConst);
                 return true;
@@ -42,7 +42,7 @@ namespace PInvoke
                 return true;
             }
 
-            if (_loader.TryLoadDefined(name, out nt))
+            if (_loader.TryImportDefined(name, out nt))
             {
                 _storage.AddDefinedType(nt);
                 return true;
@@ -58,7 +58,7 @@ namespace PInvoke
                 return true;
             }
 
-            if (_loader.TryLoadProcedure(name, out proc))
+            if (_loader.TryImportProcedure(name, out proc))
             {
                 _storage.AddProcedure(proc);
                 return true;
@@ -74,7 +74,7 @@ namespace PInvoke
                 return true;
             }
 
-            if (_loader.TryLoadTypedef(name, out nt))
+            if (_loader.TryImportTypedef(name, out nt))
             {
                 _storage.AddTypedef(nt);
                 return true;

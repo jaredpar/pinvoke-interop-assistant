@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 namespace PInvoke.Primitive
 {
     // CTODO: Get rid of try.  JUst load the values here.  Either you can or can't load. 
-    public sealed class PrimitiveImporter : INativeSymbolLoader
+    public sealed class PrimitiveImporter : INativeSymbolImporter
     {
         private readonly IPrimitiveReader _reader;
-        private readonly Dictionary<string, NativeSymbolId> _symbolIdMap = new Dictionary<string, NativeSymbolId>(StringComparer.Ordinal);
+        private readonly HashSet<NativeSymbolId> _symbolSet = new HashSet<NativeSymbolId>();
+        private readonly Dictionary<string, NativeSymbolId> _symbolIdMap = new Dictionary<string, NativeSymbolId>();
 
         public PrimitiveImporter(IPrimitiveReader reader)
         {
@@ -22,11 +23,12 @@ namespace PInvoke.Primitive
         {
             foreach (var item in _reader.ReadSymbolIds())
             {
+                _symbolSet.Add(item);
                 _symbolIdMap[item.Name] = item;
             }
         }
 
-        private NativeDefinedType ImportDefined(NativeSymbolId id)
+        private NativeSymbol Import(NativeSymbolId id)
         { 
             switch (id.Kind)
             {
@@ -37,6 +39,8 @@ namespace PInvoke.Primitive
                     return ImportEnum(id);
                 case NativeSymbolKind.FunctionPointer:
                     return ImportFunctionPointer(id);
+                case NativeSymbolKind.Procedure:
+                    return ImportProcedure(id);
                 default:
                     Contract.ThrowInvalidEnumValue(id.Kind);
                     return null;
@@ -134,40 +138,68 @@ namespace PInvoke.Primitive
             return proc;
         }
 
-        public bool TryLoadConstant(string name, out NativeConstant nConst)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool TryLoadDefined(string name, out NativeDefinedType nt)
+        public bool TryImport(string name, out NativeSymbol symbol)
         {
             NativeSymbolId id;
-            if (!_symbolIdMap.TryGetValue(name, out id))
+            if (!_symbolIdMap.TryGetValue(name ,out id))
             {
-                nt = null;
+                symbol = null;
                 return false;
             }
 
-            nt = ImportDefined(id);
-            return true;
+            return TryImport(id, out symbol);
         }
 
-        public bool TryLoadProcedure(string name, out NativeProcedure proc)
+        public bool TryImport(NativeSymbolId id, out NativeSymbol symbol)
         {
-            NativeSymbolId id;
-            if (!_symbolIdMap.TryGetValue(name, out id))
+            if (!_symbolSet.Contains(id))
             {
-                proc = null;
+                symbol = null;
                 return false;
             }
 
-            proc = ImportProcedure(id);
+            symbol = Import(id);
             return true;
         }
 
-        public bool TryLoadTypedef(string name, out NativeTypeDef nt)
+        private bool TryLoadCore<T>(string name, out T value) where T : NativeSymbol
         {
-            throw new NotImplementedException();
+            value = default(T);
+
+            NativeSymbolId id;
+            if (!_symbolIdMap.TryGetValue(name, out id))
+            {
+                return false;
+            }
+
+            NativeSymbol symbol;
+            if (!TryImport(id, out symbol))
+            {
+                return false;
+            }
+
+            value = symbol as T;
+            return value != null;
+        }
+
+        public bool TryImportDefined(string name, out NativeDefinedType nt)
+        {
+            return TryLoadCore(name, out nt);
+        }
+
+        public bool TryImportTypedef(string name, out NativeTypeDef nt)
+        {
+            return TryLoadCore(name, out nt);
+        }
+
+        public bool TryImportProcedure(string name, out NativeProcedure proc)
+        {
+            return TryLoadCore(name, out proc);
+        }
+
+        public bool TryImportConstant(string name, out NativeConstant nConst)
+        {
+            return TryLoadCore(name, out nConst);
         }
     }
 }

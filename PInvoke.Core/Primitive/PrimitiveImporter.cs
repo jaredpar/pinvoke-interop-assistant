@@ -42,6 +42,8 @@ namespace PInvoke.Primitive
                     return ImportProcedure(id);
                 case NativeSymbolKind.TypedefType:
                     return ImportTypeDef(id);
+                case NativeSymbolKind.Constant:
+                    return ImportConstant(id);
                 default:
                     Contract.ThrowInvalidEnumValue(id.Kind);
                     return null;
@@ -72,6 +74,12 @@ namespace PInvoke.Primitive
                     return new NativePointer(ImportType(data.ElementTypeId));
                 case NativeSymbolKind.BuiltinType:
                     return new NativeBuiltinType(data.BuiltinType);
+                case NativeSymbolKind.BitVectorType:
+                    return new NativeBitVector(data.ElementCount);
+                case NativeSymbolKind.NamedType:
+                    return new NativeNamedType(qualification: data.Qualification, name: data.Name, isConst: data.IsConst);
+                case NativeSymbolKind.OpaqueType:
+                    return new NativeOpaqueType();
                 default:
                     Contract.ThrowInvalidEnumValue(data.Kind);
                     return null;
@@ -82,6 +90,12 @@ namespace PInvoke.Primitive
         {
             var data = _reader.ReadTypeDefData(id);
             return new NativeTypeDef(id.Name, ImportType(data.TargetTypeId));
+        }
+
+        private NativeConstant ImportConstant(NativeSymbolId id)
+        {
+            var data = _reader.ReadConstantData(id);
+            return new NativeConstant(id.Name, data.Value, data.Kind);
         }
 
         private NativeDefinedType ImportStructOrUnion(NativeSymbolId id)

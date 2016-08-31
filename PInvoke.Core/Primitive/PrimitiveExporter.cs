@@ -73,11 +73,15 @@ namespace PInvoke.Primitive
                 case NativeSymbolKind.Procedure:
                     DoExportProcedure((NativeProcedure)symbol);
                     break;
+                case NativeSymbolKind.Constant:
+                    DoExportConstant((NativeConstant)symbol);
+                    break;
                 case NativeSymbolKind.EnumNameValue:
                 case NativeSymbolKind.SalAttribute:
                 case NativeSymbolKind.SalEntry:
                 case NativeSymbolKind.BuiltinType:
                 case NativeSymbolKind.ProcedureSignature:
+                case NativeSymbolKind.BitVectorType:
                     // Must be handled elsewhere
                     Contract.ThrowIfFalse(false);
                     break;
@@ -116,6 +120,13 @@ namespace PInvoke.Primitive
             }
         }
 
+        private void DoExportConstant(NativeConstant c)
+        {
+            var id = new NativeSymbolId(c.Name, c.Kind);
+            _writer.Write(id);
+            _writer.Write(new NativeConstantData(id, c.Value.Expression, c.ConstantKind));
+        }
+
         private NativeTypeId DoExportType(NativeType nt)
         {
             switch (nt.Kind)
@@ -140,6 +151,26 @@ namespace PInvoke.Primitive
                         var id = GetNextSimpleId();
                         var pointer = (NativePointer)nt;
                         _writer.Write(new NativeTypeData(id, nt.Kind, elementTypeId: DoExportType(pointer.RealType)));
+                        return new NativeTypeId(id);
+                    }
+                case NativeSymbolKind.BitVectorType:
+                    {
+                        var id = GetNextSimpleId();
+                        var v = (NativeBitVector)nt;
+                        _writer.Write(new NativeTypeData(id, nt.Kind, elementCount: v.Size));
+                        return new NativeTypeId(id);
+                    }
+                case NativeSymbolKind.NamedType:
+                    {
+                        var id = GetNextSimpleId();
+                        var n = (NativeNamedType)nt;
+                        _writer.Write(new NativeTypeData(id, nt.Kind, name: n.Name, qualification: n.Qualification, isConst: n.IsConst));
+                        return new NativeTypeId(id);
+                    }
+                case NativeSymbolKind.OpaqueType:
+                    {
+                        var id = GetNextSimpleId();
+                        _writer.Write(new NativeTypeData(id, nt.Kind));
                         return new NativeTypeId(id);
                     }
                 case NativeSymbolKind.StructType:

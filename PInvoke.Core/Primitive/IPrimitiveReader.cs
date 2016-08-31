@@ -18,5 +18,6 @@ namespace PInvoke.Primitive
         NativeProcedureData ReadProcedureData(NativeSymbolId id);
         NativeTypeData ReadTypeData(NativeSimpleId id);
         NativeTypeDefData ReadTypeDefData(NativeSymbolId id);
+        NativeConstantData ReadConstantData(NativeSymbolId data);
     }
 }

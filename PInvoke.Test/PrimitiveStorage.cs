@@ -19,6 +19,7 @@ namespace PInvoke.Test
         private readonly List<NativeProcedureData> _procDataList = new List<NativeProcedureData>();
         private readonly List<NativeTypeData> _typeDataList = new List<NativeTypeData>();
         private readonly List<NativeTypeDefData> _typeDefDataList = new List<NativeTypeDefData>();
+        private readonly List<NativeConstantData> _constDataList = new List<NativeConstantData>();
 
         public IEnumerable<NativeMemberData> ReadMembers(NativeSymbolId typeId)
         {
@@ -70,6 +71,11 @@ namespace PInvoke.Test
             return _typeDefDataList.Single(x => x.SourceTypeId == id);
         }
 
+        public NativeConstantData ReadConstantData(NativeSymbolId id)
+        {
+            return _constDataList.Single(x => x.Id == id);
+        }
+
         public void Write(NativeMemberData member)
         {
             _memberList.Add(member);
@@ -118,6 +124,11 @@ namespace PInvoke.Test
         public void Write(NativeTypeDefData data)
         {
             _typeDefDataList.Add(data);
+        }
+
+        public void Write(NativeConstantData data)
+        {
+            _constDataList.Add(data);
         }
     }
 }

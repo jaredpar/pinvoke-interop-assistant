@@ -91,6 +91,7 @@
     <Compile Include="Primitive\IPrimitiveReader.cs" />
     <Compile Include="Primitive\IPrimitiveWriter.cs" />
     <Compile Include="Primitive\NativeEnumValueData.cs" />
+    <Compile Include="Primitive\NativeConstantData.cs" />
     <Compile Include="Primitive\NativeTypeDefData.cs" />
     <Compile Include="Primitive\NativeTypeData.cs" />
     <Compile Include="Primitive\NativeProcedureData.cs" />

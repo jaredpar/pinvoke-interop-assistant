@@ -866,7 +866,6 @@ namespace PInvoke
             set { _isConst = value; }
         }
 
-
         public override NativeSymbolKind Kind
         {
             get { return NativeSymbolKind.NamedType; }
@@ -1004,8 +1003,6 @@ namespace PInvoke
     /// <remarks></remarks>
     public class NativeBitVector : NativeSpecializedType
     {
-
-
         private int _size;
         public override NativeSymbolKind Kind
         {

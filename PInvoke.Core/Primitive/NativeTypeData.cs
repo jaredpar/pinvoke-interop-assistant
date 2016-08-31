@@ -13,14 +13,28 @@ namespace PInvoke.Primitive
         public int ElementCount { get; }
         public NativeTypeId ElementTypeId { get; }
         public BuiltinType BuiltinType { get; }
+        public string Name { get; }
+        public string Qualification { get; }
+        public bool IsConst { get; }
 
-        public NativeTypeData(NativeSimpleId id, NativeSymbolKind kind, int elementCount = 0, NativeTypeId? elementTypeId = null, BuiltinType builtinType = default(BuiltinType))
+        public NativeTypeData(
+            NativeSimpleId id, 
+            NativeSymbolKind kind, 
+            int elementCount = 0, 
+            NativeTypeId? elementTypeId = null, 
+            BuiltinType builtinType = default(BuiltinType), 
+            string name = null,
+            string qualification = null,
+            bool isConst = false)
         {
             Id = id;
             Kind = kind;
             ElementCount = elementCount;
             ElementTypeId = elementTypeId ?? NativeTypeId.Nil;
             BuiltinType = builtinType;
+            Name = name;
+            Qualification = qualification;
+            IsConst = isConst;
         }
     }
 }

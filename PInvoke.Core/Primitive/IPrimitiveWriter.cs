@@ -18,5 +18,6 @@ namespace PInvoke.Primitive
         void Write(NativeProcedureData data);
         void Write(NativeTypeData data);
         void Write(NativeTypeDefData data);
+        void Write(NativeConstantData data);
     }
 }

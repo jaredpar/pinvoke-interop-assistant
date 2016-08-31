@@ -488,7 +488,6 @@ namespace PInvoke
             get { return _list; }
         }
 
-
         public NativeEnum()
         {
         }
@@ -501,9 +500,7 @@ namespace PInvoke
         /// <summary>
         /// Enum's can't have members, just name value pairs
         /// </summary>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public override System.Collections.Generic.IEnumerable<NativeSymbol> GetChildren()
+        public override IEnumerable<NativeSymbol> GetChildren()
         {
             List<NativeSymbol> list = new List<NativeSymbol>();
             foreach (NativeEnumValue pair in this.Values)
@@ -528,15 +525,11 @@ namespace PInvoke
     [DebuggerDisplay("{Name} = {Value}")]
     public class NativeEnumValue : NativeExtraSymbol
     {
-
-
         private NativeValueExpression _value;
+
         /// <summary>
         /// Value of the value
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
         public NativeValueExpression Value
         {
             get { return _value; }
@@ -558,7 +551,7 @@ namespace PInvoke
             get { return NativeSymbolKind.EnumNameValue; }
         }
 
-        public override System.Collections.Generic.IEnumerable<NativeSymbol> GetChildren()
+        public override IEnumerable<NativeSymbol> GetChildren()
         {
             return GetSingleChild(_value);
         }
@@ -567,7 +560,6 @@ namespace PInvoke
         {
             ReplaceChildSingle(oldChild, newChild, ref _value);
         }
-
     }
 
     #endregion
@@ -1788,7 +1780,6 @@ namespace PInvoke
     /// <summary>
     /// Represents the value of an experession
     /// </summary>
-    /// <remarks></remarks>
     public class NativeValueExpression : NativeExtraSymbol
     {
         private string _expression;
@@ -1796,6 +1787,7 @@ namespace PInvoke
         private ExpressionNode _node;
 
         private bool _errorParsingExpr = false;
+
         /// <summary>
         /// Value of the expression
         /// </summary>

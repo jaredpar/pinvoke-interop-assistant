@@ -9,6 +9,7 @@ namespace PInvoke.Primitive
     public interface IPrimitiveReader
     {
         IEnumerable<NativeTypeId> ReadTypeIds();
-        IEnumerable<NativeMemberId> ReadMembers(NativeTypeId typeId);
+        IEnumerable<NativeMemberData> ReadMembers(NativeTypeId typeId);
+        IEnumerable<NativeEnumValueData> ReadEnumValues(NativeTypeId typeId);
     }
 }

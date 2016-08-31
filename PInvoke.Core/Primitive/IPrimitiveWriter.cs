@@ -9,6 +9,7 @@ namespace PInvoke.Primitive
     public interface IPrimitiveWriter
     {
         void Write(NativeTypeId typeId);
-        void Write(NativeMemberId memberId);
+        void Write(NativeMemberData memberId);
+        void Write(NativeEnumValueData enumValue);
     }
 }

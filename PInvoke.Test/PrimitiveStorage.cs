@@ -10,11 +10,12 @@ namespace PInvoke.Test
     public sealed class PrimitiveStorage : IPrimitiveReader, IPrimitiveWriter
     {
         private readonly List<NativeTypeId> _typeIdList = new List<NativeTypeId>();
-        private readonly List<NativeMemberId> _memberIdList = new List<NativeMemberId>();
+        private readonly List<NativeMemberData> _memberList = new List<NativeMemberData>();
+        private readonly List<NativeEnumValueData> _enumValueList = new List<NativeEnumValueData>();
 
-        public IEnumerable<NativeMemberId> ReadMembers(NativeTypeId typeId)
+        public IEnumerable<NativeMemberData> ReadMembers(NativeTypeId typeId)
         {
-            return _memberIdList.Where(x => x.ContainingTypeId == typeId);
+            return _memberList.Where(x => x.ContainingTypeId == typeId);
         }
 
         public IEnumerable<NativeTypeId> ReadTypeIds()
@@ -22,14 +23,24 @@ namespace PInvoke.Test
             return _typeIdList;
         }
 
-        public void Write(NativeMemberId member)
+        public IEnumerable<NativeEnumValueData> ReadEnumValues(NativeTypeId typeId)
         {
-            _memberIdList.Add(member);
+            return _enumValueList.Where(x => x.ContainingTypeId == typeId);
+        }
+
+        public void Write(NativeMemberData member)
+        {
+            _memberList.Add(member);
         }
 
         public void Write(NativeTypeId typeId)
         {
             _typeIdList.Add(typeId);
+        }
+
+        public void Write(NativeEnumValueData data)
+        {
+            _enumValueList.Add(data);
         }
     }
 }

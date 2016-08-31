@@ -90,7 +90,8 @@
     <Compile Include="INativeSymbolLookup.cs" />
     <Compile Include="Primitive\IPrimitiveReader.cs" />
     <Compile Include="Primitive\IPrimitiveWriter.cs" />
-    <Compile Include="Primitive\NativeMemberId.cs" />
+    <Compile Include="Primitive\NativeEnumValueData.cs" />
+    <Compile Include="Primitive\NativeMemberData.cs" />
     <Compile Include="Primitive\NativeTypeId.cs" />
     <Compile Include="Primitive\PrimitiveExporter.cs" />
     <Compile Include="Primitive\PrimitiveImporter.cs" />

@@ -56,21 +56,48 @@ namespace PInvoke.Primitive
             switch (symbol.Kind)
             {
                 case NativeSymbolKind.StructType:
+                case NativeSymbolKind.UnionType:
                     DoExportDefined((NativeDefinedType)symbol);
                     break;
+                case NativeSymbolKind.EnumType:
+                    DoExportEnum((NativeEnum)symbol);
+                    break;
+                case NativeSymbolKind.EnumNameValue:
+                    // Must be handled elsewhere
+                    Contract.ThrowIfFalse(false);
+                    break;
                 default:
-                    throw Contract.CreateInvalidEnumValueException(symbol.Kind);
-            }
-
-            foreach (var child in symbol.GetChildren())
-            {
-                MaybeExport(child);
+                    Contract.ThrowInvalidEnumValue(symbol.Kind);
+                    break;
             }
         }
 
         private void DoExportDefined(NativeDefinedType nt)
         {
-            _writer.Write(new NativeTypeId(nt.Name, nt.Kind));
+            Contract.Requires(nt.Kind == NativeSymbolKind.StructType || nt.Kind == NativeSymbolKind.UnionType);
+            var typeId = new NativeTypeId(nt.Name, nt.Kind);
+            _writer.Write(typeId);
+
+            foreach (var member in nt.Members)
+            {
+                var data = new NativeMemberData(
+                    member.Name,
+                    new NativeTypeId(member.NativeType.Name, member.NativeType.Kind),
+                    typeId);
+                _writer.Write(data);
+                MaybeExport(member.NativeType);
+            }
+        }
+
+        private void DoExportEnum(NativeEnum e)
+        {
+            var typeId = new NativeTypeId(e.Name, e.Kind);
+            _writer.Write(typeId);
+            foreach (var value in e.Values)
+            {
+                var data = new NativeEnumValueData(value.Name, value.Value.Expression, typeId);
+                _writer.Write(data);
+            }
         }
 
         private bool IsExporting(NativeSymbol symbol)

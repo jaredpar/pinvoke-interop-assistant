@@ -10,7 +10,7 @@ namespace PInvoke.Primitive
     public sealed class PrimitiveImporter : INativeSymbolLoader
     {
         private readonly IPrimitiveReader _reader;
-        private readonly Dictionary<string, NativeTypeId> _typeIdMap = new Dictionary<string, NativeTypeId>(StringComparer.Ordinal);
+        private readonly Dictionary<string, NativeSymbolId> _symbolIdMap = new Dictionary<string, NativeSymbolId>(StringComparer.Ordinal);
 
         public PrimitiveImporter(IPrimitiveReader reader)
         {
@@ -20,31 +20,13 @@ namespace PInvoke.Primitive
 
         private void BuildInitialMaps()
         {
-            foreach (var item in _reader.ReadTypeIds())
+            foreach (var item in _reader.ReadSymbolIds())
             {
-                _typeIdMap[item.Name] = item;
+                _symbolIdMap[item.Name] = item;
             }
         }
 
-        public bool TryLoadConstant(string name, out NativeConstant nConst)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool TryLoadDefined(string name, out NativeDefinedType nt)
-        {
-            NativeTypeId id;
-            if (!_typeIdMap.TryGetValue(name, out id))
-            {
-                nt = null;
-                return false;
-            }
-
-            nt = ImportDefined(id);
-            return true;
-        }
-
-        private NativeDefinedType ImportDefined(NativeTypeId id)
+        private NativeDefinedType ImportDefined(NativeSymbolId id)
         { 
             switch (id.Kind)
             {
@@ -61,7 +43,7 @@ namespace PInvoke.Primitive
             }
         }
 
-        private NativeType ImportType(NativeTypeId id)
+        private NativeType ImportType(NativeSymbolId id)
         {
             if (id.Kind == NativeSymbolKind.BuiltinType)
             {
@@ -72,7 +54,7 @@ namespace PInvoke.Primitive
             return new NativeNamedType(id.Name);
         }
 
-        private NativeDefinedType ImportStructOrUnion(NativeTypeId id)
+        private NativeDefinedType ImportStructOrUnion(NativeSymbolId id)
         {
             Contract.Requires(id.Kind == NativeSymbolKind.StructType || id.Kind == NativeSymbolKind.UnionType);
             var nt = id.Kind == NativeSymbolKind.StructType
@@ -89,7 +71,7 @@ namespace PInvoke.Primitive
             return nt;
         }
 
-        private NativeEnum ImportEnum(NativeTypeId id)
+        private NativeEnum ImportEnum(NativeSymbolId id)
         {
             var e = new NativeEnum(id.Name);
 
@@ -133,7 +115,7 @@ namespace PInvoke.Primitive
             return sig;
         }
 
-        private NativeFunctionPointer ImportFunctionPointer(NativeTypeId id)
+        private NativeFunctionPointer ImportFunctionPointer(NativeSymbolId id)
         {
             var data = _reader.ReadFuntionPointerData(id);
             var ptr = new NativeFunctionPointer(id.Name);
@@ -142,9 +124,45 @@ namespace PInvoke.Primitive
             return ptr;
         }
 
-        public bool TryLoadProcedure(string name, out NativeProcedure proc)
+        private NativeProcedure ImportProcedure(NativeSymbolId id)
+        {
+            var data = _reader.ReadProcedureData(id);
+            var proc = new NativeProcedure(id.Name);
+            proc.DllName = data.DllName;
+            proc.Signature = ImportSignature(data.SignatureId);
+            proc.CallingConvention = data.CallingConvention;
+            return proc;
+        }
+
+        public bool TryLoadConstant(string name, out NativeConstant nConst)
         {
             throw new NotImplementedException();
+        }
+
+        public bool TryLoadDefined(string name, out NativeDefinedType nt)
+        {
+            NativeSymbolId id;
+            if (!_symbolIdMap.TryGetValue(name, out id))
+            {
+                nt = null;
+                return false;
+            }
+
+            nt = ImportDefined(id);
+            return true;
+        }
+
+        public bool TryLoadProcedure(string name, out NativeProcedure proc)
+        {
+            NativeSymbolId id;
+            if (!_symbolIdMap.TryGetValue(name, out id))
+            {
+                proc = null;
+                return false;
+            }
+
+            proc = ImportProcedure(id);
+            return true;
         }
 
         public bool TryLoadTypedef(string name, out NativeTypeDef nt)

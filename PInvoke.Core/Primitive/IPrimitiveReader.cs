@@ -8,12 +8,13 @@ namespace PInvoke.Primitive
 {
     public interface IPrimitiveReader
     {
-        IEnumerable<NativeTypeId> ReadTypeIds();
-        IEnumerable<NativeMemberData> ReadMembers(NativeTypeId typeId);
-        IEnumerable<NativeEnumValueData> ReadEnumValues(NativeTypeId typeId);
+        IEnumerable<NativeSymbolId> ReadSymbolIds();
+        IEnumerable<NativeMemberData> ReadMembers(NativeSymbolId typeId);
+        IEnumerable<NativeEnumValueData> ReadEnumValues(NativeSymbolId typeId);
         IEnumerable<NativeSalEntryData> ReadSalEntries(NativeSimpleId salId);
         IEnumerable<NativeParameterData> ReadParameters(NativeSimpleId signatureId);
         NativeSignatureData ReadSignatureData(NativeSimpleId signatureId);
-        NativeFunctionPointerData ReadFuntionPointerData(NativeTypeId id);
+        NativeFunctionPointerData ReadFuntionPointerData(NativeSymbolId id);
+        NativeProcedureData ReadProcedureData(NativeSymbolId id);
     }
 }

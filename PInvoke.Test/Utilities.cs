@@ -179,7 +179,6 @@ namespace PInvoke.Test
 
     public static class SymbolPrinter
     {
-
         public static string Convert(NativeSymbol sym)
         {
             string str = sym.Name;

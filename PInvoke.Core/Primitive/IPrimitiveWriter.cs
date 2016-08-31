@@ -8,12 +8,13 @@ namespace PInvoke.Primitive
 {
     public interface IPrimitiveWriter
     {
-        void Write(NativeTypeId typeId);
+        void Write(NativeSymbolId typeId);
         void Write(NativeMemberData memberId);
         void Write(NativeEnumValueData enumValue);
         void Write(NativeSalEntryData data);
         void Write(NativeSignatureData data);
         void Write(NativeParameterData data);
         void Write(NativeFunctionPointerData data);
+        void Write(NativeProcedureData data);
     }
 }

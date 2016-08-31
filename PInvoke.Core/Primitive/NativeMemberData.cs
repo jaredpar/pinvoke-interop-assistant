@@ -8,11 +8,11 @@ namespace PInvoke.Primitive
 {
     public struct NativeMemberData
     {
-        public NativeTypeId ContainingTypeId {get;}
-        public NativeTypeId MemberTypeId { get; }
+        public NativeSymbolId ContainingTypeId {get;}
+        public NativeSymbolId MemberTypeId { get; }
         public string Name { get; }
 
-        public NativeMemberData(string name, NativeTypeId memberTypeId, NativeTypeId containingTypeId)
+        public NativeMemberData(string name, NativeSymbolId memberTypeId, NativeSymbolId containingTypeId)
         {
             ContainingTypeId = containingTypeId;
             MemberTypeId = memberTypeId;

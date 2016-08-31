@@ -23,6 +23,17 @@ namespace PInvoke.Test
                 Assert.Equal(SymbolPrinter.Convert(nt), SymbolPrinter.Convert(other));
             }
 
+            private void TestRoundTrip(NativeProcedure p)
+            {
+                var storage = new PrimitiveStorage();
+                var exporter = new PrimitiveExporter(storage);
+                exporter.Export(p);
+                var importer = new PrimitiveImporter(storage);
+                NativeProcedure other;
+                Assert.True(importer.TryLoadProcedure(p.Name, out other));
+                Assert.Equal(SymbolPrinter.Convert(p), SymbolPrinter.Convert(other));
+            }
+
             [Fact]
             public void StructSimple()
             {
@@ -57,6 +68,28 @@ namespace PInvoke.Test
             public void FunctionPointerSimple()
             {
                 var p = new NativeFunctionPointer("ptr");
+                p.CallingConvention = NativeCallingConvention.CDeclaration;
+                p.Signature = new NativeSignature();
+                p.Signature.ReturnType = new NativeBuiltinType(BuiltinType.NativeInt32);
+                TestRoundTrip(p);
+            }
+            
+            [Fact]
+            public void FunctionPointerReturnSal()
+            {
+                var p = new NativeFunctionPointer("ptr");
+                p.CallingConvention = NativeCallingConvention.CDeclaration;
+                p.Signature = new NativeSignature();
+                p.Signature.ReturnTypeSalAttribute = new NativeSalAttribute();
+                p.Signature.ReturnTypeSalAttribute.SalEntryList.Add(new NativeSalEntry(SalEntryType.NotNull));
+                p.Signature.ReturnType = new NativeBuiltinType(BuiltinType.NativeInt32);
+                TestRoundTrip(p);
+            }
+
+            [Fact]
+            public void ProcedureSimple()
+            {
+                var p = new NativeProcedure("ptr");
                 p.CallingConvention = NativeCallingConvention.CDeclaration;
                 p.Signature = new NativeSignature();
                 p.Signature.ReturnType = new NativeBuiltinType(BuiltinType.NativeInt32);

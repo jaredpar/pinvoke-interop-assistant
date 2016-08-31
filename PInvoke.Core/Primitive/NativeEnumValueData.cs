@@ -8,11 +8,11 @@ namespace PInvoke.Primitive
 {
     public struct NativeEnumValueData
     {
-        public NativeTypeId ContainingTypeId {get;}
+        public NativeSymbolId ContainingTypeId {get;}
         public string Name { get; }
         public string Value { get; }
 
-        public NativeEnumValueData(string name, string value, NativeTypeId containingTypeId)
+        public NativeEnumValueData(string name, string value, NativeSymbolId containingTypeId)
         {
             Name = name;
             Value = value;

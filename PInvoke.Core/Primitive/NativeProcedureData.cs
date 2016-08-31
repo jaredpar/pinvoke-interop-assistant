@@ -6,17 +6,19 @@ using System.Threading.Tasks;
 
 namespace PInvoke.Primitive
 {
-    public struct NativeFunctionPointerData
+    public struct NativeProcedureData
     {
-        public NativeSymbolId ContainingTypeId {get;}
+        public NativeSymbolId ProcedureId {get;}
         public NativeCallingConvention CallingConvention { get; }
         public NativeSimpleId SignatureId { get; }
+        public string DllName { get; }
 
-        public NativeFunctionPointerData(NativeSymbolId containingTypeId, NativeCallingConvention convention, NativeSimpleId signatureId)
+        public NativeProcedureData(NativeSymbolId procedureId, NativeCallingConvention convention, NativeSimpleId signatureId, string dllName)
         {
-            ContainingTypeId = containingTypeId;
+            ProcedureId = procedureId;
             CallingConvention = convention;
             SignatureId = signatureId;
+            DllName = dllName;
         }
     }
 }

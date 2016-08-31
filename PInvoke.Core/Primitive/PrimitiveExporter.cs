@@ -67,10 +67,14 @@ namespace PInvoke.Primitive
                 case NativeSymbolKind.FunctionPointer:
                     DoExportFunctionPointer((NativeFunctionPointer)symbol);
                     break;
+                case NativeSymbolKind.Procedure:
+                    DoExportProcedure((NativeProcedure)symbol);
+                    break;
                 case NativeSymbolKind.EnumNameValue:
                 case NativeSymbolKind.SalAttribute:
                 case NativeSymbolKind.SalEntry:
                 case NativeSymbolKind.BuiltinType:
+                case NativeSymbolKind.ProcedureSignature:
                     // Must be handled elsewhere
                     Contract.ThrowIfFalse(false);
                     break;
@@ -84,7 +88,7 @@ namespace PInvoke.Primitive
         private void DoExportDefined(NativeDefinedType nt)
         {
             Contract.Requires(nt.Kind == NativeSymbolKind.StructType || nt.Kind == NativeSymbolKind.UnionType);
-            var typeId = new NativeTypeId(nt.Name, nt.Kind);
+            var typeId = new NativeSymbolId(nt.Name, nt.Kind);
             _writer.Write(typeId);
 
             foreach (var member in nt.Members)
@@ -100,7 +104,7 @@ namespace PInvoke.Primitive
 
         private void DoExportEnum(NativeEnum e)
         {
-            var typeId = new NativeTypeId(e.Name, e.Kind);
+            var typeId = new NativeSymbolId(e.Name, e.Kind);
             _writer.Write(typeId);
             foreach (var value in e.Values)
             {
@@ -109,16 +113,16 @@ namespace PInvoke.Primitive
             }
         }
 
-        private NativeTypeId DoExportType(NativeType nt)
+        private NativeSymbolId DoExportType(NativeType nt)
         {
             if (nt.Kind == NativeSymbolKind.BuiltinType)
             {
                 var b = (NativeBuiltinType)nt;
-                return new NativeTypeId(b.BuiltinType.ToString(), NativeSymbolKind.BuiltinType);
+                return new NativeSymbolId(b.BuiltinType.ToString(), NativeSymbolKind.BuiltinType);
             }
 
             MaybeExport(nt);
-            return new NativeTypeId(nt.Name, nt.Kind);
+            return new NativeSymbolId(nt.Name, nt.Kind);
         }
 
         private NativeSimpleId DoExportSal(NativeSalAttribute sal)
@@ -167,7 +171,7 @@ namespace PInvoke.Primitive
 
         private void DoExportFunctionPointer(NativeFunctionPointer ptr)
         {
-            var id = new NativeTypeId(ptr.Name, ptr.Kind);
+            var id = new NativeSymbolId(ptr.Name, ptr.Kind);
             _writer.Write(id);
 
             var sigId = DoExportSignature(ptr.Signature);
@@ -175,6 +179,19 @@ namespace PInvoke.Primitive
                 id,
                 ptr.CallingConvention,
                 sigId);
+            _writer.Write(data);
+        }
+
+        private void DoExportProcedure(NativeProcedure proc)
+        {
+            var id = new NativeSymbolId(proc.Name, proc.Kind);
+            _writer.Write(id);
+
+            var data = new NativeProcedureData(
+                id,
+                proc.CallingConvention,
+                DoExportSignature(proc.Signature),
+                proc.DllName);
             _writer.Write(data);
         }
 

@@ -91,12 +91,13 @@
     <Compile Include="Primitive\IPrimitiveReader.cs" />
     <Compile Include="Primitive\IPrimitiveWriter.cs" />
     <Compile Include="Primitive\NativeEnumValueData.cs" />
+    <Compile Include="Primitive\NativeProcedureData.cs" />
     <Compile Include="Primitive\NativeFunctionPointerData.cs" />
     <Compile Include="Primitive\NativeMemberData.cs" />
     <Compile Include="Primitive\NativeSimpleId.cs" />
     <Compile Include="Primitive\NativeSignatureTypes.cs" />
     <Compile Include="Primitive\NativeSalTypes.cs" />
-    <Compile Include="Primitive\NativeTypeId.cs" />
+    <Compile Include="Primitive\NativeSymbolId.cs" />
     <Compile Include="Primitive\PrimitiveExporter.cs" />
     <Compile Include="Primitive\PrimitiveImporter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

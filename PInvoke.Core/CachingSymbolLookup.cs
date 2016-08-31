@@ -8,15 +8,17 @@ namespace PInvoke
 {
     public class CachingSymbolLookup : INativeSymbolLookup
     {
-        private readonly BasicSymbolStorage _storage;
-        private readonly INativeSymbolImporter _loader;
+        private readonly BasicSymbolStorage _storage = new BasicSymbolStorage();
+        private readonly INativeSymbolImporter _importer;
 
         public IEnumerable<NativeEnum> NativeEnums
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
+            get { throw new NotImplementedException(); }
+        }
+
+        public CachingSymbolLookup(INativeSymbolImporter importer)
+        {
+            _importer = importer;
         }
 
         public bool TryFindConstant(string name, out NativeConstant nConst)
@@ -26,7 +28,7 @@ namespace PInvoke
                 return true;
             }
 
-            if (_loader.TryImportConstant(name, out nConst))
+            if (_importer.TryImportConstant(name, out nConst))
             {
                 _storage.AddConstant(nConst);
                 return true;
@@ -42,7 +44,7 @@ namespace PInvoke
                 return true;
             }
 
-            if (_loader.TryImportDefined(name, out nt))
+            if (_importer.TryImportDefined(name, out nt))
             {
                 _storage.AddDefinedType(nt);
                 return true;
@@ -58,7 +60,7 @@ namespace PInvoke
                 return true;
             }
 
-            if (_loader.TryImportProcedure(name, out proc))
+            if (_importer.TryImportProcedure(name, out proc))
             {
                 _storage.AddProcedure(proc);
                 return true;
@@ -74,7 +76,7 @@ namespace PInvoke
                 return true;
             }
 
-            if (_loader.TryImportTypedef(name, out nt))
+            if (_importer.TryImportTypedef(name, out nt))
             {
                 _storage.AddTypedef(nt);
                 return true;

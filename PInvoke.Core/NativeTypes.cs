@@ -351,10 +351,8 @@ namespace PInvoke
 
         /// <summary>
         /// Whether or not this type is anonymous
+        /// CTODO: this isn't imported / exported in the new system
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
         public bool IsAnonymous
         {
             get { return _isAnonymous; }
@@ -377,7 +375,6 @@ namespace PInvoke
             get { return _members; }
         }
 
-
         protected NativeDefinedType()
         {
         }
@@ -387,7 +384,7 @@ namespace PInvoke
             this.Name = name;
         }
 
-        public override System.Collections.Generic.IEnumerable<NativeSymbol> GetChildren()
+        public override IEnumerable<NativeSymbol> GetChildren()
         {
             List<NativeSymbol> list = new List<NativeSymbol>();
             foreach (NativeMember member in Members)
@@ -1669,7 +1666,6 @@ namespace PInvoke
     /// <summary>
     /// Constant in Native code
     /// </summary>
-    /// <remarks></remarks>
     public class NativeConstant : NativeExtraSymbol
     {
         private NativeValueExpression _value;

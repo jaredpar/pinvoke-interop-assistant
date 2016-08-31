@@ -32,14 +32,11 @@ namespace PInvoke
 
         // CTODO: delete this
         [ThreadStatic()]
-
         private static NativeStorage t_default;
+
         /// <summary>
         /// Default Instance to use if not explicitly given one
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
         public static NativeStorage DefaultInstance
         {
             get

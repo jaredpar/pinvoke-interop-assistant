@@ -6,10 +6,16 @@ using System.Threading.Tasks;
 
 namespace PInvoke
 {
-    // CTODO: should lookups be hierarchical?  Yes very likely they should.  Let NativeSymbolBag 
-    // do all of the resolution between the layers.
+    /// <summary>
+    /// Interface for looking up symbols. 
+    ///
+    /// Successive calls to TryFindDefined must produce objects which are reference equals.  If an 
+    /// implementation cannot guarantee that it must implement <see cref="INativeSymbolLoader"/>.
+    /// </summary>
     public interface INativeSymbolLookup
     {
+        // CTODO: Need to move this to a different layer.  Not all storage can efficiently return
+        // blocks of APIs.  Could be hugely allocating.
         // CTODO: need properties for rest of the types
         IEnumerable<NativeEnum> NativeEnums { get; }
 

@@ -14,7 +14,7 @@ using System.IO;
 
 namespace PInvoke
 {
-    public partial class NativeStorage : INativeSymbolLookup, INativeSymbolStorage
+    public partial class NativeStorage : INativeSymbolLookup, INativeSymbolStorage, INativeSymbolLoader
     {
         [DebuggerDisplay("Id={Id} Kind={Kind}")]
         public class TypeReference
@@ -1813,6 +1813,26 @@ namespace PInvoke
                 Debug.Fail(ex.Message);
                 return new NativeStorage();
             }
+        }
+
+        public bool TryCreateDefined(string name, out NativeDefinedType nt)
+        {
+            return TryFindDefined(name, out nt);
+        }
+
+        public bool TryCreateTypedef(string name, out NativeTypeDef nt)
+        {
+            return TryFindTypedef(name, out nt);
+        }
+
+        public bool TryCreateProcedure(string name, out NativeProcedure proc)
+        {
+            return TryFindProcedure(name, out proc);
+        }
+
+        public bool TryCreateConstant(string name, out NativeConstant nConst)
+        {
+            return TryFindConstant(name, out nConst);
         }
     }
 }

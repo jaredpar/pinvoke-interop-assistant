@@ -229,8 +229,6 @@ namespace PInvoke
     /// <remarks></remarks>
     public abstract class NativeType : NativeSymbol
     {
-
-
         protected NativeType()
         {
         }
@@ -340,7 +338,6 @@ namespace PInvoke
 
             return null;
         }
-
     }
 
     #endregion
@@ -349,7 +346,6 @@ namespace PInvoke
 
     public abstract class NativeDefinedType : NativeType
     {
-
         private bool _isAnonymous;
 
         private List<NativeMember> _members = new List<NativeMember>();
@@ -712,7 +708,6 @@ namespace PInvoke
         {
             ReplaceChildSingle(oldChild, newChild, ref _realType);
         }
-
     }
 
     #endregion
@@ -1424,7 +1419,6 @@ namespace PInvoke
         /// </summary>
         /// <remarks></remarks>
         Inline
-
     }
 
     /// <summary>

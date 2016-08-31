@@ -13,7 +13,7 @@ namespace PInvoke
     /// <summary>
     /// Bag for NativeType instances which is used for querying and type resolution
     /// </summary>
-    public class NativeSymbolBag : INativeSymbolBag
+    public sealed class NativeSymbolBag : INativeSymbolBag
     {
         // CTODO: Remove all the storage and replace with INativeSymbolStorage or INativeSymbolBag
         private readonly Dictionary<string, NativeConstant> _constMap = new Dictionary<string, NativeConstant>(StringComparer.Ordinal);
@@ -35,9 +35,6 @@ namespace PInvoke
         /// <summary>
         /// List of NativeDefinedType instances in the map
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
         public IEnumerable<NativeDefinedType> NativeDefinedTypes
         {
             get { return _definedMap.Values; }
@@ -46,9 +43,6 @@ namespace PInvoke
         /// <summary>
         /// List of NativeTypedef instances in the map
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
         public IEnumerable<NativeTypeDef> NativeTypedefs
         {
             get { return _typeDefMap.Values; }
@@ -630,6 +624,7 @@ namespace PInvoke
 
         /// <summary>
         /// Save all of the information into a NativeStorage database that is completely resolved
+        /// CTODO: INativeSymbolStorage is wrong.  Should have a lower API like INativeSymbolLookupRaw.
         /// </summary>
         public void SaveToNativeStorage(INativeSymbolStorage nativeStorage)
         {

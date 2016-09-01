@@ -48,7 +48,7 @@ namespace PInvoke.Controls
         }
         private DataGridViewColumn _nameColumn;
         private DataGridViewColumn _valueColumn;
-        private NativeStorage _ns;
+        private INativeSymbolStorage _storage;
         private IncrementalSearch _search;
         private string _searchText;
         private bool _showInvalidData;
@@ -82,15 +82,15 @@ namespace PInvoke.Controls
         }
 
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public NativeStorage NativeStorage
+        public INativeSymbolStorage Storage
         {
-            get { return _ns; }
+            get { return _storage; }
             set
             {
-                _ns = value;
+                _storage = value;
                 if (_info != null)
                 {
-                    _info.NativeStorage = value;
+                    _info.Storage = value;
                     StartSearch();
                 }
             }
@@ -124,7 +124,7 @@ namespace PInvoke.Controls
                     return _selectionBag;
                 }
 
-                NativeSymbolBag bag = new NativeSymbolBag(_ns);
+                NativeSymbolBag bag = new NativeSymbolBag(_storage);
                 foreach (NativeSymbol cur in SelectedSymbols)
                 {
 
@@ -170,22 +170,23 @@ namespace PInvoke.Controls
             set
             {
                 _kind = value;
+                var ns = (Storage as NativeStorage) ?? new NativeStorage();
                 switch (_kind)
                 {
                     case PInvoke.Controls.SearchKind.Constant:
-                        _info = new SearchDataGridInfo.ConstantsInfo();
+                        _info = new SearchDataGridInfo.ConstantsInfo(ns);
                         break;
                     case PInvoke.Controls.SearchKind.Procedure:
-                        _info = new SearchDataGridInfo.ProcedureInfo();
+                        _info = new SearchDataGridInfo.ProcedureInfo(ns);
                         break;
                     case PInvoke.Controls.SearchKind.Type:
-                        _info = new SearchDataGridInfo.TypeInfo();
+                        _info = new SearchDataGridInfo.TypeInfo(ns);
                         break;
                     case PInvoke.Controls.SearchKind.None:
                         _info = new SearchDataGridInfo.EmptyInfo();
                         break;
                     case PInvoke.Controls.SearchKind.All:
-                        _info = new SearchDataGridInfo.AllInfo();
+                        _info = new SearchDataGridInfo.AllInfo(ns);
                         break;
                     default:
                         _info = new SearchDataGridInfo.EmptyInfo();
@@ -214,9 +215,14 @@ namespace PInvoke.Controls
         [Category("Action")]
         public event EventHandler SelectedSymbolsChanged;
 
-        public SearchDataGrid()
+        public SearchDataGrid() : this(new BasicSymbolStorage())
         {
-            _ns = NativeStorage.DefaultInstance;
+
+        }
+
+        public SearchDataGrid(INativeSymbolStorage storage)
+        {
+            _storage = storage;
             m_timer.Enabled = false;
             m_timer.Interval = 500;
 
@@ -332,7 +338,7 @@ namespace PInvoke.Controls
 
             _info.ShowInvalidData = _showInvalidData;
             _info.SearchText = SearchText;
-            _info.NativeStorage = _ns;
+            _info.Storage = _storage;
             _search = new IncrementalSearch(_info.GetInitialData(), _info.ShouldAllow);
 
             SearchImpl();
@@ -469,13 +475,19 @@ namespace PInvoke.Controls
 
     public abstract class SearchDataGridInfo
     {
-        public NativeStorage NativeStorage = NativeStorage.DefaultInstance;
+        // CTODO: should this be a lookup instead? 
+        public INativeSymbolStorage Storage;
         public bool ShowInvalidData;
 
         public string SearchText;
         public virtual string ValueColumnName
         {
             get { return "Value"; }
+        }
+
+        protected SearchDataGridInfo(INativeSymbolStorage storage)
+        {
+            Storage = storage;
         }
 
         public bool ShouldAllow(object cur)
@@ -503,8 +515,12 @@ namespace PInvoke.Controls
 
         public class EmptyInfo : SearchDataGridInfo
         {
+            public EmptyInfo() : base(new BasicSymbolStorage())
+            {
 
-            public override System.Collections.IEnumerable GetInitialData()
+            }
+
+            public override IEnumerable GetInitialData()
             {
                 return new List<object>();
             }
@@ -530,8 +546,14 @@ namespace PInvoke.Controls
         #region "ConstantsInfo"
         public class ConstantsInfo : SearchDataGridInfo
         {
+            public NativeStorage NativeStorage { get; }
 
-            public override System.Collections.IEnumerable GetInitialData()
+            public ConstantsInfo(NativeStorage storage) : base(storage)
+            {
+                NativeStorage = storage;
+            }
+
+            public override IEnumerable GetInitialData()
             {
                 return NativeStorage.Constant;
             }
@@ -546,7 +568,7 @@ namespace PInvoke.Controls
             {
                 ConstantRow row = (ConstantRow)o;
                 NativeConstant c = null;
-                if (NativeStorage.TryFindConstant(row.Name, out c))
+                if (Storage.TryFindConstant(row.Name, out c))
                 {
                     return c.Value.Expression;
                 }
@@ -561,7 +583,7 @@ namespace PInvoke.Controls
             {
                 ConstantRow row = (ConstantRow)o;
                 NativeConstant cValue = null;
-                if (NativeStorage.TryFindConstant(row.Name, out cValue))
+                if (Storage.TryFindConstant(row.Name, out cValue))
                 {
                     symbol = cValue;
                     return true;
@@ -624,6 +646,12 @@ namespace PInvoke.Controls
         #region "ProcedureInfo"
         public class ProcedureInfo : SearchDataGridInfo
         {
+            public NativeStorage NativeStorage { get; }
+
+            public ProcedureInfo(NativeStorage storage) : base(storage)
+            {
+                NativeStorage = storage;
+            }
 
             public override System.Collections.IEnumerable GetInitialData()
             {
@@ -640,7 +668,7 @@ namespace PInvoke.Controls
             {
                 ProcedureRow row = (ProcedureRow)o;
                 NativeProcedure proc = null;
-                if (NativeStorage.TryFindProcedure(row.Name, out proc))
+                if (Storage.TryFindProcedure(row.Name, out proc))
                 {
                     return proc.Signature.DisplayName;
                 }
@@ -652,7 +680,7 @@ namespace PInvoke.Controls
             {
                 ProcedureRow row = (ProcedureRow)o;
                 NativeProcedure proc = null;
-                if (NativeStorage.TryFindProcedure(row.Name, out proc))
+                if (Storage.TryFindProcedure(row.Name, out proc))
                 {
                     symbol = proc;
                     return true;
@@ -668,6 +696,12 @@ namespace PInvoke.Controls
         #region "TypeInfo"
         public class TypeInfo : SearchDataGridInfo
         {
+            public NativeStorage NativeStorage { get; }
+
+            public TypeInfo(NativeStorage storage) : base(storage)
+            {
+                NativeStorage = storage;
+            }
 
             public override System.Collections.IEnumerable GetInitialData()
             {
@@ -699,7 +733,7 @@ namespace PInvoke.Controls
             {
                 string name = GetName(o);
                 NativeType type = null;
-                if (NativeStorage.TryFindByName(name, out type))
+                if (Storage.TryFindByName(name, out type))
                 {
                     switch (type.Kind)
                     {
@@ -724,7 +758,7 @@ namespace PInvoke.Controls
             {
                 string name = GetName(o);
                 NativeType type = null;
-                if (NativeStorage.TryFindByName(name, out type))
+                if (Storage.TryFindByName(name, out type))
                 {
                     symbol = type;
                     return true;
@@ -738,6 +772,12 @@ namespace PInvoke.Controls
         #region "AllInfo"
         public class AllInfo : SearchDataGridInfo
         {
+            public NativeStorage NativeStorage { get; }
+
+            public AllInfo(NativeStorage storage) : base(storage)
+            {
+                NativeStorage = storage;
+            }
 
             public override System.Collections.IEnumerable GetInitialData()
             {
@@ -809,7 +849,7 @@ namespace PInvoke.Controls
                 if (definedRow != null || typedefRow != null)
                 {
                     NativeType type = null;
-                    if (NativeStorage.TryFindByName(name, out type))
+                    if (Storage.TryFindByName(name, out type))
                     {
                         symbol = type;
                         switch (type.Kind)
@@ -845,7 +885,7 @@ namespace PInvoke.Controls
                 else if (constRow != null)
                 {
                     NativeConstant cValue = null;
-                    if (NativeStorage.TryFindConstant(name, out cValue))
+                    if (Storage.TryFindConstant(name, out cValue))
                     {
                         symbol = cValue;
                         value = cValue.Value.Expression;
@@ -858,7 +898,7 @@ namespace PInvoke.Controls
                 else if (procRow != null)
                 {
                     NativeProcedure proc = null;
-                    if (NativeStorage.TryFindProcedure(name, out proc))
+                    if (Storage.TryFindProcedure(name, out proc))
                     {
                         symbol = proc;
                         value = proc.Signature.DisplayName;

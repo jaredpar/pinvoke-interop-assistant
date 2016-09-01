@@ -18,10 +18,9 @@ namespace PInvoke.Test
     ///</summary>
     public class CodeDomIteratorTest
     {
-
         private List<object> Convert(string code)
         {
-            BasicConverter converter = new BasicConverter();
+            BasicConverter converter = new BasicConverter(LanguageType.VisualBasic, StorageFactory.CreateStandard());
             CodeTypeDeclarationCollection ctd = converter.ConvertNativeCodeToCodeDom(code, new PInvoke.ErrorProvider());
             CodeDomIterator it = new CodeDomIterator();
             return it.Iterate(ctd);

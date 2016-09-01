@@ -24,7 +24,7 @@ namespace PInvoke.Controls
             set
             {
                 _ns = value;
-                _searchGrid.NativeStorage = value;
+                _searchGrid.Storage = value;
             }
         }
 
@@ -64,8 +64,9 @@ namespace PInvoke.Controls
             get { return _bag; }
         }
 
-        public SelectSymbolDialog() : this(SearchKind.Constant, NativeStorage.DefaultInstance)
+        public SelectSymbolDialog() : this(SearchKind.Constant, new NativeStorage())
         {
+
         }
 
         public SelectSymbolDialog(SearchKind kind, NativeStorage ns)

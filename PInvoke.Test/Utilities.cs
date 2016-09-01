@@ -402,7 +402,7 @@ namespace PInvoke.Test
         {
             Assert.True(bag.TryResolveSymbolsAndValues());
 
-            BasicConverter con = new BasicConverter();
+            BasicConverter con = new BasicConverter(lang, StorageFactory.CreateStandard());
             CodeTypeDeclarationCollection col = con.ConvertToCodeDom(bag, new ErrorProvider());
 
             VerifyConstValue(col, lang, name, val, type);
@@ -459,7 +459,7 @@ namespace PInvoke.Test
         {
             Assert.True(bag.TryResolveSymbolsAndValues());
 
-            BasicConverter con = new BasicConverter();
+            BasicConverter con = new BasicConverter(lang, StorageFactory.CreateStandard());
             CodeTypeDeclarationCollection col = con.ConvertToCodeDom(bag, new ErrorProvider());
 
             // Look for the constants class

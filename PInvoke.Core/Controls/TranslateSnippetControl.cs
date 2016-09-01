@@ -27,7 +27,7 @@ namespace PInvoke.Controls
             internal string ParseOutput;
         }
 
-        private NativeStorage _ns = NativeStorage.DefaultInstance;
+        private NativeStorage _ns;
         private TransformKindFlags _transKind = TransformKindFlags.All;
         private List<Macro> _initialMacroList = new List<Macro>();
 
@@ -44,9 +44,16 @@ namespace PInvoke.Controls
             // This call is required by the Windows Form Designer.
             InitializeComponent();
 
+            _ns = new NativeStorage();
+
             // Add any initialization after the InitializeComponent() call.
             m_langTypeCb.Items.AddRange(EnumUtil.GetAllValuesObject<LanguageType>());
             m_langTypeCb.SelectedItem = LanguageType.VisualBasic;
+        }
+
+        public TranslateSnippetControl(NativeStorage storage)
+        {
+            _ns = storage;
         }
 
         #region "ISignatureImportControl"

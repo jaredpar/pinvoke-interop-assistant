@@ -59,14 +59,6 @@ namespace PInvoke.Transform
             set { _transformKind = value; }
         }
 
-        public BasicConverter() : this(LanguageType.VisualBasic, NativeStorage.DefaultInstance)
-        {
-        }
-
-        public BasicConverter(LanguageType type) : this(type, NativeStorage.DefaultInstance)
-        {
-        }
-
         public BasicConverter(LanguageType type, NativeStorage ns)
         {
             _ns = ns;

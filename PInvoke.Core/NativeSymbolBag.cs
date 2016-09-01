@@ -593,11 +593,6 @@ namespace PInvoke
             return System.Text.RegularExpressions.Regex.IsMatch(name, "^Anonymous_((\\w+_){4})(\\w+)$");
         }
 
-        public static NativeSymbolBag CreateFrom(Parser.NativeCodeAnalyzerResult result)
-        {
-            return CreateFrom(result, NativeStorage.DefaultInstance);
-        }
-
         public static NativeSymbolBag CreateFrom(Parser.NativeCodeAnalyzerResult result, NativeStorage ns)
         {
             return CreateFrom(result, ns, new ErrorProvider());

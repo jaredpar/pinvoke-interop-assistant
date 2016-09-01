@@ -31,26 +31,6 @@ namespace PInvoke
             }
         }
 
-        // CTODO: delete this
-        [ThreadStatic()]
-        private static NativeStorage t_default;
-
-        /// <summary>
-        /// Default Instance to use if not explicitly given one
-        /// </summary>
-        public static NativeStorage DefaultInstance
-        {
-            get
-            {
-                if (t_default == null)
-                {
-                    t_default = new NativeStorage();
-                }
-                return t_default;
-            }
-            set { t_default = value; }
-        }
-
         public partial class DefinedTypeDataTable
         {
             private void DefinedTypeDataTable_ColumnChanging(System.Object sender, System.Data.DataColumnChangeEventArgs e)

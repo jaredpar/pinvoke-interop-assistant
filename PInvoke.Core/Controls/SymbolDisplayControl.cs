@@ -53,10 +53,15 @@ namespace PInvoke.Controls
 
         public event EventHandler SearchKindChanged;
 
-        public SymbolDisplayControl()
+        public SymbolDisplayControl() : this(new NativeStorage())
         {
-            _ns = NativeStorage.DefaultInstance;
-            _conv = new BasicConverter(LanguageType.VisualBasic);
+
+        }
+
+        public SymbolDisplayControl(NativeStorage storage)
+        {
+            _ns = storage;
+            _conv = new BasicConverter(LanguageType.VisualBasic, storage);
 
             // This call is required by the Windows Form Designer.
             InitializeComponent();
@@ -108,7 +113,7 @@ namespace PInvoke.Controls
             {
                 _ns = value;
                 _conv.NativeStorage = value;
-                m_searchGrid.NativeStorage = value;
+                m_searchGrid.Storage = value;
             }
         }
 

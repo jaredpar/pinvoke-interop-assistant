@@ -325,7 +325,7 @@ namespace PInvoke.Test
             NativeSymbolBag bag = new NativeSymbolBag(ns);
 
             NativeConstant c = null;
-            Assert.False(bag.TryFindConstant("c1", out c));
+            Assert.False(bag.Storage.TryFindConstant("c1", out c));
             Assert.True(bag.TryFindConstant("c1", out c));
             Assert.True(bag.TryFindConstant("c1", out c));
         }
@@ -418,7 +418,7 @@ namespace PInvoke.Test
         {
             NativeStruct nt = new NativeStruct();
             nt.IsAnonymous = true;
-            Assert.True(string.IsNullOrEmpty(nt.Name));
+            Assert.False(string.IsNullOrEmpty(nt.Name));
 
             NativeSymbolBag bag = new NativeSymbolBag();
             bag.AddDefinedType(nt);

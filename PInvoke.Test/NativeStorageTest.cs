@@ -283,6 +283,7 @@ namespace PInvoke.Test
             NativeSymbolBag bag = new NativeSymbolBag(ns);
             NativeProcedure ret1 = null;
             Assert.True(bag.TryFindProcedure("p1", out ret1));
+            bag.AddProcedure(ret1);
             Assert.True(bag.TryResolveSymbolsAndValues());
             Assert.Equal(SymbolPrinter.Convert(p1), SymbolPrinter.Convert(ret1));
         }

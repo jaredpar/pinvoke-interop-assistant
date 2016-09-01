@@ -11,7 +11,7 @@ using static PInvoke.Contract;
 namespace PInvoke
 {
     /// <summary>
-    /// Bag for NativeType instances which is used for querying and type resolution
+    /// An <see cref="INativeSymbolStorage"/>  which is capable of doing name resolution.
     /// </summary>
     public sealed class NativeSymbolBag : INativeSymbolBag
     {
@@ -197,6 +197,14 @@ namespace PInvoke
                 return true;
             }
 
+            NativeBuiltinType bt = null;
+            if (NativeBuiltinType.TryConvertToBuiltinType(name, out bt))
+            {
+                loadedFromNextLookup = false;
+                type = bt;
+                return true;
+            }
+
             loadedFromNextLookup = false;
             return false;
         }
@@ -239,8 +247,14 @@ namespace PInvoke
 
             // When there is a qualification it is either struct, union or enum.  Try and load the defined type
             // for the name and then make sure that it is the correct type 
-            NativeDefinedType definedNt = null;
             if (!TryFindTypeCore(namedType.Name, out type, out loadedFromNextLookup))
+            {
+                type = null;
+                return false;
+            }
+
+            var definedNt = type as NativeDefinedType;
+            if (definedNt == null)
             {
                 type = null;
                 return false;

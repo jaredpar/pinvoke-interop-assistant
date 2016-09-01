@@ -356,7 +356,18 @@ namespace PInvoke
         public bool IsAnonymous
         {
             get { return _isAnonymous; }
-            set { _isAnonymous = value; }
+            set
+            {
+                _isAnonymous = value;
+                if (_isAnonymous)
+                {
+                    if (string.IsNullOrEmpty(Name))
+                    {
+                        Name = NativeSymbolBag.GenerateAnonymousName();
+                    }
+                    Debug.Assert(NativeSymbolBag.IsAnonymousName(Name));
+                }
+            }
         }
 
         public override NativeSymbolCategory Category
@@ -2099,7 +2110,7 @@ namespace PInvoke
             _value = value;
         }
 
-        public override System.Collections.Generic.IEnumerable<NativeSymbol> GetChildren()
+        public override IEnumerable<NativeSymbol> GetChildren()
         {
             if (_valueKind == NativeValueKind.SymbolType)
             {
@@ -2222,10 +2233,16 @@ namespace PInvoke
             }
             else if (token.IsAnyWord)
             {
-                NativeSymbol symbol;
-                if (bag != null && bag.TryFindValue(token.Value, out symbol))
+                NativeConstant constant;
+                NativeEnum enumeration;
+                NativeEnumValue value;
+                if (bag != null && bag.TryFindConstant(token.Value, out constant))
                 {
-                    ntVal = NativeValue.CreateSymbolValue(token.Value, symbol);
+                    ntVal = NativeValue.CreateSymbolValue(token.Value, constant);
+                }
+                else if (bag != null && bag.TryFindEnumValue(token.Value, out enumeration, out value))
+                {
+                    ntVal = NativeValue.CreateSymbolValue(token.Value, enumeration);
                 }
                 else
                 {

@@ -9,8 +9,8 @@ namespace PInvoke.Primitive
     public sealed class PrimitiveImporter : INativeSymbolImporter
     {
         private readonly IPrimitiveReader _reader;
-        private readonly HashSet<NativeSymbolId> _symbolSet = new HashSet<NativeSymbolId>();
-        private readonly Dictionary<string, NativeSymbolId> _symbolIdMap = new Dictionary<string, NativeSymbolId>();
+        private readonly HashSet<PrimitiveSymbolId> _symbolSet = new HashSet<PrimitiveSymbolId>();
+        private readonly Dictionary<string, PrimitiveSymbolId> _symbolIdMap = new Dictionary<string, PrimitiveSymbolId>();
 
         public PrimitiveImporter(IPrimitiveReader reader)
         {
@@ -27,7 +27,7 @@ namespace PInvoke.Primitive
             }
         }
 
-        private NativeSymbol Import(NativeSymbolId id)
+        private NativeSymbol Import(PrimitiveSymbolId id)
         { 
             switch (id.Kind)
             {
@@ -50,7 +50,7 @@ namespace PInvoke.Primitive
             }
         }
 
-        private NativeType ImportType(NativeTypeId id)
+        private NativeType ImportType(PrimitiveTypeId id)
         {
             // When importing symbols as types don't dig deep.  Just return as a named
             // type and let the higher layers do the resolution process.  It's not appropriate
@@ -63,7 +63,7 @@ namespace PInvoke.Primitive
             return ImportType(id.SimpleId);
         }
 
-        private NativeType ImportType(NativeSimpleId id)
+        private NativeType ImportType(PrimitiveSimpleId id)
         {
             var data = _reader.ReadTypeData(id);
             switch (data.Kind)
@@ -86,19 +86,19 @@ namespace PInvoke.Primitive
             }
         }
 
-        private NativeTypeDef ImportTypeDef(NativeSymbolId id)
+        private NativeTypeDef ImportTypeDef(PrimitiveSymbolId id)
         {
             var data = _reader.ReadTypeDefData(id);
             return new NativeTypeDef(id.Name, ImportType(data.TargetTypeId));
         }
 
-        private NativeConstant ImportConstant(NativeSymbolId id)
+        private NativeConstant ImportConstant(PrimitiveSymbolId id)
         {
             var data = _reader.ReadConstantData(id);
             return new NativeConstant(id.Name, data.Value, data.Kind);
         }
 
-        private NativeDefinedType ImportStructOrUnion(NativeSymbolId id)
+        private NativeDefinedType ImportStructOrUnion(PrimitiveSymbolId id)
         {
             Contract.Requires(id.Kind == NativeSymbolKind.StructType || id.Kind == NativeSymbolKind.UnionType);
             var nt = id.Kind == NativeSymbolKind.StructType
@@ -115,7 +115,7 @@ namespace PInvoke.Primitive
             return nt;
         }
 
-        private NativeEnum ImportEnum(NativeSymbolId id)
+        private NativeEnum ImportEnum(PrimitiveSymbolId id)
         {
             var e = new NativeEnum(id.Name);
 
@@ -127,7 +127,7 @@ namespace PInvoke.Primitive
             return e;
         }
 
-        private NativeSalAttribute ImportSalAttribute(NativeSimpleId id)
+        private NativeSalAttribute ImportSalAttribute(PrimitiveSimpleId id)
         {
             if (id.IsNil)
             {
@@ -143,7 +143,7 @@ namespace PInvoke.Primitive
             return sal;
         }
 
-        private NativeSignature ImportSignature(NativeSimpleId id)
+        private NativeSignature ImportSignature(PrimitiveSimpleId id)
         {
             var data = _reader.ReadSignatureData(id);
             var sig = new NativeSignature();
@@ -159,7 +159,7 @@ namespace PInvoke.Primitive
             return sig;
         }
 
-        private NativeFunctionPointer ImportFunctionPointer(NativeSymbolId id)
+        private NativeFunctionPointer ImportFunctionPointer(PrimitiveSymbolId id)
         {
             var data = _reader.ReadFuntionPointerData(id);
             var ptr = new NativeFunctionPointer(id.Name);
@@ -168,7 +168,7 @@ namespace PInvoke.Primitive
             return ptr;
         }
 
-        private NativeProcedure ImportProcedure(NativeSymbolId id)
+        private NativeProcedure ImportProcedure(PrimitiveSymbolId id)
         {
             var data = _reader.ReadProcedureData(id);
             var proc = new NativeProcedure(id.Name);
@@ -180,7 +180,7 @@ namespace PInvoke.Primitive
 
         public bool TryImport(string name, out NativeSymbol symbol)
         {
-            NativeSymbolId id;
+            PrimitiveSymbolId id;
             if (!_symbolIdMap.TryGetValue(name ,out id))
             {
                 symbol = null;
@@ -190,7 +190,7 @@ namespace PInvoke.Primitive
             return TryImport(id, out symbol);
         }
 
-        public bool TryImport(NativeSymbolId id, out NativeSymbol symbol)
+        public bool TryImport(PrimitiveSymbolId id, out NativeSymbol symbol)
         {
             if (!_symbolSet.Contains(id))
             {
@@ -206,7 +206,7 @@ namespace PInvoke.Primitive
         {
             value = default(T);
 
-            NativeSymbolId id;
+            PrimitiveSymbolId id;
             if (!_symbolIdMap.TryGetValue(name, out id))
             {
                 return false;

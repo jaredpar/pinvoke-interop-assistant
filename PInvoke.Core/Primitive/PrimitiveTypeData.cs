@@ -6,22 +6,22 @@ using System.Threading.Tasks;
 
 namespace PInvoke.Primitive
 {
-    public struct NativeTypeData
+    public struct PrimitiveTypeData
     {
-        public NativeSimpleId Id { get; }
+        public PrimitiveSimpleId Id { get; }
         public NativeSymbolKind Kind { get; }
         public int ElementCount { get; }
-        public NativeTypeId ElementTypeId { get; }
+        public PrimitiveTypeId ElementTypeId { get; }
         public BuiltinType BuiltinType { get; }
         public string Name { get; }
         public string Qualification { get; }
         public bool IsConst { get; }
 
-        public NativeTypeData(
-            NativeSimpleId id, 
+        public PrimitiveTypeData(
+            PrimitiveSimpleId id, 
             NativeSymbolKind kind, 
             int elementCount = 0, 
-            NativeTypeId? elementTypeId = null, 
+            PrimitiveTypeId? elementTypeId = null, 
             BuiltinType builtinType = default(BuiltinType), 
             string name = null,
             string qualification = null,
@@ -30,7 +30,7 @@ namespace PInvoke.Primitive
             Id = id;
             Kind = kind;
             ElementCount = elementCount;
-            ElementTypeId = elementTypeId ?? NativeTypeId.Nil;
+            ElementTypeId = elementTypeId ?? PrimitiveTypeId.Nil;
             BuiltinType = builtinType;
             Name = name;
             Qualification = qualification;

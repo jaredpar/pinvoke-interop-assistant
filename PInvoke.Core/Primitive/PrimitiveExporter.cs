@@ -16,7 +16,7 @@ namespace PInvoke.Primitive
         /// </summary>
         private readonly Dictionary<NativeSymbol, bool?> _exportedMap = new Dictionary<NativeSymbol, bool?>();
 
-        private int _nextSimpleId = NativeSimpleId.Nil.Id + 1;
+        private int _nextSimpleId = PrimitiveSimpleId.Nil.Id + 1;
 
         public PrimitiveExporter(IPrimitiveWriter writer)
         {
@@ -95,12 +95,12 @@ namespace PInvoke.Primitive
         private void DoExportDefined(NativeDefinedType nt)
         {
             Contract.Requires(nt.Kind == NativeSymbolKind.StructType || nt.Kind == NativeSymbolKind.UnionType);
-            var typeId = new NativeSymbolId(nt.Name, nt.Kind);
+            var typeId = new PrimitiveSymbolId(nt.Name, nt.Kind);
             _writer.Write(typeId);
 
             foreach (var member in nt.Members)
             {
-                var data = new NativeMemberData(
+                var data = new PrimitiveMemberData(
                     member.Name,
                     DoExportType(member.NativeType),
                     typeId);
@@ -111,23 +111,23 @@ namespace PInvoke.Primitive
 
         private void DoExportEnum(NativeEnum e)
         {
-            var typeId = new NativeSymbolId(e.Name, e.Kind);
+            var typeId = new PrimitiveSymbolId(e.Name, e.Kind);
             _writer.Write(typeId);
             foreach (var value in e.Values)
             {
-                var data = new NativeEnumValueData(value.Name, value.Value.Expression, typeId);
+                var data = new PrimitiveEnumValueData(value.Name, value.Value.Expression, typeId);
                 _writer.Write(data);
             }
         }
 
         private void DoExportConstant(NativeConstant c)
         {
-            var id = new NativeSymbolId(c.Name, c.Kind);
+            var id = new PrimitiveSymbolId(c.Name, c.Kind);
             _writer.Write(id);
-            _writer.Write(new NativeConstantData(id, c.Value.Expression, c.ConstantKind));
+            _writer.Write(new PrimitiveConstantData(id, c.Value.Expression, c.ConstantKind));
         }
 
-        private NativeTypeId DoExportType(NativeType nt)
+        private PrimitiveTypeId DoExportType(NativeType nt)
         {
             switch (nt.Kind)
             {
@@ -136,60 +136,60 @@ namespace PInvoke.Primitive
                         // CTODO: shoud cache builtins
                         var id = GetNextSimpleId();
                         var b = (NativeBuiltinType)nt;
-                        _writer.Write(new NativeTypeData(id, nt.Kind, builtinType: b.BuiltinType));
-                        return new NativeTypeId(id);
+                        _writer.Write(new PrimitiveTypeData(id, nt.Kind, builtinType: b.BuiltinType));
+                        return new PrimitiveTypeId(id);
                     }
                 case NativeSymbolKind.ArrayType:
                     {
                         var id = GetNextSimpleId();
                         var array = (NativeArray)nt;
-                        _writer.Write(new NativeTypeData(id, nt.Kind, elementCount: array.ElementCount, elementTypeId: DoExportType(array.RealType)));
-                        return new NativeTypeId(id);
+                        _writer.Write(new PrimitiveTypeData(id, nt.Kind, elementCount: array.ElementCount, elementTypeId: DoExportType(array.RealType)));
+                        return new PrimitiveTypeId(id);
                     }
                 case NativeSymbolKind.PointerType:
                     {
                         var id = GetNextSimpleId();
                         var pointer = (NativePointer)nt;
-                        _writer.Write(new NativeTypeData(id, nt.Kind, elementTypeId: DoExportType(pointer.RealType)));
-                        return new NativeTypeId(id);
+                        _writer.Write(new PrimitiveTypeData(id, nt.Kind, elementTypeId: DoExportType(pointer.RealType)));
+                        return new PrimitiveTypeId(id);
                     }
                 case NativeSymbolKind.BitVectorType:
                     {
                         var id = GetNextSimpleId();
                         var v = (NativeBitVector)nt;
-                        _writer.Write(new NativeTypeData(id, nt.Kind, elementCount: v.Size));
-                        return new NativeTypeId(id);
+                        _writer.Write(new PrimitiveTypeData(id, nt.Kind, elementCount: v.Size));
+                        return new PrimitiveTypeId(id);
                     }
                 case NativeSymbolKind.NamedType:
                     {
                         var id = GetNextSimpleId();
                         var n = (NativeNamedType)nt;
-                        _writer.Write(new NativeTypeData(id, nt.Kind, name: n.Name, qualification: n.Qualification, isConst: n.IsConst));
-                        return new NativeTypeId(id);
+                        _writer.Write(new PrimitiveTypeData(id, nt.Kind, name: n.Name, qualification: n.Qualification, isConst: n.IsConst));
+                        return new PrimitiveTypeId(id);
                     }
                 case NativeSymbolKind.OpaqueType:
                     {
                         var id = GetNextSimpleId();
-                        _writer.Write(new NativeTypeData(id, nt.Kind));
-                        return new NativeTypeId(id);
+                        _writer.Write(new PrimitiveTypeData(id, nt.Kind));
+                        return new PrimitiveTypeId(id);
                     }
                 case NativeSymbolKind.StructType:
                 case NativeSymbolKind.UnionType:
                 case NativeSymbolKind.EnumType:
                 case NativeSymbolKind.FunctionPointer:
                     MaybeExport(nt);
-                    return new NativeTypeId(new NativeSymbolId(nt.Name, nt.Kind));
+                    return new PrimitiveTypeId(new PrimitiveSymbolId(nt.Name, nt.Kind));
                 default:
                     Contract.ThrowInvalidEnumValue(nt.Kind);
-                    return NativeTypeId.Nil;
+                    return PrimitiveTypeId.Nil;
             }
         }
 
-        private NativeSimpleId DoExportSal(NativeSalAttribute sal)
+        private PrimitiveSimpleId DoExportSal(NativeSalAttribute sal)
         {
             if (sal.IsEmpty)
             {
-                return NativeSimpleId.Nil;
+                return PrimitiveSimpleId.Nil;
             }
 
             var id = GetNextSimpleId();
@@ -197,18 +197,18 @@ namespace PInvoke.Primitive
             for (var i = 0; i < list.Count; i++)
             {
                 var entry = list[i];
-                var data = new NativeSalEntryData(id, i, entry.SalEntryType, entry.Text);
+                var data = new PrimitiveSalEntryData(id, i, entry.SalEntryType, entry.Text);
                 _writer.Write(data);
             }
 
             return id;
         }
 
-        private NativeSimpleId DoExportSignature(NativeSignature sig)
+        private PrimitiveSimpleId DoExportSignature(NativeSignature sig)
         {
             var id = GetNextSimpleId();
             var returnTypeSalId = DoExportSal(sig.ReturnTypeSalAttribute);
-            var sigData = new NativeSignatureData(
+            var sigData = new PrimitiveSignatureData(
                 id,
                 DoExportType(sig.ReturnType),
                 DoExportSal(sig.ReturnTypeSalAttribute));
@@ -218,7 +218,7 @@ namespace PInvoke.Primitive
             for (var i = 0; i < list.Count; i++)
             {
                 var p = list[i];
-                var data = new NativeParameterData(
+                var data = new PrimitiveParameterData(
                     id,
                     i,
                     p.Name,
@@ -231,11 +231,11 @@ namespace PInvoke.Primitive
 
         private void DoExportFunctionPointer(NativeFunctionPointer ptr)
         {
-            var id = new NativeSymbolId(ptr.Name, ptr.Kind);
+            var id = new PrimitiveSymbolId(ptr.Name, ptr.Kind);
             _writer.Write(id);
 
             var sigId = DoExportSignature(ptr.Signature);
-            var data = new NativeFunctionPointerData(
+            var data = new PrimitiveFunctionPointerData(
                 id,
                 ptr.CallingConvention,
                 sigId);
@@ -244,19 +244,19 @@ namespace PInvoke.Primitive
 
         private void DoExportTypeDef(NativeTypeDef typeDef)
         {
-            var id = new NativeSymbolId(typeDef.Name, typeDef.Kind);
+            var id = new PrimitiveSymbolId(typeDef.Name, typeDef.Kind);
             _writer.Write(id);
 
-            var data = new NativeTypeDefData(id, DoExportType(typeDef.RealType));
+            var data = new PrimitiveTypeDefData(id, DoExportType(typeDef.RealType));
             _writer.Write(data);
         }
 
         private void DoExportProcedure(NativeProcedure proc)
         {
-            var id = new NativeSymbolId(proc.Name, proc.Kind);
+            var id = new PrimitiveSymbolId(proc.Name, proc.Kind);
             _writer.Write(id);
 
-            var data = new NativeProcedureData(
+            var data = new PrimitiveProcedureData(
                 id,
                 proc.CallingConvention,
                 DoExportSignature(proc.Signature),
@@ -264,9 +264,9 @@ namespace PInvoke.Primitive
             _writer.Write(data);
         }
 
-        private NativeSimpleId GetNextSimpleId()
+        private PrimitiveSimpleId GetNextSimpleId()
         {
-            return new NativeSimpleId(_nextSimpleId++);
+            return new PrimitiveSimpleId(_nextSimpleId++);
         }
 
         private bool IsExporting(NativeSymbol symbol)

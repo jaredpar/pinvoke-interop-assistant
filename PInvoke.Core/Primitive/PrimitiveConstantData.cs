@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace PInvoke.Primitive
 {
-    public struct NativeConstantData
+    public struct PrimitiveConstantData
     {
-        public NativeSymbolId Id { get; }
+        public PrimitiveSymbolId Id { get; }
         public string Value { get; }
         public ConstantKind Kind { get; }
 
-        public NativeConstantData(NativeSymbolId id, string value, ConstantKind kind)
+        public PrimitiveConstantData(PrimitiveSymbolId id, string value, ConstantKind kind)
         {
             Id = id;
             Value = value;

@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace PInvoke.Primitive
 {
-    public struct NativeEnumValueData
+    public struct PrimitiveEnumValueData
     {
-        public NativeSymbolId ContainingTypeId {get;}
+        public PrimitiveSymbolId ContainingTypeId {get;}
         public string Name { get; }
         public string Value { get; }
 
-        public NativeEnumValueData(string name, string value, NativeSymbolId containingTypeId)
+        public PrimitiveEnumValueData(string name, string value, PrimitiveSymbolId containingTypeId)
         {
             Name = name;
             Value = value;

@@ -23,18 +23,18 @@ namespace PInvoke.Primitive
                 _writer.Write((int)kind);
             }
 
-            private void WriteCore(NativeSymbolId id)
+            private void WriteCore(PrimitiveSymbolId id)
             {
                 WriteCore(id.Name);
                 _writer.Write((int)id.Kind);
             }
 
-            private void WriteCore(NativeSimpleId id)
+            private void WriteCore(PrimitiveSimpleId id)
             {
                 _writer.Write(id.Id);
             }
 
-            private void WriteCore(NativeTypeId id)
+            private void WriteCore(PrimitiveTypeId id)
             {
                 WriteCore(id.SymbolId);
                 WriteCore(id.SimpleId);
@@ -53,7 +53,7 @@ namespace PInvoke.Primitive
                 }
             }
 
-            public void Write(NativeEnumValueData enumValue)
+            public void Write(PrimitiveEnumValueData enumValue)
             {
                 WriteCore(ItemKind.EnumValueData);
                 WriteCore(enumValue.Name);
@@ -61,7 +61,7 @@ namespace PInvoke.Primitive
                 WriteCore(enumValue.ContainingTypeId);
             }
 
-            public void Write(NativeSignatureData data)
+            public void Write(PrimitiveSignatureData data)
             {
                 WriteCore(ItemKind.SignatureData);
                 WriteCore(data.SignatureId);
@@ -69,7 +69,7 @@ namespace PInvoke.Primitive
                 WriteCore(data.ReturnTypeSalId);
             }
 
-            public void Write(NativeFunctionPointerData data)
+            public void Write(PrimitiveFunctionPointerData data)
             {
                 WriteCore(ItemKind.FunctionPointerData);
                 WriteCore(data.ContainingTypeId);
@@ -77,7 +77,7 @@ namespace PInvoke.Primitive
                 WriteCore(data.SignatureId);
             }
 
-            public void Write(NativeTypeData data)
+            public void Write(PrimitiveTypeData data)
             {
                 WriteCore(ItemKind.TypeData);
                 WriteCore(data.Id);
@@ -90,7 +90,7 @@ namespace PInvoke.Primitive
                 _writer.Write(data.IsConst);
             }
 
-            public void Write(NativeConstantData data)
+            public void Write(PrimitiveConstantData data)
             {
                 WriteCore(ItemKind.ConstantData);
                 WriteCore(data.Id);
@@ -98,14 +98,14 @@ namespace PInvoke.Primitive
                 _writer.Write((int)data.Kind);
             }
 
-            public void Write(NativeTypeDefData data)
+            public void Write(PrimitiveTypeDefData data)
             {
                 WriteCore(ItemKind.TypeDefData);
                 WriteCore(data.SourceTypeId);
                 WriteCore(data.TargetTypeId);
             }
 
-            public void Write(NativeProcedureData data)
+            public void Write(PrimitiveProcedureData data)
             {
                 WriteCore(ItemKind.ProcedureData);
                 WriteCore(data.ProcedureId);
@@ -114,7 +114,7 @@ namespace PInvoke.Primitive
                 WriteCore(data.DllName);
             }
 
-            public void Write(NativeParameterData data)
+            public void Write(PrimitiveParameterData data)
             {
                 WriteCore(ItemKind.ParameterData);
                 WriteCore(data.SignatureId);
@@ -123,7 +123,7 @@ namespace PInvoke.Primitive
                 WriteCore(data.TypeId);
             }
 
-            public void Write(NativeSalEntryData data)
+            public void Write(PrimitiveSalEntryData data)
             {
                 WriteCore(ItemKind.SalEntryData);
                 WriteCore(data.SalId);
@@ -132,7 +132,7 @@ namespace PInvoke.Primitive
                 WriteCore(data.Text);
             }
 
-            public void Write(NativeMemberData memberId)
+            public void Write(PrimitiveMemberData memberId)
             {
                 WriteCore(ItemKind.MemberData);
                 WriteCore(memberId.Name);
@@ -140,7 +140,7 @@ namespace PInvoke.Primitive
                 WriteCore(memberId.ContainingTypeId);
             }
 
-            public void Write(NativeSymbolId symbolId)
+            public void Write(PrimitiveSymbolId symbolId)
             {
                 WriteCore(ItemKind.SymbolId);
                 WriteCore(symbolId);

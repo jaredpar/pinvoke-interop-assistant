@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace PInvoke.Primitive
 {
-    public struct NativeSalEntryData
+    public struct PrimitiveSalEntryData
     {
-        public NativeSimpleId SalId { get; }
+        public PrimitiveSimpleId SalId { get; }
         public int Index { get; }
         public SalEntryType SalEntryType { get; }
         public string Text { get; }
 
-        public NativeSalEntryData(NativeSimpleId id, int index, SalEntryType type, string text)
+        public PrimitiveSalEntryData(PrimitiveSimpleId id, int index, SalEntryType type, string text)
         {
             SalId = id;
             Index = index;

@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace PInvoke.Primitive
 {
-    public struct NativeProcedureData
+    public struct PrimitiveProcedureData
     {
-        public NativeSymbolId ProcedureId {get;}
+        public PrimitiveSymbolId ProcedureId {get;}
         public NativeCallingConvention CallingConvention { get; }
-        public NativeSimpleId SignatureId { get; }
+        public PrimitiveSimpleId SignatureId { get; }
         public string DllName { get; }
 
-        public NativeProcedureData(NativeSymbolId procedureId, NativeCallingConvention convention, NativeSimpleId signatureId, string dllName)
+        public PrimitiveProcedureData(PrimitiveSymbolId procedureId, NativeCallingConvention convention, PrimitiveSimpleId signatureId, string dllName)
         {
             ProcedureId = procedureId;
             CallingConvention = convention;

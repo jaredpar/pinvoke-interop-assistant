@@ -294,7 +294,7 @@ namespace PInvoke.Test
         [Fact()]
         public void FindOrLoad1()
         {
-            NativeStorage ns = NativeStorage.DefaultInstance;
+            var ns = new NativeStorage();
             ns.AddDefinedType(new NativeStruct("s1"));
             NativeSymbolBag bag = new NativeSymbolBag(ns);
 
@@ -307,7 +307,7 @@ namespace PInvoke.Test
         [Fact()]
         public void FindOrLoad2()
         {
-            NativeStorage ns = NativeStorage.DefaultInstance;
+            var ns = new NativeStorage();
             ns.AddTypeDef(new NativeTypeDef("td", new NativeBuiltinType(BuiltinType.NativeChar)));
             NativeSymbolBag bag = new NativeSymbolBag(ns);
 
@@ -320,7 +320,7 @@ namespace PInvoke.Test
         [Fact()]
         public void FindOrLoad3()
         {
-            NativeStorage ns = NativeStorage.DefaultInstance;
+            var ns = new NativeStorage();
             ns.AddConstant(new NativeConstant("c1", "value"));
             NativeSymbolBag bag = new NativeSymbolBag(ns);
 
@@ -333,7 +333,7 @@ namespace PInvoke.Test
         [Fact()]
         public void FindOrLoad4()
         {
-            NativeStorage ns = NativeStorage.DefaultInstance;
+            var ns = new NativeStorage();
             NativeProcedure p1 = new NativeProcedure("p1");
             p1.Signature.ReturnType = new NativeBuiltinType(BuiltinType.NativeBoolean);
             ns.AddProcedure(p1);

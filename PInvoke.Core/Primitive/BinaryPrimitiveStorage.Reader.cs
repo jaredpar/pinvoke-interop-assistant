@@ -67,21 +67,21 @@ namespace PInvoke.Primitive
                 }
             }
 
-            private NativeSymbolId ReadSymbolIdCore()
+            private PrimitiveSymbolId ReadSymbolIdCore()
             {
-                return new NativeSymbolId(
+                return new PrimitiveSymbolId(
                     ReadStringCore(),
                     (NativeSymbolKind)_reader.ReadInt32());
             }
 
-            private NativeSimpleId ReadSimpleIdCore()
+            private PrimitiveSimpleId ReadSimpleIdCore()
             {
-                return new NativeSimpleId(_reader.ReadInt32());
+                return new PrimitiveSimpleId(_reader.ReadInt32());
             }
 
-            private NativeTypeId ReadTypeIdCore()
+            private PrimitiveTypeId ReadTypeIdCore()
             {
-                return new NativeTypeId(ReadSymbolIdCore(), ReadSimpleIdCore());
+                return new PrimitiveTypeId(ReadSymbolIdCore(), ReadSimpleIdCore());
             }
 
             private string ReadStringCore()
@@ -92,7 +92,7 @@ namespace PInvoke.Primitive
 
             private void ReadSalEntryData()
             {
-                var data = new NativeSalEntryData(
+                var data = new PrimitiveSalEntryData(
                     ReadSimpleIdCore(),
                     _reader.ReadInt32(),
                     (SalEntryType)_reader.ReadInt32(),
@@ -102,7 +102,7 @@ namespace PInvoke.Primitive
 
             private void ReadParameterData()
             {
-                var data = new NativeParameterData(
+                var data = new PrimitiveParameterData(
                     ReadSimpleIdCore(),
                     _reader.ReadInt32(),
                     ReadStringCore(),
@@ -112,7 +112,7 @@ namespace PInvoke.Primitive
 
             private void ReadProcedureData()
             {
-                var data = new NativeProcedureData(
+                var data = new PrimitiveProcedureData(
                     ReadSymbolIdCore(),
                     (NativeCallingConvention)_reader.ReadInt32(),
                     ReadSimpleIdCore(),
@@ -122,7 +122,7 @@ namespace PInvoke.Primitive
 
             private void ReadTypeDefData()
             {
-                var data = new NativeTypeDefData(
+                var data = new PrimitiveTypeDefData(
                     ReadSymbolIdCore(),
                     ReadTypeIdCore());
                 _storage.Write(data);
@@ -130,7 +130,7 @@ namespace PInvoke.Primitive
 
             private void ReadConstantData()
             {
-                var data = new NativeConstantData(
+                var data = new PrimitiveConstantData(
                     ReadSymbolIdCore(),
                     ReadStringCore(),
                     (ConstantKind)_reader.ReadInt32());
@@ -139,7 +139,7 @@ namespace PInvoke.Primitive
 
             private void ReadTypeData()
             {
-                var data = new NativeTypeData(
+                var data = new PrimitiveTypeData(
                     ReadSimpleIdCore(),
                     (NativeSymbolKind)_reader.ReadInt32(),
                     _reader.ReadInt32(),
@@ -153,7 +153,7 @@ namespace PInvoke.Primitive
 
             private void ReadFunctionPointerData()
             {
-                var data = new NativeFunctionPointerData(
+                var data = new PrimitiveFunctionPointerData(
                     ReadSymbolIdCore(),
                     (NativeCallingConvention)_reader.ReadInt32(),
                     ReadSimpleIdCore());
@@ -162,7 +162,7 @@ namespace PInvoke.Primitive
 
             private void ReadSignatureData()
             {
-                var data = new NativeSignatureData(
+                var data = new PrimitiveSignatureData(
                     ReadSimpleIdCore(),
                     ReadTypeIdCore(),
                     ReadSimpleIdCore());
@@ -171,7 +171,7 @@ namespace PInvoke.Primitive
 
             private void ReadEnumValueData()
             {
-                var data = new NativeEnumValueData(
+                var data = new PrimitiveEnumValueData(
                     ReadStringCore(),
                     ReadStringCore(),
                     ReadSymbolIdCore());
@@ -180,7 +180,7 @@ namespace PInvoke.Primitive
 
             private void ReadMemberData()
             {
-                var data = new NativeMemberData(
+                var data = new PrimitiveMemberData(
                     ReadStringCore(),
                     ReadTypeIdCore(),
                     ReadSymbolIdCore());

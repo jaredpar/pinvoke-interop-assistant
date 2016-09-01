@@ -9,129 +9,129 @@ namespace PInvoke.Primitive
 {
     public sealed class BasicPrimitiveStorage : IPrimitiveReader, IPrimitiveWriter
     {
-        private readonly List<NativeSymbolId> _symbolIdList = new List<NativeSymbolId>();
-        private readonly List<NativeMemberData> _memberList = new List<NativeMemberData>();
-        private readonly List<NativeEnumValueData> _enumValueList = new List<NativeEnumValueData>();
-        private readonly List<NativeSalEntryData> _salDataList = new List<NativeSalEntryData>();
-        private readonly List<NativeParameterData> _paramDataList = new List<NativeParameterData>();
-        private readonly List<NativeFunctionPointerData> _funcPtrDataList = new List<NativeFunctionPointerData>();
-        private readonly List<NativeSignatureData> _sigDataList = new List<NativeSignatureData>();
-        private readonly List<NativeProcedureData> _procDataList = new List<NativeProcedureData>();
-        private readonly List<NativeTypeData> _typeDataList = new List<NativeTypeData>();
-        private readonly List<NativeTypeDefData> _typeDefDataList = new List<NativeTypeDefData>();
-        private readonly List<NativeConstantData> _constDataList = new List<NativeConstantData>();
+        private readonly List<PrimitiveSymbolId> _symbolIdList = new List<PrimitiveSymbolId>();
+        private readonly List<PrimitiveMemberData> _memberList = new List<PrimitiveMemberData>();
+        private readonly List<PrimitiveEnumValueData> _enumValueList = new List<PrimitiveEnumValueData>();
+        private readonly List<PrimitiveSalEntryData> _salDataList = new List<PrimitiveSalEntryData>();
+        private readonly List<PrimitiveParameterData> _paramDataList = new List<PrimitiveParameterData>();
+        private readonly List<PrimitiveFunctionPointerData> _funcPtrDataList = new List<PrimitiveFunctionPointerData>();
+        private readonly List<PrimitiveSignatureData> _sigDataList = new List<PrimitiveSignatureData>();
+        private readonly List<PrimitiveProcedureData> _procDataList = new List<PrimitiveProcedureData>();
+        private readonly List<PrimitiveTypeData> _typeDataList = new List<PrimitiveTypeData>();
+        private readonly List<PrimitiveTypeDefData> _typeDefDataList = new List<PrimitiveTypeDefData>();
+        private readonly List<PrimitiveConstantData> _constDataList = new List<PrimitiveConstantData>();
 
-        public IEnumerable<NativeMemberData> ReadMembers(NativeSymbolId typeId)
+        public IEnumerable<PrimitiveMemberData> ReadMembers(PrimitiveSymbolId typeId)
         {
             return _memberList.Where(x => x.ContainingTypeId == typeId);
         }
 
-        public IEnumerable<NativeSymbolId> ReadSymbolIds()
+        public IEnumerable<PrimitiveSymbolId> ReadSymbolIds()
         {
             return _symbolIdList;
         }
 
-        public IEnumerable<NativeEnumValueData> ReadEnumValues(NativeSymbolId typeId)
+        public IEnumerable<PrimitiveEnumValueData> ReadEnumValues(PrimitiveSymbolId typeId)
         {
             return _enumValueList.Where(x => x.ContainingTypeId == typeId);
         }
 
-        public IEnumerable<NativeSalEntryData> ReadSalEntries(NativeSimpleId salId)
+        public IEnumerable<PrimitiveSalEntryData> ReadSalEntries(PrimitiveSimpleId salId)
         {
             return _salDataList.Where(x => x.SalId == salId);
         }
 
-        public IEnumerable<NativeParameterData> ReadParameters(NativeSimpleId signatureId)
+        public IEnumerable<PrimitiveParameterData> ReadParameters(PrimitiveSimpleId signatureId)
         {
             return _paramDataList.Where(x => x.SignatureId == signatureId);
         }
 
-        public NativeSignatureData ReadSignatureData(NativeSimpleId signatureId)
+        public PrimitiveSignatureData ReadSignatureData(PrimitiveSimpleId signatureId)
         {
             return _sigDataList.Single(x => x.SignatureId == signatureId);
         }
 
-        public NativeFunctionPointerData ReadFuntionPointerData(NativeSymbolId id)
+        public PrimitiveFunctionPointerData ReadFuntionPointerData(PrimitiveSymbolId id)
         {
             return _funcPtrDataList.Single(x => x.ContainingTypeId == id);
         }
 
-        public NativeProcedureData ReadProcedureData(NativeSymbolId id)
+        public PrimitiveProcedureData ReadProcedureData(PrimitiveSymbolId id)
         {
             return _procDataList.Single(x => x.ProcedureId == id);
         }
 
-        public NativeTypeData ReadTypeData(NativeSimpleId id)
+        public PrimitiveTypeData ReadTypeData(PrimitiveSimpleId id)
         {
             return _typeDataList.Single(x => x.Id == id);
         }
 
-        public NativeTypeDefData ReadTypeDefData(NativeSymbolId id)
+        public PrimitiveTypeDefData ReadTypeDefData(PrimitiveSymbolId id)
         {
             return _typeDefDataList.Single(x => x.SourceTypeId == id);
         }
 
-        public NativeConstantData ReadConstantData(NativeSymbolId id)
+        public PrimitiveConstantData ReadConstantData(PrimitiveSymbolId id)
         {
             return _constDataList.Single(x => x.Id == id);
         }
 
-        public NativeEnumValueData? ReadEnumValueData(string valueName)
+        public PrimitiveEnumValueData? ReadEnumValueData(string valueName)
         {
             return _enumValueList.SingleOrDefault(x => x.Name == valueName);
         }
 
-        public void Write(NativeMemberData member)
+        public void Write(PrimitiveMemberData member)
         {
             _memberList.Add(member);
         }
 
-        public void Write(NativeSymbolId typeId)
+        public void Write(PrimitiveSymbolId typeId)
         {
             _symbolIdList.Add(typeId);
         }
 
-        public void Write(NativeEnumValueData data)
+        public void Write(PrimitiveEnumValueData data)
         {
             _enumValueList.Add(data);
         }
 
-        public void Write(NativeSalEntryData data)
+        public void Write(PrimitiveSalEntryData data)
         {
             _salDataList.Add(data);
         }
 
-        public void Write(NativeParameterData data)
+        public void Write(PrimitiveParameterData data)
         {
             _paramDataList.Add(data);
         }
 
-        public void Write(NativeFunctionPointerData data)
+        public void Write(PrimitiveFunctionPointerData data)
         {
             _funcPtrDataList.Add(data);
         }
 
-        public void Write(NativeSignatureData data)
+        public void Write(PrimitiveSignatureData data)
         {
             _sigDataList.Add(data);
         }
 
-        public void Write(NativeProcedureData data)
+        public void Write(PrimitiveProcedureData data)
         {
             _procDataList.Add(data);
         }
 
-        public void Write(NativeTypeData data)
+        public void Write(PrimitiveTypeData data)
         {
             _typeDataList.Add(data);
         }
 
-        public void Write(NativeTypeDefData data)
+        public void Write(PrimitiveTypeDefData data)
         {
             _typeDefDataList.Add(data);
         }
 
-        public void Write(NativeConstantData data)
+        public void Write(PrimitiveConstantData data)
         {
             _constDataList.Add(data);
         }

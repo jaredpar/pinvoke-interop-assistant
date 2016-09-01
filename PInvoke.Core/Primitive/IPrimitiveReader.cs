@@ -8,17 +8,17 @@ namespace PInvoke.Primitive
 {
     public interface IPrimitiveReader
     {
-        IEnumerable<NativeSymbolId> ReadSymbolIds();
-        IEnumerable<NativeMemberData> ReadMembers(NativeSymbolId typeId);
-        IEnumerable<NativeEnumValueData> ReadEnumValues(NativeSymbolId typeId);
-        IEnumerable<NativeSalEntryData> ReadSalEntries(NativeSimpleId salId);
-        IEnumerable<NativeParameterData> ReadParameters(NativeSimpleId signatureId);
-        NativeSignatureData ReadSignatureData(NativeSimpleId signatureId);
-        NativeFunctionPointerData ReadFuntionPointerData(NativeSymbolId id);
-        NativeProcedureData ReadProcedureData(NativeSymbolId id);
-        NativeTypeData ReadTypeData(NativeSimpleId id);
-        NativeTypeDefData ReadTypeDefData(NativeSymbolId id);
-        NativeConstantData ReadConstantData(NativeSymbolId data);
-        NativeEnumValueData? ReadEnumValueData(string valueName);
+        IEnumerable<PrimitiveSymbolId> ReadSymbolIds();
+        IEnumerable<PrimitiveMemberData> ReadMembers(PrimitiveSymbolId typeId);
+        IEnumerable<PrimitiveEnumValueData> ReadEnumValues(PrimitiveSymbolId typeId);
+        IEnumerable<PrimitiveSalEntryData> ReadSalEntries(PrimitiveSimpleId salId);
+        IEnumerable<PrimitiveParameterData> ReadParameters(PrimitiveSimpleId signatureId);
+        PrimitiveSignatureData ReadSignatureData(PrimitiveSimpleId signatureId);
+        PrimitiveFunctionPointerData ReadFuntionPointerData(PrimitiveSymbolId id);
+        PrimitiveProcedureData ReadProcedureData(PrimitiveSymbolId id);
+        PrimitiveTypeData ReadTypeData(PrimitiveSimpleId id);
+        PrimitiveTypeDefData ReadTypeDefData(PrimitiveSymbolId id);
+        PrimitiveConstantData ReadConstantData(PrimitiveSymbolId data);
+        PrimitiveEnumValueData? ReadEnumValueData(string valueName);
     }
 }

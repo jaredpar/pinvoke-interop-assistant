@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace PInvoke.Primitive
 {
-    public struct NativeTypeDefData
+    public struct PrimitiveTypeDefData
     {
-        public NativeSymbolId SourceTypeId { get; }
-        public NativeTypeId TargetTypeId { get; }
+        public PrimitiveSymbolId SourceTypeId { get; }
+        public PrimitiveTypeId TargetTypeId { get; }
 
-        public NativeTypeDefData(NativeSymbolId sourceTypeId, NativeTypeId targetTypeId)
+        public PrimitiveTypeDefData(PrimitiveSymbolId sourceTypeId, PrimitiveTypeId targetTypeId)
         {
             SourceTypeId = sourceTypeId;
             TargetTypeId = targetTypeId;

@@ -145,7 +145,7 @@ namespace PInvoke.Controls
                                     bag.AddProcedure((NativeProcedure)cur);
                                     break;
                                 case NativeSymbolKind.TypedefType:
-                                    bag.AddTypedef((NativeTypeDef)cur);
+                                    bag.AddTypeDef((NativeTypeDef)cur);
                                     break;
                                 default:
                                     Contract.ThrowInvalidEnumValue(cur.Kind);

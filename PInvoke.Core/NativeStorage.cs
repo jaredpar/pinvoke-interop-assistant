@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Linq;
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 using System.Threading;
 using System.Text;
@@ -1034,7 +1035,7 @@ namespace PInvoke
         /// </summary>
         /// <param name="nt"></param>
         /// <remarks></remarks>
-        public void AddTypedef(NativeTypeDef nt)
+        public void AddTypeDef(NativeTypeDef nt)
         {
             if (nt == null)
             {
@@ -1058,7 +1059,7 @@ namespace PInvoke
             TypedefType.Add(nt.Name, typeRef);
         }
 
-        public bool TryFindTypedef(string name, out NativeTypeDef typedefNt)
+        public bool TryFindTypeDef(string name, out NativeTypeDef typedefNt)
         {
             typedefNt = null;
 
@@ -1223,7 +1224,7 @@ namespace PInvoke
             foreach (TypedefTypeRow nRow in TypedefType.FindByNamePattern(namePattern))
             {
                 NativeTypeDef typeDef = null;
-                if (TryFindTypedef(nRow.Name, out typeDef))
+                if (TryFindTypeDef(nRow.Name, out typeDef))
                 {
                     list.Add(typeDef);
                 }
@@ -1334,6 +1335,30 @@ namespace PInvoke
 
             retProc = proc;
             return true;
+        }
+
+        public bool TryFindEnumValue(string name, out NativeEnum enumeration, out NativeEnumValue value)
+        {
+            List<EnumValueRow> rows;
+            if (!EnumValue.TryFindByValueName(name, out rows))
+            {
+                enumeration = null;
+                value = null;
+                return false;
+            }
+
+            var row = rows[0];
+            NativeDefinedType nt;
+            if (!TryFindDefined(row.Name, out nt) || nt.Kind != NativeSymbolKind.EnumType)
+            {
+                enumeration = null;
+                value = null;
+                return false;
+            }
+
+            enumeration = (NativeEnum)nt;
+            value = enumeration.Values.SingleOrDefault(x => x.Name == name);
+            return value != null;
         }
 
         public List<PInvoke.Parser.Macro> LoadAllMacros()
@@ -1820,7 +1845,7 @@ namespace PInvoke
 
         public bool TryCreateTypedef(string name, out NativeTypeDef nt)
         {
-            return TryFindTypedef(name, out nt);
+            return TryFindTypeDef(name, out nt);
         }
 
         public bool TryCreateProcedure(string name, out NativeProcedure proc)

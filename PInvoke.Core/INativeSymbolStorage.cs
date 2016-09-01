@@ -10,7 +10,7 @@ namespace PInvoke
     {
         void AddConstant(NativeConstant nConst);
         void AddDefinedType(NativeDefinedType definedNt);
-        void AddTypedef(NativeTypeDef typeDef);
+        void AddTypeDef(NativeTypeDef typeDef);
         void AddProcedure(NativeProcedure proc);
     }
 }

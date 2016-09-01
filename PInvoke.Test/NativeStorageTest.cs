@@ -199,7 +199,7 @@ namespace PInvoke.Test
             t1.RealType = new NativeBuiltinType(BuiltinType.NativeByte);
 
             NativeStorage ns = new NativeStorage();
-            ns.AddTypedef(t1);
+            ns.AddTypeDef(t1);
 
             NativeType rett1 = null;
             Assert.True(ns.TryFindByName(t1.Name, out rett1));
@@ -278,11 +278,11 @@ namespace PInvoke.Test
 
             NativeStorage ns = new NativeStorage();
             ns.AddProcedure(p1);
-            ns.AddTypedef(td);
+            ns.AddTypeDef(td);
 
             NativeSymbolBag bag = new NativeSymbolBag(ns);
             NativeProcedure ret1 = null;
-            Assert.True(bag.TryFindOrLoadProcedure("p1", out ret1));
+            Assert.True(bag.TryFindProcedure("p1", out ret1));
             Assert.True(bag.TryResolveSymbolsAndValues());
             Assert.Equal(SymbolPrinter.Convert(p1), SymbolPrinter.Convert(ret1));
         }

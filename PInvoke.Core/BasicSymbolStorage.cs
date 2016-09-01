@@ -19,10 +19,12 @@ namespace PInvoke
         private readonly Dictionary<string, NativeProcedure> _procMap = new Dictionary<string, NativeProcedure>(StringComparer.Ordinal);
         private readonly Dictionary<string, NativeSymbol> _valueMap = new Dictionary<string, NativeSymbol>(StringComparer.Ordinal);
 
-        public IEnumerable<NativeEnum> NativeEnums
-        {
-            get { return _definedMap.Values.Where(x => x.Kind == NativeSymbolKind.EnumType).Cast<NativeEnum>(); }
-        }
+        public int Count => _constMap.Count + _definedMap.Count + _typeDefMap.Count + _procMap.Count + _valueMap.Count;
+        public IEnumerable<NativeDefinedType> NativeDefinedTypes => _definedMap.Values;
+        public IEnumerable<NativeTypeDef> NativeTypeDefs => _typeDefMap.Values;
+        public IEnumerable<NativeProcedure> NativeProcedures => _procMap.Values;
+        public IEnumerable<NativeConstant> NativeConstants => _constMap.Values;
+        public IEnumerable<NativeEnum> NativeEnums => _definedMap.Values.Where(x => x.Kind == NativeSymbolKind.EnumType).Cast<NativeEnum>();
 
         public void AddConstant(NativeConstant nConst)
         {
@@ -32,9 +34,19 @@ namespace PInvoke
         public void AddDefinedType(NativeDefinedType definedNt)
         {
             _definedMap.Add(definedNt.Name, definedNt);
+
+            // CTODO: is this the wrong layer.  Should every storage do this???? 
+            var ntEnum = definedNt as NativeEnum;
+            if (ntEnum != null)
+            {
+                foreach (NativeEnumValue pair in ntEnum.Values)
+                {
+                    AddValue(pair.Name, ntEnum);
+                }
+            }
         }
 
-        public void AddTypedef(NativeTypeDef typeDef)
+        public void AddTypeDef(NativeTypeDef typeDef)
         {
             _typeDefMap.Add(typeDef.Name, typeDef);
         }
@@ -44,12 +56,20 @@ namespace PInvoke
             _procMap.Add(proc.Name, proc);
         }
 
+        /// <summary>
+        /// Add an expression into the bag
+        /// </summary>
+        private void AddValue(string name, NativeSymbol value)
+        {
+            _valueMap[name] = value;
+        }
+
         public bool TryFindDefined(string name, out NativeDefinedType nt)
         {
             return _definedMap.TryGetValue(name, out nt);
         }
 
-        public bool TryFindTypedef(string name, out NativeTypeDef nt)
+        public bool TryFindTypeDef(string name, out NativeTypeDef nt)
         {
             return _typeDefMap.TryGetValue(name, out nt);
         }
@@ -62,6 +82,26 @@ namespace PInvoke
         public bool TryFindConstant(string name, out NativeConstant nConst)
         {
             return _constMap.TryGetValue(name, out nConst);
+        }
+
+        public bool TryFindEnumValue(string name, out NativeEnum enumeration, out NativeEnumValue value)
+        {
+            foreach (var currentEnum in NativeEnums)
+            {
+                foreach (var currentValue in currentEnum.Values)
+                {
+                    if (currentValue.Name == name)
+                    {
+                        enumeration = currentEnum;
+                        value = currentValue;
+                        return true;
+                    }
+                }
+            }
+
+            enumeration = null;
+            value = null;
+            return false;
         }
     }
 }

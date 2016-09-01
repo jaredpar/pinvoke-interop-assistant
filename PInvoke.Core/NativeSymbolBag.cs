@@ -15,59 +15,32 @@ namespace PInvoke
     /// </summary>
     public sealed class NativeSymbolBag : INativeSymbolBag
     {
-        // CTODO: Remove all the storage and replace with INativeSymbolStorage or INativeSymbolBag
-        private readonly Dictionary<string, NativeConstant> _constMap = new Dictionary<string, NativeConstant>(StringComparer.Ordinal);
-        private readonly Dictionary<string, NativeDefinedType> _definedMap = new Dictionary<string, NativeDefinedType>(StringComparer.Ordinal);
-        private readonly Dictionary<string, NativeTypeDef> _typeDefMap = new Dictionary<string, NativeTypeDef>(StringComparer.Ordinal);
-        private readonly Dictionary<string, NativeProcedure> _procMap = new Dictionary<string, NativeProcedure>(StringComparer.Ordinal);
-        private readonly Dictionary<string, NativeSymbol> _valueMap = new Dictionary<string, NativeSymbol>(StringComparer.Ordinal);
+        private struct ResolveResult
+        {
+            internal bool StepSucceeded { get; }
+            internal bool NeedMoreWork { get; }
+
+            internal ResolveResult(bool stepSucceeded, bool needMoreWork)
+            {
+                StepSucceeded = stepSucceeded;
+                NeedMoreWork = needMoreWork;
+            }
+        }
+
+        private readonly BasicSymbolStorage _storage;
 
         // CTODO: make this readonly
         private INativeSymbolLookup _nextSymbolLookup;
 
         public static INativeSymbolLookup EmptyLookup => EmptyNativeSymbolBag.Instance;
 
-        public int Count
-        {
-            get { return _constMap.Count + _definedMap.Count + _typeDefMap.Count + _procMap.Count + _valueMap.Count; }
-        }
-
-        /// <summary>
-        /// List of NativeDefinedType instances in the map
-        /// </summary>
-        public IEnumerable<NativeDefinedType> NativeDefinedTypes
-        {
-            get { return _definedMap.Values; }
-        }
-
-        /// <summary>
-        /// List of NativeTypedef instances in the map
-        /// </summary>
-        public IEnumerable<NativeTypeDef> NativeTypedefs
-        {
-            get { return _typeDefMap.Values; }
-        }
-
-        /// <summary>
-        /// Procedures in the bag
-        /// </summary>
-        public IEnumerable<NativeProcedure> NativeProcedures
-        {
-            get { return _procMap.Values; }
-        }
-
-        /// <summary>
-        /// List of NativeConstant instances
-        /// </summary>
-        public IEnumerable<NativeConstant> NativeConstants
-        {
-            get { return _constMap.Values; }
-        }
-
-        public IEnumerable<NativeEnum> NativeEnums
-        {
-            get { return _definedMap.Values.Where(x => x.Kind == NativeSymbolKind.EnumType).Cast<NativeEnum>(); }
-        }
+        public int Count => _storage.Count;
+        public IEnumerable<NativeDefinedType> NativeDefinedTypes => _storage.NativeDefinedTypes;
+        public IEnumerable<NativeTypeDef> NativeTypeDefs => _storage.NativeTypeDefs;
+        public IEnumerable<NativeProcedure> NativeProcedures => _storage.NativeProcedures;
+        public IEnumerable<NativeConstant> NativeConstants => _storage.NativeConstants;
+        public IEnumerable<NativeEnum> NativeEnums => _storage.NativeEnums;
+        public BasicSymbolStorage Storage => _storage;
 
         /// <summary>
         /// Backing INativeSymbolBag for this bag.  Used to resolve NativeNamedType instances
@@ -80,262 +53,27 @@ namespace PInvoke
 
         public NativeSymbolBag(INativeSymbolLookup nextSymbolBag = null)
         {
+            _storage = new BasicSymbolStorage();
             _nextSymbolLookup = nextSymbolBag ?? EmptyLookup;
         }
 
-        /// <summary>
-        /// Add the defined type into the bag
-        /// </summary>
-        /// <param name="nt"></param>
-        /// <remarks></remarks>
-        public void AddDefinedType(NativeDefinedType nt)
-        {
-            if (nt == null)
-            {
-                throw new ArgumentNullException("nt");
-            }
+        public bool TryFindDefined(string name, out NativeDefinedType nt) => TryFindCore(name, out nt);
+        public bool TryFindTypeDef(string name, out NativeTypeDef typeDef) => TryFindCore(name, out typeDef);
+        public bool TryFindProcedure(string name, out NativeProcedure proc) => TryFindCore(name, out proc);
+        public bool TryFindConstant(string name, out NativeConstant constant) => TryFindCore(name, out constant);
 
-            if (nt.IsAnonymous)
-            {
-                nt.Name = GenerateAnonymousName();
-            }
+        public bool TryFindEnumValue(string name, out NativeEnum enumeration, out NativeEnumValue value) =>
+            _storage.TryFindEnumValue(name, out enumeration, out value) ||
+            _nextSymbolLookup.TryFindEnumValue(name, out enumeration, out value);
 
-            _definedMap.Add(nt.Name, nt);
+        private bool TryFindCore<T>(string name, out T symbol) where T : NativeSymbol => 
+            _storage.TryFind(name, out symbol) || 
+            _nextSymbolLookup.TryFind(name, out symbol);
 
-            NativeEnum ntEnum = nt as NativeEnum;
-            if (ntEnum != null)
-            {
-                foreach (NativeEnumValue pair in ntEnum.Values)
-                {
-                    AddValue(pair.Name, ntEnum);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Try and find a NativeDefinedType instance by name
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="nt"></param>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public bool TryFindDefinedType(string name, out NativeDefinedType nt)
-        {
-            if (name == null)
-            {
-                throw new ArgumentNullException("name");
-            }
-
-            return _definedMap.TryGetValue(name, out nt);
-        }
-
-        public bool TryFindDefined(string name, out NativeDefinedType nt)
-        {
-            return TryFindOrLoadDefinedType(name, out nt);
-        }
-
-        public bool TryFindOrLoadDefinedType(string name, out NativeDefinedType nt)
-        {
-            bool notUsed = false;
-            return TryFindOrLoadDefinedType(name, out nt, out notUsed);
-        }
-
-        public bool TryFindOrLoadDefinedType(string name, out NativeDefinedType nt, out bool fromStorage)
-        {
-            if (name == null)
-            {
-                throw new ArgumentNullException("name");
-            }
-            if (TryFindDefinedType(name, out nt))
-            {
-                fromStorage = false;
-                return true;
-            }
-
-            if (_nextSymbolLookup.TryFindDefined(name, out nt))
-            {
-                AddDefinedType(nt);
-                fromStorage = true;
-                return true;
-            }
-
-            nt = null;
-            fromStorage = false;
-            return false;
-        }
-
-        /// <summary>
-        /// Add a typedef to the bag
-        /// </summary>
-        /// <param name="nt"></param>
-        /// <remarks></remarks>
-        public void AddTypedef(NativeTypeDef nt)
-        {
-            if (nt == null)
-            {
-                throw new ArgumentNullException("nt");
-            }
-
-            _typeDefMap.Add(nt.Name, nt);
-        }
-
-
-        /// <summary>
-        /// Try and find a NativeTypeDef instance by name
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="nt"></param>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public bool TryFindTypedef(string name, out NativeTypeDef nt)
-        {
-            if (name == null)
-            {
-                throw new ArgumentNullException("name");
-            }
-            return _typeDefMap.TryGetValue(name, out nt);
-        }
-
-        public bool TryFindOrLoadTypedef(string name, out NativeTypeDef nt)
-        {
-            if (name == null)
-            {
-                throw new ArgumentNullException("name");
-            }
-
-            if (TryFindTypedef(name, out nt))
-            {
-                return true;
-            }
-
-            if (_nextSymbolLookup.TryFindTypedef(name, out nt))
-            {
-                AddTypedef(nt);
-                return true;
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Add a procedure to the bag
-        /// </summary>
-        /// <param name="proc"></param>
-        /// <remarks></remarks>
-        public void AddProcedure(NativeProcedure proc)
-        {
-            if (proc == null)
-            {
-                throw new ArgumentNullException("proc");
-            }
-
-            _procMap.Add(proc.Name, proc);
-        }
-
-        /// <summary>
-        /// Try and find a NativeProcedure instance by name
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="proc"></param>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public bool TryFindProcedure(string name, out NativeProcedure proc)
-        {
-            if (name == null)
-            {
-                throw new ArgumentNullException("name");
-            }
-
-            return _procMap.TryGetValue(name, out proc);
-        }
-
-        public bool TryFindOrLoadProcedure(string name, out NativeProcedure proc)
-        {
-            if (name == null)
-            {
-                throw new ArgumentNullException("name");
-            }
-            if (TryFindProcedure(name, out proc))
-            {
-                return true;
-            }
-
-            if (_nextSymbolLookup.TryFindProcedure(name, out proc))
-            {
-                AddProcedure(proc);
-                return true;
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Add a constant to the bag
-        /// </summary>
-        /// <param name="nConst"></param>
-        /// <remarks></remarks>
-        public void AddConstant(NativeConstant nConst)
-        {
-            if (nConst == null)
-            {
-                throw new ArgumentNullException("nConst");
-            }
-
-            _constMap.Add(nConst.Name, nConst);
-            AddValue(nConst.Name, nConst);
-        }
-
-        /// <summary>
-        /// Add an expression into the bag
-        /// </summary>
-        /// <param name="value"></param>
-        /// <remarks></remarks>
-        private void AddValue(string name, NativeSymbol value)
-        {
-            if (value == null)
-            {
-                throw new ArgumentNullException("value");
-            }
-
-            _valueMap[name] = value;
-        }
-
-        /// <summary>
-        /// Try find a NativeConstant by name
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="nConst"></param>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public bool TryFindConstant(string name, out NativeConstant nConst)
-        {
-            if (name == null)
-            {
-                throw new ArgumentNullException("name");
-            }
-            return _constMap.TryGetValue(name, out nConst);
-        }
-
-        public bool TryFindOrLoadConstant(string name, out NativeConstant nConst)
-        {
-            if (name == null)
-            {
-                throw new ArgumentNullException("name");
-            }
-
-            if (TryFindConstant(name, out nConst))
-            {
-                return true;
-            }
-
-            if (_nextSymbolLookup.TryFindConstant(name, out nConst))
-            {
-                AddConstant(nConst);
-                return true;
-            }
-
-            return false;
-        }
+        public void AddDefinedType(NativeDefinedType type) => _storage.AddDefinedType(type);
+        public void AddProcedure(NativeProcedure proc) => _storage.AddProcedure(proc);
+        public void AddTypeDef(NativeTypeDef typeDef) => _storage.AddTypeDef(typeDef);
+        public void AddConstant(NativeConstant constant) => _storage.AddConstant(constant);
 
         /// <summary>
         /// Find the resolved symbols
@@ -372,13 +110,10 @@ namespace PInvoke
         /// <summary>
         /// find all of the reachable NativeSymbol instances in this bag
         /// </summary>
-        /// <returns></returns>
-        /// <remarks></remarks>
         public List<NativeSymbol> FindAllReachableNativeSymbols()
         {
-
-            List<NativeSymbol> list = new List<NativeSymbol>();
-            foreach (NativeSymbolRelationship cur in FindAllReachableNativeSymbolRelationships())
+            var list = new List<NativeSymbol>();
+            foreach (var cur in FindAllReachableNativeSymbolRelationships())
             {
                 list.Add(cur.Symbol);
             }
@@ -390,22 +125,22 @@ namespace PInvoke
         {
             // Build up the list of types
             List<NativeSymbol> list = new List<NativeSymbol>();
-            foreach (NativeDefinedType definedNt in _definedMap.Values)
+            foreach (var definedNt in NativeDefinedTypes)
             {
                 list.Add(definedNt);
             }
 
-            foreach (NativeTypeDef typedefNt in _typeDefMap.Values)
+            foreach (NativeTypeDef typedefNt in NativeTypeDefs)
             {
                 list.Add(typedefNt);
             }
 
-            foreach (NativeProcedure proc in _procMap.Values)
+            foreach (NativeProcedure proc in NativeProcedures)
             {
                 list.Add(proc);
             }
 
-            foreach (NativeConstant c in _constMap.Values)
+            foreach (NativeConstant c in NativeConstants)
             {
                 list.Add(c);
             }
@@ -448,178 +183,92 @@ namespace PInvoke
             return list;
         }
 
-        public bool TryFindOrLoadNativeType(NativeNamedType namedType, ref NativeType nt)
+        private bool TryFindTypeCore(string name, out NativeType type, out bool loadedFromNextLookup)
         {
-            bool notUsed = false;
-            return TryFindOrLoadNativeType(namedType, out nt, out notUsed);
+            if (_storage.TryFindType(name, out type))
+            {
+                loadedFromNextLookup = false;
+                return true;
+            }
+
+            if (_nextSymbolLookup.TryFindType(name, out type))
+            {
+                loadedFromNextLookup = true;
+                return true;
+            }
+
+            loadedFromNextLookup = false;
+            return false;
+        }
+
+        private bool TryFindValueCore(string name, out NativeSymbol symbol, out bool loadedFromNextLookup)
+        {
+            if (_storage.TryFindValue(name, out symbol))
+            {
+                loadedFromNextLookup = false;
+                return true;
+            }
+
+            if (_nextSymbolLookup.TryFindValue(name, out symbol))
+            {
+                loadedFromNextLookup = true;
+                return true;
+            }
+
+            loadedFromNextLookup = false;
+            return false;
         }
 
         /// <summary>
-        /// Try and load the named type
+        /// Try and resolve this <see cref="NativeNamedType"/> to a real type or at least
+        /// the next level.
         /// </summary>
-        /// <param name="namedType"></param>
-        /// <param name="nt"></param>
-        /// <param name="loadFromStorage"></param>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public bool TryFindOrLoadNativeType(NativeNamedType namedType, out NativeType nt, out bool loadFromStorage)
+        public bool TryResolveNamedType(NativeNamedType namedType, out NativeType type)
+        {
+            bool loadedFromNextLookup;
+            return TryResolveNamedTypeCore(namedType, out type, out loadedFromNextLookup);
+        }
+
+        private bool TryResolveNamedTypeCore(NativeNamedType namedType, out NativeType type, out bool loadedFromNextLookup)
         {
             if (string.IsNullOrEmpty(namedType.Qualification))
             {
                 // If there is no qualification then just load the type by it's name
-                return TryFindOrLoadNativeType(namedType.Name, out nt, out loadFromStorage);
+                return this.TryFindTypeCore(namedType.Name, out type, out loadedFromNextLookup);
             }
 
             // When there is a qualification it is either struct, union or enum.  Try and load the defined type
             // for the name and then make sure that it is the correct type 
             NativeDefinedType definedNt = null;
-            if (!this.TryFindOrLoadDefinedType(namedType.Name, out definedNt, out loadFromStorage))
+            if (!TryFindTypeCore(namedType.Name, out type, out loadedFromNextLookup))
             {
-                nt = null;
+                type = null;
                 return false;
             }
 
-            string test = null;
+            string typeQualification = null;
             switch (definedNt.Kind)
             {
                 case NativeSymbolKind.StructType:
-                    test = "struct";
+                    typeQualification = "struct";
                     break;
                 case NativeSymbolKind.UnionType:
-                    test = "union";
+                    typeQualification = "union";
                     break;
                 case NativeSymbolKind.EnumType:
-                    test = "enum";
+                    typeQualification = "enum";
                     break;
                 default:
-                    nt = null;
                     return false;
             }
 
             string qual = namedType.Qualification;
-            if (string.Equals("class", qual, StringComparison.OrdinalIgnoreCase))
+            if ("class" == qual)
             {
                 qual = "struct";
             }
 
-            if (0 != string.CompareOrdinal(test, qual))
-            {
-                nt = null;
-                return false;
-            }
-
-            nt = definedNt;
-            return true;
-        }
-
-        /// <summary>
-        /// Try and get a NativeType from the bag with the specified name.  Prefer types in
-        /// the following order
-        ///   NativeDefinedType
-        ///   NativeTypeDef
-        ///   NativeStorage
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="nt"></param>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public bool TryFindOrLoadNativeType(string name, out NativeType nt)
-        {
-            bool notUsed = false;
-            return TryFindOrLoadNativeType(name, out nt, out notUsed);
-        }
-
-        public bool TryFindOrLoadNativeType(string name, out NativeType nt, out bool loadFromStorage)
-        {
-
-            // First check the defined types
-            loadFromStorage = false;
-            NativeDefinedType definedNt = null;
-            if (TryFindDefinedType(name, out definedNt))
-            {
-                nt = definedNt;
-                return true;
-            }
-
-            // Second, check the typedefs
-            NativeTypeDef typeDefNt = null;
-            if (TryFindTypedef(name, out typeDefNt))
-            {
-                nt = typeDefNt;
-                return true;
-            }
-
-            // Lastly try and find it in the stored file
-            if (_nextSymbolLookup.TryFindByName(name, out nt))
-            {
-                ThrowIfNull(nt);
-                loadFromStorage = true;
-
-                // If this is a stored symbol we need to add it to the bag.  Otherwise we can 
-                // hit an infinite loop.  Assume we have a structure like so
-
-                // struct s1
-                // { 
-                //   struct s1 *p;
-                // }
-                //
-                // This contains a recursive reference to itself.  We need to store the looked
-                // up type to prevent an infinite loop
-                if (nt.Category == NativeSymbolCategory.Defined)
-                {
-                    AddDefinedType((NativeDefinedType)nt);
-                }
-                else if (nt.Kind == NativeSymbolKind.TypedefType)
-                {
-                    AddTypedef((NativeTypeDef)nt);
-                }
-
-                return true;
-            }
-
-            nt = null;
-            return false;
-        }
-
-        public bool TryFindValue(string valueName, out NativeSymbol ns)
-        {
-            return _valueMap.TryGetValue(valueName, out ns);
-        }
-
-        public bool TryFindOrLoadValue(string valueName, out NativeSymbol ns)
-        {
-            bool notUsed = false;
-            return TryFindOrLoadValue(valueName, out ns, out notUsed);
-        }
-
-        public bool TryFindOrLoadValue(string valueName, out NativeSymbol ns, out bool loaded)
-        {
-            loaded = false;
-            if (TryFindValue(valueName, out ns))
-            {
-                return true;
-            }
-
-            // First look for a constant by this name
-            NativeConstant nConst = null;
-            if (_nextSymbolLookup.TryFindConstant(valueName, out nConst))
-            {
-                AddConstant(nConst);
-                loaded = true;
-                ns = nConst;
-                return true;
-            }
-
-            // Lastly look for enums by value 
-            List<NativeDefinedType> enumTypes;
-            if (_nextSymbolLookup.TryFindEnumByValueName(valueName, out enumTypes))
-            {
-                loaded = true;
-                ns = enumTypes[0];
-                return true;
-            }
-
-            return false;
+            return typeQualification == qual;
         }
 
         /// <summary>
@@ -640,7 +289,7 @@ namespace PInvoke
 
             foreach (NativeTypeDef typeDef in this.FindResolvedTypedefs())
             {
-                nativeStorage.AddTypedef(typeDef);
+                nativeStorage.AddTypeDef(typeDef);
             }
 
             foreach (NativeProcedure proc in this.FindResolvedProcedures())
@@ -652,14 +301,12 @@ namespace PInvoke
         /// <summary>
         /// Find all of the resolved defined types.  
         /// </summary>
-        /// <returns></returns>
-        /// <remarks></remarks>
         public IEnumerable<NativeDefinedType> FindResolvedDefinedTypes()
         {
-            Dictionary<NativeSymbol, Nullable<bool>> map = new Dictionary<NativeSymbol, Nullable<bool>>();
-            List<NativeDefinedType> list = new List<NativeDefinedType>();
+            var map = new Dictionary<NativeSymbol, bool?>();
+            var list = new List<NativeDefinedType>();
 
-            foreach (NativeDefinedType definedNt in _definedMap.Values)
+            foreach (var definedNt in _storage.NativeDefinedTypes)
             {
                 if (IsResolved(definedNt, map))
                 {
@@ -673,14 +320,12 @@ namespace PInvoke
         /// <summary>
         /// Find all of the resolved typedefs
         /// </summary>
-        /// <returns></returns>
-        /// <remarks></remarks>
         public IEnumerable<NativeTypeDef> FindResolvedTypedefs()
         {
-            Dictionary<NativeSymbol, Nullable<bool>> map = new Dictionary<NativeSymbol, Nullable<bool>>();
-            List<NativeTypeDef> list = new List<NativeTypeDef>();
+            var map = new Dictionary<NativeSymbol, bool?>();
+            var list = new List<NativeTypeDef>();
 
-            foreach (NativeTypeDef typedefNt in _typeDefMap.Values)
+            foreach (var typedefNt in NativeTypeDefs)
             {
                 if (IsResolved(typedefNt, map))
                 {
@@ -694,14 +339,12 @@ namespace PInvoke
         /// <summary>
         /// Find all of the resolved NativeProcedure instances
         /// </summary>
-        /// <returns></returns>
-        /// <remarks></remarks>
         public IEnumerable<NativeProcedure> FindResolvedProcedures()
         {
-            Dictionary<NativeSymbol, Nullable<bool>> map = new Dictionary<NativeSymbol, Nullable<bool>>();
-            List<NativeProcedure> list = new List<NativeProcedure>();
+            var map = new Dictionary<NativeSymbol, bool?>();
+            var list = new List<NativeProcedure>();
 
-            foreach (NativeProcedure proc in _procMap.Values)
+            foreach (var proc in NativeProcedures)
             {
                 if (IsResolved(proc, map))
                 {
@@ -714,10 +357,10 @@ namespace PInvoke
 
         public IEnumerable<NativeConstant> FindResolvedConstants()
         {
-            Dictionary<NativeSymbol, Nullable<bool>> map = new Dictionary<NativeSymbol, Nullable<bool>>();
-            List<NativeConstant> list = new List<NativeConstant>();
+            var map = new Dictionary<NativeSymbol, bool?>();
+            var list = new List<NativeConstant>();
 
-            foreach (NativeConstant c in _constMap.Values)
+            foreach (var c in NativeConstants)
             {
                 if (IsResolved(c, map))
                 {
@@ -727,8 +370,6 @@ namespace PInvoke
 
             return list;
         }
-
-        #region "Resolution Functions"
 
         public bool TryResolveSymbolsAndValues()
         {
@@ -750,17 +391,10 @@ namespace PInvoke
         /// Try and resolve all of the unresolved types in the bag.  Return false if the types
         /// couldn't all be resolved
         /// </summary>
-        /// <returns></returns>
-        /// <remarks></remarks>
         public bool TryResolveSymbolsAndValues(ProcedureFinder finder, ErrorProvider ep)
         {
-            if (ep == null)
-            {
-                throw new ArgumentNullException("ep");
-            }
-
             // Try and resolve the proc name
-            foreach (NativeProcedure proc in _procMap.Values)
+            foreach (var proc in NativeProcedures)
             {
                 if (string.IsNullOrEmpty(proc.DllName))
                 {
@@ -773,22 +407,18 @@ namespace PInvoke
 
         private bool ResolveCore(ErrorProvider ep)
         {
-            bool allResolved = false;
+            var allResolved = true;
             do
             {
-                bool loadedSymbolFromStorage = false;
-                bool allSymbolResolved = ResolveCoreSymbols(ep, ref loadedSymbolFromStorage);
+                var symbolResult = ResolveCoreSymbols(ep);
+                var valueResult = ResolveCoreValues(ep);
+                allResolved = allResolved && symbolResult.StepSucceeded && valueResult.StepSucceeded;
 
-                bool loadedValueFromStorage = false;
-                bool allValuesResolved = ResolveCoreValues(ep, ref loadedValueFromStorage);
-
-                // When an object is loaded from storage it is done a at a single level.  So we
-                // now need to walk that type and resolve any named types from it
-                if (!loadedSymbolFromStorage && !loadedValueFromStorage)
+                if (!symbolResult.NeedMoreWork && !valueResult.NeedMoreWork)
                 {
-                    allResolved = (allValuesResolved && allSymbolResolved);
-                    break; // TODO: might not be correct. Was : Exit Do
+                    break;
                 }
+
             } while (true);
 
             return allResolved;
@@ -797,12 +427,10 @@ namespace PInvoke
         /// <summary>
         /// Try and resolve the unresolved symbols in the system
         /// </summary>
-        /// <param name="ep"></param>
-        /// <param name="loadedSomethingFromStorage"></param>
-        /// <remarks></remarks>
-        private bool ResolveCoreSymbols(ErrorProvider ep, ref bool loadedSomethingFromStorage)
+        private ResolveResult ResolveCoreSymbols(ErrorProvider ep)
         {
-            bool allResolved = true;
+            var succeeded = true;
+            var needMoreWork = false;
 
             foreach (NativeSymbolRelationship rel in this.FindUnresolvedNativeSymbolRelationships())
             {
@@ -816,81 +444,79 @@ namespace PInvoke
                 NativeNamedType namedType = rel.Symbol as NativeNamedType;
                 if (namedType == null)
                 {
-                    ep.AddError("Failed to resolve {0} -> '{1}'", rel.Symbol.Kind, rel.Symbol.DisplayName);
+                    ep.AddError($"Failed to resolve {rel.Symbol.Kind} -> '{rel.Symbol.DisplayName}'");
                     continue;
                 }
 
                 NativeType nt = null;
-                bool fromStorage = false;
-                if (this.TryFindOrLoadNativeType(namedType, out nt, out fromStorage))
+                bool loadedFromNextLookup;
+                if (TryResolveNamedTypeCore(namedType, out nt, out loadedFromNextLookup))
                 {
-                    if (fromStorage)
-                    {
-                        loadedSomethingFromStorage = true;
-                    }
+                    Debug.Assert(nt != null);
                     namedType.RealType = nt;
-
+                    needMoreWork = true;
                 }
                 else if (rel.Parent != null && rel.Parent.Kind == NativeSymbolKind.PointerType && !string.IsNullOrEmpty(namedType.Qualification))
                 {
                     // When we have a pointer to an unresolved type, treat this as an opaque type
-                    ep.AddWarning("Treating '{0}' as pointer to opaque type", namedType.DisplayName);
+                    ep.AddWarning($"Treating '{namedType.DisplayName}' as pointer to opaque type");
                     namedType.RealType = new NativeOpaqueType();
                 }
                 else
                 {
-                    ep.AddError("Failed to resolve name '{0}'", namedType.DisplayName);
-                    allResolved = false;
+                    ep.AddError($"Failed to resolve name '{namedType.DisplayName}'");
+                    succeeded = false;
                 }
             }
 
-            return allResolved;
+            return new ResolveResult(succeeded, needMoreWork);
         }
 
         /// <summary>
         /// Try and resolve the unresolved values in the system.  
         /// </summary>
-        /// <param name="ep"></param>
-        /// <param name="loadedSomethingFromStorage"></param>
-        /// <remarks></remarks>
-        private bool ResolveCoreValues(ErrorProvider ep, ref bool loadedSomethingFromStorage)
+        private ResolveResult ResolveCoreValues(ErrorProvider ep)
         {
-            bool allResolved = true;
+            var succeeded = true;
+            var needMoreWork = false;
             foreach (NativeValue nValue in this.FindUnresolvedNativeValues())
             {
-                bool fromStorage = false;
-
+                var loadedFromNextLookup = false;
                 switch (nValue.ValueKind)
                 {
                     case NativeValueKind.SymbolValue:
-                        NativeSymbol ns = null;
-                        if (this.TryFindOrLoadValue(nValue.Name, out ns, out fromStorage))
                         {
-                            nValue.Value = ns;
+                            NativeSymbol symbol = null;
+                            if (TryFindValueCore(nValue.Name, out symbol, out loadedFromNextLookup))
+                            {
+                                nValue.Value = symbol;
+                            }
                         }
                         break;
                     case NativeValueKind.SymbolType:
-                        NativeType nt = null;
-                        if (this.TryFindOrLoadNativeType(nValue.Name, out nt, out fromStorage))
                         {
-                            nValue.Value = nt;
+                            NativeType type = null;
+                            if (TryFindTypeCore(nValue.Name, out type, out loadedFromNextLookup))
+                            {
+                                nValue.Value = type;
+                            }
                         }
                         break;
                 }
 
                 if (!nValue.IsImmediateResolved)
                 {
-                    ep.AddError("Failed to resolve value '{0}'", nValue.Name);
-                    allResolved = false;
+                    ep.AddError($"Failed to resolve value '{nValue.Name}'");
+                    succeeded = false;
                 }
 
-                if (fromStorage)
+                if (loadedFromNextLookup)
                 {
-                    loadedSomethingFromStorage = true;
+                    needMoreWork = true;
                 }
             }
 
-            return allResolved;
+            return new ResolveResult(succeeded, needMoreWork);
         }
 
         private bool IsResolved(NativeSymbol ns, Dictionary<NativeSymbol, bool?> map)
@@ -940,10 +566,6 @@ namespace PInvoke
             return ret.Value;
         }
 
-        #endregion
-
-        #region "Shared Helpers"
-
         public static string GenerateAnonymousName()
         {
             Guid g = Guid.NewGuid();
@@ -969,6 +591,7 @@ namespace PInvoke
 
         /// <summary>
         /// Create a NativeTypeBag from the result of a code analysis
+        /// CTODO: review
         /// </summary>
         public static NativeSymbolBag CreateFrom(Parser.NativeCodeAnalyzerResult result, INativeSymbolLookup nextSymbolBag, ErrorProvider ep)
         {
@@ -1006,7 +629,7 @@ namespace PInvoke
             {
                 try
                 {
-                    bag.AddTypedef(typedefNt);
+                    bag.AddTypeDef(typedefNt);
                 }
                 catch
                 {
@@ -1028,8 +651,5 @@ namespace PInvoke
 
             return bag;
         }
-
-        #endregion
-
     }
 }

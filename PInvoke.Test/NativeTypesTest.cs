@@ -14,7 +14,6 @@ namespace PInvoke.Test
 {
     public class NativeSymbolTest
     {
-
         private void VerifyReachable(NativeType nt, params string[] names)
         {
             NativeSymbolBag bag = new NativeSymbolBag();
@@ -27,7 +26,7 @@ namespace PInvoke.Test
             }
             else if (typedefNt != null)
             {
-                bag.AddTypedef((NativeTypeDef)nt);
+                bag.AddTypeDef((NativeTypeDef)nt);
             }
             else
             {

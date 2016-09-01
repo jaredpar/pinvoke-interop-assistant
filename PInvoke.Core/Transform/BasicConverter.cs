@@ -90,7 +90,7 @@ namespace PInvoke.Transform
         public CodeTypeDeclarationCollection ConvertToCodeDom(NativeTypeDef typedef, ErrorProvider ep)
         {
             NativeSymbolBag bag = new NativeSymbolBag(_ns);
-            bag.AddTypedef(typedef);
+            bag.AddTypeDef(typedef);
             return ConvertBagToCodeDom(bag, ep);
         }
 
@@ -348,7 +348,7 @@ namespace PInvoke.Transform
                 if (NativeSymbolCategory.Defined == sym.Category)
                 {
                     NativeDefinedType defined = null;
-                    if (!bag.TryFindDefinedType(sym.Name, out defined))
+                    if (!bag.TryFindDefined(sym.Name, out defined))
                     {
                         bag.AddDefinedType((NativeDefinedType)sym);
                     }

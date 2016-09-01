@@ -69,16 +69,32 @@ namespace PInvoke
             return false;
         }
 
-        public bool TryFindTypedef(string name, out NativeTypeDef nt)
+        public bool TryFindTypeDef(string name, out NativeTypeDef nt)
         {
-            if (_storage.TryFindTypedef(name, out nt))
+            if (_storage.TryFindTypeDef(name, out nt))
             {
                 return true;
             }
 
             if (_importer.TryImportTypedef(name, out nt))
             {
-                _storage.AddTypedef(nt);
+                _storage.AddTypeDef(nt);
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool TryFindEnumValue(string name, out NativeEnum enumeration, out NativeEnumValue value)
+        {
+            if (_storage.TryFindEnumValue(name, out enumeration, out value))
+            {
+                return true;
+            }
+
+            if (_importer.TryImportEnumValue(name, out enumeration, out value))
+            {
+                _storage.AddDefinedType(enumeration);
                 return true;
             }
 

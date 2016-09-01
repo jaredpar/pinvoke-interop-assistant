@@ -19,5 +19,6 @@ namespace PInvoke.Primitive
         NativeTypeData ReadTypeData(NativeSimpleId id);
         NativeTypeDefData ReadTypeDefData(NativeSymbolId id);
         NativeConstantData ReadConstantData(NativeSymbolId data);
+        NativeEnumValueData? ReadEnumValueData(string valueName);
     }
 }

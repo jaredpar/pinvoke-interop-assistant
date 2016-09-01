@@ -21,7 +21,7 @@ namespace PInvoke
             }
 
             NativeTypeDef typedef = null;
-            if (lookup.TryFindTypedef(name, out typedef))
+            if (lookup.TryFindTypeDef(name, out typedef))
             {
                 nt = typedef;
                 return true;
@@ -54,6 +54,87 @@ namespace PInvoke
             }
 
             return enumTypes.Count > 0;
+        }
+
+        public static bool TryFind<T>(this INativeSymbolLookup lookup, string name, out T symbol)
+            where T: NativeSymbol
+        {
+            NativeDefinedType nt;
+            if (lookup.TryFindDefined(name, out nt))
+            {
+                symbol = nt as T;
+                return symbol != null;
+            }
+
+            NativeTypeDef typeDef;
+            if (lookup.TryFindTypeDef(name, out typeDef))
+            {
+                symbol = typeDef as T;
+                return symbol != null;
+            }
+
+            NativeProcedure proc;
+            if (lookup.TryFindProcedure(name, out proc))
+            {
+                symbol = proc as T;
+                return symbol != null;
+            }
+
+            NativeConstant constant;
+            if (lookup.TryFindConstant(name, out constant))
+            {
+                symbol = constant as T;
+                return symbol != null;
+            }
+
+            symbol = null;
+            return false;
+        }
+
+        public static bool TryFindType(this INativeSymbolLookup lookup, string name, out NativeType type)
+        {
+            NativeDefinedType nt;
+            if (lookup.TryFindDefined(name, out nt))
+            {
+                type = nt;
+                return true;
+            }
+
+            NativeTypeDef typeDef;
+            if (lookup.TryFindTypeDef(name, out typeDef))
+            {
+                type = typeDef;
+                return true;
+            }
+
+            type = null;
+            return false;
+        }
+
+        public static bool TryFindEnumValue(this INativeSymbolLookup lookup, string name, out NativeEnumValue value)
+        {
+            NativeEnum enumeration;
+            return lookup.TryFindEnumValue(name, out enumeration, out value);
+        }
+
+        public static bool TryFindValue(this INativeSymbolLookup lookup, string name, out NativeSymbol symbol)
+        {
+            NativeConstant constant;
+            if (lookup.TryFindConstant(name, out constant))
+            {
+                symbol = constant;
+                return true;
+            }
+
+            NativeEnumValue value;
+            if (lookup.TryFindEnumValue(name, out value))
+            {
+                symbol = value;
+                return true;
+            }
+
+            symbol = null;
+            return false;
         }
     }
 }

@@ -76,6 +76,11 @@ namespace PInvoke.Test
             return _constDataList.Single(x => x.Id == id);
         }
 
+        public NativeEnumValueData? ReadEnumValueData(string valueName)
+        {
+            return _enumValueList.SingleOrDefault(x => x.Name == valueName);
+        }
+
         public void Write(NativeMemberData member)
         {
             _memberList.Add(member);

@@ -27,7 +27,7 @@ namespace PInvoke.Test
             bag.AddDefinedType(definedNt1);
 
             NativeType ret1 = null;
-            Assert.True(bag.TryFindOrLoadNativeType(definedNt1.DisplayName, out ret1));
+            Assert.True(bag.TryFindType(definedNt1.DisplayName, out ret1));
             Assert.Same(ret1, definedNt1);
         }
 
@@ -42,8 +42,8 @@ namespace PInvoke.Test
 
             NativeType ret1 = null;
             NativeType ret2 = null;
-            Assert.True(bag.TryFindOrLoadNativeType(definedNt1.DisplayName, out ret1));
-            Assert.True(bag.TryFindOrLoadNativeType(definedNt2.DisplayName, out ret2));
+            Assert.True(bag.TryFindType(definedNt1.DisplayName, out ret1));
+            Assert.True(bag.TryFindType(definedNt2.DisplayName, out ret2));
             Assert.Same(ret1, definedNt1);
             Assert.Same(ret2, definedNt2);
         }
@@ -68,10 +68,10 @@ namespace PInvoke.Test
             NativeSymbolBag bag = new NativeSymbolBag();
             NativeTypeDef td1 = new NativeTypeDef("td1");
 
-            bag.AddTypedef(td1);
+            bag.AddTypeDef(td1);
 
             NativeType ret1 = null;
-            Assert.True(bag.TryFindOrLoadNativeType(td1.DisplayName, out ret1));
+            Assert.True(bag.TryFindType(td1.DisplayName, out ret1));
             Assert.Same(ret1, td1);
 
         }
@@ -83,14 +83,14 @@ namespace PInvoke.Test
             NativeTypeDef td1 = new NativeTypeDef("td1");
             NativeTypeDef td2 = new NativeTypeDef("td2");
 
-            bag.AddTypedef(td1);
-            bag.AddTypedef(td2);
+            bag.AddTypeDef(td1);
+            bag.AddTypeDef(td2);
 
             NativeType ret1 = null;
             NativeType ret2 = null;
-            Assert.True(bag.TryFindOrLoadNativeType(td1.DisplayName, out ret1));
+            Assert.True(bag.TryFindType(td1.DisplayName, out ret1));
             Assert.Same(ret1, td1);
-            Assert.True(bag.TryFindOrLoadNativeType(td2.DisplayName, out ret2));
+            Assert.True(bag.TryFindType(td2.DisplayName, out ret2));
             Assert.Same(ret2, td2);
         }
 
@@ -105,8 +105,8 @@ namespace PInvoke.Test
             NativeTypeDef td1 = new NativeTypeDef("td1");
             NativeTypeDef td2 = new NativeTypeDef("td1");
 
-            bag.AddTypedef(td1);
-            Assert.Throws<ArgumentException>(() => bag.AddTypedef(td2));
+            bag.AddTypeDef(td1);
+            Assert.Throws<ArgumentException>(() => bag.AddTypeDef(td2));
         }
 
         [Fact()]
@@ -116,12 +116,12 @@ namespace PInvoke.Test
             NativeStruct definedNt1 = new NativeStruct("s1");
             bag.AddDefinedType(definedNt1);
             NativeTypeDef td1 = new NativeTypeDef("td1");
-            bag.AddTypedef(td1);
+            bag.AddTypeDef(td1);
 
             NativeType ret = null;
-            Assert.True(bag.TryFindOrLoadNativeType(definedNt1.DisplayName, out ret));
+            Assert.True(bag.TryFindType(definedNt1.DisplayName, out ret));
             Assert.Same(definedNt1, ret);
-            Assert.True(bag.TryFindOrLoadNativeType(td1.DisplayName, out ret));
+            Assert.True(bag.TryFindType(td1.DisplayName, out ret));
             Assert.Same(td1, ret);
 
         }
@@ -138,12 +138,12 @@ namespace PInvoke.Test
             NativeStruct definedNt1 = new NativeStruct("s1");
             bag.AddDefinedType(definedNt1);
             NativeTypeDef td1 = new NativeTypeDef("s1");
-            bag.AddTypedef(td1);
+            bag.AddTypeDef(td1);
 
             NativeType ret = null;
-            Assert.True(bag.TryFindOrLoadNativeType(definedNt1.DisplayName, out ret));
+            Assert.True(bag.TryFindType(definedNt1.DisplayName, out ret));
             Assert.Same(definedNt1, ret);
-            Assert.True(bag.TryFindOrLoadNativeType(td1.DisplayName, out ret));
+            Assert.True(bag.TryFindType(td1.DisplayName, out ret));
             Assert.Same(definedNt1, ret);
         }
 
@@ -161,7 +161,7 @@ namespace PInvoke.Test
             NativeTypeDef td1 = new NativeTypeDef("td1");
             NativeNamedType n1 = new NativeNamedType("s1");
             td1.RealType = n1;
-            bag.AddTypedef(td1);
+            bag.AddTypeDef(td1);
 
             Assert.True(bag.TryResolveSymbolsAndValues());
             Assert.Same(s1, n1.RealType);
@@ -182,7 +182,7 @@ namespace PInvoke.Test
             NativeNamedType n1 = new NativeNamedType("s1");
             NativePointer p1 = new NativePointer(n1);
             td1.RealType = p1;
-            bag.AddTypedef(td1);
+            bag.AddTypeDef(td1);
 
             Assert.True(bag.TryResolveSymbolsAndValues());
             Assert.Same(s1, n1.RealType);
@@ -269,7 +269,7 @@ namespace PInvoke.Test
             p1.Signature.Parameters.Add(new NativeParameter("param1", new NativeBuiltinType(BuiltinType.NativeDouble)));
 
             bag.AddProcedure(p1);
-            bag.AddTypedef(new NativeTypeDef("foo", new NativeBuiltinType(BuiltinType.NativeFloat)));
+            bag.AddTypeDef(new NativeTypeDef("foo", new NativeBuiltinType(BuiltinType.NativeFloat)));
             Assert.True(bag.TryResolveSymbolsAndValues());
         }
 
@@ -287,7 +287,7 @@ namespace PInvoke.Test
             p1.Signature.Parameters.Add(new NativeParameter("param1", new NativeNamedType("foo")));
 
             bag.AddProcedure(p1);
-            bag.AddTypedef(new NativeTypeDef("foo", new NativeBuiltinType(BuiltinType.NativeFloat)));
+            bag.AddTypeDef(new NativeTypeDef("foo", new NativeBuiltinType(BuiltinType.NativeFloat)));
             Assert.True(bag.TryResolveSymbolsAndValues());
         }
 
@@ -299,22 +299,22 @@ namespace PInvoke.Test
             NativeSymbolBag bag = new NativeSymbolBag(ns);
 
             NativeDefinedType s1 = null;
-            Assert.False(bag.TryFindDefinedType("s1", out s1));
-            Assert.True(bag.TryFindOrLoadDefinedType("s1", out s1));
-            Assert.True(bag.TryFindDefinedType("s1", out s1));
+            Assert.False(bag.Storage.TryFindDefined("s1", out s1));
+            Assert.True(bag.TryFindDefined("s1", out s1));
+            Assert.True(bag.TryFindDefined("s1", out s1));
         }
 
         [Fact()]
         public void FindOrLoad2()
         {
             NativeStorage ns = NativeStorage.DefaultInstance;
-            ns.AddTypedef(new NativeTypeDef("td", new NativeBuiltinType(BuiltinType.NativeChar)));
+            ns.AddTypeDef(new NativeTypeDef("td", new NativeBuiltinType(BuiltinType.NativeChar)));
             NativeSymbolBag bag = new NativeSymbolBag(ns);
 
             NativeTypeDef td = null;
-            Assert.False(bag.TryFindTypedef("td", out td));
-            Assert.True(bag.TryFindOrLoadTypedef("td", out td));
-            Assert.True(bag.TryFindTypedef("td", out td));
+            Assert.False(bag.Storage.TryFindTypeDef("td", out td));
+            Assert.True(bag.TryFindTypeDef("td", out td));
+            Assert.True(bag.TryFindTypeDef("td", out td));
         }
 
         [Fact()]
@@ -326,7 +326,7 @@ namespace PInvoke.Test
 
             NativeConstant c = null;
             Assert.False(bag.TryFindConstant("c1", out c));
-            Assert.True(bag.TryFindOrLoadConstant("c1", out c));
+            Assert.True(bag.TryFindConstant("c1", out c));
             Assert.True(bag.TryFindConstant("c1", out c));
         }
 
@@ -340,8 +340,8 @@ namespace PInvoke.Test
             NativeSymbolBag bag = new NativeSymbolBag(ns);
 
             NativeProcedure p = null;
-            Assert.False(bag.TryFindProcedure("p1", out p));
-            Assert.True(bag.TryFindOrLoadProcedure("p1", out p));
+            Assert.False(bag.Storage.TryFindProcedure("p1", out p));
+            Assert.True(bag.TryFindProcedure("p1", out p));
             Assert.True(bag.TryFindProcedure("p1", out p));
         }
 
@@ -356,11 +356,11 @@ namespace PInvoke.Test
         public void FindOrLoad5()
         {
             NativeSymbolBag bag = new NativeSymbolBag();
-            bag.AddTypedef(new NativeTypeDef("foo", new NativeNamedType("struct", "foo")));
+            bag.AddTypeDef(new NativeTypeDef("foo", new NativeNamedType("struct", "foo")));
             bag.AddDefinedType(new NativeStruct("foo"));
 
             NativeType nt = null;
-            Assert.True(bag.TryFindOrLoadNativeType(new NativeNamedType("struct", "foo"), ref nt));
+            Assert.True(bag.TryResolveNamedType(new NativeNamedType("struct", "foo"), out nt));
             Assert.Equal(NativeSymbolKind.StructType, nt.Kind);
         }
 
@@ -375,18 +375,18 @@ namespace PInvoke.Test
             ns.AddDefinedType(new NativeStruct("s1"));
 
             NativeSymbolBag bag = new NativeSymbolBag(ns);
-            bag.AddTypedef(new NativeTypeDef("S1", "s1"));
+            bag.AddTypeDef(new NativeTypeDef("S1", "s1"));
             Assert.True(bag.TryResolveSymbolsAndValues());
 
             NativeDefinedType td = null;
-            Assert.True(bag.TryFindDefinedType("s1", out td));
+            Assert.True(bag.TryFindDefined("s1", out td));
         }
 
         [Fact()]
         public void ResolveLoad2()
         {
             NativeStorage ns = new NativeStorage();
-            ns.AddTypedef(new NativeTypeDef("TEST_INT", BuiltinType.NativeInt32));
+            ns.AddTypeDef(new NativeTypeDef("TEST_INT", BuiltinType.NativeInt32));
 
             NativeStruct s1 = new NativeStruct("s1");
             s1.Members.Add(new NativeMember("m1", new NativeNamedType("TEST_INT")));
@@ -396,7 +396,7 @@ namespace PInvoke.Test
             Assert.True(bag.TryResolveSymbolsAndValues());
 
             NativeTypeDef td = null;
-            Assert.True(bag.TryFindTypedef("TEST_INT", out td));
+            Assert.True(bag.TryFindTypeDef("TEST_INT", out td));
         }
 
 
@@ -436,7 +436,7 @@ namespace PInvoke.Test
             bag.NextSymbolBag = StorageFactory.CreateStandard();
 
             NativeType nt = null;
-            Assert.True(bag.TryFindOrLoadNativeType("RecursiveStruct", out nt));
+            Assert.True(bag.TryFindType("RecursiveStruct", out nt));
         }
 
         /// <summary>
@@ -572,7 +572,7 @@ namespace PInvoke.Test
             NativeTypeDef td = new NativeTypeDef("FOOBAR", ptr);
             NativeSymbolBag bag = new NativeSymbolBag();
 
-            bag.AddTypedef(td);
+            bag.AddTypeDef(td);
             Assert.Equal(1, bag.FindUnresolvedNativeSymbolRelationships().Count);
             Assert.True(bag.TryResolveSymbolsAndValues());
             Assert.NotNull(named.RealType);
@@ -591,7 +591,7 @@ namespace PInvoke.Test
             NativeTypeDef td = new NativeTypeDef("FOOBAR", ptr);
             NativeSymbolBag bag = new NativeSymbolBag();
 
-            bag.AddTypedef(td);
+            bag.AddTypeDef(td);
             Assert.Equal(1, bag.FindUnresolvedNativeSymbolRelationships().Count);
             Assert.False(bag.TryResolveSymbolsAndValues());
         }

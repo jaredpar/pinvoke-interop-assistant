@@ -202,7 +202,7 @@ namespace PInvoke.Primitive
             return true;
         }
 
-        private bool TryLoadCore<T>(string name, out T value) where T : NativeSymbol
+        private bool TryImportCore<T>(string name, out T value) where T : NativeSymbol
         {
             value = default(T);
 
@@ -224,22 +224,46 @@ namespace PInvoke.Primitive
 
         public bool TryImportDefined(string name, out NativeDefinedType nt)
         {
-            return TryLoadCore(name, out nt);
+            return TryImportCore(name, out nt);
         }
 
         public bool TryImportTypedef(string name, out NativeTypeDef nt)
         {
-            return TryLoadCore(name, out nt);
+            return TryImportCore(name, out nt);
         }
 
         public bool TryImportProcedure(string name, out NativeProcedure proc)
         {
-            return TryLoadCore(name, out proc);
+            return TryImportCore(name, out proc);
         }
 
         public bool TryImportConstant(string name, out NativeConstant nConst)
         {
-            return TryLoadCore(name, out nConst);
+            return TryImportCore(name, out nConst);
+        }
+
+        public bool TryImportEnumValue(string name, out NativeEnum enumeration, out NativeEnumValue value)
+        {
+            // CTODO: Got to be a better way here.  Should this just be a global symbol.
+            var data = _reader.ReadEnumValueData(name);
+            if (data == null)
+            {
+                enumeration = null;
+                value = null;
+                return false;
+            }
+
+            NativeDefinedType nt;
+            if (!TryImportDefined(data.Value.ContainingTypeId.Name, out nt) || nt.Kind != NativeSymbolKind.EnumType)
+            {
+                enumeration = null;
+                value = null;
+                return false;
+            }
+
+            enumeration = (NativeEnum)nt;
+            value = enumeration.Values.Single(x => x.Name == name);
+            return true;
         }
     }
 }

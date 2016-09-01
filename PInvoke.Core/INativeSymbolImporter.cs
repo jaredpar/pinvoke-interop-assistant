@@ -15,6 +15,10 @@ namespace PInvoke
         bool TryImportDefined(string name, out NativeDefinedType nt);
         bool TryImportTypedef(string name, out NativeTypeDef nt);
         bool TryImportProcedure(string name, out NativeProcedure proc);
-        bool TryImportConstant(string name, out NativeConstant nConst);
+        bool TryImportConstant(string name, out NativeConstant constant);
+
+        // CTODO: No way to guarantee enumeration has value as a reference in Values.  Perhaps just return
+        // enumeration here and let the caller dig in for the value.
+        bool TryImportEnumValue(string name, out NativeEnum enumeration, out NativeEnumValue value);
     }
 }

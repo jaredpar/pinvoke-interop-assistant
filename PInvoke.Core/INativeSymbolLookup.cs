@@ -21,8 +21,9 @@ namespace PInvoke
         IEnumerable<NativeEnum> NativeEnums { get; }
 
         bool TryFindDefined(string name, out NativeDefinedType nt);
-        bool TryFindTypedef(string name, out NativeTypeDef nt);
+        bool TryFindTypeDef(string name, out NativeTypeDef nt);
         bool TryFindProcedure(string name, out NativeProcedure proc);
-        bool TryFindConstant(string name, out NativeConstant nConst);
+        bool TryFindConstant(string name, out NativeConstant constant);
+        bool TryFindEnumValue(string name, out NativeEnum enumeration, out NativeEnumValue value);
     }
 }

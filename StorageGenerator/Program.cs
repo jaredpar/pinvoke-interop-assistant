@@ -45,15 +45,15 @@ internal static class Program
         NativeStorage ns = new NativeStorage();
 
         // Add in the basic type defs
-        ns.AddTypedef(new NativeTypeDef("SIZE_T", new NativeBuiltinType(BuiltinType.NativeInt32, true)));
-        ns.AddTypedef(new NativeTypeDef("DWORD64", new NativeBuiltinType(BuiltinType.NativeInt64, true)));
-        ns.AddTypedef(new NativeTypeDef("HWND", new NativePointer(BuiltinType.NativeVoid)));
-        ns.AddTypedef(new NativeTypeDef("HMENU", new NativePointer(BuiltinType.NativeVoid)));
-        ns.AddTypedef(new NativeTypeDef("HACCEL", new NativePointer(BuiltinType.NativeVoid)));
-        ns.AddTypedef(new NativeTypeDef("HBRUSH", new NativePointer(BuiltinType.NativeVoid)));
-        ns.AddTypedef(new NativeTypeDef("HFONT", new NativePointer(BuiltinType.NativeVoid)));
-        ns.AddTypedef(new NativeTypeDef("HDC", new NativePointer(BuiltinType.NativeVoid)));
-        ns.AddTypedef(new NativeTypeDef("HICON", new NativePointer(BuiltinType.NativeVoid)));
+        ns.AddTypeDef(new NativeTypeDef("SIZE_T", new NativeBuiltinType(BuiltinType.NativeInt32, true)));
+        ns.AddTypeDef(new NativeTypeDef("DWORD64", new NativeBuiltinType(BuiltinType.NativeInt64, true)));
+        ns.AddTypeDef(new NativeTypeDef("HWND", new NativePointer(BuiltinType.NativeVoid)));
+        ns.AddTypeDef(new NativeTypeDef("HMENU", new NativePointer(BuiltinType.NativeVoid)));
+        ns.AddTypeDef(new NativeTypeDef("HACCEL", new NativePointer(BuiltinType.NativeVoid)));
+        ns.AddTypeDef(new NativeTypeDef("HBRUSH", new NativePointer(BuiltinType.NativeVoid)));
+        ns.AddTypeDef(new NativeTypeDef("HFONT", new NativePointer(BuiltinType.NativeVoid)));
+        ns.AddTypeDef(new NativeTypeDef("HDC", new NativePointer(BuiltinType.NativeVoid)));
+        ns.AddTypeDef(new NativeTypeDef("HICON", new NativePointer(BuiltinType.NativeVoid)));
 
         return ns;
     }
@@ -73,8 +73,8 @@ internal static class Program
         VerifyTrue(ns.TryFindProcedure("CreateWellKnownSid", out proc));
 
         NativeTypeDef typedef = null;
-        VerifyTrue(ns.TryFindTypedef("LPCSTR", out typedef));
-        VerifyTrue(ns.TryFindTypedef("LPWSTR", out typedef));
+        VerifyTrue(ns.TryFindTypeDef("LPCSTR", out typedef));
+        VerifyTrue(ns.TryFindTypeDef("LPWSTR", out typedef));
 
         NativeType defined = null;
         VerifyTrue(ns.TryFindByName("WNDPROC", out defined));

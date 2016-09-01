@@ -36,13 +36,20 @@ namespace PInvoke
             return false;
         }
 
+        public bool TryFindEnumValue(string name, out NativeEnum enumeration, out NativeEnumValue value)
+        {
+            enumeration = null;
+            value = null;
+            return false;
+        }
+
         public bool TryFindProcedure(string name, out NativeProcedure proc)
         {
             proc = null;
             return false;
         }
 
-        public bool TryFindTypedef(string name, out NativeTypeDef nt)
+        public bool TryFindTypeDef(string name, out NativeTypeDef nt)
         {
             nt = null;
             return false;

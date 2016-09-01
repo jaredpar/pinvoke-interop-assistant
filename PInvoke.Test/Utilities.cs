@@ -217,60 +217,60 @@ namespace PInvoke.Test
             }
 
             // Bool types
-            ns.AddTypedef(new NativeTypeDef("BOOL", BuiltinType.NativeInt32));
-            ns.AddTypedef(new NativeTypeDef("DWORD", new NativeBuiltinType(BuiltinType.NativeInt32, true)));
+            ns.AddTypeDef(new NativeTypeDef("BOOL", BuiltinType.NativeInt32));
+            ns.AddTypeDef(new NativeTypeDef("DWORD", new NativeBuiltinType(BuiltinType.NativeInt32, true)));
 
             // WPARAM 
             td1 = new NativeTypeDef("UINT_PTR", new NativeBuiltinType(BuiltinType.NativeInt32, true));
-            ns.AddTypedef(new NativeTypeDef("WPARAM", td1));
-            ns.AddTypedef(new NativeTypeDef("LPARAM", td1));
+            ns.AddTypeDef(new NativeTypeDef("WPARAM", td1));
+            ns.AddTypeDef(new NativeTypeDef("LPARAM", td1));
 
             // WCHAR
             NativeTypeDef wcharTd = new NativeTypeDef("WCHAR", new NativeBuiltinType(BuiltinType.NativeInt16, true));
-            ns.AddTypedef(wcharTd);
+            ns.AddTypeDef(wcharTd);
 
             // CHAR
             td1 = new NativeTypeDef("CHAR", BuiltinType.NativeChar);
-            ns.AddTypedef(td1);
+            ns.AddTypeDef(td1);
 
             // TCHAR
             td2 = new NativeTypeDef("TCHAR", td1);
-            ns.AddTypedef(td2);
+            ns.AddTypeDef(td2);
 
             // LPWSTR
             pt1 = new NativePointer(wcharTd);
             td2 = new NativeTypeDef("LPWSTR", pt1);
-            ns.AddTypedef(td2);
+            ns.AddTypeDef(td2);
 
             // LPCWSTR
             n1 = new NativeNamedType(wcharTd.Name, wcharTd);
             n1.IsConst = true;
             pt1 = new NativePointer(n1);
             td2 = new NativeTypeDef("LPCWSTR", pt1);
-            ns.AddTypedef(td2);
+            ns.AddTypeDef(td2);
 
             // LPSTR
             pt1 = new NativePointer(new NativeBuiltinType(BuiltinType.NativeChar));
             td1 = new NativeTypeDef("LPSTR", pt1);
-            ns.AddTypedef(td1);
+            ns.AddTypeDef(td1);
 
             // LPTSTR
-            ns.AddTypedef(new NativeTypeDef("LPTSTR", td1));
+            ns.AddTypeDef(new NativeTypeDef("LPTSTR", td1));
 
             // LPCSTR
             n1 = new NativeNamedType("char", true);
             n1.RealType = new NativeBuiltinType(BuiltinType.NativeChar, false);
             pt1 = new NativePointer(n1);
             td1 = new NativeTypeDef("LPCSTR", pt1);
-            ns.AddTypedef(td1);
+            ns.AddTypeDef(td1);
 
             // LPCTSTR
             td2 = new NativeTypeDef("LPCTSTR", td1);
-            ns.AddTypedef(td2);
+            ns.AddTypeDef(td2);
 
             // BSTR
-            ns.AddTypedef(new NativeTypeDef("OLECHAR", BuiltinType.NativeWChar));
-            ns.AddTypedef(new NativeTypeDef("BSTR", new NativePointer(new NativeTypeDef("OLECHAR", BuiltinType.NativeWChar))));
+            ns.AddTypeDef(new NativeTypeDef("OLECHAR", BuiltinType.NativeWChar));
+            ns.AddTypeDef(new NativeTypeDef("BSTR", new NativePointer(new NativeTypeDef("OLECHAR", BuiltinType.NativeWChar))));
 
             // Struct with a recrsive reference to itself
             s1 = new NativeStruct("RecursiveStruct");
@@ -287,16 +287,16 @@ namespace PInvoke.Test
             // DECIMAL
             s1 = new NativeStruct("tagDEC");
             ns.AddDefinedType(s1);
-            ns.AddTypedef(new NativeTypeDef("DECIMAL", s1));
+            ns.AddTypeDef(new NativeTypeDef("DECIMAL", s1));
 
             // CURRENCY
             u1 = new NativeUnion("tagCY");
             ns.AddDefinedType(u1);
-            ns.AddTypedef(new NativeTypeDef("CY", u1));
-            ns.AddTypedef(new NativeTypeDef("CURRENCY", new NativeTypeDef("CY", u1)));
+            ns.AddTypeDef(new NativeTypeDef("CY", u1));
+            ns.AddTypeDef(new NativeTypeDef("CURRENCY", new NativeTypeDef("CY", u1)));
 
             // BYTE
-            ns.AddTypedef(new NativeTypeDef("BYTE", new NativeBuiltinType(BuiltinType.NativeChar, true)));
+            ns.AddTypeDef(new NativeTypeDef("BYTE", new NativeBuiltinType(BuiltinType.NativeChar, true)));
 
             ns.AcceptChanges();
             return ns;

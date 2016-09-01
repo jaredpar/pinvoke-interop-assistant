@@ -88,6 +88,9 @@
     <Compile Include="INativeSymbolImporter.cs" />
     <Compile Include="INativeSymbolStorage.cs" />
     <Compile Include="INativeSymbolLookup.cs" />
+    <Compile Include="Primitive\BinaryPrimitiveStorage.Reader.cs" />
+    <Compile Include="Primitive\BinaryPrimitiveStorage.Writer.cs" />
+    <Compile Include="Primitive\BinaryPrimitiveStorage.cs" />
     <Compile Include="Primitive\IPrimitiveReader.cs" />
     <Compile Include="Primitive\IPrimitiveWriter.cs" />
     <Compile Include="Primitive\NativeEnumValueData.cs" />
@@ -104,6 +107,7 @@
     <Compile Include="Primitive\NativeSymbolId.cs" />
     <Compile Include="Primitive\PrimitiveExporter.cs" />
     <Compile Include="Primitive\PrimitiveImporter.cs" />
+    <Compile Include="Primitive\BasicPrimitiveStorage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="NativeStorage.Designer.cs">

@@ -27,6 +27,12 @@ namespace PInvoke.Primitive
             SimpleId = simpleId;
         }
 
+        public NativeTypeId(NativeSymbolId symbolId, NativeSimpleId simpleId)
+        {
+            SymbolId = symbolId;
+            SimpleId = simpleId;
+        }
+
         public static bool operator ==(NativeTypeId left, NativeTypeId right) => left.SymbolId == right.SymbolId && left.SimpleId == right.SimpleId;
         public static bool operator !=(NativeTypeId left, NativeTypeId right) => !(left == right);
         public bool Equals(NativeTypeId other) => this == other;

@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using PInvoke.Primitive;
 
-namespace PInvoke.Test
+namespace PInvoke.Primitive
 {
-    public sealed class PrimitiveStorage : IPrimitiveReader, IPrimitiveWriter
+    public sealed class BasicPrimitiveStorage : IPrimitiveReader, IPrimitiveWriter
     {
         private readonly List<NativeSymbolId> _symbolIdList = new List<NativeSymbolId>();
         private readonly List<NativeMemberData> _memberList = new List<NativeMemberData>();

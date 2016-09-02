@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PInvoke.Parser;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -118,6 +119,30 @@ namespace PInvoke
             return false;
         }
 
+        public static T GetGlobalSymbol<T>(this INativeSymbolLookup lookup, string name)
+            where T : NativeSymbol
+        {
+            T symbol;
+            if (!TryGetGlobalSymbol(lookup, name, out symbol))
+            {
+                throw new Exception($"Unable to get symbol {name}");
+            }
+
+            return symbol;
+        }
+
+        public static T GetGlobalSymbol<T>(this INativeSymbolLookup lookup, NativeName name)
+            where T : NativeSymbol
+        {
+            T symbol;
+            if (!TryGetGlobalSymbol(lookup, name, out symbol))
+            {
+                throw new Exception($"Unable to get symbol {name.Name}");
+            }
+
+            return symbol;
+        }
+
         #endregion
 
         #region INativeSymbolStorage
@@ -129,6 +154,46 @@ namespace PInvoke
         public static void AddTypeDef(this INativeSymbolStorage storage, NativeTypeDef typeDef) => storage.Add(new NativeGlobalSymbol(typeDef));
 
         public static void AddProcedure(this INativeSymbolStorage storage, NativeProcedure procedure) => storage.Add(new NativeGlobalSymbol(procedure));
+
+        public static IEnumerable<Macro> GetAllMacros(this INativeSymbolStorage storage)
+        {
+            var list = new List<Macro>();
+            foreach (var name in storage.NativeNames.Where(x => x.Kind == NativeNameKind.Constant))
+            {
+                NativeConstant constant;
+                if (!storage.TryGetGlobalSymbol(name, out constant))
+                {
+                    continue;
+                }
+
+                switch (constant.ConstantKind)
+                { 
+                    case ConstantKind.MacroMethod:
+                        {
+                            var body = constant.Value.Expression;
+                            if (body.Length > 1 && body[0] == '"' && body[body.Length - 1] == '"')
+                            {
+                                body = body.Substring(1, body.Length - 2);
+                            }
+
+                            MethodMacro method = null;
+                            if (MethodMacro.TryCreateFromDeclaration(name.Name, body, out method))
+                            {
+                                list.Add(method);
+                            }
+                        }
+                        break;
+                    case ConstantKind.Macro:
+                        list.Add(new Macro(name.Name, constant.Value.Expression));
+                        break;
+                    default:
+                        Contract.ThrowInvalidEnumValue(constant.ConstantKind);
+                        break;
+                }
+            }
+
+            return list;
+        }
 
         #endregion
 

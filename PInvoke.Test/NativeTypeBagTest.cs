@@ -433,7 +433,7 @@ namespace PInvoke.Test
         public void Storage1()
         {
             NativeSymbolBag bag = new NativeSymbolBag();
-            bag.NextSymbolBag = StorageFactory.CreateStandard();
+            bag.NextSymbolLookup = StorageFactory.CreateStandard();
 
             NativeType nt = null;
             Assert.True(bag.TryGetType("RecursiveStruct", out nt));

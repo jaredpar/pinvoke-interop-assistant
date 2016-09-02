@@ -45,7 +45,7 @@ namespace PInvoke
         /// <summary>
         /// Backing INativeSymbolBag for this bag.  Used to resolve NativeNamedType instances
         /// </summary>
-        public INativeSymbolLookup NextSymbolBag
+        public INativeSymbolLookup NextSymbolLookup
         {
             get { return _nextSymbolLookup; }
             set { _nextSymbolLookup = value; }
@@ -585,9 +585,9 @@ namespace PInvoke
             return System.Text.RegularExpressions.Regex.IsMatch(name, "^Anonymous_((\\w+_){4})(\\w+)$");
         }
 
-        public static NativeSymbolBag CreateFrom(Parser.NativeCodeAnalyzerResult result, NativeStorage ns)
+        public static NativeSymbolBag CreateFrom(Parser.NativeCodeAnalyzerResult result, INativeSymbolStorage storage)
         {
-            return CreateFrom(result, ns, new ErrorProvider());
+            return CreateFrom(result, storage, new ErrorProvider());
         }
 
         /// <summary>

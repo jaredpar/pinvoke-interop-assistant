@@ -90,7 +90,7 @@ namespace PInvoke
         public void AddError(string str, params object[] args)
         {
             string msg = string.Format(str, args);
-            _errorList.Add(msg);
+            AddError(msg);
         }
 
         /// <summary>

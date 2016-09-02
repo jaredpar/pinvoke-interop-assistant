@@ -415,8 +415,8 @@ namespace WindowsTool
             if (!_nativeStorageSet && _nativeStorage != null)
             {
                 statusStrip.Text = String.Empty;
-                symbolDisplay.NativeStorage = _nativeStorage;
-                snippetDisplay.NativeStorage = _nativeStorage;
+                symbolDisplay.Storage = _nativeStorage;
+                snippetDisplay.Storage = _nativeStorage;
                 _nativeStorageSet = true;
             }
         }

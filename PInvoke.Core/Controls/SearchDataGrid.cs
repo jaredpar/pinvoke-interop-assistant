@@ -167,23 +167,22 @@ namespace PInvoke.Controls
             set
             {
                 _kind = value;
-                var ns = (Storage as NativeStorage) ?? new NativeStorage();
                 switch (_kind)
                 {
                     case SearchKind.Constant:
-                        _info = new SearchDataGridInfo.ConstantsInfo(ns);
+                        _info = new SearchDataGridInfo.ConstantsInfo(Storage);
                         break;
                     case SearchKind.Procedure:
-                        _info = new SearchDataGridInfo.ProcedureInfo(ns);
+                        _info = new SearchDataGridInfo.ProcedureInfo(Storage);
                         break;
                     case SearchKind.Type:
-                        _info = new SearchDataGridInfo.TypeInfo(ns);
+                        _info = new SearchDataGridInfo.TypeInfo(Storage);
                         break;
                     case SearchKind.None:
                         _info = new SearchDataGridInfo.EmptyInfo();
                         break;
                     case SearchKind.All:
-                        _info = new SearchDataGridInfo.AllInfo(ns);
+                        _info = new SearchDataGridInfo.AllInfo(Storage);
                         break;
                     default:
                         _info = new SearchDataGridInfo.EmptyInfo();

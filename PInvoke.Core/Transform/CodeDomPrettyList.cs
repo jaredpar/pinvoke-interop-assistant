@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Data;
 using System.Diagnostics;
 using System.CodeDom;
@@ -191,24 +191,17 @@ namespace PInvoke.Transform
 
             // Next look in the native storage for more types  
             // CTODO: this cast is bad.
-            NativeStorage ns = (NativeStorage)_bag.NextSymbolBag;
-            NativeStorage.TypeReference typeRef = ns.CreateTypeReference(target);
-            if (typeRef != null)
+            var lookup = _bag.NextSymbolLookup;
+            foreach (var name in lookup.NativeNames.Where(x => x.Kind == NativeNameKind.TypeDef))
             {
-                foreach (NativeStorage.TypedefTypeRow trow in ns.TypedefType.FindByTarget(typeRef))
-                {
-                    NativeTypeDef found = null;
-                    if (_bag.TryGetGlobalSymbol(trow.Name, out found))
-                    {
-                        list.Add(found);
-                    }
+                var typeDef = lookup.GetGlobalSymbol<NativeTypeDef>(name);
+                if (typeDef.RealType == target)
+                { 
+                    list.Add(typeDef);
                 }
             }
 
             return list;
         }
-
-
     }
-
 }

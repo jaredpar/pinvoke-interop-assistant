@@ -25,20 +25,14 @@ namespace PInvoke.Transform
     /// <remarks></remarks>
     public class BasicConverter
     {
-        private NativeStorage _ns;
+        private INativeSymbolStorage _storage;
         private LanguageType _type;
-
         private TransformKindFlags _transformKind = TransformKindFlags.All;
-        /// <summary>
-        /// Native storage to use when resolving types
-        /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public NativeStorage NativeStorage
+
+        public INativeSymbolStorage Storage
         {
-            get { return _ns; }
-            set { _ns = value; }
+            get { return _storage; }
+            set { _storage = value; }
         }
 
         /// <summary>
@@ -59,15 +53,15 @@ namespace PInvoke.Transform
             set { _transformKind = value; }
         }
 
-        public BasicConverter(LanguageType type, NativeStorage ns)
+        public BasicConverter(LanguageType type, INativeSymbolStorage storage)
         {
-            _ns = ns;
+            _storage = storage;
             _type = type;
         }
 
         public CodeTypeDeclarationCollection ConvertToCodeDom(NativeConstant c, ErrorProvider ep)
         {
-            NativeSymbolBag bag = new NativeSymbolBag(_ns);
+            NativeSymbolBag bag = new NativeSymbolBag(_storage);
             bag.AddConstant(c);
             return ConvertBagToCodeDom(bag, ep);
         }
@@ -81,7 +75,7 @@ namespace PInvoke.Transform
 
         public CodeTypeDeclarationCollection ConvertToCodeDom(NativeTypeDef typedef, ErrorProvider ep)
         {
-            NativeSymbolBag bag = new NativeSymbolBag(_ns);
+            NativeSymbolBag bag = new NativeSymbolBag(_storage);
             bag.AddTypeDef(typedef);
             return ConvertBagToCodeDom(bag, ep);
         }
@@ -95,7 +89,7 @@ namespace PInvoke.Transform
 
         public CodeTypeDeclarationCollection ConvertToCodeDom(NativeDefinedType definedNt, ErrorProvider ep)
         {
-            NativeSymbolBag bag = new NativeSymbolBag(_ns);
+            NativeSymbolBag bag = new NativeSymbolBag(_storage);
             bag.AddDefinedType(definedNt);
             return ConvertBagToCodeDom(bag, ep);
         }
@@ -109,7 +103,7 @@ namespace PInvoke.Transform
 
         public CodeTypeDeclarationCollection ConvertToCodeDom(NativeProcedure proc, ErrorProvider ep)
         {
-            NativeSymbolBag bag = new NativeSymbolBag(_ns);
+            NativeSymbolBag bag = new NativeSymbolBag(_storage);
             bag.AddProcedure(proc);
             return ConvertBagToCodeDom(bag, ep);
         }
@@ -169,7 +163,8 @@ namespace PInvoke.Transform
                 throw new ArgumentNullException("ep");
             }
 
-            NativeCodeAnalyzer analyzer = NativeCodeAnalyzerFactory.CreateForMiniParse(OsVersion.WindowsVista, _ns.LoadAllMacros());
+            var analyzer = NativeCodeAnalyzerFactory.CreateForMiniParse(OsVersion.WindowsVista, _storage.GetAllMacros());
+
             // CTODO: probably should delete this 
             analyzer.IncludePathList.Add("c:\\program files (x86)\\windows kits\\8.1\\include\\shared");
             NativeSymbolBag bag = default(NativeSymbolBag);
@@ -178,7 +173,7 @@ namespace PInvoke.Transform
                 NativeCodeAnalyzerResult result = analyzer.Analyze(reader);
 
                 ep.Append(result.ErrorProvider);
-                bag = NativeSymbolBag.CreateFrom(result, _ns);
+                bag = NativeSymbolBag.CreateFrom(result, _storage);
             }
 
             return ConvertBagToCodeDom(bag, ep);

@@ -1,10 +1,9 @@
-
+// Copyright (c) Microsoft Corporation.  All rights reserved.
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
-// Copyright (c) Microsoft Corporation.  All rights reserved.
 using System.ComponentModel;
 using System.Windows.Forms;
 using PInvoke;
@@ -14,10 +13,9 @@ namespace PInvoke.Controls
 {
     public partial class SymbolDisplayControl
     {
-
-        private NativeStorage _ns;
-
+        private INativeSymbolStorage _storage;
         private BasicConverter _conv;
+
         /// <summary>
         /// Kind of search being performed
         /// </summary>
@@ -53,14 +51,14 @@ namespace PInvoke.Controls
 
         public event EventHandler SearchKindChanged;
 
-        public SymbolDisplayControl() : this(new NativeStorage())
+        public SymbolDisplayControl() : this(new BasicSymbolStorage())
         {
 
         }
 
-        public SymbolDisplayControl(NativeStorage storage)
+        public SymbolDisplayControl(INativeSymbolStorage storage)
         {
-            _ns = storage;
+            _storage = storage;
             _conv = new BasicConverter(LanguageType.VisualBasic, storage);
 
             // This call is required by the Windows Form Designer.
@@ -99,20 +97,13 @@ namespace PInvoke.Controls
             set { m_languageCb.SelectedItem = value; }
         }
 
-        /// <summary>
-        /// NativeStorage instance to use
-        /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public NativeStorage NativeStorage
+        public INativeSymbolStorage Storage
         {
-            get { return _ns; }
+            get { return _storage; }
             set
             {
-                _ns = value;
-                _conv.NativeStorage = value;
+                _storage = value;
+                _conv.Storage = value;
                 m_searchGrid.Storage = value;
             }
         }
@@ -277,10 +268,3 @@ namespace PInvoke.Controls
     }
 
 }
-
-//=======================================================
-//Service provided by Telerik (www.telerik.com)
-//Conversion powered by NRefactory.
-//Twitter: @telerik
-//Facebook: facebook.com/telerik
-//=======================================================

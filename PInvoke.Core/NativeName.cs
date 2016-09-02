@@ -132,6 +132,26 @@ namespace PInvoke
                 }
             }
         }
+
+        public static bool IsAnyType(NativeNameKind kind)
+        {
+            switch (kind)
+            {
+                case NativeNameKind.Struct:
+                case NativeNameKind.Union:
+                case NativeNameKind.FunctionPointer:
+                case NativeNameKind.TypeDef:
+                    return true;
+                case NativeNameKind.Procedure:
+                case NativeNameKind.Constant:
+                case NativeNameKind.Enum:
+                case NativeNameKind.EnumValue:
+                    return false;
+                default:
+                    Contract.ThrowInvalidEnumValue(kind);
+                    return false;
+            }
+        }
     }
 
     /// <summary>

@@ -57,23 +57,15 @@ namespace PInvoke
             _nextSymbolLookup = nextSymbolBag ?? EmptyLookup;
         }
 
-        public bool TryFindDefined(string name, out NativeDefinedType nt) => TryFindCore(name, out nt);
-        public bool TryFindTypeDef(string name, out NativeTypeDef typeDef) => TryFindCore(name, out typeDef);
-        public bool TryFindProcedure(string name, out NativeProcedure proc) => TryFindCore(name, out proc);
-        public bool TryFindConstant(string name, out NativeConstant constant) => TryFindCore(name, out constant);
+        public bool TryGetGlobalSymbol(string name, out NativeGlobalSymbol symbol) =>
+            _storage.TryGetGlobalSymbol(name, out symbol) ||
+            _nextSymbolLookup.TryGetGlobalSymbol(name, out symbol);
 
-        public bool TryFindEnumValue(string name, out NativeEnum enumeration, out NativeEnumValue value) =>
-            _storage.TryFindEnumValue(name, out enumeration, out value) ||
-            _nextSymbolLookup.TryFindEnumValue(name, out enumeration, out value);
+        public bool TryGetGlobalSymbol(NativeName name, out NativeGlobalSymbol symbol) =>
+            _storage.TryGetGlobalSymbol(name, out symbol) ||
+            _nextSymbolLookup.TryGetGlobalSymbol(name, out symbol);
 
-        private bool TryFindCore<T>(string name, out T symbol) where T : NativeSymbol => 
-            _storage.TryFind(name, out symbol) || 
-            _nextSymbolLookup.TryFind(name, out symbol);
-
-        public void AddDefinedType(NativeDefinedType type) => _storage.AddDefinedType(type);
-        public void AddProcedure(NativeProcedure proc) => _storage.AddProcedure(proc);
-        public void AddTypeDef(NativeTypeDef typeDef) => _storage.AddTypeDef(typeDef);
-        public void AddConstant(NativeConstant constant) => _storage.AddConstant(constant);
+        public void Add(NativeGlobalSymbol symbol) => _storage.Add(symbol);
 
         /// <summary>
         /// Find the resolved symbols
@@ -185,13 +177,13 @@ namespace PInvoke
 
         private bool TryFindTypeCore(string name, out NativeType type, out bool loadedFromNextLookup)
         {
-            if (_storage.TryFindType(name, out type))
+            if (_storage.TryGetType(name, out type))
             {
                 loadedFromNextLookup = false;
                 return true;
             }
 
-            if (_nextSymbolLookup.TryFindType(name, out type))
+            if (_nextSymbolLookup.TryGetType(name, out type))
             {
                 loadedFromNextLookup = true;
                 return true;
@@ -209,15 +201,15 @@ namespace PInvoke
             return false;
         }
 
-        private bool TryFindValueCore(string name, out NativeSymbol symbol, out bool loadedFromNextLookup)
+        private bool TryGetValueCore(string name, out NativeSymbol symbol, out bool loadedFromNextLookup)
         {
-            if (_storage.TryFindValue(name, out symbol))
+            if (_storage.TryGetValue(name, out symbol))
             {
                 loadedFromNextLookup = false;
                 return true;
             }
 
-            if (_nextSymbolLookup.TryFindValue(name, out symbol))
+            if (_nextSymbolLookup.TryGetValue(name, out symbol))
             {
                 loadedFromNextLookup = true;
                 return true;
@@ -501,7 +493,7 @@ namespace PInvoke
                     case NativeValueKind.SymbolValue:
                         {
                             NativeSymbol symbol = null;
-                            if (TryFindValueCore(nValue.Name, out symbol, out loadedFromNextLookup))
+                            if (TryGetValueCore(nValue.Name, out symbol, out loadedFromNextLookup))
                             {
                                 nValue.Value = symbol;
                             }

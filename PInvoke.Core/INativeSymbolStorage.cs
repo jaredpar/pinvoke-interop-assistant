@@ -8,9 +8,6 @@ namespace PInvoke
 {
     public interface INativeSymbolStorage : INativeSymbolLookup
     {
-        void AddConstant(NativeConstant nConst);
-        void AddDefinedType(NativeDefinedType definedNt);
-        void AddTypeDef(NativeTypeDef typeDef);
-        void AddProcedure(NativeProcedure proc);
+        void Add(NativeGlobalSymbol symbol);
     }
 }

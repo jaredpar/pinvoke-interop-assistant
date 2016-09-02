@@ -340,7 +340,7 @@ namespace PInvoke.Transform
                 if (NativeSymbolCategory.Defined == sym.Category)
                 {
                     NativeDefinedType defined = null;
-                    if (!bag.TryFindDefined(sym.Name, out defined))
+                    if (!bag.TryGetGlobalSymbol(sym.Name, out defined))
                     {
                         bag.AddDefinedType((NativeDefinedType)sym);
                     }

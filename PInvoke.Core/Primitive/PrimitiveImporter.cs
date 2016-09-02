@@ -222,6 +222,28 @@ namespace PInvoke.Primitive
             return value != null;
         }
 
+        public bool TryImport(string name, out NativeGlobalSymbol symbol)
+        {
+            return this.TryImportExhaustive(name, out symbol);
+        }
+
+        public bool TryImport(NativeName name, out NativeGlobalSymbol symbol)
+        {
+            var symbolId = new PrimitiveSymbolId(name.Name, name.SymbolKind);
+            NativeSymbol foundSymbol;
+            NativeName foundName;
+            if (TryImport(symbolId, out foundSymbol) && 
+                NativeNameUtil.TryGetName(foundSymbol, out foundName) &&
+                foundName == name)
+            {
+                symbol = new NativeGlobalSymbol(foundName, foundSymbol);
+                return true;
+            }
+
+            symbol = default(NativeGlobalSymbol);
+            return false;
+        }
+
         public bool TryImportDefined(string name, out NativeDefinedType nt)
         {
             return TryImportCore(name, out nt);

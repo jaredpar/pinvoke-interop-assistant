@@ -8,26 +8,71 @@ namespace PInvoke
 {
     public static class Extensions
     {
+        #region INativeSymbolLookup 
+
         /// <summary>
-        /// Try and load a type by it's name in this lookup.
+        /// Do a lookup for a symbol with a specific name of the specified type.
         /// </summary>
-        public static bool TryFindByName(this INativeSymbolLookup lookup, string name, out NativeType nt)
+        public static bool TryGetGlobalSymbol<T>(this INativeSymbolLookup lookup, NativeName name, out T symbol)
+            where T : NativeSymbol
         {
-            NativeDefinedType definedNt = null;
-            if (lookup.TryFindDefined(name, out definedNt))
+            NativeGlobalSymbol globalSymbol;
+            if (!lookup.TryGetGlobalSymbol(name, out globalSymbol))
             {
-                nt = definedNt;
+                symbol = null;
+                return false;
+            }
+
+            symbol = globalSymbol.Symbol as T;
+            return symbol != null;
+        }
+
+        /// <summary>
+        /// Do a lookup for a symbol with a specific name of the specified type.
+        /// </summary>
+        public static bool TryGetGlobalSymbol<T>(this INativeSymbolLookup lookup, string name, out T symbol)
+            where T : NativeSymbol
+        {
+            NativeGlobalSymbol globalSymbol;
+            if (!lookup.TryGetGlobalSymbol(name, out globalSymbol))
+            {
+                symbol = null;
+                return false;
+            }
+
+            symbol = globalSymbol.Symbol as T;
+            return symbol != null;
+        }
+
+        /// <summary>
+        /// Do a lookup for a symbol with a specific name of the specified type.
+        /// </summary>
+        internal static bool TryGetGlobalSymbolExhaustive(this INativeSymbolLookup lookup, string name, out NativeGlobalSymbol symbol)
+        {
+            foreach (var kind in Enum.GetValues(typeof(NativeNameKind)).Cast<NativeNameKind>())
+            {
+                var nativeName = new NativeName(name, kind);
+                if (lookup.TryGetGlobalSymbol(nativeName, out symbol))
+                {
+                    return true;
+                }
+            }
+
+            symbol = default(NativeGlobalSymbol);
+            return false;
+        }
+
+        /// <summary>
+        /// Try and find any global symbol with the specified name.
+        /// </summary>
+        public static bool TryGetType(this INativeSymbolLookup lookup, string name, out NativeType nt)
+        {
+            if (lookup.TryGetGlobalSymbol(name, out nt))
+            {
                 return true;
             }
 
-            NativeTypeDef typedef = null;
-            if (lookup.TryFindTypeDef(name, out typedef))
-            {
-                nt = typedef;
-                return true;
-            }
-
-            // Lastly try and load the Builtin types
+            // CTODO: This should belong in NativeSymbolBag.  It's a resolution function, not lookup.
             NativeBuiltinType bt = null;
             if (NativeBuiltinType.TryConvertToBuiltinType(name, out bt))
             {
@@ -39,109 +84,71 @@ namespace PInvoke
             return false;
         }
 
+        public static bool TryGetValue(this INativeSymbolLookup lookup, string name, out NativeSymbol symbol) =>
+            lookup.TryGetGlobalSymbol(new NativeName(name, NativeNameKind.Constant), out symbol) ||
+            lookup.TryGetGlobalSymbol(new NativeName(name, NativeNameKind.EnumValue), out symbol);
+
         /// <summary>
         /// Find all NativeEnum which have a value of this name in this lookup.
         /// </summary>
-        public static bool TryFindEnumByValueName(this INativeSymbolLookup lookup, string enumValueName, out List<NativeDefinedType> enumTypes)
+        public static bool TryGetEnumByValueName(this INativeSymbolLookup lookup, string enumValueName, out NativeEnum enumeration)
         {
-            enumTypes = new List<NativeDefinedType>();
+            NativeEnumValue value;
+            return TryGetEnumByValueName(lookup, enumValueName, out enumeration, out value);
+        }
+
+        public static bool TryGetEnumByValueName(this INativeSymbolLookup lookup, string enumValueName, out NativeEnum enumeration, out NativeEnumValue value)
+        {
             foreach (var name in lookup.NativeNames.Where(x => x.Kind == NativeNameKind.Enum))
             {
-                NativeDefinedType nt;
-                if (!lookup.TryFindDefined(name.Name, out nt))
+                if (!lookup.TryGetGlobalSymbol(name.Name, out enumeration))
                 {
                     continue;
                 }
 
-                var e = (NativeEnum)nt;
-                if (e.Values.Any(x => x.Name == enumValueName))
+                value = enumeration.Values.SingleOrDefault(x => x.Name == enumValueName);
+                if (value != null)
                 {
-                    enumTypes.Add(nt);
+                    return true;
                 }
             }
 
-            return enumTypes.Count > 0;
-        }
-
-        public static bool TryFind<T>(this INativeSymbolLookup lookup, string name, out T symbol)
-            where T: NativeSymbol
-        {
-            NativeDefinedType nt;
-            if (lookup.TryFindDefined(name, out nt))
-            {
-                symbol = nt as T;
-                return symbol != null;
-            }
-
-            NativeTypeDef typeDef;
-            if (lookup.TryFindTypeDef(name, out typeDef))
-            {
-                symbol = typeDef as T;
-                return symbol != null;
-            }
-
-            NativeProcedure proc;
-            if (lookup.TryFindProcedure(name, out proc))
-            {
-                symbol = proc as T;
-                return symbol != null;
-            }
-
-            NativeConstant constant;
-            if (lookup.TryFindConstant(name, out constant))
-            {
-                symbol = constant as T;
-                return symbol != null;
-            }
-
-            symbol = null;
+            enumeration = null;
+            value = null;
             return false;
         }
 
-        public static bool TryFindType(this INativeSymbolLookup lookup, string name, out NativeType type)
+        #endregion
+
+        #region INativeSymbolStorage
+
+        public static void AddConstant(this INativeSymbolStorage storage, NativeConstant constant) => storage.Add(new NativeGlobalSymbol(constant));
+
+        public static void AddDefinedType(this INativeSymbolStorage storage, NativeDefinedType definedType) => storage.Add(new NativeGlobalSymbol(definedType));
+
+        public static void AddTypeDef(this INativeSymbolStorage storage, NativeTypeDef typeDef) => storage.Add(new NativeGlobalSymbol(typeDef));
+
+        public static void AddProcedure(this INativeSymbolStorage storage, NativeProcedure procedure) => storage.Add(new NativeGlobalSymbol(procedure));
+
+        #endregion
+
+        #region INativeSymbolImporter
+
+        internal static bool TryImportExhaustive(this INativeSymbolImporter importer, string name, out NativeGlobalSymbol symbol)
         {
-            NativeDefinedType nt;
-            if (lookup.TryFindDefined(name, out nt))
+            foreach (var kind in Enum.GetValues(typeof(NativeNameKind)).Cast<NativeNameKind>())
             {
-                type = nt;
-                return true;
+                var nativeName = new NativeName(name, kind);
+                if (importer.TryImport(nativeName, out symbol))
+                {
+                    return true;
+                }
             }
 
-            NativeTypeDef typeDef;
-            if (lookup.TryFindTypeDef(name, out typeDef))
-            {
-                type = typeDef;
-                return true;
-            }
-
-            type = null;
+            symbol = default(NativeGlobalSymbol);
             return false;
         }
 
-        public static bool TryFindEnumValue(this INativeSymbolLookup lookup, string name, out NativeEnumValue value)
-        {
-            NativeEnum enumeration;
-            return lookup.TryFindEnumValue(name, out enumeration, out value);
-        }
-
-        public static bool TryFindValue(this INativeSymbolLookup lookup, string name, out NativeSymbol symbol)
-        {
-            NativeConstant constant;
-            if (lookup.TryFindConstant(name, out constant))
-            {
-                symbol = constant;
-                return true;
-            }
-
-            NativeEnumValue value;
-            if (lookup.TryFindEnumValue(name, out value))
-            {
-                symbol = value;
-                return true;
-            }
-
-            symbol = null;
-            return false;
-        }
+        #endregion
     }
 }

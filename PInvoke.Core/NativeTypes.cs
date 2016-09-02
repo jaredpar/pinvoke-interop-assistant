@@ -370,6 +370,10 @@ namespace PInvoke
             }
         }
 
+        public NativeName NativeName => new NativeName(Name, NameKind);
+
+        public abstract NativeNameKind NameKind { get; }
+
         public override NativeSymbolCategory Category
         {
             get { return NativeSymbolCategory.Defined; }
@@ -425,12 +429,9 @@ namespace PInvoke
     /// <remarks></remarks>
     public class NativeStruct : NativeDefinedType
     {
+        public override NativeSymbolKind Kind => NativeSymbolKind.StructType;
 
-        public override NativeSymbolKind Kind
-        {
-            get { return NativeSymbolKind.StructType; }
-        }
-
+        public override NativeNameKind NameKind => NativeNameKind.Struct;
 
         public NativeStruct()
         {
@@ -452,12 +453,9 @@ namespace PInvoke
     /// <remarks></remarks>
     public class NativeUnion : NativeDefinedType
     {
+        public override NativeSymbolKind Kind => NativeSymbolKind.UnionType;
 
-        public override NativeSymbolKind Kind
-        {
-            get { return NativeSymbolKind.UnionType; }
-        }
-
+        public override NativeNameKind NameKind => NativeNameKind.Union;
 
         public NativeUnion()
         {
@@ -480,10 +478,9 @@ namespace PInvoke
     {
         private List<NativeEnumValue> _list = new List<NativeEnumValue>();
 
-        public override NativeSymbolKind Kind
-        {
-            get { return NativeSymbolKind.EnumType; }
-        }
+        public override NativeSymbolKind Kind => NativeSymbolKind.EnumType;
+
+        public override NativeNameKind NameKind => NativeNameKind.Enum;
 
         /// <summary>
         /// The values of the enum
@@ -544,6 +541,8 @@ namespace PInvoke
             set { _value = value; }
         }
 
+        public NativeName NativeName => new NativeName(Name, NativeNameKind.EnumValue);
+
         public NativeEnumValue(string name) : this(name, string.Empty)
         {
         }
@@ -597,10 +596,9 @@ namespace PInvoke
             set { _conv = value; }
         }
 
-        public override NativeSymbolKind Kind
-        {
-            get { return NativeSymbolKind.FunctionPointer; }
-        }
+        public override NativeSymbolKind Kind => NativeSymbolKind.FunctionPointer;
+
+        public override NativeNameKind NameKind => NativeNameKind.FunctionPointer;
 
         public override string DisplayName
         {
@@ -948,10 +946,9 @@ namespace PInvoke
     [DebuggerDisplay("{FullName} -> {RealTypeFullname}")]
     public class NativeTypeDef : NativeProxyType
     {
-        public override NativeSymbolKind Kind
-        {
-            get { return NativeSymbolKind.TypedefType; }
-        }
+        public override NativeSymbolKind Kind => NativeSymbolKind.TypedefType;
+
+        public NativeName NativeName => new NativeName(Name, NativeNameKind.TypeDef);
 
         public NativeTypeDef(string name) : base(name)
         {
@@ -1435,15 +1432,11 @@ namespace PInvoke
             set { _conv = value; }
         }
 
-        public override NativeSymbolCategory Category
-        {
-            get { return NativeSymbolCategory.Procedure; }
-        }
+        public override NativeSymbolCategory Category => NativeSymbolCategory.Procedure;
 
-        public override NativeSymbolKind Kind
-        {
-            get { return NativeSymbolKind.Procedure; }
-        }
+        public override NativeSymbolKind Kind => NativeSymbolKind.Procedure;
+
+        public NativeName NativeName => new NativeName(Name, NativeNameKind.Procedure);
 
         public override string DisplayName
         {
@@ -1719,11 +1712,9 @@ namespace PInvoke
             }
         }
 
-        public override NativeSymbolKind Kind
-        {
-            get { return NativeSymbolKind.Constant; }
-        }
+        public override NativeSymbolKind Kind => NativeSymbolKind.Constant;
 
+        public NativeName NativeName => new NativeName(Name, NativeNameKind.Constant);
 
         private NativeConstant()
         {
@@ -2236,11 +2227,11 @@ namespace PInvoke
                 NativeConstant constant;
                 NativeEnum enumeration;
                 NativeEnumValue value;
-                if (bag != null && bag.TryFindConstant(token.Value, out constant))
+                if (bag != null && bag.TryGetGlobalSymbol(token.Value, out constant))
                 {
                     ntVal = NativeValue.CreateSymbolValue(token.Value, constant);
                 }
-                else if (bag != null && bag.TryFindEnumValue(token.Value, out enumeration, out value))
+                else if (bag != null && bag.TryGetEnumByValueName(token.Value, out enumeration, out value))
                 {
                     ntVal = NativeValue.CreateSymbolValue(token.Value, enumeration);
                 }

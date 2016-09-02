@@ -19,10 +19,14 @@ namespace PInvoke
         /// </summary>
         IEnumerable<NativeName> NativeNames { get; }
 
-        bool TryFindDefined(string name, out NativeDefinedType nt);
-        bool TryFindTypeDef(string name, out NativeTypeDef nt);
-        bool TryFindProcedure(string name, out NativeProcedure proc);
-        bool TryFindConstant(string name, out NativeConstant constant);
-        bool TryFindEnumValue(string name, out NativeEnum enumeration, out NativeEnumValue value);
+        /// <summary>
+        /// Try and get a global symbol with the specified name and kind
+        /// </summary>
+        bool TryGetGlobalSymbol(NativeName name, out NativeGlobalSymbol symbol);
+
+        /// <summary>
+        /// Try and get a global symbol with a matching name
+        /// </summary>
+        bool TryGetGlobalSymbol(string name, out NativeGlobalSymbol symbol);
     }
 }

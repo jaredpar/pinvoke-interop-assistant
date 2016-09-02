@@ -12,46 +12,15 @@ namespace PInvoke
 
         public IEnumerable<NativeName> NativeNames => new NativeName[] { };
 
-        public bool TryFindByName(string name, out NativeType nt)
+        public bool TryGetGlobalSymbol(string name, out NativeGlobalSymbol symbol)
         {
-            nt = null;
+            symbol = default(NativeGlobalSymbol);
             return false;
         }
 
-        public bool TryFindConstant(string name, out NativeConstant nConst)
+        public bool TryGetGlobalSymbol(NativeName name, out NativeGlobalSymbol symbol)
         {
-            nConst = null;
-            return false;
-        }
-
-        public bool TryFindDefined(string name, out NativeDefinedType nt)
-        {
-            nt = null;
-            return false;
-        }
-
-        public bool TryFindEnumByValueName(string enumValueName, out List<NativeDefinedType> enumTypes)
-        {
-            enumTypes = null;
-            return false;
-        }
-
-        public bool TryFindEnumValue(string name, out NativeEnum enumeration, out NativeEnumValue value)
-        {
-            enumeration = null;
-            value = null;
-            return false;
-        }
-
-        public bool TryFindProcedure(string name, out NativeProcedure proc)
-        {
-            proc = null;
-            return false;
-        }
-
-        public bool TryFindTypeDef(string name, out NativeTypeDef nt)
-        {
-            nt = null;
+            symbol = default(NativeGlobalSymbol);
             return false;
         }
     }

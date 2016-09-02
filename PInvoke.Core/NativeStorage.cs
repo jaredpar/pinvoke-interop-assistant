@@ -953,6 +953,32 @@ namespace PInvoke
             }
         }
 
+        public void Add(NativeGlobalSymbol symbol)
+        {
+            switch (symbol.Kind)
+            {
+                case NativeNameKind.Struct:
+                case NativeNameKind.Union:
+                case NativeNameKind.FunctionPointer:
+                case NativeNameKind.Enum:
+                    AddDefinedType((NativeDefinedType)symbol.Symbol);
+                    break;
+                case NativeNameKind.Procedure:
+                    AddProcedure((NativeProcedure)symbol.Symbol);
+                    break;
+                case NativeNameKind.TypeDef:
+                    AddTypeDef((NativeTypeDef)symbol.Symbol);
+                    break;
+                case NativeNameKind.Constant:
+                    AddConstant((NativeConstant)symbol.Symbol);
+                    break;
+                case NativeNameKind.EnumValue:
+                    throw new NotImplementedException();
+                default:
+                    break;
+            }
+        }
+
         public void AddConstant(NativeConstant nConst)
         {
             if (nConst == null)
@@ -1852,6 +1878,78 @@ namespace PInvoke
         public bool TryCreateConstant(string name, out NativeConstant nConst)
         {
             return TryFindConstant(name, out nConst);
+        }
+
+        public bool TryGetGlobalSymbol(NativeName name, out NativeGlobalSymbol symbol)
+        {
+            switch (name.Kind)
+            {
+                case NativeNameKind.Struct:
+                case NativeNameKind.Union:
+                case NativeNameKind.FunctionPointer:
+                case NativeNameKind.Enum:
+                    {
+                        NativeDefinedType definedType;
+                        if (TryFindDefined(name.Name, out definedType))
+                        {
+                            symbol = new NativeGlobalSymbol(definedType);
+                            return true;
+                        }
+                    }
+                    break;
+                case NativeNameKind.Procedure:
+                    {
+                        NativeProcedure proc;
+                        if (TryFindProcedure(name.Name, out proc))
+                        {
+                            symbol = new NativeGlobalSymbol(proc);
+                            return true;
+                        }
+                    }
+                    break;
+                case NativeNameKind.TypeDef:
+                    {
+                        NativeTypeDef typeDef;
+                        if (TryFindTypeDef(name.Name, out typeDef))
+                        {
+                            symbol = new NativeGlobalSymbol(typeDef);
+                            return true;
+                        }
+                    }
+                    break;
+                case NativeNameKind.Constant:
+                    {
+                        NativeConstant constant;
+                        if (TryFindConstant(name.Name, out constant))
+                        {
+                            symbol = new NativeGlobalSymbol(constant);
+                            return true;
+                        }
+                    }
+                    break;
+                case NativeNameKind.EnumValue:
+                    {
+                        NativeEnum enumeration;
+                        NativeEnumValue value;
+                        if (TryFindEnumValue(name.Name, out enumeration, out value))
+                        {
+                            symbol = new NativeGlobalSymbol(value);
+                            return true;
+                        }
+                    }
+                    break;
+                default:
+                    Contract.ThrowInvalidEnumValue(name.Kind);
+                    break;
+            }
+
+            symbol = default(NativeGlobalSymbol);
+            return false;
+        }
+
+        public bool TryGetGlobalSymbol(string name, out NativeGlobalSymbol symbol)
+        {
+            return this.TryGetGlobalSymbolExhaustive(name, out symbol);
         }
     }
 }

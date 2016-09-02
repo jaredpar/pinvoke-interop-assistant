@@ -198,7 +198,7 @@ namespace PInvoke.Transform
                 foreach (NativeStorage.TypedefTypeRow trow in ns.TypedefType.FindByTarget(typeRef))
                 {
                     NativeTypeDef found = null;
-                    if (_bag.TryFindTypeDef(trow.Name, out found))
+                    if (_bag.TryGetGlobalSymbol(trow.Name, out found))
                     {
                         list.Add(found);
                     }

@@ -88,6 +88,7 @@
     <Compile Include="INativeSymbolImporter.cs" />
     <Compile Include="INativeSymbolStorage.cs" />
     <Compile Include="INativeSymbolLookup.cs" />
+    <Compile Include="NativeGlobalSymbol.cs" />
     <Compile Include="NativeName.cs" />
     <Compile Include="Primitive\BinaryPrimitiveStorage.Reader.cs" />
     <Compile Include="Primitive\BinaryPrimitiveStorage.Writer.cs" />

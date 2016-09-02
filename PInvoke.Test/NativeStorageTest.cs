@@ -25,7 +25,7 @@ namespace PInvoke.Test
             NativeStorage ns = new NativeStorage();
             ns.AddDefinedType(s1);
 
-            Assert.True(ns.TryFindByName(s1.Name, out s2));
+            Assert.True(ns.TryGetGlobalSymbol(s1.Name, out s2));
         }
 
         [Fact()]
@@ -45,7 +45,7 @@ namespace PInvoke.Test
             NativeStorage ns = new NativeStorage();
             ns.AddDefinedType(s1);
 
-            Assert.True(ns.TryFindByName(s1.Name, out s2));
+            Assert.True(ns.TryGetType(s1.Name, out s2));
         }
 
         /// <summary>
@@ -165,7 +165,7 @@ namespace PInvoke.Test
             ns.AddDefinedType(s1);
 
             NativeType rets1 = null;
-            Assert.True(ns.TryFindByName(s1.Name, out rets1));
+            Assert.True(ns.TryGetType(s1.Name, out rets1));
             Assert.NotNull(rets1);
             Assert.True(NativeTypeEqualityComparer.AreEqualTopLevel(s1, rets1));
         }
@@ -184,7 +184,7 @@ namespace PInvoke.Test
             ns.AddDefinedType(s1);
 
             NativeType rets1 = null;
-            Assert.True(ns.TryFindByName(s1.Name, out rets1));
+            Assert.True(ns.TryGetType(s1.Name, out rets1));
             Assert.True(NativeTypeEqualityComparer.AreEqualTopLevel(s1, rets1));
         }
 
@@ -202,7 +202,7 @@ namespace PInvoke.Test
             ns.AddTypeDef(t1);
 
             NativeType rett1 = null;
-            Assert.True(ns.TryFindByName(t1.Name, out rett1));
+            Assert.True(ns.TryGetType(t1.Name, out rett1));
             Assert.True(NativeTypeEqualityComparer.AreEqualRecursive(rett1, t1));
         }
 
@@ -282,7 +282,7 @@ namespace PInvoke.Test
 
             NativeSymbolBag bag = new NativeSymbolBag(ns);
             NativeProcedure ret1 = null;
-            Assert.True(bag.TryFindProcedure("p1", out ret1));
+            Assert.True(bag.TryGetGlobalSymbol("p1", out ret1));
             bag.AddProcedure(ret1);
             Assert.True(bag.TryResolveSymbolsAndValues());
             Assert.Equal(SymbolPrinter.Convert(p1), SymbolPrinter.Convert(ret1));

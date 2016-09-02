@@ -20,7 +20,7 @@ namespace PInvoke
 
     public static class NativeNameUtil
     {
-        public static NativeSymbolKind ToNativeSymbolKind(NativeNameKind kind)
+        public static NativeSymbolKind GetNativeSymbolKind(NativeNameKind kind)
         {
             switch (kind)
             {
@@ -99,6 +99,17 @@ namespace PInvoke
             return true;
         }
 
+        public static NativeName GetName(NativeSymbol symbol)
+        {
+            NativeName name;
+            if (!TryGetName(symbol, out name))
+            {
+                throw new Exception($"Unable to create name for {symbol.Name} {symbol.Kind}");
+            }
+
+            return name;
+        }
+
         public static IEnumerable<NativeName> GetNames(IEnumerable<NativeSymbol> symbols)
         {
             foreach (var symbol in symbols)
@@ -132,7 +143,9 @@ namespace PInvoke
 
         public string Name { get; }
         public NativeNameKind Kind { get; }
+
         public bool IsNil => this == Nil;
+        public NativeSymbolKind SymbolKind => NativeNameUtil.GetNativeSymbolKind(Kind);
 
         public NativeName(string name, NativeNameKind kind)
         {

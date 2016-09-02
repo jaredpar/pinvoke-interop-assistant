@@ -77,10 +77,10 @@ internal static class Program
         VerifyTrue(ns.TryFindTypeDef("LPWSTR", out typedef));
 
         NativeType defined = null;
-        VerifyTrue(ns.TryFindByName("WNDPROC", out defined));
-        VerifyTrue(ns.TryFindByName("HOOKPROC", out defined));
-        VerifyTrue(ns.TryFindByName("tagPOINT", out defined));
-        VerifyTrue(ns.TryFindByName("_SYSTEM_INFO", out defined));
+        VerifyTrue(ns.TryGetType("WNDPROC", out defined));
+        VerifyTrue(ns.TryGetType("HOOKPROC", out defined));
+        VerifyTrue(ns.TryGetType("tagPOINT", out defined));
+        VerifyTrue(ns.TryGetType("_SYSTEM_INFO", out defined));
 
         NativeConstant c = null;
         VerifyTrue(ns.TryFindConstant("WM_PAINT", out c));

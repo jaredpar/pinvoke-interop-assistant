@@ -12,6 +12,10 @@ namespace PInvoke
     /// </summary>
     public interface INativeSymbolImporter
     {
+        bool TryImport(string name, out NativeGlobalSymbol symbol);
+        bool TryImport(NativeName name, out NativeGlobalSymbol symbol);
+
+        // CTODO: move to extension methods
         bool TryImportDefined(string name, out NativeDefinedType nt);
         bool TryImportTypedef(string name, out NativeTypeDef nt);
         bool TryImportProcedure(string name, out NativeProcedure proc);

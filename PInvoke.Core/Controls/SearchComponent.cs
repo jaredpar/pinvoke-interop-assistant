@@ -30,6 +30,7 @@ namespace PInvoke.Controls
         private List<object> _found = new List<object>();
 
         private Filter _filter;
+
         /// <summary>
         /// Whether or not the search is completed
         /// </summary>

@@ -684,8 +684,6 @@ namespace PInvoke
             /// <summary>
             /// Convert all of the stored constants back into Macro instances
             /// </summary>
-            /// <returns></returns>
-            /// <remarks></remarks>
             internal List<PInvoke.Parser.Macro> LoadAllMacros()
             {
                 List<PInvoke.Parser.Macro> list = new List<PInvoke.Parser.Macro>();

@@ -11,10 +11,7 @@ namespace PInvoke
         private readonly BasicSymbolStorage _storage = new BasicSymbolStorage();
         private readonly INativeSymbolImporter _importer;
 
-        public IEnumerable<NativeEnum> NativeEnums
-        {
-            get { throw new NotImplementedException(); }
-        }
+        public IEnumerable<NativeName> NativeNames => _storage.NativeNames;
 
         public CachingSymbolLookup(INativeSymbolImporter importer)
         {

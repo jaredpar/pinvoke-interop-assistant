@@ -25,6 +25,7 @@ namespace PInvoke
         public IEnumerable<NativeProcedure> NativeProcedures => _procMap.Values;
         public IEnumerable<NativeConstant> NativeConstants => _constMap.Values;
         public IEnumerable<NativeEnum> NativeEnums => _definedMap.Values.Where(x => x.Kind == NativeSymbolKind.EnumType).Cast<NativeEnum>();
+        public IEnumerable<NativeName> NativeNames => NativeNameUtil.GetNames(_constMap.Values, _definedMap.Values, _typeDefMap.Values, _procMap.Values, _valueMap.Values);
 
         public void AddConstant(NativeConstant nConst)
         {
@@ -86,7 +87,7 @@ namespace PInvoke
 
         public bool TryFindEnumValue(string name, out NativeEnum enumeration, out NativeEnumValue value)
         {
-            foreach (var currentEnum in NativeEnums)
+            foreach (var currentEnum in _definedMap.Values.Where(x => x.Kind == NativeSymbolKind.EnumType).Cast<NativeEnum>())
             {
                 foreach (var currentValue in currentEnum.Values)
                 {

@@ -45,9 +45,16 @@ namespace PInvoke
         public static bool TryFindEnumByValueName(this INativeSymbolLookup lookup, string enumValueName, out List<NativeDefinedType> enumTypes)
         {
             enumTypes = new List<NativeDefinedType>();
-            foreach (var nt in lookup.NativeEnums)
+            foreach (var name in lookup.NativeNames.Where(x => x.Kind == NativeNameKind.Enum))
             {
-                if (nt.Values.Any(x => x.Name == enumValueName))
+                NativeDefinedType nt;
+                if (!lookup.TryFindDefined(name.Name, out nt))
+                {
+                    continue;
+                }
+
+                var e = (NativeEnum)nt;
+                if (e.Values.Any(x => x.Name == enumValueName))
                 {
                     enumTypes.Add(nt);
                 }

@@ -14,11 +14,10 @@ namespace PInvoke
     /// </summary>
     public interface INativeSymbolLookup
     {
-        // CTODO: Need to move this to a different layer.  Not all storage can efficiently return
-        // blocks of APIs.  Could be hugely allocating.
-        // CTODO: need properties for rest of the types
-        // CTODO: probably return an enumeration of SymbolId or such.
-        IEnumerable<NativeEnum> NativeEnums { get; }
+        /// <summary>
+        /// The set of all global names this lookup can provide.
+        /// </summary>
+        IEnumerable<NativeName> NativeNames { get; }
 
         bool TryFindDefined(string name, out NativeDefinedType nt);
         bool TryFindTypeDef(string name, out NativeTypeDef nt);

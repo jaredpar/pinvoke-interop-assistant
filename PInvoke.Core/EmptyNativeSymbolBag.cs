@@ -10,7 +10,7 @@ namespace PInvoke
     {
         internal static readonly EmptyNativeSymbolBag Instance = new EmptyNativeSymbolBag();
 
-        public IEnumerable<NativeEnum> NativeEnums => new NativeEnum[] { };
+        public IEnumerable<NativeName> NativeNames => new NativeName[] { };
 
         public bool TryFindByName(string name, out NativeType nt)
         {

@@ -98,6 +98,29 @@ namespace PInvoke
             name = new NativeName(symbol.Name, kind);
             return true;
         }
+
+        public static IEnumerable<NativeName> GetNames(IEnumerable<NativeSymbol> symbols)
+        {
+            foreach (var symbol in symbols)
+            {
+                NativeName name;
+                if (TryGetName(symbol, out name))
+                {
+                    yield return name;
+                }
+            }
+        }
+
+        public static IEnumerable<NativeName> GetNames(params IEnumerable<NativeSymbol>[] col)
+        {
+            foreach (var item in col)
+            {
+                foreach (var name in GetNames(item))
+                {
+                    yield return name;
+                }
+            }
+        }
     }
 
     /// <summary>

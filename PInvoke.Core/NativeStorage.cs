@@ -917,21 +917,39 @@ namespace PInvoke
             }
         }
 
-        public IEnumerable<NativeEnum> NativeEnums
+        public IEnumerable<NativeName> NativeNames
         {
             get
             {
-                var list = new List<NativeEnum>();
-                foreach (EnumValueRow erow in EnumValue.Rows)
+                var list = new List<Tuple<string, NativeSymbolKind>>();
+                foreach (DefinedTypeRow row in DefinedType.Rows)
                 {
-                    NativeDefinedType nt;
-                    if (TryFindDefined(erow.Name, out nt) && nt.Kind == NativeSymbolKind.EnumType)
-                    {
-                        list.Add((NativeEnum)nt);
-                    }
+                    list.Add(Tuple.Create(row.Name, row.Kind));
                 }
 
-                return list;
+                foreach (EnumValueRow row in EnumValue.Rows)
+                {
+                    list.Add(Tuple.Create(row.Name, NativeSymbolKind.EnumNameValue));
+                }
+
+                foreach (ConstantRow row in Constant.Rows)
+                {
+                    list.Add(Tuple.Create(row.Name, NativeSymbolKind.Constant));
+                }
+
+                foreach (ProcedureRow row in Procedure.Rows)
+                {
+                    list.Add(Tuple.Create(row.Name, NativeSymbolKind.Procedure));
+                }
+
+                foreach (var tuple in list)
+                {
+                    NativeNameKind kind;
+                    if (NativeNameUtil.TryGetNativeNameKind(tuple.Item2, out kind))
+                    {
+                        yield return new NativeName(tuple.Item1, kind);
+                    }
+                }
             }
         }
 

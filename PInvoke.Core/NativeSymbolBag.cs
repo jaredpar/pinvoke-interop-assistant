@@ -35,11 +35,11 @@ namespace PInvoke
         public static INativeSymbolLookup EmptyLookup => EmptyNativeSymbolBag.Instance;
 
         public int Count => _storage.Count;
+        public IEnumerable<NativeName> NativeNames => _storage.NativeNames;
         public IEnumerable<NativeDefinedType> NativeDefinedTypes => _storage.NativeDefinedTypes;
         public IEnumerable<NativeTypeDef> NativeTypeDefs => _storage.NativeTypeDefs;
         public IEnumerable<NativeProcedure> NativeProcedures => _storage.NativeProcedures;
         public IEnumerable<NativeConstant> NativeConstants => _storage.NativeConstants;
-        public IEnumerable<NativeEnum> NativeEnums => _storage.NativeEnums;
         public BasicSymbolStorage Storage => _storage;
 
         /// <summary>

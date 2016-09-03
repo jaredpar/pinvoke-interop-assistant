@@ -82,7 +82,7 @@ namespace PInvoke.Controls
                 {
                     _enumerator = null;
                     completed = true;
-                    break; // TODO: might not be correct. Was : Exit Do
+                    break;
                 }
 
                 var cur = _enumerator.Current;
@@ -93,7 +93,7 @@ namespace PInvoke.Controls
 
                 if ((DateTime.Now - start) > _delayTime)
                 {
-                    break; // TODO: might not be correct. Was : Exit Do
+                    break;
                 }
             } while (true);
 

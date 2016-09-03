@@ -294,7 +294,7 @@ namespace PInvoke.Transform
                 if (IsType(cur.AttributeType, typeof(StructLayoutAttribute)))
                 {
                     attrib = cur;
-                    break; // TODO: might not be correct. Was : Exit For
+                    break;
                 }
             }
 

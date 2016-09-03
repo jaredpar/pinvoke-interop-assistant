@@ -68,21 +68,7 @@ namespace PInvoke
         /// </summary>
         public static bool TryGetType(this INativeSymbolLookup lookup, string name, out NativeType nt)
         {
-            if (lookup.TryGetGlobalSymbol(name, out nt))
-            {
-                return true;
-            }
-
-            // CTODO: This should belong in NativeSymbolBag.  It's a resolution function, not lookup.
-            NativeBuiltinType bt = null;
-            if (NativeBuiltinType.TryConvertToBuiltinType(name, out bt))
-            {
-                nt = bt;
-                return true;
-            }
-
-            nt = null;
-            return false;
+            return lookup.TryGetGlobalSymbol(name, out nt);
         }
 
         public static bool TryGetValue(this INativeSymbolLookup lookup, string name, out NativeSymbol symbol) =>
@@ -212,6 +198,34 @@ namespace PInvoke
 
             symbol = default(NativeGlobalSymbol);
             return false;
+        }
+
+        public static bool TryImport<T>(this INativeSymbolImporter importer, string name, out T symbol)
+            where T : NativeSymbol
+        {
+            NativeGlobalSymbol globalSymbol;
+            if (!importer.TryImport(name, out globalSymbol))
+            {
+                symbol = null;
+                return false;
+            }
+
+            symbol = globalSymbol.Symbol as T;
+            return symbol != null;
+        }
+
+        public static bool TryImport<T>(this INativeSymbolImporter importer, NativeName name, out T symbol)
+            where T : NativeSymbol
+        {
+            NativeGlobalSymbol globalSymbol;
+            if (!importer.TryImport(name, out globalSymbol))
+            {
+                symbol = null;
+                return false;
+            }
+
+            symbol = globalSymbol.Symbol as T;
+            return symbol != null;
         }
 
         #endregion

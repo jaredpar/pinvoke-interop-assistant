@@ -52,7 +52,7 @@ namespace PInvoke
                         var e = (NativeEnum)symbol;
                         _definedMap.Add(e.Name, e);
 
-                        // CTODO: this nesting feels wrong.
+                        // TODO: this nesting feels wrong.
                         foreach (NativeEnumValue value in e.Values)
                         {
                             _enumValueMap.Add(value.Name, value);

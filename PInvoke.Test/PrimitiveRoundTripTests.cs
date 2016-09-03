@@ -31,7 +31,7 @@ namespace PInvoke.Test
             exporter.Export(p);
             var importer = new PrimitiveImporter(CreateReader());
             NativeProcedure other;
-            Assert.True(importer.TryImportProcedure(p.Name, out other));
+            Assert.True(importer.TryImport(p.Name, out other));
             Assert.Equal(SymbolPrinter.Convert(p), SymbolPrinter.Convert(other));
         }
 

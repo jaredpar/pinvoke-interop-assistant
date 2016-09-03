@@ -982,7 +982,7 @@ namespace PInvoke.Parser
                 if (token.TokenType == TokenType.ParenClose)
                 {
                     _scanner.GetNextToken();
-                    break; // TODO: might not be correct. Was : Exit Do
+                    break;
                 }
                 else if (token.TokenType == TokenType.Period)
                 {
@@ -1112,7 +1112,7 @@ namespace PInvoke.Parser
                 {
                     if (_scanner.EndOfStream)
                     {
-                        break; // TODO: might not be correct. Was : Exit Do
+                        break;
                     }
 
                     Token token = _scanner.PeekNextToken();

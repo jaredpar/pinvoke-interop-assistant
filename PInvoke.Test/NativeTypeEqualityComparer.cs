@@ -201,7 +201,7 @@ namespace PInvoke.Test
                 NativeNamedType namedtype = (NativeNamedType)nt;
                 if (namedtype.RealType == null)
                 {
-                    break; // TODO: might not be correct. Was : Exit While
+                    break;
                 }
 
                 nt = namedtype.RealType;

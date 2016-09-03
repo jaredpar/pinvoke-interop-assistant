@@ -134,7 +134,7 @@ internal static class Program
         bag.SaveToNativeStorage(ns);
         VerifyGeneratedStorage(ns);
 
-        // CTODO: need to write to file again otherwise it's just in memory.  
+        // TODO: need to write to file again otherwise it's just in memory.  
 
         // Copy the file to the various applications
         File.Copy("windows.xml", "..\\..\\..\\ConsoleTool\\bin\\Debug\\windows.xml", true);

@@ -438,7 +438,7 @@ namespace PInvoke.Controls
                     if (!StringComparer.Ordinal.Equals(_selectionList[i], GetHashString(SelectedRows[i])))
                     {
                         changed = true;
-                        break; // TODO: might not be correct. Was : Exit For
+                        break;
                     }
                 }
             }
@@ -465,7 +465,7 @@ namespace PInvoke.Controls
 
     public abstract class SearchDataGridInfo
     {
-        // CTODO: should this be a lookup instead? 
+        // TODO: should this be a lookup instead? 
         public INativeSymbolStorage Storage;
         public bool ShowInvalidData;
 

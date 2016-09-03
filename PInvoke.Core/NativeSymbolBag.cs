@@ -29,7 +29,7 @@ namespace PInvoke
 
         private readonly BasicSymbolStorage _storage;
 
-        // CTODO: make this readonly
+        // TODO: make this readonly
         private INativeSymbolLookup _nextSymbolLookup;
 
         public static INativeSymbolLookup EmptyLookup => EmptyNativeSymbolBag.Instance;
@@ -279,7 +279,7 @@ namespace PInvoke
 
         /// <summary>
         /// Save all of the information into a NativeStorage database that is completely resolved
-        /// CTODO: INativeSymbolStorage is wrong.  Should have a lower API like INativeSymbolLookupRaw.
+        /// TODO: INativeSymbolStorage is wrong.  Should have a lower API like INativeSymbolLookupRaw.
         /// </summary>
         public void SaveToNativeStorage(INativeSymbolStorage nativeStorage)
         {
@@ -592,7 +592,7 @@ namespace PInvoke
 
         /// <summary>
         /// Create a NativeTypeBag from the result of a code analysis
-        /// CTODO: review
+        /// TODO: review
         /// </summary>
         public static NativeSymbolBag CreateFrom(Parser.NativeCodeAnalyzerResult result, INativeSymbolLookup nextSymbolBag, ErrorProvider ep)
         {

@@ -190,7 +190,7 @@ namespace PInvoke.Transform
             }
 
             // Next look in the native storage for more types  
-            // CTODO: this cast is bad.
+            // TODO: this cast is bad.
             var lookup = _bag.NextSymbolLookup;
             foreach (var name in lookup.NativeNames.Where(x => x.Kind == NativeNameKind.TypeDef))
             {

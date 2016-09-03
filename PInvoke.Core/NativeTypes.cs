@@ -61,7 +61,7 @@ namespace PInvoke
     [DebuggerDisplay("{DisplayName}")]
     public abstract class NativeSymbol
     {
-        // CTODO: mutable data, destroy
+        // TODO: mutable data, destroy
         protected static List<NativeSymbol> EmptySymbolList = new List<NativeSymbol>();
 
         private string _name;
@@ -248,7 +248,7 @@ namespace PInvoke
                 }
                 else
                 {
-                    break; // TODO: might not be correct. Was : Exit While
+                    break;
                 }
             }
 
@@ -326,7 +326,7 @@ namespace PInvoke
                 }
                 else
                 {
-                    break; // TODO: might not be correct. Was : Exit While
+                    break;
                 }
 
                 if (cur != null && 0 == string.CompareOrdinal(cur.Name, search))
@@ -351,7 +351,7 @@ namespace PInvoke
 
         /// <summary>
         /// Whether or not this type is anonymous
-        /// CTODO: this isn't imported / exported in the new system
+        /// TODO: this isn't imported / exported in the new system
         /// </summary>
         public bool IsAnonymous
         {
@@ -471,10 +471,9 @@ namespace PInvoke
     #region "NativeEnum"
 
     /// <summary>
-    /// Native enum 
+    /// Containing for a native enum type.
     /// </summary>
-    /// <remarks></remarks>
-    public class NativeEnum : NativeDefinedType
+    public sealed class NativeEnum : NativeDefinedType
     {
         private List<NativeEnumValue> _list = new List<NativeEnumValue>();
 
@@ -485,9 +484,6 @@ namespace PInvoke
         /// <summary>
         /// The values of the enum
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
         public List<NativeEnumValue> Values
         {
             get { return _list; }
@@ -526,7 +522,6 @@ namespace PInvoke
     /// <summary>
     /// An enum value
     /// </summary>
-    /// <remarks></remarks>
     [DebuggerDisplay("{Name} = {Value}")]
     public class NativeEnumValue : NativeExtraSymbol
     {
@@ -724,7 +719,7 @@ namespace PInvoke
         /// <summary>
         /// Element count of the array.  If the array is not bound then this will
         /// be -1
-        /// CTODO: use a nullable here
+        /// TODO: use a nullable here
         /// </summary>
         public int ElementCount
         {
@@ -2140,7 +2135,7 @@ namespace PInvoke
 
         public static NativeValue CreateNumber(Number n)
         {
-            // CTODO: Consider passing Number through here.
+            // TODO: Consider passing Number through here.
             return new NativeValue(n.Value, NativeValueKind.Number);
         }
 

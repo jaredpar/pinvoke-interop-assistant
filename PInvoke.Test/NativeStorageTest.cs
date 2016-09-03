@@ -129,7 +129,7 @@ namespace PInvoke.Test
         }
 
         /// <summary>
-        /// Make sure that only a shollow save is done
+        /// Make sure that only a shallow save is done
         /// </summary>
         /// <remarks></remarks>
         [Fact()]
@@ -147,14 +147,13 @@ namespace PInvoke.Test
             NativeDefinedType rets2 = null;
             Assert.True(ns.TryGetGlobalSymbol(s2.Name, out rets2));
             Assert.NotNull(rets2);
-            Assert.False(NativeTypeEqualityComparer.AreEqualRecursive(s2, rets2));
+            Assert.True(NativeTypeEqualityComparer.AreEqualRecursive(s2, rets2));
             Assert.True(NativeTypeEqualityComparer.AreEqualTopLevel(s2, rets2));
         }
 
         /// <summary>
         /// Save a type that has a reference to itself (via a pointer)
         /// </summary>
-        /// <remarks></remarks>
         [Fact()]
         public void SaveAndLoad2()
         {

@@ -165,7 +165,7 @@ namespace PInvoke.Transform
 
             var analyzer = NativeCodeAnalyzerFactory.CreateForMiniParse(OsVersion.WindowsVista, _storage.GetAllMacros());
 
-            // CTODO: probably should delete this 
+            // TODO: probably should delete this 
             analyzer.IncludePathList.Add("c:\\program files (x86)\\windows kits\\8.1\\include\\shared");
             NativeSymbolBag bag = default(NativeSymbolBag);
             using (System.IO.StringReader reader = new StringReader(code))
@@ -374,7 +374,7 @@ namespace PInvoke.Transform
                             if (line == null)
                             {
                                 builder.Append(sigBuilder);
-                                break; // TODO: might not be correct. Was : Exit While
+                                break;
                             }
 
                             Match match = Regex.Match(line, "^\\s*public\\s+static(.*)$");
@@ -391,7 +391,7 @@ namespace PInvoke.Transform
 
                             if (Regex.IsMatch(line, "\\s*}\\s*"))
                             {
-                                break; // TODO: might not be correct. Was : Exit Do
+                                break;
                             }
                             sigBuilder.AppendLine(line);
                         } while (true);

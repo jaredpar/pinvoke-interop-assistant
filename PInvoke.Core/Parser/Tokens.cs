@@ -837,13 +837,13 @@ namespace PInvoke.Parser
                 }
                 else
                 {
-                    break; // TODO: might not be correct. Was : Exit Do
+                    break;
                 }
 
                 str = str.Substring(0, str.Length - 1);
                 if (string.IsNullOrEmpty(str))
                 {
-                    break; // TODO: might not be correct. Was : Exit Do
+                    break;
                 }
             } while (true);
 
@@ -863,7 +863,7 @@ namespace PInvoke.Parser
 
                         info.IsFloatingPoint = true;
                         str = str.Substring(0, i);
-                        break; // TODO: might not be correct. Was : Exit For
+                        break;
                     }
                     else if (cur == '.')
                     {

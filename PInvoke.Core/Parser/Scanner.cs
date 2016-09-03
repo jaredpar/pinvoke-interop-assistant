@@ -1037,7 +1037,7 @@ namespace PInvoke.Parser
                         }
                         else if (_buffer.EndOfStream || builder.Length > 5)
                         {
-                            break; // TODO: might not be correct. Was : Exit Do
+                            break;
                         }
                         else
                         {

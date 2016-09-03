@@ -526,7 +526,7 @@ namespace PInvoke.Test
                 if (0 == string.CompareOrdinal(cur.Name, name))
                 {
                     ctd = cur;
-                    break; // TODO: might not be correct. Was : Exit For
+                    break;
                 }
             }
 
@@ -568,7 +568,7 @@ namespace PInvoke.Test
                 if (string.Equals(name, cur.Name, StringComparison.Ordinal))
                 {
                     found = cur;
-                    break; // TODO: might not be correct. Was : Exit For
+                    break;
                 }
             }
 
@@ -622,7 +622,7 @@ namespace PInvoke.Test
                 if (0 == string.CompareOrdinal(name, mem.Name))
                 {
                     cMem = mem;
-                    break; // TODO: might not be correct. Was : Exit For
+                    break;
                 }
             }
 
@@ -652,7 +652,7 @@ namespace PInvoke.Test
                 if (string.Equals(name, cur.Name, StringComparison.Ordinal))
                 {
                     decl = cur;
-                    break; // TODO: might not be correct. Was : Exit For
+                    break;
                 }
             }
 
@@ -666,7 +666,7 @@ namespace PInvoke.Test
                 if (string.Equals(name, cur.Name, StringComparison.Ordinal))
                 {
                     arg = cur;
-                    break; // TODO: might not be correct. Was : Exit For
+                    break; 
                 }
             }
         }

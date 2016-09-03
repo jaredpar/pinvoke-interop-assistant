@@ -112,14 +112,6 @@
     <Compile Include="Primitive\BasicPrimitiveStorage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="NativeMethods.cs" />
-    <Compile Include="NativeStorage.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>NativeStorage.xsd</DependentUpon>
-    </Compile>
-    <Compile Include="NativeStorage.cs">
-      <DependentUpon>NativeStorage.xsd</DependentUpon>
-    </Compile>
     <Compile Include="NativeSymbolBag.cs" />
     <Compile Include="Parser\BinaryOperator.cs" />
     <Compile Include="Parser\ExpressionEvaluator.cs" />
@@ -177,19 +169,6 @@
       <SubType>Designer</SubType>
       <DependentUpon>TranslateSnippetControl.cs</DependentUpon>
     </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="NativeStorage.xsc">
-      <DependentUpon>NativeStorage.xsd</DependentUpon>
-    </None>
-    <None Include="NativeStorage.xsd">
-      <SubType>Designer</SubType>
-      <Generator>MSDataSetGenerator</Generator>
-      <LastGenOutput>NativeStorage.Designer.cs</LastGenOutput>
-    </None>
-    <None Include="NativeStorage.xss">
-      <DependentUpon>NativeStorage.xsd</DependentUpon>
-    </None>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

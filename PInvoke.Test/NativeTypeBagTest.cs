@@ -294,7 +294,7 @@ namespace PInvoke.Test
         [Fact()]
         public void FindOrLoad1()
         {
-            var ns = new NativeStorage();
+            var ns = new BasicSymbolStorage();
             ns.AddDefinedType(new NativeStruct("s1"));
             NativeSymbolBag bag = new NativeSymbolBag(ns);
 
@@ -307,7 +307,7 @@ namespace PInvoke.Test
         [Fact()]
         public void FindOrLoad2()
         {
-            var ns = new NativeStorage();
+            var ns = new BasicSymbolStorage();
             ns.AddTypeDef(new NativeTypeDef("td", new NativeBuiltinType(BuiltinType.NativeChar)));
             NativeSymbolBag bag = new NativeSymbolBag(ns);
 
@@ -320,7 +320,7 @@ namespace PInvoke.Test
         [Fact()]
         public void FindOrLoad3()
         {
-            var ns = new NativeStorage();
+            var ns = new BasicSymbolStorage();
             ns.AddConstant(new NativeConstant("c1", "value"));
             NativeSymbolBag bag = new NativeSymbolBag(ns);
 
@@ -333,7 +333,7 @@ namespace PInvoke.Test
         [Fact()]
         public void FindOrLoad4()
         {
-            var ns = new NativeStorage();
+            var ns = new BasicSymbolStorage();
             NativeProcedure p1 = new NativeProcedure("p1");
             p1.Signature.ReturnType = new NativeBuiltinType(BuiltinType.NativeBoolean);
             ns.AddProcedure(p1);
@@ -371,7 +371,7 @@ namespace PInvoke.Test
         [Fact()]
         public void ResolveLoad1()
         {
-            NativeStorage ns = new NativeStorage();
+            var ns = new BasicSymbolStorage();
             ns.AddDefinedType(new NativeStruct("s1"));
 
             NativeSymbolBag bag = new NativeSymbolBag(ns);
@@ -385,7 +385,7 @@ namespace PInvoke.Test
         [Fact()]
         public void ResolveLoad2()
         {
-            NativeStorage ns = new NativeStorage();
+            var ns = new BasicSymbolStorage();
             ns.AddTypeDef(new NativeTypeDef("TEST_INT", BuiltinType.NativeInt32));
 
             NativeStruct s1 = new NativeStruct("s1");
@@ -512,7 +512,7 @@ namespace PInvoke.Test
         [Fact()]
         public void ValueFromStorage1()
         {
-            var ns = new NativeStorage();
+            var ns = new BasicSymbolStorage();
             ns.AddConstant(new NativeConstant("c1", "1"));
             var bag = new NativeSymbolBag(ns);
             bag.AddConstant(new NativeConstant("c2", "5+c1"));
@@ -528,7 +528,7 @@ namespace PInvoke.Test
         [Fact()]
         public void ValueFromStorage2()
         {
-            var ns = new NativeStorage();
+            var ns = new BasicSymbolStorage();
             var bag = new NativeSymbolBag(ns);
 
             NativeEnum ntEnum = new NativeEnum("e1");
@@ -549,7 +549,7 @@ namespace PInvoke.Test
         [Fact()]
         public void ValueFromStorage3()
         {
-            var ns = new NativeStorage();
+            var ns = new BasicSymbolStorage();
             NativeSymbolBag bag = new NativeSymbolBag(ns);
             ns.AddDefinedType(new NativeStruct("s1"));
 

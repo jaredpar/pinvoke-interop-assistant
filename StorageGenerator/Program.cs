@@ -40,9 +40,9 @@ internal static class Program
         }
     }
 
-    private static NativeStorage CreateInitialNativeStorage()
+    private static BasicSymbolStorage CreateInitialBasicSymbolStorage()
     {
-        NativeStorage ns = new NativeStorage();
+        var ns = new BasicSymbolStorage();
 
         // Add in the basic type defs
         ns.AddTypeDef(new NativeTypeDef("SIZE_T", new NativeBuiltinType(BuiltinType.NativeInt32, true)));
@@ -64,17 +64,17 @@ internal static class Program
     /// <param name="ns"></param>
     /// <remarks></remarks>
 
-    private static void VerifyGeneratedStorage(NativeStorage ns)
+    private static void VerifyGeneratedStorage(BasicSymbolStorage ns)
     {
         NativeProcedure proc = null;
-        VerifyTrue(ns.TryFindProcedure("SendMessageA", out proc));
-        VerifyTrue(ns.TryFindProcedure("SendMessageW", out proc));
-        VerifyTrue(ns.TryFindProcedure("GetForegroundWindow", out proc));
-        VerifyTrue(ns.TryFindProcedure("CreateWellKnownSid", out proc));
+        VerifyTrue(ns.TryGetGlobalSymbol("SendMessageA", out proc));
+        VerifyTrue(ns.TryGetGlobalSymbol("SendMessageW", out proc));
+        VerifyTrue(ns.TryGetGlobalSymbol("GetForegroundWindow", out proc));
+        VerifyTrue(ns.TryGetGlobalSymbol("CreateWellKnownSid", out proc));
 
         NativeTypeDef typedef = null;
-        VerifyTrue(ns.TryFindTypeDef("LPCSTR", out typedef));
-        VerifyTrue(ns.TryFindTypeDef("LPWSTR", out typedef));
+        VerifyTrue(ns.TryGetGlobalSymbol("LPCSTR", out typedef));
+        VerifyTrue(ns.TryGetGlobalSymbol("LPWSTR", out typedef));
 
         NativeType defined = null;
         VerifyTrue(ns.TryGetType("WNDPROC", out defined));
@@ -83,8 +83,8 @@ internal static class Program
         VerifyTrue(ns.TryGetType("_SYSTEM_INFO", out defined));
 
         NativeConstant c = null;
-        VerifyTrue(ns.TryFindConstant("WM_PAINT", out c));
-        VerifyTrue(ns.TryFindConstant("WM_LBUTTONDOWN", out c));
+        VerifyTrue(ns.TryGetGlobalSymbol("WM_PAINT", out c));
+        VerifyTrue(ns.TryGetGlobalSymbol("WM_LBUTTONDOWN", out c));
 
     }
 
@@ -96,7 +96,7 @@ internal static class Program
         }
     }
 
-    private static NativeStorage Generate(TextWriter writer)
+    private static BasicSymbolStorage Generate(TextWriter writer)
     {
         NativeCodeAnalyzer analyzer = NativeCodeAnalyzerFactory.Create(OsVersion.WindowsVista);
         analyzer.IncludePathList.AddRange(NativeCodeAnalyzerFactory.GetCommonSdkPaths());
@@ -114,7 +114,7 @@ internal static class Program
         {
             Debug.Fail("Encountered an error during the parse");
         }
-        NativeSymbolBag bag = NativeSymbolBag.CreateFrom(result, CreateInitialNativeStorage(), ep);
+        NativeSymbolBag bag = NativeSymbolBag.CreateFrom(result, CreateInitialBasicSymbolStorage(), ep);
 
         // Resolve with the full dll list
         using (ProcedureFinder finder = new ProcedureFinder(FullDllList))
@@ -130,13 +130,11 @@ internal static class Program
         // GenerateCode(writer, bag)
 
         // Now write out the file
-        var ns = new NativeStorage();
-        ns.CacheLookup = true;
+        var ns = new BasicSymbolStorage();
         bag.SaveToNativeStorage(ns);
-        ns.CacheLookup = false;
-        ns.AcceptChanges();
         VerifyGeneratedStorage(ns);
-        ns.WriteXml("windows.xml");
+
+        // CTODO: need to write to file again otherwise it's just in memory.  
 
         // Copy the file to the various applications
         File.Copy("windows.xml", "..\\..\\..\\ConsoleTool\\bin\\Debug\\windows.xml", true);

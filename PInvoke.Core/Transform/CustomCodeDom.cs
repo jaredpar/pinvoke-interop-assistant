@@ -105,7 +105,7 @@ namespace PInvoke.Transform
 
             using (var writer = new StringWriter())
             {
-                provider.GenerateCodeFromExpression(_expr, writer, new CodeGeneratorOptions());
+                provider.GenerateCodeFromExpression(Expression, writer, new CodeGeneratorOptions());
                 Value = prefix + writer.ToString() + ")";
             }
         }
@@ -149,7 +149,7 @@ namespace PInvoke.Transform
 
             using (var writer = new StringWriter())
             {
-                provider.GenerateCodeFromExpression(_leftExpr, writer, new CodeGeneratorOptions());
+                provider.GenerateCodeFromExpression(Left, writer, new CodeGeneratorOptions());
                 expr += writer.ToString();
                 expr += ")";
             }
@@ -165,7 +165,7 @@ namespace PInvoke.Transform
 
             using (var writer = new StringWriter())
             {
-                provider.GenerateCodeFromExpression(_rightExpr, writer, new CodeGeneratorOptions());
+                provider.GenerateCodeFromExpression(Right, writer, new CodeGeneratorOptions());
                 expr += string.Format("({0})", writer.ToString());
             }
 
@@ -207,7 +207,7 @@ namespace PInvoke.Transform
             CodeDomProvider provider = GetProvider();
             using (var writer = new StringWriter())
             {
-                provider.GenerateCodeFromExpression(_expr, writer, new CodeGeneratorOptions());
+                provider.GenerateCodeFromExpression(Expression, writer, new CodeGeneratorOptions());
                 Value = "-" + writer.ToString();
             }
         }

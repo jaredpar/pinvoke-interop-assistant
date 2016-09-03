@@ -161,7 +161,7 @@ namespace PInvoke.Transform
 
         private void RunPluginUnionMembers(CodeTypeDeclaration ctd)
         {
-            if (TransformKindFlags.UnionMembers != (_kind & TransformKindFlags.UnionMembers))
+            if (TransformKindFlags.UnionMembers != (Kind & TransformKindFlags.UnionMembers))
             {
                 return;
             }
@@ -181,7 +181,7 @@ namespace PInvoke.Transform
 
         private void RunPluginEnumMembers(CodeTypeDeclaration ctd)
         {
-            if (TransformKindFlags.EnumMembers != (_kind & TransformKindFlags.EnumMembers))
+            if (TransformKindFlags.EnumMembers != (Kind & TransformKindFlags.EnumMembers))
             {
                 return;
             }
@@ -191,7 +191,7 @@ namespace PInvoke.Transform
 
         private void ProcessParameters(CodeMemberMethod codeProc)
         {
-            if (TransformKindFlags.Signature != (_kind & TransformKindFlags.Signature))
+            if (TransformKindFlags.Signature != (Kind & TransformKindFlags.Signature))
             {
                 return;
             }
@@ -207,7 +207,7 @@ namespace PInvoke.Transform
 
         private void ProcessReturnType(CodeMemberMethod codeMethod)
         {
-            if (TransformKindFlags.Signature != (_kind & TransformKindFlags.Signature))
+            if (TransformKindFlags.Signature != (Kind & TransformKindFlags.Signature))
             {
                 return;
             }
@@ -223,7 +223,7 @@ namespace PInvoke.Transform
 
         private void ProcessStructMembers(CodeTypeDeclaration ctd, TransformKindFlags kind)
         {
-            if (TransformKindFlags.StructMembers != (_kind & TransformKindFlags.StructMembers))
+            if (TransformKindFlags.StructMembers != (Kind & TransformKindFlags.StructMembers))
             {
                 return;
             }
@@ -239,7 +239,7 @@ namespace PInvoke.Transform
 
         private void ProcessWrapperMethods(CodeTypeDeclaration ctd, CodeMemberMethod codeMethod)
         {
-            if (TransformKindFlags.WrapperMethods != (_kind & TransformKindFlags.WrapperMethods))
+            if (TransformKindFlags.WrapperMethods != (Kind & TransformKindFlags.WrapperMethods))
             {
                 return;
             }

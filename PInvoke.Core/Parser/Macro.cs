@@ -88,7 +88,7 @@ namespace PInvoke.Parser
 
         public Macro(string name)
         {
-            _name = name;
+            Name = name;
         }
 
         public Macro(string name, string val) : this(name, val, false)
@@ -97,9 +97,9 @@ namespace PInvoke.Parser
 
         public Macro(string name, string val, bool permanent)
         {
-            _name = name;
-            _value = val;
-            _isPermanent = permanent;
+            Name = name;
+            Value = val;
+            IsPermanent = permanent;
         }
 
     }

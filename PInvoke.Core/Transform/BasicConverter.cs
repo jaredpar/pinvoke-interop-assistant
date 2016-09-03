@@ -69,8 +69,8 @@ namespace PInvoke.Transform
 
         public BasicConverter(LanguageType type, NativeStorage ns)
         {
-            _ns = ns;
-            _type = type;
+            NativeStorage = ns;
+            LanguageType = type;
         }
 
         public CodeTypeDeclarationCollection ConvertToCodeDom(NativeConstant c, ErrorProvider ep)

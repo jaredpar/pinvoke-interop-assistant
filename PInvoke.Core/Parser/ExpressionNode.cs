@@ -74,7 +74,7 @@ namespace PInvoke.Parser
         public ExpressionNode(ExpressionKind kind, Token value)
         {
             _kind = kind;
-            _token = value;
+            Token = value;
         }
 
         public static ExpressionNode CreateLeaf(bool bValue)

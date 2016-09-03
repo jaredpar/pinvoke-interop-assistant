@@ -554,7 +554,7 @@ namespace PInvoke
         public NativeEnumValue(string name, string value)
         {
             this.Name = name;
-            _value = new NativeValueExpression(value);
+            Value = new NativeValueExpression(value);
         }
 
         public override NativeSymbolKind Kind
@@ -924,7 +924,7 @@ namespace PInvoke
 
         public NativeNamedType(string qualification, string name) : base(name)
         {
-            _qualification = qualification;
+            Qualification = qualification;
         }
 
         public NativeNamedType(string name) : base(name)
@@ -938,7 +938,7 @@ namespace PInvoke
 
         public NativeNamedType(string qualification, string name, bool isConst) : base(name)
         {
-            _qualification = qualification;
+            Qualification = qualification;
             _isConst = isConst;
         }
 
@@ -1161,7 +1161,7 @@ namespace PInvoke
 
         public NativeBuiltinType(BuiltinType bt) : base("")
         {
-            _builtinType = bt;
+            BuiltinType = bt;
             Init();
         }
 
@@ -1173,7 +1173,7 @@ namespace PInvoke
 
         public NativeBuiltinType(string name) : base(name)
         {
-            _builtinType = PInvoke.BuiltinType.NativeUnknown;
+            BuiltinType = PInvoke.BuiltinType.NativeUnknown;
             Init();
         }
 
@@ -1772,7 +1772,7 @@ namespace PInvoke
             }
 
             this.Name = name;
-            _constantKind = kind;
+            ConstantKind = kind;
 
             // We don't support macro methods at this point.  Instead we will just generate out the 
             // method signature for the method and print the string out into the code
@@ -1781,7 +1781,7 @@ namespace PInvoke
                 value = "\"" + value + "\"";
             }
 
-            _value = new NativeValueExpression(value);
+            Value = new NativeValueExpression(value);
         }
 
         public override System.Collections.Generic.IEnumerable<NativeSymbol> GetChildren()

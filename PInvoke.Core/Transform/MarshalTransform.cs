@@ -37,7 +37,7 @@ namespace PInvoke.Transform
         public MarshalTransform(LanguageType lang, NativeSymbolBag bag, TransformKindFlags kind)
         {
             _trans = new CodeTransform(lang, bag);
-            _kind = kind;
+            Kind = kind;
 
             // Method Parameters
             _list.Add(new BooleanTypesTransformPlugin());

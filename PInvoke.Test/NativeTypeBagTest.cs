@@ -63,6 +63,13 @@ namespace PInvoke.Test
         }
 
         [Fact()]
+        public void AddDefinedTypeTest4()
+        {
+            var bag = new NativeSymbolBag();
+            Assert.Throws<ArgumentNullException>(() => bag.AddDefinedType(null));
+        }
+
+        [Fact()]
         public void AddTypeDef1()
         {
             NativeSymbolBag bag = new NativeSymbolBag();
@@ -107,6 +114,13 @@ namespace PInvoke.Test
 
             bag.AddTypedef(td1);
             Assert.Throws<ArgumentException>(() => bag.AddTypedef(td2));
+        }
+
+        [Fact()]
+        public void AddTypeDef4()
+        {
+            var bag = new NativeSymbolBag();
+            Assert.Throws<ArgumentNullException>(() => bag.AddTypedef(null));
         }
 
         [Fact()]
@@ -289,6 +303,13 @@ namespace PInvoke.Test
             bag.AddProcedure(p1);
             bag.AddTypedef(new NativeTypeDef("foo", new NativeBuiltinType(BuiltinType.NativeFloat)));
             Assert.True(bag.TryResolveSymbolsAndValues());
+        }
+
+        [Fact()]
+        public void Proc7()
+        {
+            var bag = new NativeSymbolBag();
+            Assert.Throws<ArgumentNullException>(() => bag.AddProcedure(null));
         }
 
         [Fact()]

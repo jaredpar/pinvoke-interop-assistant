@@ -671,7 +671,7 @@ namespace PInvoke.Parser
 
             try
             {
-                // CTODO: Possible make this a function of Number
+                // TODO: Possible make this a function of Number
                 retChar = Convert.ToChar(Convert.ToInt32(number.Value));
                 return true;
             }

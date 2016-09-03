@@ -133,7 +133,7 @@ namespace PInvoke.Primitive
             {
                 case NativeSymbolKind.BuiltinType:
                     {
-                        // CTODO: shoud cache builtins
+                        // TODO: shoud cache builtins
                         var id = GetNextSimpleId();
                         var b = (NativeBuiltinType)nt;
                         _writer.Write(new PrimitiveTypeData(id, nt.Kind, builtinType: b.BuiltinType));

@@ -145,7 +145,7 @@ namespace PInvoke.Test
         public void BasicScan8()
         {
             Scanner scanner = CreateScanner("typedef");
-            VerifyNext(scanner, TokenType.TypedefKeyword, "typedef");
+            VerifyNext(scanner, TokenType.TypeDefKeyword, "typedef");
         }
 
         [Fact()]

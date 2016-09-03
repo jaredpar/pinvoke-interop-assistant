@@ -59,7 +59,7 @@ namespace PInvoke.Parser
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public List<NativeTypeDef> NativeTypedefs
+        public List<NativeTypeDef> NativeTypeDefs
         {
             get { return _typedefList; }
         }
@@ -312,7 +312,7 @@ namespace PInvoke.Parser
                         token = _scanner.PeekNextToken();
                     }
 
-                    if (token.TokenType == TokenType.TypedefKeyword)
+                    if (token.TokenType == TokenType.TypeDefKeyword)
                     {
                         ProcessTypeDef();
                     }
@@ -403,7 +403,7 @@ namespace PInvoke.Parser
 
             // Chew through the typedef token if it hasn't been consumed
             Token token = _scanner.PeekNextToken();
-            if (token.TokenType == TokenType.TypedefKeyword)
+            if (token.TokenType == TokenType.TypeDefKeyword)
             {
                 _scanner.GetNextToken();
             }
@@ -439,7 +439,7 @@ namespace PInvoke.Parser
             }
 
             // Now just process the post members
-            return this.ProcessTypePostTypedefs(source);
+            return this.ProcessTypePostTypeDefs(source);
         }
 
         private NativeStruct ProcessClass()
@@ -549,7 +549,7 @@ namespace PInvoke.Parser
             // after the struct definition
             if (!isInline)
             {
-                ProcessTypePostTypedefs(ntStruct);
+                ProcessTypePostTypeDefs(ntStruct);
             }
 
             return ntStruct;
@@ -607,7 +607,7 @@ namespace PInvoke.Parser
             // If this is not an inline type then process the post type defs
             if (!isInline)
             {
-                ProcessTypePostTypedefs(ntUnion);
+                ProcessTypePostTypeDefs(ntUnion);
             }
 
             return ntUnion;
@@ -667,7 +667,7 @@ namespace PInvoke.Parser
             // If this isnot' an inline type then process the post type defs
             if (!isInline)
             {
-                ProcessTypePostTypedefs(ntEnum);
+                ProcessTypePostTypeDefs(ntEnum);
             }
 
             return ntEnum;
@@ -1101,7 +1101,7 @@ namespace PInvoke.Parser
         /// struct
         /// </summary>
         /// <remarks></remarks>
-        private List<NativeTypeDef> ProcessTypePostTypedefs(NativeType originalNt)
+        private List<NativeTypeDef> ProcessTypePostTypeDefs(NativeType originalNt)
         {
             bool done = false;
             List<NativeTypeDef> list = new List<NativeTypeDef>();
@@ -1697,7 +1697,7 @@ namespace PInvoke.Parser
         {
             ThrowIfNull(typeDef);
 
-            _result.NativeTypedefs.Add(typeDef);
+            _result.NativeTypeDefs.Add(typeDef);
             _result.ParsedTypes.Add(typeDef);
         }
 

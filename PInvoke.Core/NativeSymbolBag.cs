@@ -28,9 +28,7 @@ namespace PInvoke
         }
 
         private readonly BasicSymbolStorage _storage;
-
-        // TODO: make this readonly
-        private INativeSymbolLookup _nextSymbolLookup;
+        private readonly INativeSymbolLookup _nextSymbolLookup;
 
         public static INativeSymbolLookup EmptyLookup => EmptyNativeSymbolBag.Instance;
 
@@ -41,15 +39,7 @@ namespace PInvoke
         public IEnumerable<NativeProcedure> NativeProcedures => _storage.NativeProcedures;
         public IEnumerable<NativeConstant> NativeConstants => _storage.NativeConstants;
         public BasicSymbolStorage Storage => _storage;
-
-        /// <summary>
-        /// Backing INativeSymbolBag for this bag.  Used to resolve NativeNamedType instances
-        /// </summary>
-        public INativeSymbolLookup NextSymbolLookup
-        {
-            get { return _nextSymbolLookup; }
-            set { _nextSymbolLookup = value; }
-        }
+        public INativeSymbolLookup NextSymbolLookup => _nextSymbolLookup;
 
         public NativeSymbolBag(INativeSymbolLookup nextSymbolBag = null)
         {
@@ -81,7 +71,7 @@ namespace PInvoke
                 list.Add(definedNt);
             }
 
-            foreach (NativeTypeDef typedef in FindResolvedTypedefs())
+            foreach (NativeTypeDef typedef in FindResolvedTypeDefs())
             {
                 list.Add(typedef);
             }
@@ -293,7 +283,7 @@ namespace PInvoke
                 nativeStorage.AddDefinedType(definedNt);
             }
 
-            foreach (NativeTypeDef typeDef in this.FindResolvedTypedefs())
+            foreach (NativeTypeDef typeDef in this.FindResolvedTypeDefs())
             {
                 nativeStorage.AddTypeDef(typeDef);
             }
@@ -326,7 +316,7 @@ namespace PInvoke
         /// <summary>
         /// Find all of the resolved typedefs
         /// </summary>
-        public IEnumerable<NativeTypeDef> FindResolvedTypedefs()
+        public IEnumerable<NativeTypeDef> FindResolvedTypeDefs()
         {
             var map = new Dictionary<NativeSymbol, bool?>();
             var list = new List<NativeTypeDef>();

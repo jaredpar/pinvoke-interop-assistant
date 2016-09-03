@@ -482,7 +482,7 @@ namespace PInvoke.Transform
         {
             ThrowIfNull(nt);
 
-            nt = nt.DigThroughTypedefAndNamedTypes();
+            nt = nt.DigThroughTypeDefAndNamedTypes();
 
             if (nt != null && nt.Kind == NativeSymbolKind.BitVectorType)
             {
@@ -784,7 +784,7 @@ namespace PInvoke.Transform
                     comment += proxyNt.DisplayName;
                     NativePointer pointerNt = (NativePointer)proxyNt;
                     return new CodeTypeReference(typeof(IntPtr));
-                case NativeSymbolKind.TypedefType:
+                case NativeSymbolKind.TypeDefType:
                     NativeTypeDef td = (NativeTypeDef)proxyNt;
                     comment += td.Name + "->";
                     return GenerateTypeReferenceImpl(td.RealType, ref comment);

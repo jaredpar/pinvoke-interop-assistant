@@ -40,7 +40,7 @@ namespace PInvoke.Primitive
                     return ImportFunctionPointer(id);
                 case NativeSymbolKind.Procedure:
                     return ImportProcedure(id);
-                case NativeSymbolKind.TypedefType:
+                case NativeSymbolKind.TypeDefType:
                     return ImportTypeDef(id);
                 case NativeSymbolKind.Constant:
                     return ImportConstant(id);

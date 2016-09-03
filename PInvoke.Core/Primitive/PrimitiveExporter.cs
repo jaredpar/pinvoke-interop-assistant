@@ -67,7 +67,7 @@ namespace PInvoke.Primitive
                 case NativeSymbolKind.FunctionPointer:
                     DoExportFunctionPointer((NativeFunctionPointer)symbol);
                     break;
-                case NativeSymbolKind.TypedefType:
+                case NativeSymbolKind.TypeDefType:
                     DoExportTypeDef((NativeTypeDef)symbol);
                     break;
                 case NativeSymbolKind.Procedure:

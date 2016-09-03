@@ -38,7 +38,7 @@ namespace PInvoke
         ArrayType,
         PointerType,
         BuiltinType,
-        TypedefType,
+        TypeDefType,
         BitVectorType,
         NamedType,
         Procedure,
@@ -283,7 +283,7 @@ namespace PInvoke
         /// </summary>
         /// <returns></returns>
         /// <remarks></remarks>
-        public NativeType DigThroughTypedefAndNamedTypes()
+        public NativeType DigThroughTypeDefAndNamedTypes()
         {
 
             NativeType cur = this;
@@ -293,7 +293,7 @@ namespace PInvoke
                 {
                     cur = ((NativeNamedType)cur).RealType;
                 }
-                else if (cur.Kind == NativeSymbolKind.TypedefType)
+                else if (cur.Kind == NativeSymbolKind.TypeDefType)
                 {
                     cur = ((NativeTypeDef)cur).RealType;
                 }
@@ -306,7 +306,7 @@ namespace PInvoke
             return cur;
         }
 
-        public NativeType DigThroughTypedefAndNamedTypesFor(string search)
+        public NativeType DigThroughTypeDefAndNamedTypesFor(string search)
         {
             if (0 == string.CompareOrdinal(search, this.Name))
             {
@@ -320,7 +320,7 @@ namespace PInvoke
                 {
                     cur = ((NativeNamedType)cur).RealType;
                 }
-                else if (cur.Kind == NativeSymbolKind.TypedefType)
+                else if (cur.Kind == NativeSymbolKind.TypeDefType)
                 {
                     cur = ((NativeTypeDef)cur).RealType;
                 }
@@ -669,7 +669,7 @@ namespace PInvoke
             {
                 if (_realType != null)
                 {
-                    return _realType.DigThroughTypedefAndNamedTypes();
+                    return _realType.DigThroughTypeDefAndNamedTypes();
                 }
 
                 return _realType;
@@ -941,7 +941,7 @@ namespace PInvoke
     [DebuggerDisplay("{FullName} -> {RealTypeFullname}")]
     public class NativeTypeDef : NativeProxyType
     {
-        public override NativeSymbolKind Kind => NativeSymbolKind.TypedefType;
+        public override NativeSymbolKind Kind => NativeSymbolKind.TypeDefType;
 
         public NativeName NativeName => new NativeName(Name, NativeNameKind.TypeDef);
 
@@ -1513,7 +1513,7 @@ namespace PInvoke
             {
                 if (NativeType != null)
                 {
-                    return NativeType.DigThroughTypedefAndNamedTypes();
+                    return NativeType.DigThroughTypeDefAndNamedTypes();
                 }
 
                 return null;
@@ -1616,7 +1616,7 @@ namespace PInvoke
             {
                 if (NativeType != null)
                 {
-                    return NativeType.DigThroughTypedefAndNamedTypes();
+                    return NativeType.DigThroughTypeDefAndNamedTypes();
                 }
 
                 return null;

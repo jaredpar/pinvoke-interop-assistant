@@ -46,7 +46,7 @@ namespace PInvoke.Transform
                 NativeDefinedType definedNt = GetDefined(ctd);
                 if (IsBadName(ctd.Name))
                 {
-                    foreach (NativeTypeDef possible in FindTypedefsTargeting(definedNt))
+                    foreach (NativeTypeDef possible in FindTypeDefsTargeting(definedNt))
                     {
                         if (!IsBadName(possible.Name))
                         {
@@ -170,12 +170,12 @@ namespace PInvoke.Transform
         /// <param name="target"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        private List<NativeTypeDef> FindTypedefsTargeting(NativeType target)
+        private List<NativeTypeDef> FindTypeDefsTargeting(NativeType target)
         {
             // Build the cache
             if (_resolvedTypeDefList == null)
             {
-                _resolvedTypeDefList = new List<NativeTypeDef>(_bag.FindResolvedTypedefs());
+                _resolvedTypeDefList = new List<NativeTypeDef>(_bag.FindResolvedTypeDefs());
             }
 
             List<NativeTypeDef> list = new List<NativeTypeDef>();

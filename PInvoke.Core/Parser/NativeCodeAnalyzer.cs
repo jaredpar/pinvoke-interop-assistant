@@ -353,7 +353,7 @@ namespace PInvoke.Parser
 
             // Add in all of the parsed out types
             result.NativeDefinedTypes.AddRange(parseResult.NativeDefinedTypes);
-            result.NativeTypeDefs.AddRange(parseResult.NativeTypedefs);
+            result.NativeTypeDefs.AddRange(parseResult.NativeTypeDefs);
             result.NativeProcedures.AddRange(parseResult.NativeProcedures);
         }
 

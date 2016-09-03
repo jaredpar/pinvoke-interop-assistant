@@ -87,7 +87,7 @@ namespace PInvoke.Parser
         UnionKeyword,
         EnumKeyword,
         ClassKeyword,
-        TypedefKeyword,
+        TypeDefKeyword,
         InlineKeyword,
         VolatileKeyword,
         ClrCallKeyword,
@@ -276,7 +276,7 @@ namespace PInvoke.Parser
             Dictionary<string, TokenType> keywordMap = new Dictionary<string, TokenType>(StringComparer.Ordinal);
             keywordMap["struct"] = TokenType.StructKeyword;
             keywordMap["union"] = TokenType.UnionKeyword;
-            keywordMap["typedef"] = TokenType.TypedefKeyword;
+            keywordMap["typedef"] = TokenType.TypeDefKeyword;
             keywordMap["enum"] = TokenType.EnumKeyword;
             keywordMap["class"] = TokenType.ClassKeyword;
             keywordMap["__declspec"] = TokenType.DeclSpec;

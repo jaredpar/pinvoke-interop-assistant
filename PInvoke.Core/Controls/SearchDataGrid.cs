@@ -141,7 +141,7 @@ namespace PInvoke.Controls
                                 case NativeSymbolKind.Procedure:
                                     bag.AddProcedure((NativeProcedure)cur);
                                     break;
-                                case NativeSymbolKind.TypedefType:
+                                case NativeSymbolKind.TypeDefType:
                                     bag.AddTypeDef((NativeTypeDef)cur);
                                     break;
                                 default:

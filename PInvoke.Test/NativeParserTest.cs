@@ -490,49 +490,49 @@ namespace PInvoke.Test
         public void Typedef4()
         {
             ParseResult result = ParseFile("SampleFiles\\TypeDef4.txt");
-            Assert.Equal("foo1(int)", SymbolPrinter.Convert(result.NativeTypedefs[0]));
-            Assert.Equal("foo2(*(int))", SymbolPrinter.Convert(result.NativeTypedefs[1]));
-            Assert.Equal("LPWSTR(*(wchar))", SymbolPrinter.Convert(result.NativeTypedefs[2]));
-            Assert.Equal("FOO(*(wchar))", SymbolPrinter.Convert(result.NativeTypedefs[3]));
+            Assert.Equal("foo1(int)", SymbolPrinter.Convert(result.NativeTypeDefs[0]));
+            Assert.Equal("foo2(*(int))", SymbolPrinter.Convert(result.NativeTypeDefs[1]));
+            Assert.Equal("LPWSTR(*(wchar))", SymbolPrinter.Convert(result.NativeTypeDefs[2]));
+            Assert.Equal("FOO(*(wchar))", SymbolPrinter.Convert(result.NativeTypeDefs[3]));
         }
 
         [Fact()]
         public void Typedef5()
         {
             ParseResult result = ParseFile("SampleFiles\\TypeDef5.txt");
-            Assert.Equal("CINT(int(int))", SymbolPrinter.Convert(result.NativeTypedefs[0]));
-            Assert.Equal("LPCSTR(*(WCHAR))", SymbolPrinter.Convert(result.NativeTypedefs[1]));
+            Assert.Equal("CINT(int(int))", SymbolPrinter.Convert(result.NativeTypeDefs[0]));
+            Assert.Equal("LPCSTR(*(WCHAR))", SymbolPrinter.Convert(result.NativeTypeDefs[1]));
         }
 
         [Fact()]
         public void Typedef6()
         {
             ParseResult result = ParseFile("SampleFiles\\TypeDef6.txt");
-            Assert.Equal("intarray([](int))", SymbolPrinter.Convert(result.NativeTypedefs[0]));
-            Assert.Equal("chararray([](char))", SymbolPrinter.Convert(result.NativeTypedefs[1]));
+            Assert.Equal("intarray([](int))", SymbolPrinter.Convert(result.NativeTypeDefs[0]));
+            Assert.Equal("chararray([](char))", SymbolPrinter.Convert(result.NativeTypeDefs[1]));
         }
 
         [Fact()]
         public void Typedef7()
         {
             ParseResult result = ParseFile("SampleFiles\\TypeDef7.txt");
-            Assert.Equal("s1(_s1(m1(int)))", SymbolPrinter.Convert(result.NativeTypedefs[0]));
+            Assert.Equal("s1(_s1(m1(int)))", SymbolPrinter.Convert(result.NativeTypeDefs[0]));
         }
 
         [Fact()]
         public void Typedef8()
         {
             ParseResult result = ParseFile("SampleFiles\\TypeDef8.txt");
-            Assert.Equal("f1(f1(Sig(int)(Sal)))", SymbolPrinter.Convert(result.NativeTypedefs[0]));
-            Assert.Equal("f2(f2(Sig(*(int))(Sal)(param1(int)(Sal))))", SymbolPrinter.Convert(result.NativeTypedefs[1]));
+            Assert.Equal("f1(f1(Sig(int)(Sal)))", SymbolPrinter.Convert(result.NativeTypeDefs[0]));
+            Assert.Equal("f2(f2(Sig(*(int))(Sal)(param1(int)(Sal))))", SymbolPrinter.Convert(result.NativeTypeDefs[1]));
         }
 
         [Fact()]
         public void Typedef9()
         {
             ParseResult result = ParseFile("SampleFiles\\TypeDef9.txt");
-            Assert.Equal("td1(char)", SymbolPrinter.Convert(result.NativeTypedefs[0]));
-            Assert.Equal("td2(char)", SymbolPrinter.Convert(result.NativeTypedefs[1]));
+            Assert.Equal("td1(char)", SymbolPrinter.Convert(result.NativeTypeDefs[0]));
+            Assert.Equal("td2(char)", SymbolPrinter.Convert(result.NativeTypeDefs[1]));
         }
 
         [Fact()]

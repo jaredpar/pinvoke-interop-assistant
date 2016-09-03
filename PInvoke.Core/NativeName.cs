@@ -28,7 +28,7 @@ namespace PInvoke
                 case NativeNameKind.Union: return NativeSymbolKind.UnionType;
                 case NativeNameKind.FunctionPointer: return NativeSymbolKind.FunctionPointer;
                 case NativeNameKind.Procedure: return NativeSymbolKind.Procedure;
-                case NativeNameKind.TypeDef: return NativeSymbolKind.TypedefType;
+                case NativeNameKind.TypeDef: return NativeSymbolKind.TypeDefType;
                 case NativeNameKind.Constant: return NativeSymbolKind.Constant;
                 case NativeNameKind.Enum: return NativeSymbolKind.EnumType;
                 case NativeNameKind.EnumValue: return NativeSymbolKind.EnumNameValue;
@@ -49,7 +49,7 @@ namespace PInvoke
                 case NativeSymbolKind.UnionType:
                     nameKind = NativeNameKind.Union;
                     return true;
-                case NativeSymbolKind.TypedefType:
+                case NativeSymbolKind.TypeDefType:
                     nameKind = NativeNameKind.TypeDef;
                     return true;
                 case NativeSymbolKind.Procedure:

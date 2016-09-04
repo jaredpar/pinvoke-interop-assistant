@@ -12,11 +12,9 @@ namespace PInvoke
     /// </summary>
     public interface INativeSymbolImporter
     {
+        IEnumerable<NativeName> Names { get; }
+
         bool TryImport(string name, out NativeGlobalSymbol symbol);
         bool TryImport(NativeName name, out NativeGlobalSymbol symbol);
-
-        // TODO: No way to guarantee enumeration has value as a reference in Values.  Perhaps just return
-        // enumeration here and let the caller dig in for the value.
-        bool TryImportEnumValue(string name, out NativeEnum enumeration, out NativeEnumValue value);
     }
 }

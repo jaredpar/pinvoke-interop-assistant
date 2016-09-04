@@ -45,6 +45,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BasicSymbolStorage.cs" />
+    <Compile Include="StorageUtil.Csv.cs" />
+    <Compile Include="StorageUtil.cs" />
+    <Compile Include="StorageUtil.Binary.cs" />
     <Compile Include="CachingSymbolLookup.cs" />
     <Compile Include="Contract.cs" />
     <Compile Include="Controls\CodeBox.Designer.cs">
@@ -90,9 +93,11 @@
     <Compile Include="INativeSymbolLookup.cs" />
     <Compile Include="NativeGlobalSymbol.cs" />
     <Compile Include="NativeName.cs" />
-    <Compile Include="Primitive\BinaryPrimitiveStorage.Reader.cs" />
-    <Compile Include="Primitive\BinaryPrimitiveStorage.Writer.cs" />
-    <Compile Include="Primitive\BinaryPrimitiveStorage.cs" />
+    <Compile Include="Primitive\Bulk\BulkUtil.Writer.cs" />
+    <Compile Include="Primitive\Bulk\BulkUtil.Reader.cs" />
+    <Compile Include="Primitive\Bulk\BulkUtil.cs" />
+    <Compile Include="Primitive\Bulk\IBulkReader.cs" />
+    <Compile Include="Primitive\Bulk\IBulkWriter.cs" />
     <Compile Include="Primitive\IPrimitiveReader.cs" />
     <Compile Include="Primitive\IPrimitiveWriter.cs" />
     <Compile Include="Primitive\PrimitiveEnumValueData.cs" />

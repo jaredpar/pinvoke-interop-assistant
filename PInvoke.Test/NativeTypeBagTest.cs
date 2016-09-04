@@ -462,8 +462,8 @@ namespace PInvoke.Test
         {
             NativeSymbolBag bag = new NativeSymbolBag();
             NativeEnum ntEnum = new NativeEnum("Enum1");
-            ntEnum.Values.Add(new NativeEnumValue("v1", "1"));
-            ntEnum.Values.Add(new NativeEnumValue("v2", "v1+1"));
+            ntEnum.AddValue("v1", "1");
+            ntEnum.AddValue("v2", "v1+1");
             bag.AddDefinedType(ntEnum);
             Assert.Equal(1, bag.FindUnresolvedNativeValues().Count);
             Assert.True(bag.TryResolveSymbolsAndValues());
@@ -531,7 +531,7 @@ namespace PInvoke.Test
             var bag = new NativeSymbolBag(ns);
 
             NativeEnum ntEnum = new NativeEnum("e1");
-            ntEnum.Values.Add(new NativeEnumValue("v1", "5"));
+            ntEnum.AddValue("v1", "5");
             bag.AddDefinedType(ntEnum);
 
             NativeConstant ntConst1 = new NativeConstant("c1", "5+v1");

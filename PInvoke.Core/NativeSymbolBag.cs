@@ -7,6 +7,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using static PInvoke.Contract;
+using PInvoke.Parser;
 
 namespace PInvoke
 {
@@ -38,6 +39,8 @@ namespace PInvoke
         public IEnumerable<NativeTypeDef> NativeTypeDefs => _storage.NativeTypeDefs;
         public IEnumerable<NativeProcedure> NativeProcedures => _storage.NativeProcedures;
         public IEnumerable<NativeConstant> NativeConstants => _storage.NativeConstants;
+        public IEnumerable<NativeEnumValue> NativeEnumValues => _storage.NativeEnumValues;
+
         public BasicSymbolStorage Storage => _storage;
         public INativeSymbolLookup NextSymbolLookup => _nextSymbolLookup;
 
@@ -582,64 +585,21 @@ namespace PInvoke
 
         /// <summary>
         /// Create a NativeTypeBag from the result of a code analysis
-        /// TODO: review
         /// </summary>
-        public static NativeSymbolBag CreateFrom(Parser.NativeCodeAnalyzerResult result, INativeSymbolLookup nextSymbolBag, ErrorProvider ep)
+        public static NativeSymbolBag CreateFrom(NativeCodeAnalyzerResult result, INativeSymbolLookup nextSymbolBag, ErrorProvider ep)
         {
-            if (ep == null)
-            {
-                throw new ArgumentNullException("ep");
-            }
-
-            NativeSymbolBag bag = new NativeSymbolBag(nextSymbolBag);
-            foreach (NativeConstant nConst in result.AllNativeConstants)
+            var bag = new NativeSymbolBag(nextSymbolBag);
+            foreach (var symbol in result.Symbols)
             {
                 try
                 {
-                    bag.AddConstant(nConst);
+                    bag.Add(symbol);
                 }
                 catch
                 {
-                    ep.AddError("Duplicate NativeConstant Name: {0}", nConst.Name);
+                    ep.AddError($"Error adding symbol {symbol.Name.Name}");
                 }
             }
-
-            foreach (NativeDefinedType definedNt in result.NativeDefinedTypes)
-            {
-                try
-                {
-                    bag.AddDefinedType(definedNt);
-                }
-                catch
-                {
-                    ep.AddError("Duplicate NativeDefinedType Name: {0}", definedNt.Name);
-                }
-            }
-
-            foreach (NativeTypeDef typedefNt in result.NativeTypeDefs)
-            {
-                try
-                {
-                    bag.AddTypeDef(typedefNt);
-                }
-                catch
-                {
-                    ep.AddError("Duplicate NativeTypeDef Name: {0}", typedefNt.Name);
-                }
-            }
-
-            foreach (NativeProcedure proc in result.NativeProcedures)
-            {
-                try
-                {
-                    bag.AddProcedure(proc);
-                }
-                catch (Exception)
-                {
-                    ep.AddError("Duplicate NativeProcedure Name: {0}", proc.Name);
-                }
-            }
-
             return bag;
         }
     }

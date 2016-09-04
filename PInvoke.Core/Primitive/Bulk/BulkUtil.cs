@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PInvoke.Primitive
+namespace PInvoke.Primitive.Bulk
 {
-    public static partial class BinaryPrimitiveStorage
+    public static partial class BulkUtil
     {
         private enum ItemKind
         {
@@ -24,17 +23,15 @@ namespace PInvoke.Primitive
             SymbolId
         }
 
-        public static IPrimitiveWriter CreateWriter(Stream stream)
+        public static BasicPrimitiveStorage Read(IBulkReader bulkReader)
         {
-            return new Writer(new BinaryWriter(stream));
+            var reader = new Reader(bulkReader);
+            return reader.Read();
         }
 
-        public static IPrimitiveReader CreateReader(Stream stream)
+        public static IPrimitiveWriter CreateWriter(IBulkWriter bulkWriter)
         {
-            var storage = new BasicPrimitiveStorage();
-            var reader = new Reader(new BinaryReader(stream), storage);
-            reader.Go();
-            return storage;
+            return new Writer(bulkWriter);
         }
     }
 }

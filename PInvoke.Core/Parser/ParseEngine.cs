@@ -17,75 +17,27 @@ namespace PInvoke.Parser
     /// Result of a parse operation
     /// </summary>
     /// <remarks></remarks>
-    public class ParseResult
+    public sealed class ParseResult
     {
-        private ErrorProvider _errorProvider = new ErrorProvider();
-        private NativeSymbolBag _bag = new NativeSymbolBag();
-        private List<NativeDefinedType> _definedList = new List<NativeDefinedType>();
-        private List<NativeTypeDef> _typedefList = new List<NativeTypeDef>();
-        private List<NativeProcedure> _procList = new List<NativeProcedure>();
-
-        private List<NativeType> _parsedList = new List<NativeType>();
-
-        public ParseResult()
-        {
-        }
-
         /// <summary>
         /// Contains error and warning information from the Parse
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public ErrorProvider ErrorProvider
-        {
-            get { return _errorProvider; }
-        }
+        public ErrorProvider ErrorProvider { get; } = new ErrorProvider();
 
-        /// <summary>
-        /// List of NativeDefinedTypes encountered during the parse
-        /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public List<NativeDefinedType> NativeDefinedTypes
-        {
-            get { return _definedList; }
-        }
+        public List<NativeDefinedType> NativeDefinedTypes { get; } = new List<NativeDefinedType>();
 
-        /// <summary>
-        /// List of NativeTypedef instances encounterd during the parse
-        /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public List<NativeTypeDef> NativeTypeDefs
-        {
-            get { return _typedefList; }
-        }
+        public List<NativeProcedure> NativeProcedures { get; } = new List<NativeProcedure>();
 
-        /// <summary>
-        /// List of NativeProcedure instances encountered during the parse
-        /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public List<NativeProcedure> NativeProcedures
-        {
-            get { return _procList; }
-        }
+        public List<NativeTypeDef> NativeTypeDefs { get; } = new List<NativeTypeDef>();
 
-        /// <summary>
-        /// Flat list of types parsed out of the file
-        /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public List<NativeType> ParsedTypes
-        {
-            get { return _parsedList; }
-        }
+        public List<NativeEnumValue> NativeEnumValues { get; } = new List<NativeEnumValue>();
 
+        public List<NativeType> ParsedTypes { get; } = new List<NativeType>();
+
+        public ParseResult()
+        {
+
+        }
     }
 
     public class ParseException : Exception
@@ -652,17 +604,19 @@ namespace PInvoke.Parser
             // Get the open brace
             _scanner.GetNextToken(TokenType.BraceOpen);
 
-            List<NativeEnumValue> list = ProcessEnumValues();
+            var ntEnum = new NativeEnum(name);
+            ntEnum.IsAnonymous = isInline;
+            ProcessParsedDefinedType(ntEnum);
+
+            List<NativeEnumValue> list = ProcessEnumValues(ntEnum.Name);
+            foreach (var item in list)
+            {
+                _result.NativeEnumValues.Add(item);
+                ntEnum.Values.Add(item);
+            }
 
             // Get the close brace
             _scanner.GetNextToken(TokenType.BraceClose);
-
-            // Create the enumeration
-            NativeEnum ntEnum = new NativeEnum();
-            ntEnum.Name = name;
-            ntEnum.IsAnonymous = isInline;
-            ntEnum.Values.AddRange(list);
-            ProcessParsedDefinedType(ntEnum);
 
             // If this isnot' an inline type then process the post type defs
             if (!isInline)
@@ -678,7 +632,7 @@ namespace PInvoke.Parser
         /// </summary>
         /// <returns></returns>
         /// <remarks></remarks>
-        private List<NativeEnumValue> ProcessEnumValues()
+        private List<NativeEnumValue> ProcessEnumValues(string enumName)
         {
             List<NativeEnumValue> list = new List<NativeEnumValue>();
 
@@ -698,10 +652,10 @@ namespace PInvoke.Parser
                 {
                     case TokenType.Comma:
                         _scanner.GetNextToken();
-                        list.Add(new NativeEnumValue(nameToken.Value));
+                        list.Add(new NativeEnumValue(enumName, nameToken.Value));
                         break;
                     case TokenType.BraceClose:
-                        list.Add(new NativeEnumValue(nameToken.Value));
+                        list.Add(new NativeEnumValue(enumName, nameToken.Value));
                         break;
                     case TokenType.OpAssign:
                         _scanner.GetNextToken();
@@ -710,7 +664,7 @@ namespace PInvoke.Parser
                         {
                             _scanner.GetNextToken();
                         }
-                        list.Add(new NativeEnumValue(nameToken.Value, value));
+                        list.Add(new NativeEnumValue(enumName: enumName, valueName: nameToken.Value, value: value));
                         break;
                     default:
                         _scanner.AddWarning("Unexpected token while processing enum values: {0}", token.TokenType);

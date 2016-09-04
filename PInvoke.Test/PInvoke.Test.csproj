@@ -58,6 +58,7 @@
     <Compile Include="ExpressionEvaluatorTest.cs" />
     <Compile Include="ExpressionParserTest.cs" />
     <Compile Include="ExpressionValueTest.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="Generated.cs" />
     <Compile Include="MacroTest.cs" />
     <Compile Include="MarshalTransformTest.cs" />

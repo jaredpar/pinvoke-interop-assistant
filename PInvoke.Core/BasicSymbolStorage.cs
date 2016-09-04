@@ -25,6 +25,7 @@ namespace PInvoke
         public IEnumerable<NativeProcedure> NativeProcedures => _procMap.Values;
         public IEnumerable<NativeConstant> NativeConstants => _constMap.Values;
         public IEnumerable<NativeEnum> NativeEnums => _definedMap.Values.Where(x => x.Kind == NativeSymbolKind.EnumType).Cast<NativeEnum>();
+        public IEnumerable<NativeEnumValue> NativeEnumValues => _enumValueMap.Values;
         public IEnumerable<NativeName> NativeNames => NativeNameUtil.GetNames(_constMap.Values, _definedMap.Values, _typeDefMap.Values, _procMap.Values, _enumValueMap.Values);
 
         public void Add(NativeGlobalSymbol globalSymbol)
@@ -36,6 +37,7 @@ namespace PInvoke
                 case NativeNameKind.Struct:
                 case NativeNameKind.Union:
                 case NativeNameKind.FunctionPointer:
+                case NativeNameKind.Enum:
                     _definedMap.Add(name.Name, (NativeDefinedType)symbol);
                     break;
                 case NativeNameKind.Procedure:
@@ -46,18 +48,6 @@ namespace PInvoke
                     break;
                 case NativeNameKind.Constant:
                     _constMap.Add(name.Name, (NativeConstant)symbol);
-                    break;
-                case NativeNameKind.Enum:
-                    {
-                        var e = (NativeEnum)symbol;
-                        _definedMap.Add(e.Name, e);
-
-                        // TODO: this nesting feels wrong.
-                        foreach (NativeEnumValue value in e.Values)
-                        {
-                            _enumValueMap.Add(value.Name, value);
-                        }
-                    }
                     break;
                 case NativeNameKind.EnumValue:
                     _enumValueMap.Add(name.Name, (NativeEnumValue)symbol);

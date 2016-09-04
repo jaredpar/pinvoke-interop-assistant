@@ -11,28 +11,36 @@ namespace PInvoke.Test
 {
     public abstract class PrimitiveRoundTripTests
     {
-        protected abstract IPrimitiveWriter CreateWriter();
+        protected abstract void Write(INativeSymbolLookup lookup);
 
         protected abstract IPrimitiveReader CreateReader();
 
         private void TestRoundTrip(NativeSymbol symbol)
         {
-            var exporter = new PrimitiveExporter(CreateWriter());
-            exporter.Export(symbol);
-            var importer = new PrimitiveImporter(CreateReader());
-            NativeSymbol other;
-            Assert.True(importer.TryImport(symbol.Name, out other));
-            Assert.Equal(SymbolPrinter.Convert(symbol), SymbolPrinter.Convert(other));
+            var storage = new BasicSymbolStorage();
+            var name = NativeNameUtil.GetName(symbol);
+            var globalSymbol = new NativeGlobalSymbol(name, symbol);
+            storage.Add(globalSymbol);
+            TestRoundTrip(storage);
         }
 
-        private void TestRoundTrip(NativeProcedure p)
+        private void TestRoundTrip(INativeSymbolLookup lookup)
         {
-            var exporter = new PrimitiveExporter(CreateWriter());
-            exporter.Export(p);
+            Write(lookup);
             var importer = new PrimitiveImporter(CreateReader());
-            NativeProcedure other;
-            Assert.True(importer.TryImport(p.Name, out other));
-            Assert.Equal(SymbolPrinter.Convert(p), SymbolPrinter.Convert(other));
+            foreach (var name in lookup.NativeNames)
+            {
+                var symbol = lookup.GetGlobalSymbol(name);
+                NativeGlobalSymbol other;
+
+                if (!importer.TryImport(name, out other))
+                {
+
+                }
+
+                Assert.True(importer.TryImport(name, out other));
+                Assert.Equal(SymbolPrinter.Convert(symbol.Symbol), SymbolPrinter.Convert(other.Symbol));
+            }
         }
 
         public sealed class BasicPrimitiveStorageTests : PrimitiveRoundTripTests
@@ -41,7 +49,20 @@ namespace PInvoke.Test
 
             protected override IPrimitiveReader CreateReader() => _storage;
 
-            protected override IPrimitiveWriter CreateWriter() => _storage;
+            protected override void Write(INativeSymbolLookup lookup)
+            {
+                var exporter = new PrimitiveExporter(_storage);
+                foreach (var name in lookup.NativeNames)
+                {
+                    if (name.Kind == NativeNameKind.EnumValue)
+                    {
+                        continue;
+                    }
+
+                    var symbol = lookup.GetGlobalSymbol(name);
+                    exporter.Export(symbol.Symbol);
+                }
+            }
         }
 
         public sealed class BinaryPrimitiveStorageTests : PrimitiveRoundTripTests
@@ -51,14 +72,14 @@ namespace PInvoke.Test
             protected override IPrimitiveReader CreateReader()
             {
                 _stream.Position = 0;
-                return BinaryPrimitiveStorage.CreateReader(_stream);
+                return StorageUtil.ReadBinaryPrimitive(_stream);
             }
 
-            protected override IPrimitiveWriter CreateWriter()
+            protected override void Write(INativeSymbolLookup lookup) 
             {
-                return BinaryPrimitiveStorage.CreateWriter(_stream);
+                _stream.Position = 0;
+                StorageUtil.WriteBinary(_stream, lookup);
             }
-
         }
 
         [Fact]
@@ -79,9 +100,11 @@ namespace PInvoke.Test
         public void EnumWithValues()
         {
             var e = new NativeEnum("e1");
-            e.Values.Add(new NativeEnumValue("v1"));
-            e.Values.Add(new NativeEnumValue("v2"));
-            TestRoundTrip(e);
+            e.Values.Add(new NativeEnumValue("e1", "v1"));
+            e.Values.Add(new NativeEnumValue("e1", "v2"));
+            var storage = new BasicSymbolStorage();
+            storage.AddEnumAndValues(e);
+            TestRoundTrip(storage);
         }
 
         [Fact]

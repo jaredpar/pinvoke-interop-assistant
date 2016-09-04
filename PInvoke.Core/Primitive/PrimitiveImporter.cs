@@ -12,6 +12,23 @@ namespace PInvoke.Primitive
         private readonly HashSet<PrimitiveSymbolId> _symbolSet = new HashSet<PrimitiveSymbolId>();
         private readonly Dictionary<string, PrimitiveSymbolId> _symbolIdMap = new Dictionary<string, PrimitiveSymbolId>();
 
+        public IEnumerable<NativeName> Names
+        {
+            get
+            {
+                foreach (var id in _symbolIdMap.Values)
+                {
+                    NativeNameKind kind;
+                    if (!NativeNameUtil.TryGetNativeNameKind(id.Kind, out kind))
+                    {
+                        continue;
+                    }
+
+                    yield return new NativeName(id.Name, kind);
+                }
+            }
+        }
+
         public PrimitiveImporter(IPrimitiveReader reader)
         {
             _reader = reader;
@@ -118,12 +135,10 @@ namespace PInvoke.Primitive
         private NativeEnum ImportEnum(PrimitiveSymbolId id)
         {
             var e = new NativeEnum(id.Name);
-
-            foreach (var value in _reader.ReadEnumValues(id))
+            foreach (var data in _reader.ReadEnumValues(id))
             {
-                e.Values.Add(new NativeEnumValue(value.Name, value.Value));
+                e.Values.Add(new NativeEnumValue(data.ContainingTypeId.Name, data.Name, data.Value));
             }
-
             return e;
         }
 
@@ -242,28 +257,6 @@ namespace PInvoke.Primitive
 
             symbol = default(NativeGlobalSymbol);
             return false;
-        }
-
-        public bool TryImportEnumValue(string name, out NativeEnum enumeration, out NativeEnumValue value)
-        {
-            // TODO: Got to be a better way here.  Should this just be a global symbol.
-            var data = _reader.ReadEnumValueData(name);
-            if (data == null)
-            {
-                enumeration = null;
-                value = null;
-                return false;
-            }
-
-            var enumName = new NativeName(data.Value.ContainingTypeId.Name, NativeNameKind.Enum);
-            if (!this.TryImport(enumName, out enumeration))
-            {
-                value = null;
-                return false;
-            }
-
-            value = enumeration.Values.Single(x => x.Name == name);
-            return true;
         }
     }
 }

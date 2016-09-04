@@ -1,76 +1,79 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PInvoke.Primitive
+namespace PInvoke.Primitive.Bulk
 {
-    public static partial class BinaryPrimitiveStorage
+    public static partial class BulkUtil
     {
         private sealed class Reader
         {
-            private readonly BinaryReader _reader;
-            private readonly BasicPrimitiveStorage _storage;
+            private readonly IBulkReader _reader;
 
-            internal Reader(BinaryReader reader, BasicPrimitiveStorage storage)
+            internal Reader(IBulkReader reader)
             {
                 _reader = reader;
-                _storage = storage;
             }
 
-            internal void Go()
+            internal BasicPrimitiveStorage Read()
             {
-                while (_reader.PeekChar() != -1)
+                var storage = new BasicPrimitiveStorage();
+                while (!_reader.IsDone())
                 {
+                    _reader.ReadItemStart();
                     var kind = (ItemKind)_reader.ReadInt32();
                     switch (kind)
                     {
                         case ItemKind.EnumValueData:
-                            ReadEnumValueData();
+                            storage.Write(ReadEnumValueData());
                             break;
                         case ItemKind.SignatureData:
-                            ReadSignatureData();
+                            storage.Write(ReadSignatureData());
                             break;
                         case ItemKind.FunctionPointerData:
-                            ReadFunctionPointerData();
+                            storage.Write(ReadFunctionPointerData());
                             break;
                         case ItemKind.TypeData:
-                            ReadTypeData();
+                            storage.Write(ReadTypeData());
                             break;
                         case ItemKind.ConstantData:
-                            ReadConstantData();
+                            storage.Write(ReadConstantData());
                             break;
                         case ItemKind.TypeDefData:
-                            ReadTypeDefData();
+                            storage.Write(ReadTypeDefData());
                             break;
                         case ItemKind.ProcedureData:
-                            ReadProcedureData();
+                            storage.Write(ReadProcedureData());
                             break;
                         case ItemKind.ParameterData:
-                            ReadParameterData();
+                            storage.Write(ReadParameterData());
                             break;
                         case ItemKind.SalEntryData:
-                            ReadSalEntryData();
+                            storage.Write(ReadSalEntryData());
                             break;
                         case ItemKind.MemberData:
-                            ReadMemberData();
+                            storage.Write(ReadMemberData());
                             break;
                         case ItemKind.SymbolId:
-                            ReadSymbolId();
+                            storage.Write(ReadSymbolId());
                             break;
                         default:
                             Contract.ThrowInvalidEnumValue(kind);
                             break;
                     }
+
+                    _reader.ReadItemEnd();
                 }
+
+                return storage;
             }
 
             private PrimitiveSymbolId ReadSymbolIdCore()
             {
                 return new PrimitiveSymbolId(
-                    ReadStringCore(),
+                    _reader.ReadString(),
                     (NativeSymbolKind)_reader.ReadInt32());
             }
 
@@ -84,60 +87,54 @@ namespace PInvoke.Primitive
                 return new PrimitiveTypeId(ReadSymbolIdCore(), ReadSimpleIdCore());
             }
 
-            private string ReadStringCore()
-            {
-                var hasString = _reader.ReadBoolean();
-                return hasString ? _reader.ReadString() : null;
-            }
-
-            private void ReadSalEntryData()
+            private PrimitiveSalEntryData ReadSalEntryData()
             {
                 var data = new PrimitiveSalEntryData(
                     ReadSimpleIdCore(),
                     _reader.ReadInt32(),
                     (SalEntryType)_reader.ReadInt32(),
-                    ReadStringCore());
-                _storage.Write(data);
+                    _reader.ReadString());
+                return data;
             }
 
-            private void ReadParameterData()
+            private PrimitiveParameterData ReadParameterData()
             {
                 var data = new PrimitiveParameterData(
                     ReadSimpleIdCore(),
                     _reader.ReadInt32(),
-                    ReadStringCore(),
+                    _reader.ReadString(),
                     ReadTypeIdCore());
-                _storage.Write(data);
+                return data;
             }
 
-            private void ReadProcedureData()
+            private PrimitiveProcedureData ReadProcedureData()
             {
                 var data = new PrimitiveProcedureData(
                     ReadSymbolIdCore(),
                     (NativeCallingConvention)_reader.ReadInt32(),
                     ReadSimpleIdCore(),
-                    ReadStringCore());
-                _storage.Write(data);
+                    _reader.ReadString());
+                return data;
             }
 
-            private void ReadTypeDefData()
+            private PrimitiveTypeDefData ReadTypeDefData()
             {
                 var data = new PrimitiveTypeDefData(
                     ReadSymbolIdCore(),
                     ReadTypeIdCore());
-                _storage.Write(data);
+                return data;
             }
 
-            private void ReadConstantData()
+            private PrimitiveConstantData ReadConstantData()
             {
                 var data = new PrimitiveConstantData(
                     ReadSymbolIdCore(),
-                    ReadStringCore(),
+                    _reader.ReadString(),
                     (ConstantKind)_reader.ReadInt32());
-                _storage.Write(data);
+                return data;
             }
 
-            private void ReadTypeData()
+            private PrimitiveTypeData ReadTypeData()
             {
                 var data = new PrimitiveTypeData(
                     ReadSimpleIdCore(),
@@ -145,52 +142,52 @@ namespace PInvoke.Primitive
                     _reader.ReadInt32(),
                     ReadTypeIdCore(),
                     (BuiltinType)_reader.ReadInt32(),
-                    ReadStringCore(),
-                    ReadStringCore(),
+                    _reader.ReadString(),
+                    _reader.ReadString(),
                     _reader.ReadBoolean());
-                _storage.Write(data);
+                return data;
             }
 
-            private void ReadFunctionPointerData()
+            private PrimitiveFunctionPointerData ReadFunctionPointerData()
             {
                 var data = new PrimitiveFunctionPointerData(
                     ReadSymbolIdCore(),
                     (NativeCallingConvention)_reader.ReadInt32(),
                     ReadSimpleIdCore());
-                _storage.Write(data);
+                return data;
             }
 
-            private void ReadSignatureData()
+            private PrimitiveSignatureData ReadSignatureData()
             {
                 var data = new PrimitiveSignatureData(
                     ReadSimpleIdCore(),
                     ReadTypeIdCore(),
                     ReadSimpleIdCore());
-                _storage.Write(data);
+                return data;
             }
 
-            private void ReadEnumValueData()
+            private PrimitiveEnumValueData ReadEnumValueData()
             {
                 var data = new PrimitiveEnumValueData(
-                    ReadStringCore(),
-                    ReadStringCore(),
+                    _reader.ReadString(),
+                    _reader.ReadString(),
                     ReadSymbolIdCore());
-                _storage.Write(data);
+                return data;
             }
 
-            private void ReadMemberData()
+            private PrimitiveMemberData ReadMemberData()
             {
                 var data = new PrimitiveMemberData(
-                    ReadStringCore(),
+                    _reader.ReadString(),
                     ReadTypeIdCore(),
                     ReadSymbolIdCore());
-                _storage.Write(data);
+                return data;
             }
 
-            private void ReadSymbolId()
+            private PrimitiveSymbolId ReadSymbolId()
             {
                 var data = ReadSymbolIdCore();
-                _storage.Write(data);
+                return data;
             }
         }
     }

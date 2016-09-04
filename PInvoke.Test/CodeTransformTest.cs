@@ -94,9 +94,9 @@ namespace PInvoke.Test
         {
             NativeSymbolBag bag = new NativeSymbolBag();
             NativeEnum e1 = new NativeEnum("e1");
-            e1.Values.Add(new NativeEnumValue("v1", "2"));
-            e1.Values.Add(new NativeEnumValue("v2", "v1+1"));
-            bag.AddDefinedType(e1);
+            e1.AddValue("v1", "2");
+            e1.AddValue("v2", "v1+1");
+            bag.AddEnumAndValues(e1);
             VerifyEnumValue(bag, e1, "v1", "2");
             VerifyEnumValue(bag, e1, "v2", "(e1.v1 + 1)");
         }
@@ -110,12 +110,12 @@ namespace PInvoke.Test
         {
             NativeSymbolBag bag = new NativeSymbolBag();
             NativeEnum e1 = new NativeEnum("e1");
-            e1.Values.Add(new NativeEnumValue("v1", "2"));
-            e1.Values.Add(new NativeEnumValue("v2", "v1+1"));
+            e1.AddValue("v1", "2");
+            e1.AddValue("v2", "v1+1");
             NativeEnum e2 = new NativeEnum("e2");
-            e2.Values.Add(new NativeEnumValue("v3", "v2+1"));
-            bag.AddDefinedType(e1);
-            bag.AddDefinedType(e2);
+            e2.AddValue("v3", "v2+1");
+            bag.AddEnumAndValues(e1);
+            bag.AddEnumAndValues(e2);
             VerifyEnumValue(bag, e2, "v3", "(e1.v2 + 1)");
         }
 
@@ -129,7 +129,7 @@ namespace PInvoke.Test
             NativeSymbolBag bag = new NativeSymbolBag();
             bag.AddConstant(new NativeConstant("C1", "42"));
             NativeEnum e1 = new NativeEnum("e1");
-            e1.Values.Add(new NativeEnumValue("v1", "C1+2"));
+            e1.AddValue("v1", "C1+2");
             bag.AddDefinedType(e1);
             VerifyEnumValue(bag, e1, "v1", string.Format("({0}.C1 + 2)", TransformConstants.NativeConstantsName));
         }
@@ -261,7 +261,7 @@ namespace PInvoke.Test
         {
             NativeSymbolBag bag = new NativeSymbolBag(StorageFactory.CreateStandard());
             NativeEnum e1 = new NativeEnum("e1");
-            e1.Values.Add(new NativeEnumValue("v1", "(S1)5"));
+            e1.AddValue("v1", "(S1)5");
             bag.AddDefinedType(e1);
             VerifyEnumValue(bag, e1, "v1", "\"(S1)5\"");
         }

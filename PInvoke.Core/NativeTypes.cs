@@ -498,6 +498,13 @@ namespace PInvoke
             this.Name = name;
         }
 
+        public NativeEnumValue AddValue(string valueName, string value)
+        {
+            var e = new NativeEnumValue(Name, valueName, value);
+            Values.Add(e);
+            return e;
+        }
+
         /// <summary>
         /// Enum's can't have members, just name value pairs
         /// </summary>
@@ -527,6 +534,8 @@ namespace PInvoke
     {
         private NativeValueExpression _value;
 
+        public string EnumName { get; }
+
         /// <summary>
         /// Value of the value
         /// </summary>
@@ -538,13 +547,10 @@ namespace PInvoke
 
         public NativeName NativeName => new NativeName(Name, NativeNameKind.EnumValue);
 
-        public NativeEnumValue(string name) : this(name, string.Empty)
+        public NativeEnumValue(string enumName, string valueName, string value = "")
         {
-        }
-
-        public NativeEnumValue(string name, string value)
-        {
-            this.Name = name;
+            EnumName = enumName;
+            Name = valueName;
             _value = new NativeValueExpression(value);
         }
 

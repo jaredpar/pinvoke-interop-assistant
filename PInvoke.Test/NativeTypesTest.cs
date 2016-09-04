@@ -188,9 +188,9 @@ namespace PInvoke.Test
         public void Child3()
         {
             NativeEnum e1 = new NativeEnum("e1");
-            e1.Values.Add(new NativeEnumValue("n1", "v1"));
+            e1.AddValue("n1", "v1");
             VerifyTree(e1, "e1(n1(Value(v1)))");
-            e1.Values.Add(new NativeEnumValue("n2", "v2"));
+            e1.AddValue("n2", "v2");
             VerifyTree(e1, "e1(n1(Value(v1)))(n2(Value(v2)))");
 
         }
@@ -215,8 +215,8 @@ namespace PInvoke.Test
         public void Child5()
         {
             NativeEnum e1 = new NativeEnum("e1");
-            e1.Values.Add(new NativeEnumValue("n1", "v1"));
-            e1.ReplaceChild(e1.Values[0], new NativeEnumValue("n2", "v2"));
+            e1.Values.Add(new NativeEnumValue("e1", "n1", "v1"));
+            e1.ReplaceChild(e1.Values[0], new NativeEnumValue("e1", "n2", "v2"));
             VerifyTree(e1, "e1(n2(Value(v2)))");
         }
 

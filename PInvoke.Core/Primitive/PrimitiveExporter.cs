@@ -77,6 +77,8 @@ namespace PInvoke.Primitive
                     DoExportConstant((NativeConstant)symbol);
                     break;
                 case NativeSymbolKind.EnumNameValue:
+                    DoExportEnumValue((NativeEnumValue)symbol);
+                    break;
                 case NativeSymbolKind.SalAttribute:
                 case NativeSymbolKind.SalEntry:
                 case NativeSymbolKind.BuiltinType:
@@ -113,11 +115,13 @@ namespace PInvoke.Primitive
         {
             var typeId = new PrimitiveSymbolId(e.Name, e.Kind);
             _writer.Write(typeId);
-            foreach (var value in e.Values)
-            {
-                var data = new PrimitiveEnumValueData(value.Name, value.Value.Expression, typeId);
-                _writer.Write(data);
-            }
+        }
+
+        private void DoExportEnumValue(NativeEnumValue value)
+        {
+            var typeId = new PrimitiveSymbolId(value.EnumName, NativeSymbolKind.EnumType);
+            var data = new PrimitiveEnumValueData(value.Name, value.Value.Expression, typeId);
+            _writer.Write(data);
         }
 
         private void DoExportConstant(NativeConstant c)

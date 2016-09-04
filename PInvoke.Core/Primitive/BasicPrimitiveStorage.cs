@@ -135,5 +135,10 @@ namespace PInvoke.Primitive
         {
             _constDataList.Add(data);
         }
+
+        public INativeSymbolImporter ToSymbolImporter()
+        {
+            return new PrimitiveImporter(this);
+        }
     }
 }

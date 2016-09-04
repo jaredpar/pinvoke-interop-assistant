@@ -86,30 +86,21 @@ namespace PInvoke
 
         public static bool TryGetEnumByValueName(this INativeSymbolLookup lookup, string enumValueName, out NativeEnum enumeration, out NativeEnumValue value)
         {
-            foreach (var name in lookup.NativeNames.Where(x => x.Kind == NativeNameKind.Enum))
+            if (!lookup.TryGetGlobalSymbol(new NativeName(enumValueName, NativeNameKind.EnumValue), out value))
             {
-                if (!lookup.TryGetGlobalSymbol(name.Name, out enumeration))
-                {
-                    continue;
-                }
-
-                value = enumeration.Values.SingleOrDefault(x => x.Name == enumValueName);
-                if (value != null)
-                {
-                    return true;
-                }
+                enumeration = null;
+                return false;
             }
 
-            enumeration = null;
-            value = null;
-            return false;
+            return lookup.TryGetGlobalSymbol(
+                new NativeName(value.EnumName, NativeNameKind.Enum),
+                out enumeration);
         }
 
-        public static T GetGlobalSymbol<T>(this INativeSymbolLookup lookup, string name)
-            where T : NativeSymbol
+        public static NativeGlobalSymbol GetGlobalSymbol(this INativeSymbolLookup lookup, string name)
         {
-            T symbol;
-            if (!TryGetGlobalSymbol(lookup, name, out symbol))
+            NativeGlobalSymbol symbol;
+            if (!lookup.TryGetGlobalSymbol(name, out symbol))
             {
                 throw new Exception($"Unable to get symbol {name}");
             }
@@ -117,16 +108,40 @@ namespace PInvoke
             return symbol;
         }
 
-        public static T GetGlobalSymbol<T>(this INativeSymbolLookup lookup, NativeName name)
-            where T : NativeSymbol
+        public static NativeGlobalSymbol GetGlobalSymbol(this INativeSymbolLookup lookup, NativeName name)
         {
-            T symbol;
-            if (!TryGetGlobalSymbol(lookup, name, out symbol))
+            NativeGlobalSymbol symbol;
+            if (!lookup.TryGetGlobalSymbol(name, out symbol))
             {
-                throw new Exception($"Unable to get symbol {name.Name}");
+                throw new Exception($"Unable to get symbol {name}");
             }
 
             return symbol;
+        }
+
+        public static T GetGlobalSymbol<T>(this INativeSymbolLookup lookup, string name)
+            where T : NativeSymbol
+        {
+            var symbol = GetGlobalSymbol(lookup, name);
+            return (T)symbol.Symbol;
+        }
+
+        public static T GetGlobalSymbol<T>(this INativeSymbolLookup lookup, NativeName name)
+            where T : NativeSymbol
+        {
+            var symbol = GetGlobalSymbol(lookup, name);
+            return (T)symbol.Symbol;
+        }
+
+        public static BasicSymbolStorage ToBasicSymbolStorage(this INativeSymbolLookup lookup)
+        {
+            var storage = new BasicSymbolStorage();
+            foreach (var name in lookup.NativeNames)
+            {
+                var symbol = lookup.GetGlobalSymbol(name);
+                storage.Add(symbol);
+            }
+            return storage;
         }
 
         #endregion
@@ -140,6 +155,15 @@ namespace PInvoke
         public static void AddTypeDef(this INativeSymbolStorage storage, NativeTypeDef typeDef) => storage.Add(new NativeGlobalSymbol(typeDef));
 
         public static void AddProcedure(this INativeSymbolStorage storage, NativeProcedure procedure) => storage.Add(new NativeGlobalSymbol(procedure));
+
+        public static void AddEnumAndValues(this INativeSymbolStorage storage, NativeEnum enumeration)
+        {
+            storage.Add(new NativeGlobalSymbol(enumeration));
+            foreach (var value in enumeration.Values)
+            {
+                storage.Add(new NativeGlobalSymbol(value));
+            }
+        }
 
         public static IEnumerable<Macro> GetAllMacros(this INativeSymbolStorage storage)
         {
@@ -226,6 +250,21 @@ namespace PInvoke
 
             symbol = globalSymbol.Symbol as T;
             return symbol != null;
+        }
+
+        public static BasicSymbolStorage ToBasicSymbolStorage(this INativeSymbolImporter importer)
+        {
+            var storage = new BasicSymbolStorage();
+            foreach (var name in importer.Names)
+            {
+                NativeGlobalSymbol symbol;
+                if (importer.TryImport(name, out symbol))
+                {
+                    storage.Add(symbol);
+                }
+            }
+
+            return storage;
         }
 
         #endregion

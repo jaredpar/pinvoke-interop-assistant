@@ -45,6 +45,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BasicSymbolStorage.cs" />
+    <Compile Include="Primitive\Bulk\BulkExporter.cs" />
+    <Compile Include="Primitive\Bulk\BulkImporter.cs" />
+    <Compile Include="Primitive\Bulk\Extensions.cs" />
     <Compile Include="StorageUtil.Csv.cs" />
     <Compile Include="StorageUtil.cs" />
     <Compile Include="StorageUtil.Binary.cs" />

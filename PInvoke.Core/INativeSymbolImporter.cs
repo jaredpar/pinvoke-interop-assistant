@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 namespace PInvoke
 {
+    // TODO: delete.  Right now we only support bulk import
+
     /// <summary>
     /// Responsible for importing symbol definitions with the given names.  The values returned
     /// from these can be freshly allocated on every call.

@@ -4,10 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using PInvoke.Primitive;
-using PInvoke.Primitive.Bulk;
 
-namespace PInvoke
+namespace PInvoke.Storage
 {
     public static partial class StorageUtil
     {

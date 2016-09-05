@@ -45,13 +45,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BasicSymbolStorage.cs" />
-    <Compile Include="Primitive\Bulk\BulkExporter.cs" />
-    <Compile Include="Primitive\Bulk\BulkImporter.cs" />
-    <Compile Include="Primitive\Bulk\Extensions.cs" />
-    <Compile Include="StorageUtil.Csv.cs" />
-    <Compile Include="StorageUtil.cs" />
-    <Compile Include="StorageUtil.Binary.cs" />
-    <Compile Include="CachingSymbolLookup.cs" />
+    <Compile Include="Storage\BulkExporter.cs" />
+    <Compile Include="Storage\BulkImporter.cs" />
+    <Compile Include="Storage\Extensions.cs" />
+    <Compile Include="Storage\StorageUtil.Csv.cs" />
+    <Compile Include="Storage\StorageUtil.cs" />
+    <Compile Include="Storage\StorageUtil.Binary.cs" />
     <Compile Include="Contract.cs" />
     <Compile Include="Controls\CodeBox.Designer.cs">
       <DependentUpon>CodeBox.cs</DependentUpon>
@@ -91,33 +90,12 @@
     <Compile Include="EmptyNativeSymbolBag.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="INativeSymbolBag.cs" />
-    <Compile Include="INativeSymbolImporter.cs" />
     <Compile Include="INativeSymbolStorage.cs" />
     <Compile Include="INativeSymbolLookup.cs" />
     <Compile Include="NativeGlobalSymbol.cs" />
     <Compile Include="NativeName.cs" />
-    <Compile Include="Primitive\Bulk\BulkUtil.Writer.cs" />
-    <Compile Include="Primitive\Bulk\BulkUtil.Reader.cs" />
-    <Compile Include="Primitive\Bulk\BulkUtil.cs" />
-    <Compile Include="Primitive\Bulk\IBulkReader.cs" />
-    <Compile Include="Primitive\Bulk\IBulkWriter.cs" />
-    <Compile Include="Primitive\IPrimitiveReader.cs" />
-    <Compile Include="Primitive\IPrimitiveWriter.cs" />
-    <Compile Include="Primitive\PrimitiveEnumValueData.cs" />
-    <Compile Include="Primitive\PrimitiveConstantData.cs" />
-    <Compile Include="Primitive\PrimitiveTypeDefData.cs" />
-    <Compile Include="Primitive\PrimitiveTypeData.cs" />
-    <Compile Include="Primitive\PrimitiveProcedureData.cs" />
-    <Compile Include="Primitive\PrimitiveFunctionPointerData.cs" />
-    <Compile Include="Primitive\PrimitiveMemberData.cs" />
-    <Compile Include="Primitive\PrimitiveSimpleId.cs" />
-    <Compile Include="Primitive\PrimitiveSignatureTypes.cs" />
-    <Compile Include="Primitive\PrimitiveSalEntryData.cs" />
-    <Compile Include="Primitive\PrimitiveTypeId.cs" />
-    <Compile Include="Primitive\PrimitiveSymbolId.cs" />
-    <Compile Include="Primitive\PrimitiveExporter.cs" />
-    <Compile Include="Primitive\PrimitiveImporter.cs" />
-    <Compile Include="Primitive\BasicPrimitiveStorage.cs" />
+    <Compile Include="Storage\IBulkReader.cs" />
+    <Compile Include="Storage\IBulkWriter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="NativeSymbolBag.cs" />

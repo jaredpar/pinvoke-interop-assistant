@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PInvoke.Primitive.Bulk
+namespace PInvoke.Storage
 {
     public static class Extensions
     {

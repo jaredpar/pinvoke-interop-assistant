@@ -1,15 +1,15 @@
-﻿using PInvoke.Primitive;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
+using PInvoke.Storage;
 
 namespace PInvoke.Test
 {
-    public sealed class PrimitiveRoundTripTests
+    public sealed class BulkStorageRoundTripTest
     {
         #region RoundTripUtil 
 
@@ -17,18 +17,17 @@ namespace PInvoke.Test
         {
             internal abstract void Write(INativeSymbolLookup lookup);
 
-            internal abstract IPrimitiveReader CreateReader();
+            internal abstract BasicSymbolStorage Read();
         }
 
-        private sealed class BasicPrimitiveStorageRoundTripUtil : RoundTripUtil
+        private sealed class BasicSymbolStorageRoundTripUtil : RoundTripUtil
         {
-            private readonly BasicPrimitiveStorage _storage = new BasicPrimitiveStorage();
+            private readonly BasicSymbolStorage _storage = new BasicSymbolStorage();
 
-            internal override IPrimitiveReader CreateReader() => _storage;
+            internal override BasicSymbolStorage Read() => _storage;
 
             internal override void Write(INativeSymbolLookup lookup)
             {
-                var exporter = new PrimitiveExporter(_storage);
                 foreach (var name in lookup.NativeNames)
                 {
                     if (name.Kind == NativeNameKind.EnumValue)
@@ -36,8 +35,7 @@ namespace PInvoke.Test
                         continue;
                     }
 
-                    var symbol = lookup.GetGlobalSymbol(name);
-                    exporter.Export(symbol.Symbol);
+                    _storage.Add(lookup.GetGlobalSymbol(name));
                 }
             }
         }
@@ -46,10 +44,10 @@ namespace PInvoke.Test
         {
             private readonly MemoryStream _stream = new MemoryStream();
 
-            internal override IPrimitiveReader CreateReader()
+            internal override BasicSymbolStorage Read()
             {
                 _stream.Position = 0;
-                return StorageUtil.ReadBinaryPrimitive(_stream);
+                return StorageUtil.ReadBinary(_stream);
             }
 
             internal override void Write(INativeSymbolLookup lookup)
@@ -63,10 +61,10 @@ namespace PInvoke.Test
         {
             private readonly MemoryStream _stream = new MemoryStream();
 
-            internal override IPrimitiveReader CreateReader()
+            internal override BasicSymbolStorage Read()
             {
                 _stream.Position = 0;
-                return StorageUtil.ReadCsvPrimitive(_stream);
+                return StorageUtil.ReadCsv(_stream);
             }
 
             internal override void Write(INativeSymbolLookup lookup)
@@ -80,11 +78,11 @@ namespace PInvoke.Test
 
         private readonly List<RoundTripUtil> _utilList = new List<RoundTripUtil>();
 
-        public PrimitiveRoundTripTests()
+        public BulkStorageRoundTripTest()
         {
             _utilList.Add(new CsvRoundTripUtil());
-            _utilList.Add(new BasicPrimitiveStorageRoundTripUtil());
             _utilList.Add(new BinaryRoundTripUtil());
+            _utilList.Add(new BasicSymbolStorageRoundTripUtil());
         }
 
         private void TestRoundTrip(NativeSymbol symbol)
@@ -101,7 +99,7 @@ namespace PInvoke.Test
             foreach (var util in _utilList)
             {
                 util.Write(lookup);
-                var importer = new PrimitiveImporter(util.CreateReader());
+                var storage = util.Read();
                 foreach (var name in lookup.NativeNames)
                 {
                     if (name.Kind == NativeNameKind.EnumValue)
@@ -112,12 +110,11 @@ namespace PInvoke.Test
                     var symbol = lookup.GetGlobalSymbol(name);
                     NativeGlobalSymbol other;
 
-                    if (!importer.TryImport(name, out other))
+                    if (!storage.TryGetGlobalSymbol(name, out other))
                     {
 
                     }
-
-                    Assert.True(importer.TryImport(name, out other));
+                    Assert.True(storage.TryGetGlobalSymbol(name, out other));
                     Assert.Equal(SymbolPrinter.Convert(symbol.Symbol), SymbolPrinter.Convert(other.Symbol));
                 }
             }

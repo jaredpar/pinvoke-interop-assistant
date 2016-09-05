@@ -56,7 +56,7 @@ namespace PInvoke.Transform
 
         public SalEntrySet(SalEntryListType type)
         {
-            _type = type;
+            Type = type;
         }
 
         public SalEntry FindEntry(SalEntryType type)

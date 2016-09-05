@@ -165,5 +165,30 @@ namespace PInvoke.Test
             AssertEval("1==1", 1);
             AssertEval("1==2", 0);
         }
+
+        [Fact()]
+        public void OpNotEquals1()
+        {
+            AssertEval("1!=2", 1);
+            AssertEval("1!=1", 0);
+            AssertEval("0!=0", 0);
+        }
+
+        [Fact()]
+        public void OpLessThan1()
+        {
+            AssertEval("1<2", 1);
+            AssertEval("2<1", 0);
+            AssertEval("1<1", 0);
+        }
+
+        [Fact()]
+        public void OpLessThanOrEquals1()
+        {
+            AssertEval("1<=2", 1);
+            AssertEval("2<=1", 0);
+            AssertEval("1<=1", 1);
+            AssertEval("0<=0", 1);
+        }
     }
 }

@@ -55,8 +55,8 @@ namespace PInvoke.Transform
 
         public BasicConverter(LanguageType type, INativeSymbolStorage storage)
         {
-            _storage = storage;
-            _type = type;
+            Storage = storage;
+            LanguageType = type;
         }
 
         public CodeTypeDeclarationCollection ConvertToCodeDom(NativeConstant c, ErrorProvider ep)
@@ -173,7 +173,7 @@ namespace PInvoke.Transform
                 NativeCodeAnalyzerResult result = analyzer.Analyze(reader);
 
                 ep.Append(result.ErrorProvider);
-                bag = NativeSymbolBag.CreateFrom(result, _storage);
+                bag = NativeSymbolBag.CreateFrom(result, Storage);
             }
 
             return ConvertBagToCodeDom(bag, ep);
@@ -279,8 +279,8 @@ namespace PInvoke.Transform
             bag.TryResolveSymbolsAndValues(ep);
 
             // Create the codedom transform
-            CodeTransform transform = new CodeTransform(this._type, bag);
-            MarshalTransform marshalUtil = new MarshalTransform(this._type, bag, _transformKind);
+            CodeTransform transform = new CodeTransform(LanguageType, bag);
+            MarshalTransform marshalUtil = new MarshalTransform(LanguageType, bag, TransformKindFlags);
             CodeTypeDeclarationCollection col = new CodeTypeDeclarationCollection();
 
             // Only output the constants if there are actually any

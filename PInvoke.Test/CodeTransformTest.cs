@@ -45,10 +45,17 @@ namespace PInvoke.Test
         }
 
         [Fact()]
-        public void TryGenShift()
+        public void TryGenShift1()
         {
             VerifyExpression("1<<1", "(1) << (1)");
             VerifyExpression("1<< 4+2", "(1) << ((4 + 2))");
+        }
+
+        [Fact()]
+        public void TryGenShift2()
+        {
+            VerifyExpression("2>>1", "(2) >> (1)");
+            VerifyExpression("8>> 1+2", "(8) >> ((1 + 2))");
         }
 
         /// <summary>

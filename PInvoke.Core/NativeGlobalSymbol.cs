@@ -25,7 +25,7 @@ namespace PInvoke
         public NativeGlobalSymbol(NativeDefinedType definedType) : this(definedType.NativeName, definedType) { }
         public NativeGlobalSymbol(NativeTypeDef typeDef) : this(typeDef.NativeName, typeDef) { }
         public NativeGlobalSymbol(NativeConstant constant) : this(constant.NativeName, constant) { }
-        public NativeGlobalSymbol(NativeProcedure proc) : this(proc.NativeName, proc) { }
+        public NativeGlobalSymbol(NativeProcedure procedure) : this(procedure.NativeName, procedure) { }
         public NativeGlobalSymbol(NativeEnumValue value) : this(value.NativeName, value) { }
     }
 }

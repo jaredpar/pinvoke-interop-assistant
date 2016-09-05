@@ -7,12 +7,10 @@ using System.Diagnostics;
 
 namespace PInvoke
 {
-
     /// <summary>
     /// Parent Child symbol
     /// </summary>
-    /// <remarks></remarks>
-    public class NativeSymbolRelationship
+    public sealed class NativeSymbolRelationship
     {
         public NativeSymbol Parent { get; }
         public NativeSymbol Symbol { get; }
@@ -32,7 +30,6 @@ namespace PInvoke
     /// <remarks></remarks>
     public class NativeSymbolIterator
     {
-
         /// <summary>
         /// Find all of the reachable NativeType instances from this one
         /// </summary>
@@ -41,7 +38,6 @@ namespace PInvoke
         /// <remarks></remarks>
         public IEnumerable<NativeDefinedType> FindAllReachableDefinedTypes(NativeType nt)
         {
-
             List<NativeSymbol> list = FindAllNativeSymbols(nt);
             List<NativeDefinedType> retList = new List<NativeDefinedType>();
             foreach (NativeSymbol ns in list)

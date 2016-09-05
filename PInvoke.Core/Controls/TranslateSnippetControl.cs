@@ -1,9 +1,8 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
+
 using System;
-using System.Collections;
+using System.Linq;
 using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Forms;
@@ -15,7 +14,6 @@ namespace PInvoke.Controls
 {
     public partial class TranslateSnippetControl
     {
-
         private class RequestData
         {
             internal string Text;
@@ -27,7 +25,7 @@ namespace PInvoke.Controls
             internal string ParseOutput;
         }
 
-        private NativeStorage _ns = NativeStorage.DefaultInstance;
+        private INativeSymbolStorage _storage;
         private TransformKindFlags _transKind = TransformKindFlags.All;
         private List<Macro> _initialMacroList = new List<Macro>();
 
@@ -44,9 +42,16 @@ namespace PInvoke.Controls
             // This call is required by the Windows Form Designer.
             InitializeComponent();
 
+            _storage = new BasicSymbolStorage();
+
             // Add any initialization after the InitializeComponent() call.
             m_langTypeCb.Items.AddRange(EnumUtil.GetAllValuesObject<LanguageType>());
             m_langTypeCb.SelectedItem = LanguageType.VisualBasic;
+        }
+
+        public TranslateSnippetControl(INativeSymbolStorage storage)
+        {
+            _storage = storage;
         }
 
         #region "ISignatureImportControl"
@@ -71,13 +76,12 @@ namespace PInvoke.Controls
             set { m_langTypeCb.SelectedItem = value; }
         }
 
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public NativeStorage NativeStorage
+        public INativeSymbolStorage Storage
         {
-            get { return _ns; }
+            get { return _storage; }
             set
             {
-                _ns = value;
+                _storage = value;
                 _initialMacroList = null;
             }
         }
@@ -203,7 +207,7 @@ namespace PInvoke.Controls
             m_errorsTb.Text = "Parsing ...";
             if (_initialMacroList == null)
             {
-                _initialMacroList = _ns.LoadAllMacros();
+                _initialMacroList = _storage.GetAllMacros().ToList();
             }
 
             RequestData data = new RequestData();
@@ -216,7 +220,7 @@ namespace PInvoke.Controls
         {
             try
             {
-                BasicConverter conv = new BasicConverter(LanguageType, _ns);
+                var conv = new BasicConverter(LanguageType, _storage);
                 conv.TransformKindFlags = _transKind;
                 m_managedCodeBox.Code = conv.ConvertNativeCodeToPInvokeCode(m_nativeCodeTb.Text);
             }

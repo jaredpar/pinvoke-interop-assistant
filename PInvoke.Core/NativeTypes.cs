@@ -38,7 +38,7 @@ namespace PInvoke
         ArrayType,
         PointerType,
         BuiltinType,
-        TypedefType,
+        TypeDefType,
         BitVectorType,
         NamedType,
         Procedure,
@@ -61,10 +61,11 @@ namespace PInvoke
     [DebuggerDisplay("{DisplayName}")]
     public abstract class NativeSymbol
     {
-        // CTODO: mutable data, destroy
+        // TODO: mutable data, destroy
         protected static List<NativeSymbol> EmptySymbolList = new List<NativeSymbol>();
 
         private string _name;
+
         /// <summary>
         /// Name of the C++ type
         /// </summary>
@@ -114,7 +115,6 @@ namespace PInvoke
         {
             get { return true; }
         }
-
 
         protected NativeSymbol()
         {
@@ -228,8 +228,6 @@ namespace PInvoke
     /// <remarks></remarks>
     public abstract class NativeType : NativeSymbol
     {
-
-
         protected NativeType()
         {
         }
@@ -250,7 +248,7 @@ namespace PInvoke
                 }
                 else
                 {
-                    break; // TODO: might not be correct. Was : Exit While
+                    break;
                 }
             }
 
@@ -285,7 +283,7 @@ namespace PInvoke
         /// </summary>
         /// <returns></returns>
         /// <remarks></remarks>
-        public NativeType DigThroughTypedefAndNamedTypes()
+        public NativeType DigThroughTypeDefAndNamedTypes()
         {
 
             NativeType cur = this;
@@ -295,7 +293,7 @@ namespace PInvoke
                 {
                     cur = ((NativeNamedType)cur).RealType;
                 }
-                else if (cur.Kind == NativeSymbolKind.TypedefType)
+                else if (cur.Kind == NativeSymbolKind.TypeDefType)
                 {
                     cur = ((NativeTypeDef)cur).RealType;
                 }
@@ -308,7 +306,7 @@ namespace PInvoke
             return cur;
         }
 
-        public NativeType DigThroughTypedefAndNamedTypesFor(string search)
+        public NativeType DigThroughTypeDefAndNamedTypesFor(string search)
         {
             if (0 == string.CompareOrdinal(search, this.Name))
             {
@@ -322,13 +320,13 @@ namespace PInvoke
                 {
                     cur = ((NativeNamedType)cur).RealType;
                 }
-                else if (cur.Kind == NativeSymbolKind.TypedefType)
+                else if (cur.Kind == NativeSymbolKind.TypeDefType)
                 {
                     cur = ((NativeTypeDef)cur).RealType;
                 }
                 else
                 {
-                    break; // TODO: might not be correct. Was : Exit While
+                    break;
                 }
 
                 if (cur != null && 0 == string.CompareOrdinal(cur.Name, search))
@@ -339,7 +337,6 @@ namespace PInvoke
 
             return null;
         }
-
     }
 
     #endregion
@@ -348,21 +345,34 @@ namespace PInvoke
 
     public abstract class NativeDefinedType : NativeType
     {
-
         private bool _isAnonymous;
 
         private List<NativeMember> _members = new List<NativeMember>();
+
         /// <summary>
         /// Whether or not this type is anonymous
+        /// TODO: this isn't imported / exported in the new system
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
         public bool IsAnonymous
         {
             get { return _isAnonymous; }
-            set { _isAnonymous = value; }
+            set
+            {
+                _isAnonymous = value;
+                if (_isAnonymous)
+                {
+                    if (string.IsNullOrEmpty(Name))
+                    {
+                        Name = NativeSymbolBag.GenerateAnonymousName();
+                    }
+                    Debug.Assert(NativeSymbolBag.IsAnonymousName(Name));
+                }
+            }
         }
+
+        public NativeName NativeName => new NativeName(Name, NameKind);
+
+        public abstract NativeNameKind NameKind { get; }
 
         public override NativeSymbolCategory Category
         {
@@ -380,7 +390,6 @@ namespace PInvoke
             get { return _members; }
         }
 
-
         protected NativeDefinedType()
         {
         }
@@ -390,7 +399,7 @@ namespace PInvoke
             this.Name = name;
         }
 
-        public override System.Collections.Generic.IEnumerable<NativeSymbol> GetChildren()
+        public override IEnumerable<NativeSymbol> GetChildren()
         {
             List<NativeSymbol> list = new List<NativeSymbol>();
             foreach (NativeMember member in Members)
@@ -420,12 +429,9 @@ namespace PInvoke
     /// <remarks></remarks>
     public class NativeStruct : NativeDefinedType
     {
+        public override NativeSymbolKind Kind => NativeSymbolKind.StructType;
 
-        public override NativeSymbolKind Kind
-        {
-            get { return NativeSymbolKind.StructType; }
-        }
-
+        public override NativeNameKind NameKind => NativeNameKind.Struct;
 
         public NativeStruct()
         {
@@ -447,12 +453,9 @@ namespace PInvoke
     /// <remarks></remarks>
     public class NativeUnion : NativeDefinedType
     {
+        public override NativeSymbolKind Kind => NativeSymbolKind.UnionType;
 
-        public override NativeSymbolKind Kind
-        {
-            get { return NativeSymbolKind.UnionType; }
-        }
-
+        public override NativeNameKind NameKind => NativeNameKind.Union;
 
         public NativeUnion()
         {
@@ -468,30 +471,23 @@ namespace PInvoke
     #region "NativeEnum"
 
     /// <summary>
-    /// Native enum 
+    /// Containing for a native enum type.
     /// </summary>
-    /// <remarks></remarks>
-    public class NativeEnum : NativeDefinedType
+    public sealed class NativeEnum : NativeDefinedType
     {
-
-
         private List<NativeEnumValue> _list = new List<NativeEnumValue>();
-        public override NativeSymbolKind Kind
-        {
-            get { return NativeSymbolKind.EnumType; }
-        }
+
+        public override NativeSymbolKind Kind => NativeSymbolKind.EnumType;
+
+        public override NativeNameKind NameKind => NativeNameKind.Enum;
 
         /// <summary>
         /// The values of the enum
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
         public List<NativeEnumValue> Values
         {
             get { return _list; }
         }
-
 
         public NativeEnum()
         {
@@ -502,12 +498,17 @@ namespace PInvoke
             this.Name = name;
         }
 
+        public NativeEnumValue AddValue(string valueName, string value)
+        {
+            var e = new NativeEnumValue(Name, valueName, value);
+            Values.Add(e);
+            return e;
+        }
+
         /// <summary>
         /// Enum's can't have members, just name value pairs
         /// </summary>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public override System.Collections.Generic.IEnumerable<NativeSymbol> GetChildren()
+        public override IEnumerable<NativeSymbol> GetChildren()
         {
             List<NativeSymbol> list = new List<NativeSymbol>();
             foreach (NativeEnumValue pair in this.Values)
@@ -528,32 +529,28 @@ namespace PInvoke
     /// <summary>
     /// An enum value
     /// </summary>
-    /// <remarks></remarks>
     [DebuggerDisplay("{Name} = {Value}")]
     public class NativeEnumValue : NativeExtraSymbol
     {
-
-
         private NativeValueExpression _value;
+
+        public string EnumName { get; }
+
         /// <summary>
         /// Value of the value
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
         public NativeValueExpression Value
         {
             get { return _value; }
             set { _value = value; }
         }
 
-        public NativeEnumValue(string name) : this(name, string.Empty)
-        {
-        }
+        public NativeName NativeName => new NativeName(Name, NativeNameKind.EnumValue);
 
-        public NativeEnumValue(string name, string value)
+        public NativeEnumValue(string enumName, string valueName, string value = "")
         {
-            this.Name = name;
+            EnumName = enumName;
+            Name = valueName;
             _value = new NativeValueExpression(value);
         }
 
@@ -562,7 +559,7 @@ namespace PInvoke
             get { return NativeSymbolKind.EnumNameValue; }
         }
 
-        public override System.Collections.Generic.IEnumerable<NativeSymbol> GetChildren()
+        public override IEnumerable<NativeSymbol> GetChildren()
         {
             return GetSingleChild(_value);
         }
@@ -571,7 +568,6 @@ namespace PInvoke
         {
             ReplaceChildSingle(oldChild, newChild, ref _value);
         }
-
     }
 
     #endregion
@@ -601,11 +597,9 @@ namespace PInvoke
             set { _conv = value; }
         }
 
+        public override NativeSymbolKind Kind => NativeSymbolKind.FunctionPointer;
 
-        public override NativeSymbolKind Kind
-        {
-            get { return NativeSymbolKind.FunctionPointer; }
-        }
+        public override NativeNameKind NameKind => NativeNameKind.FunctionPointer;
 
         public override string DisplayName
         {
@@ -681,7 +675,7 @@ namespace PInvoke
             {
                 if (_realType != null)
                 {
-                    return _realType.DigThroughTypedefAndNamedTypes();
+                    return _realType.DigThroughTypeDefAndNamedTypes();
                 }
 
                 return _realType;
@@ -711,7 +705,6 @@ namespace PInvoke
         {
             ReplaceChildSingle(oldChild, newChild, ref _realType);
         }
-
     }
 
     #endregion
@@ -722,9 +715,8 @@ namespace PInvoke
 
     public class NativeArray : NativeProxyType
     {
-
-
         private int _elementCount = -1;
+
         public override NativeSymbolKind Kind
         {
             get { return NativeSymbolKind.ArrayType; }
@@ -733,10 +725,8 @@ namespace PInvoke
         /// <summary>
         /// Element count of the array.  If the array is not bound then this will
         /// be -1
+        /// TODO: use a nullable here
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
         public int ElementCount
         {
             get { return _elementCount; }
@@ -746,9 +736,6 @@ namespace PInvoke
         /// <summary>
         /// Create the display name of the array
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
         public override string DisplayName
         {
             get
@@ -886,7 +873,6 @@ namespace PInvoke
             set { _isConst = value; }
         }
 
-
         public override NativeSymbolKind Kind
         {
             get { return NativeSymbolKind.NamedType; }
@@ -958,15 +944,12 @@ namespace PInvoke
     /// NativeProxyTypes aren't really types.  They are just references or modifiers to a type.  A
     /// Typedef is itself a type and accessible by name
     /// </summary>
-    /// <remarks></remarks>
     [DebuggerDisplay("{FullName} -> {RealTypeFullname}")]
     public class NativeTypeDef : NativeProxyType
     {
+        public override NativeSymbolKind Kind => NativeSymbolKind.TypeDefType;
 
-        public override NativeSymbolKind Kind
-        {
-            get { return NativeSymbolKind.TypedefType; }
-        }
+        public NativeName NativeName => new NativeName(Name, NativeNameKind.TypeDef);
 
         public NativeTypeDef(string name) : base(name)
         {
@@ -1026,8 +1009,6 @@ namespace PInvoke
     /// <remarks></remarks>
     public class NativeBitVector : NativeSpecializedType
     {
-
-
         private int _size;
         public override NativeSymbolKind Kind
         {
@@ -1070,7 +1051,6 @@ namespace PInvoke
     /// <summary>
     /// Enumeration of the common C++ builtin types
     /// </summary>
-    /// <remarks></remarks>
     public enum BuiltinType
     {
         NativeInt16,
@@ -1087,7 +1067,6 @@ namespace PInvoke
         /// <summary>
         /// Used for BuiltinTypes initially missed
         /// </summary>
-        /// <remarks></remarks>
         NativeUnknown
     }
 
@@ -1130,9 +1109,6 @@ namespace PInvoke
         /// <summary>
         /// Bulitin Type
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
         public BuiltinType BuiltinType
         {
             get { return _builtinType; }
@@ -1424,7 +1400,6 @@ namespace PInvoke
         /// </summary>
         /// <remarks></remarks>
         Inline
-
     }
 
     /// <summary>
@@ -1458,15 +1433,11 @@ namespace PInvoke
             set { _conv = value; }
         }
 
-        public override NativeSymbolCategory Category
-        {
-            get { return NativeSymbolCategory.Procedure; }
-        }
+        public override NativeSymbolCategory Category => NativeSymbolCategory.Procedure;
 
-        public override NativeSymbolKind Kind
-        {
-            get { return NativeSymbolKind.Procedure; }
-        }
+        public override NativeSymbolKind Kind => NativeSymbolKind.Procedure;
+
+        public NativeName NativeName => new NativeName(Name, NativeNameKind.Procedure);
 
         public override string DisplayName
         {
@@ -1548,7 +1519,7 @@ namespace PInvoke
             {
                 if (NativeType != null)
                 {
-                    return NativeType.DigThroughTypedefAndNamedTypes();
+                    return NativeType.DigThroughTypeDefAndNamedTypes();
                 }
 
                 return null;
@@ -1638,14 +1609,11 @@ namespace PInvoke
     /// </summary>
     /// <remarks></remarks>
     [DebuggerDisplay("{NativeType.FullName} {Name}")]
-    public class NativeMember : NativeExtraSymbol
+    public sealed class NativeMember : NativeExtraSymbol
     {
         /// <summary>
         /// Nativetype of the member
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
         public NativeType NativeType;
 
         public NativeType NativeTypeDigged
@@ -1654,7 +1622,7 @@ namespace PInvoke
             {
                 if (NativeType != null)
                 {
-                    return NativeType.DigThroughTypedefAndNamedTypes();
+                    return NativeType.DigThroughTypeDefAndNamedTypes();
                 }
 
                 return null;
@@ -1703,7 +1671,6 @@ namespace PInvoke
     /// <summary>
     /// Constant in Native code
     /// </summary>
-    /// <remarks></remarks>
     public class NativeConstant : NativeExtraSymbol
     {
         private NativeValueExpression _value;
@@ -1746,11 +1713,9 @@ namespace PInvoke
             }
         }
 
-        public override NativeSymbolKind Kind
-        {
-            get { return NativeSymbolKind.Constant; }
-        }
+        public override NativeSymbolKind Kind => NativeSymbolKind.Constant;
 
+        public NativeName NativeName => new NativeName(Name, NativeNameKind.Constant);
 
         private NativeConstant()
         {
@@ -1799,7 +1764,6 @@ namespace PInvoke
     /// <summary>
     /// Represents the value of an experession
     /// </summary>
-    /// <remarks></remarks>
     public class NativeValueExpression : NativeExtraSymbol
     {
         private string _expression;
@@ -1807,6 +1771,7 @@ namespace PInvoke
         private ExpressionNode _node;
 
         private bool _errorParsingExpr = false;
+
         /// <summary>
         /// Value of the expression
         /// </summary>
@@ -2137,7 +2102,7 @@ namespace PInvoke
             _value = value;
         }
 
-        public override System.Collections.Generic.IEnumerable<NativeSymbol> GetChildren()
+        public override IEnumerable<NativeSymbol> GetChildren()
         {
             if (_valueKind == NativeValueKind.SymbolType)
             {
@@ -2176,7 +2141,7 @@ namespace PInvoke
 
         public static NativeValue CreateNumber(Number n)
         {
-            // CTODO: Consider passing Number through here.
+            // TODO: Consider passing Number through here.
             return new NativeValue(n.Value, NativeValueKind.Number);
         }
 
@@ -2260,10 +2225,16 @@ namespace PInvoke
             }
             else if (token.IsAnyWord)
             {
-                NativeSymbol symbol;
-                if (bag != null && bag.TryFindValue(token.Value, out symbol))
+                NativeConstant constant;
+                NativeEnum enumeration;
+                NativeEnumValue value;
+                if (bag != null && bag.TryGetGlobalSymbol(token.Value, out constant))
                 {
-                    ntVal = NativeValue.CreateSymbolValue(token.Value, symbol);
+                    ntVal = NativeValue.CreateSymbolValue(token.Value, constant);
+                }
+                else if (bag != null && bag.TryGetEnumByValueName(token.Value, out enumeration, out value))
+                {
+                    ntVal = NativeValue.CreateSymbolValue(token.Value, enumeration);
                 }
                 else
                 {
@@ -2277,7 +2248,6 @@ namespace PInvoke
 
     #region "SAL attributes"
 
-    [Flags()]
     public enum SalEntryType
     {
         Null,
@@ -2314,12 +2284,12 @@ namespace PInvoke
     /// </summary>
     /// <remarks></remarks>
     [DebuggerDisplay("{DisplayName}")]
-    public class NativeSalEntry : NativeExtraSymbol
+    public sealed class NativeSalEntry : NativeExtraSymbol
     {
-
         private SalEntryType _type;
 
         private string _text;
+
         /// <summary>
         /// Type of attribute
         /// </summary>
@@ -2388,59 +2358,59 @@ namespace PInvoke
         {
             switch (entry)
             {
-                case PInvoke.SalEntryType.Null:
+                case SalEntryType.Null:
                     return "SAL_null";
-                case PInvoke.SalEntryType.NotNull:
+                case SalEntryType.NotNull:
                     return "SAL_notnull";
-                case PInvoke.SalEntryType.MaybeNull:
+                case SalEntryType.MaybeNull:
                     return "SAL_maybenull";
-                case PInvoke.SalEntryType.ReadOnly:
+                case SalEntryType.ReadOnly:
                     return "SAL_readonly";
-                case PInvoke.SalEntryType.NotReadOnly:
+                case SalEntryType.NotReadOnly:
                     return "SAL_notreadonly";
-                case PInvoke.SalEntryType.MaybeReadOnly:
+                case SalEntryType.MaybeReadOnly:
                     return "SAL_maybereadonly";
-                case PInvoke.SalEntryType.Valid:
+                case SalEntryType.Valid:
                     return "SAL_valid";
-                case PInvoke.SalEntryType.NotValid:
+                case SalEntryType.NotValid:
                     return "SAL_notvalid";
-                case PInvoke.SalEntryType.MaybeValid:
+                case SalEntryType.MaybeValid:
                     return "SAL_maybevalid";
-                case PInvoke.SalEntryType.ReadableTo:
+                case SalEntryType.ReadableTo:
                     return "SAL_readableTo()";
-                case PInvoke.SalEntryType.ElemReadableTo:
+                case SalEntryType.ElemReadableTo:
                     return "SAL_readableTo(elementCount())";
-                case PInvoke.SalEntryType.ByteReadableTo:
+                case SalEntryType.ByteReadableTo:
                     return "SAL_readableTo(byteCount())";
-                case PInvoke.SalEntryType.WritableTo:
+                case SalEntryType.WritableTo:
                     return "SAL_writableTo()";
-                case PInvoke.SalEntryType.ElemWritableTo:
+                case SalEntryType.ElemWritableTo:
                     return "SAL_writableTo(elementCount())";
-                case PInvoke.SalEntryType.ByteWritableTo:
+                case SalEntryType.ByteWritableTo:
                     return "SAL_writableTo(byteCount())";
-                case PInvoke.SalEntryType.Deref:
+                case SalEntryType.Deref:
                     return "SAL_deref";
-                case PInvoke.SalEntryType.Pre:
+                case SalEntryType.Pre:
                     return "SAL_pre";
-                case PInvoke.SalEntryType.Post:
+                case SalEntryType.Post:
                     return "SAL_post";
-                case PInvoke.SalEntryType.ExceptThat:
+                case SalEntryType.ExceptThat:
                     return "SAL_except";
-                case PInvoke.SalEntryType.InnerControlEntryPoint:
+                case SalEntryType.InnerControlEntryPoint:
                     return "SAL_entrypoint(controlEntry, )";
-                case PInvoke.SalEntryType.InnerDataEntryPoint:
+                case SalEntryType.InnerDataEntryPoint:
                     return "SAL_entrypoint(dataEntry, )";
-                case PInvoke.SalEntryType.InnerSucces:
+                case SalEntryType.InnerSucces:
                     return "SAL_success()";
-                case PInvoke.SalEntryType.InnerCheckReturn:
+                case SalEntryType.InnerCheckReturn:
                     return "SAL_checkReturn";
-                case PInvoke.SalEntryType.InnerTypefix:
+                case SalEntryType.InnerTypefix:
                     return "SAL_typefix";
-                case PInvoke.SalEntryType.InnerOverride:
+                case SalEntryType.InnerOverride:
                     return "__override";
-                case PInvoke.SalEntryType.InnerCallBack:
+                case SalEntryType.InnerCallBack:
                     return "__callback";
-                case PInvoke.SalEntryType.InnerBlocksOn:
+                case SalEntryType.InnerBlocksOn:
                     return "SAL_blocksOn()";
                 default:
                     ThrowInvalidEnumValue(entry);
@@ -2453,13 +2423,11 @@ namespace PInvoke
     /// <summary>
     /// Represents the collection of SAL attributes
     /// </summary>
-    /// <remarks></remarks>
     [DebuggerDisplay("{DisplayName}")]
     public class NativeSalAttribute : NativeExtraSymbol
     {
-
-
         private List<NativeSalEntry> _list = new List<NativeSalEntry>();
+
         public override NativeSymbolKind Kind
         {
             get { return NativeSymbolKind.SalAttribute; }
@@ -2468,9 +2436,6 @@ namespace PInvoke
         /// <summary>
         /// List of attribute entries
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
         public List<NativeSalEntry> SalEntryList
         {
             get { return _list; }
@@ -2479,9 +2444,6 @@ namespace PInvoke
         /// <summary>
         /// True if there are no entries in the attribute
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
         public bool IsEmpty
         {
             get { return _list.Count == 0; }
@@ -2554,25 +2516,16 @@ namespace PInvoke
         /// <summary>
         /// Return type of the NativeProcedure
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
         public NativeType ReturnType;
 
         /// <summary>
         /// SAL attribute on the return type of the procedure
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
         public NativeSalAttribute ReturnTypeSalAttribute = new NativeSalAttribute();
 
         /// <summary>
         /// Parameters of the procedure
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
         public List<NativeParameter> Parameters
         {
             get { return _paramList; }

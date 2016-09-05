@@ -201,7 +201,7 @@ namespace PInvoke.Test
                 NativeNamedType namedtype = (NativeNamedType)nt;
                 if (namedtype.RealType == null)
                 {
-                    break; // TODO: might not be correct. Was : Exit While
+                    break;
                 }
 
                 nt = namedtype.RealType;
@@ -291,7 +291,7 @@ namespace PInvoke.Test
                 case NativeSymbolKind.NamedType:
                     ret = (0 == string.CompareOrdinal(((NativeNamedType)left).Name, ((NativeNamedType)right).Name));
                     break;
-                case NativeSymbolKind.TypedefType:
+                case NativeSymbolKind.TypeDefType:
                     ret = (0 == string.CompareOrdinal(((NativeTypeDef)left).Name, ((NativeTypeDef)right).Name));
                     break;
                 case NativeSymbolKind.PointerType:

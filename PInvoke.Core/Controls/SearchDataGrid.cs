@@ -3,20 +3,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Data;
 using System.Diagnostics;
 using System.ComponentModel;
 using System.Windows.Forms;
-using PInvoke;
-using ConstantRow = PInvoke.NativeStorage.ConstantRow;
-using ProcedureRow = PInvoke.NativeStorage.ProcedureRow;
-using DefinedTypeRow = PInvoke.NativeStorage.DefinedTypeRow;
-using TypedefTypeRow = PInvoke.NativeStorage.TypedefTypeRow;
 
 namespace PInvoke.Controls
 {
-    #region "SearchDataGrid"
-
     public enum SearchKind
     {
         None,
@@ -28,37 +22,39 @@ namespace PInvoke.Controls
 
     public class SearchDataGrid : DataGridView
     {
+        private Timer _timerRaw = new Timer();
 
-        private Timer withEventsField_m_timer = new Timer();
-        private Timer m_timer
-        {
-            get { return withEventsField_m_timer; }
-            set
-            {
-                if (withEventsField_m_timer != null)
-                {
-                    withEventsField_m_timer.Tick -= OnTimerInterval;
-                }
-                withEventsField_m_timer = value;
-                if (withEventsField_m_timer != null)
-                {
-                    withEventsField_m_timer.Tick += OnTimerInterval;
-                }
-            }
-        }
         private DataGridViewColumn _nameColumn;
         private DataGridViewColumn _valueColumn;
-        private NativeStorage _ns;
+        private INativeSymbolStorage _storage;
         private IncrementalSearch _search;
         private string _searchText;
         private bool _showInvalidData;
-        private List<object> _list = new List<object>();
+        private List<NativeName> _list = new List<NativeName>();
         private SearchKind _kind;
         private SearchDataGridInfo _info;
         private bool _handleCreated;
         private NativeSymbolBag _selectionBag;
 
         private List<string> _selectionList = new List<string>();
+
+        private Timer Timer
+        {
+            get { return _timerRaw; }
+            set
+            {
+                if (_timerRaw != null)
+                {
+                    _timerRaw.Tick -= OnTimerInterval;
+                }
+                _timerRaw = value;
+                if (_timerRaw != null)
+                {
+                    _timerRaw.Tick += OnTimerInterval;
+                }
+            }
+        }
+
         /// <summary>
         /// Have to do this to prevent the designer from serializing my columns
         /// </summary>
@@ -82,15 +78,15 @@ namespace PInvoke.Controls
         }
 
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public NativeStorage NativeStorage
+        public INativeSymbolStorage Storage
         {
-            get { return _ns; }
+            get { return _storage; }
             set
             {
-                _ns = value;
+                _storage = value;
                 if (_info != null)
                 {
-                    _info.NativeStorage = value;
+                    _info.Storage = value;
                     StartSearch();
                 }
             }
@@ -103,8 +99,9 @@ namespace PInvoke.Controls
                 List<NativeSymbol> list = new List<NativeSymbol>();
                 foreach (DataGridViewRow row in SelectedRows)
                 {
-                    NativeSymbol symbol = null;
-                    if (_info.TryConvertToSymbol(_list[row.Index], ref symbol))
+                    var name = _list[row.Index];
+                    NativeSymbol symbol;
+                    if (Storage.TryGetGlobalSymbol(name, out symbol))
                     {
                         list.Add(symbol);
                     }
@@ -124,7 +121,7 @@ namespace PInvoke.Controls
                     return _selectionBag;
                 }
 
-                NativeSymbolBag bag = new NativeSymbolBag(_ns);
+                NativeSymbolBag bag = new NativeSymbolBag(_storage);
                 foreach (NativeSymbol cur in SelectedSymbols)
                 {
 
@@ -144,8 +141,8 @@ namespace PInvoke.Controls
                                 case NativeSymbolKind.Procedure:
                                     bag.AddProcedure((NativeProcedure)cur);
                                     break;
-                                case NativeSymbolKind.TypedefType:
-                                    bag.AddTypedef((NativeTypeDef)cur);
+                                case NativeSymbolKind.TypeDefType:
+                                    bag.AddTypeDef((NativeTypeDef)cur);
                                     break;
                                 default:
                                     Contract.ThrowInvalidEnumValue(cur.Kind);
@@ -172,20 +169,20 @@ namespace PInvoke.Controls
                 _kind = value;
                 switch (_kind)
                 {
-                    case PInvoke.Controls.SearchKind.Constant:
-                        _info = new SearchDataGridInfo.ConstantsInfo();
+                    case SearchKind.Constant:
+                        _info = new SearchDataGridInfo.ConstantsInfo(Storage);
                         break;
-                    case PInvoke.Controls.SearchKind.Procedure:
-                        _info = new SearchDataGridInfo.ProcedureInfo();
+                    case SearchKind.Procedure:
+                        _info = new SearchDataGridInfo.ProcedureInfo(Storage);
                         break;
-                    case PInvoke.Controls.SearchKind.Type:
-                        _info = new SearchDataGridInfo.TypeInfo();
+                    case SearchKind.Type:
+                        _info = new SearchDataGridInfo.TypeInfo(Storage);
                         break;
-                    case PInvoke.Controls.SearchKind.None:
+                    case SearchKind.None:
                         _info = new SearchDataGridInfo.EmptyInfo();
                         break;
-                    case PInvoke.Controls.SearchKind.All:
-                        _info = new SearchDataGridInfo.AllInfo();
+                    case SearchKind.All:
+                        _info = new SearchDataGridInfo.AllInfo(Storage);
                         break;
                     default:
                         _info = new SearchDataGridInfo.EmptyInfo();
@@ -214,11 +211,16 @@ namespace PInvoke.Controls
         [Category("Action")]
         public event EventHandler SelectedSymbolsChanged;
 
-        public SearchDataGrid()
+        public SearchDataGrid() : this(new BasicSymbolStorage())
         {
-            _ns = NativeStorage.DefaultInstance;
-            m_timer.Enabled = false;
-            m_timer.Interval = 500;
+
+        }
+
+        public SearchDataGrid(INativeSymbolStorage storage)
+        {
+            _storage = storage;
+            Timer.Enabled = false;
+            Timer.Interval = 500;
 
             this.VirtualMode = true;
             this.ReadOnly = true;
@@ -258,7 +260,7 @@ namespace PInvoke.Controls
 
             if (disposing)
             {
-                m_timer.Dispose();
+                Timer.Dispose();
             }
         }
 
@@ -270,10 +272,10 @@ namespace PInvoke.Controls
                 return;
             }
 
-            object cur = _list[e.RowIndex];
+            var cur = _list[e.RowIndex];
             if (e.ColumnIndex == _nameColumn.Index)
             {
-                e.Value = _info.GetName(cur);
+                e.Value = cur.Name;
             }
             else if (e.ColumnIndex == _valueColumn.Index)
             {
@@ -310,9 +312,6 @@ namespace PInvoke.Controls
 
         #endregion
 
-        #region "Helpers"
-
-
         private void StartSearch()
         {
             // Don't start searching until we are actually displayed.  
@@ -322,7 +321,7 @@ namespace PInvoke.Controls
             }
 
             _list.Clear();
-            m_timer.Enabled = true;
+            Timer.Enabled = true;
             RowCount = 0;
 
             if (_search != null)
@@ -332,7 +331,7 @@ namespace PInvoke.Controls
 
             _info.ShowInvalidData = _showInvalidData;
             _info.SearchText = SearchText;
-            _info.NativeStorage = _ns;
+            _info.Storage = _storage;
             _search = new IncrementalSearch(_info.GetInitialData(), _info.ShouldAllow);
 
             SearchImpl();
@@ -343,7 +342,7 @@ namespace PInvoke.Controls
             if (_search == null)
             {
                 CheckForSelectedSymbolChange();
-                m_timer.Enabled = false;
+                Timer.Enabled = false;
                 return;
             }
 
@@ -372,15 +371,14 @@ namespace PInvoke.Controls
         /// <param name="right"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        private int SearchSort(object left, object right)
+        private int SearchSort(NativeName left, NativeName right)
         {
             string target = SearchText;
-            string leftName = _info.GetName(left);
-            string rightName = _info.GetName(right);
+            string leftName = left.Name;
+            string rightName = right.Name;
 
             if (!string.IsNullOrEmpty(target))
             {
-
                 bool leftStart = leftName.StartsWith(target, StringComparison.OrdinalIgnoreCase);
                 bool rightStart = rightName.StartsWith(target, StringComparison.OrdinalIgnoreCase);
                 if (leftStart != rightStart)
@@ -440,7 +438,7 @@ namespace PInvoke.Controls
                     if (!StringComparer.Ordinal.Equals(_selectionList[i], GetHashString(SelectedRows[i])))
                     {
                         changed = true;
-                        break; // TODO: might not be correct. Was : Exit For
+                        break;
                     }
                 }
             }
@@ -463,66 +461,91 @@ namespace PInvoke.Controls
                 }
             }
         }
-        #endregion
-
     }
 
     public abstract class SearchDataGridInfo
     {
-        public NativeStorage NativeStorage = NativeStorage.DefaultInstance;
+        // TODO: should this be a lookup instead? 
+        public INativeSymbolStorage Storage;
         public bool ShowInvalidData;
 
         public string SearchText;
+
         public virtual string ValueColumnName
         {
             get { return "Value"; }
         }
 
-        public bool ShouldAllow(object cur)
+        protected SearchDataGridInfo(INativeSymbolStorage storage)
         {
-            return ShouldAllowCore(cur);
+            Storage = storage;
         }
 
-        public abstract IEnumerable GetInitialData();
-        public abstract string GetName(object o);
-        public abstract string GetValue(object o);
-        public abstract bool TryConvertToSymbol(object o, ref NativeSymbol symbol);
+        public bool ShouldAllow(NativeName name)
+        {
+            return ShouldAllowCore(name);
+        }
 
-        protected virtual bool ShouldAllowCore(object cur)
+        public abstract IEnumerable<NativeName> GetInitialData();
+
+        public string GetValue(NativeName name)
+        {
+            NativeGlobalSymbol symbol;
+            if (!Storage.TryGetGlobalSymbol(name, out symbol))
+            {
+                return string.Empty;
+            }
+
+            return GetValue(symbol);
+        }
+
+        public string GetValue(NativeGlobalSymbol symbol)
+        {
+            switch (symbol.Kind)
+            {
+                case NativeNameKind.Struct:
+                    return $"struct {symbol.Symbol.Name}";
+                case NativeNameKind.Union:
+                    return $"union {symbol.Symbol.Name}";
+                case NativeNameKind.FunctionPointer:
+                    return $"function pointer {symbol.Symbol.Name}";
+                case NativeNameKind.Procedure:
+                    return ((NativeProcedure)symbol.Symbol).Signature.DisplayName;
+                case NativeNameKind.TypeDef:
+                    return $"typedef {symbol.Symbol.Name}";
+                case NativeNameKind.Constant:
+                    return ((NativeConstant)symbol.Symbol).Value.Expression;
+                case NativeNameKind.Enum:
+                    return $"enum {symbol.Symbol.Name}";
+                case NativeNameKind.EnumValue:
+                    return ((NativeEnumValue)symbol.Symbol).Value.Expression;
+                default:
+                    Contract.ThrowInvalidEnumValue(symbol.Kind);
+                    return string.Empty;
+            }
+        }
+
+        protected virtual bool ShouldAllowCore(NativeName name)
         {
             if (string.IsNullOrEmpty(SearchText))
             {
                 return true;
             }
 
-            string name = GetName(cur);
-            return name.IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) >= 0;
+            string rawName = name.Name;
+            return rawName.IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         #region "EmptyInfo"
 
         public class EmptyInfo : SearchDataGridInfo
         {
-
-            public override System.Collections.IEnumerable GetInitialData()
+            public EmptyInfo() : base(new BasicSymbolStorage())
             {
-                return new List<object>();
+
             }
 
-            public override string GetName(object o)
-            {
-                return string.Empty;
-            }
-
-            public override string GetValue(object o)
-            {
-                return string.Empty;
-            }
-
-            public override bool TryConvertToSymbol(object o, ref NativeSymbol symbol)
-            {
-                return false;
-            }
+            public override IEnumerable<NativeName> GetInitialData() => new NativeName[] { };
         }
 
         #endregion
@@ -530,72 +553,35 @@ namespace PInvoke.Controls
         #region "ConstantsInfo"
         public class ConstantsInfo : SearchDataGridInfo
         {
-
-            public override System.Collections.IEnumerable GetInitialData()
+            public ConstantsInfo(INativeSymbolStorage storage) :base(storage)
             {
-                return NativeStorage.Constant;
-            }
-
-            public override string GetName(object o)
-            {
-                ConstantRow row = (ConstantRow)o;
-                return row.Name;
-            }
-
-            public override string GetValue(object o)
-            {
-                ConstantRow row = (ConstantRow)o;
-                NativeConstant c = null;
-                if (NativeStorage.TryLoadConstant(row.Name, out c))
-                {
-                    return c.Value.Expression;
-                }
-                else
-                {
-                    return string.Empty;
-                }
 
             }
 
-            public override bool TryConvertToSymbol(object o, ref NativeSymbol symbol)
+            public override IEnumerable<NativeName> GetInitialData() => Storage.NativeNames.Where(x => x.Kind == NativeNameKind.Constant);
+
+            protected override bool ShouldAllowCore(NativeName name)
             {
-                ConstantRow row = (ConstantRow)o;
-                NativeConstant cValue = null;
-                if (NativeStorage.TryLoadConstant(row.Name, out cValue))
-                {
-                    symbol = cValue;
-                    return true;
-                }
-                else
+                NativeConstant constant;
+                if (!Storage.TryGetGlobalSymbol(name, out constant) ||
+                    !IsValidConstant(constant))
                 {
                     return false;
                 }
+
+                return base.ShouldAllowCore(name);
             }
 
-            protected override bool ShouldAllowCore(object cur)
+            public static bool IsValidConstant(NativeConstant constant)
             {
-                if (!ShowInvalidData)
-                {
-                    ConstantRow row = (ConstantRow)cur;
-                    if (!IsValidConstant(row))
-                    {
-                        return false;
-                    }
-                }
-
-                return base.ShouldAllowCore(cur);
-            }
-
-            public static bool IsValidConstant(ConstantRow row)
-            {
-                if (row.Kind == ConstantKind.MacroMethod)
+                if (constant.ConstantKind == ConstantKind.MacroMethod)
                 {
                     return false;
                 }
 
                 Parser.ExpressionParser p = new Parser.ExpressionParser();
                 Parser.ExpressionNode node = null;
-                if (!p.TryParse(row.Value, out node))
+                if (!p.TryParse(constant.Value.Expression, out node))
                 {
                     return false;
                 }
@@ -622,281 +608,59 @@ namespace PInvoke.Controls
         #endregion
 
         #region "ProcedureInfo"
+
         public class ProcedureInfo : SearchDataGridInfo
         {
-
-            public override System.Collections.IEnumerable GetInitialData()
+            public ProcedureInfo(INativeSymbolStorage storage) : base(storage)
             {
-                return NativeStorage.Procedure.Rows;
+
             }
 
-            public override string GetName(object o)
-            {
-                ProcedureRow row = (ProcedureRow)o;
-                return row.Name;
-            }
-
-            public override string GetValue(object o)
-            {
-                ProcedureRow row = (ProcedureRow)o;
-                NativeProcedure proc = null;
-                if (NativeStorage.TryLoadProcedure(row.Name, out proc))
-                {
-                    return proc.Signature.DisplayName;
-                }
-
-                return string.Empty;
-            }
-
-            public override bool TryConvertToSymbol(object o, ref NativeSymbol symbol)
-            {
-                ProcedureRow row = (ProcedureRow)o;
-                NativeProcedure proc = null;
-                if (NativeStorage.TryLoadProcedure(row.Name, out proc))
-                {
-                    symbol = proc;
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
+            public override IEnumerable<NativeName> GetInitialData() => Storage.NativeNames.Where(x => x.Kind == NativeNameKind.Procedure);
         }
+
         #endregion
 
         #region "TypeInfo"
+
         public class TypeInfo : SearchDataGridInfo
         {
-
-            public override System.Collections.IEnumerable GetInitialData()
+            public TypeInfo(INativeSymbolStorage storage) : base(storage)
             {
-                ArrayList list = new ArrayList();
-                list.AddRange(NativeStorage.DefinedType.Rows);
-                list.AddRange(NativeStorage.TypedefType.Rows);
-                return list;
+
             }
 
-            public override string GetName(object o)
-            {
-                DefinedTypeRow definedRow = o as DefinedTypeRow;
-                TypedefTypeRow typedefRow = o as TypedefTypeRow;
-                if (definedRow != null)
-                {
-                    return definedRow.Name;
-                }
-                else if (typedefRow != null)
-                {
-                    return typedefRow.Name;
-                }
-                else
-                {
-                    return string.Empty;
-                }
-            }
-
-            public override string GetValue(object o)
-            {
-                string name = GetName(o);
-                NativeType type = null;
-                if (NativeStorage.TryLoadByName(name, out type))
-                {
-                    switch (type.Kind)
-                    {
-                        case NativeSymbolKind.StructType:
-                            return "struct";
-                        case NativeSymbolKind.UnionType:
-                            return "union";
-                        case NativeSymbolKind.EnumNameValue:
-                        case NativeSymbolKind.EnumType:
-                            return "enum";
-                        case NativeSymbolKind.FunctionPointer:
-                            return "function pointer";
-                        case NativeSymbolKind.TypedefType:
-                            return "typedef";
-                    }
-                }
-
-                return string.Empty;
-            }
-
-            public override bool TryConvertToSymbol(object o, ref NativeSymbol symbol)
-            {
-                string name = GetName(o);
-                NativeType type = null;
-                if (NativeStorage.TryLoadByName(name, out type))
-                {
-                    symbol = type;
-                    return true;
-                }
-
-                return false;
-            }
+            public override IEnumerable<NativeName> GetInitialData() => Storage.NativeNames.Where(x => NativeNameUtil.IsAnyType(x.Kind));
         }
+
         #endregion
 
         #region "AllInfo"
+
         public class AllInfo : SearchDataGridInfo
         {
-
-            public override System.Collections.IEnumerable GetInitialData()
+            public AllInfo(INativeSymbolStorage storage) : base(storage)
             {
-                ArrayList list = new ArrayList();
-                list.AddRange(NativeStorage.Constant.Rows);
-                list.AddRange(NativeStorage.Procedure.Rows);
-                list.AddRange(NativeStorage.DefinedType.Rows);
-                list.AddRange(NativeStorage.TypedefType.Rows);
-                return list;
             }
 
-            public override string GetName(object o)
+            public override IEnumerable<NativeName> GetInitialData() => Storage.NativeNames;
+
+            protected override bool ShouldAllowCore(NativeName name)
             {
-                ProcedureRow procRow = o as ProcedureRow;
-                ConstantRow constRow = o as ConstantRow;
-                DefinedTypeRow definedRow = o as DefinedTypeRow;
-                TypedefTypeRow typedefRow = o as TypedefTypeRow;
-                if (definedRow != null)
+                if (!ShowInvalidData && name.Kind == NativeNameKind.Constant)
                 {
-                    return definedRow.Name;
-                }
-                else if (typedefRow != null)
-                {
-                    return typedefRow.Name;
-                }
-                else if (constRow != null)
-                {
-                    return constRow.Name;
-                }
-                else if (procRow != null)
-                {
-                    return procRow.Name;
-                }
-                else
-                {
-                    return string.Empty;
-                }
-            }
-
-            public override string GetValue(object o)
-            {
-                NativeSymbol symbol = null;
-                string value = null;
-                if (TryGetSymbolAndValue(o, ref symbol, ref value))
-                {
-                    return value;
-                }
-                else
-                {
-                    return string.Empty;
-                }
-            }
-
-            public override bool TryConvertToSymbol(object o, ref NativeSymbol symbol)
-            {
-                string value = null;
-                return TryGetSymbolAndValue(o, ref symbol, ref value);
-            }
-
-            private bool TryGetSymbolAndValue(object o, ref NativeSymbol symbol, ref string value)
-            {
-                ProcedureRow procRow = o as ProcedureRow;
-                ConstantRow constRow = o as ConstantRow;
-                DefinedTypeRow definedRow = o as DefinedTypeRow;
-                TypedefTypeRow typedefRow = o as TypedefTypeRow;
-                string name = GetName(o);
-
-                bool ret = true;
-                if (definedRow != null || typedefRow != null)
-                {
-                    NativeType type = null;
-                    if (NativeStorage.TryLoadByName(name, out type))
-                    {
-                        symbol = type;
-                        switch (type.Kind)
-                        {
-                            case NativeSymbolKind.StructType:
-                                value = "struct";
-                                break;
-                            case NativeSymbolKind.UnionType:
-                                value = "union";
-                                break;
-                            case NativeSymbolKind.EnumType:
-                                value = "enum";
-                                break;
-                            case NativeSymbolKind.EnumNameValue:
-                                value = "enum";
-                                break;
-                            case NativeSymbolKind.FunctionPointer:
-                                value = "function pointer";
-                                break;
-                            case NativeSymbolKind.TypedefType:
-                                value = "typedef";
-                                break;
-                            default:
-                                ret = false;
-                                break;
-                        }
-                    }
-                    else
-                    {
-                        ret = false;
-                    }
-                }
-                else if (constRow != null)
-                {
-                    NativeConstant cValue = null;
-                    if (NativeStorage.TryLoadConstant(name, out cValue))
-                    {
-                        symbol = cValue;
-                        value = cValue.Value.Expression;
-                    }
-                    else
-                    {
-                        ret = false;
-                    }
-                }
-                else if (procRow != null)
-                {
-                    NativeProcedure proc = null;
-                    if (NativeStorage.TryLoadProcedure(name, out proc))
-                    {
-                        symbol = proc;
-                        value = proc.Signature.DisplayName;
-                    }
-                    else
-                    {
-                        ret = false;
-                    }
-                }
-                else
-                {
-                    ret = false;
-                }
-
-                Debug.Assert(ret, "Please file a bug: " + name);
-                return ret;
-            }
-
-            protected override bool ShouldAllowCore(object cur)
-            {
-                if (!ShowInvalidData)
-                {
-                    ConstantRow constRow = cur as ConstantRow;
-                    if (constRow != null && !ConstantsInfo.IsValidConstant(constRow))
+                    NativeConstant constant;
+                    if (Storage.TryGetGlobalSymbol(name, out constant) && !ConstantsInfo.IsValidConstant(constant))
                     {
                         return false;
                     }
                 }
 
-                return base.ShouldAllowCore(cur);
+                return base.ShouldAllowCore(name);
             }
         }
 
         #endregion
 
     }
-
-
-    #endregion
-
 }

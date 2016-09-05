@@ -179,7 +179,6 @@ namespace PInvoke.Test
 
     public static class SymbolPrinter
     {
-
         public static string Convert(NativeSymbol sym)
         {
             string str = sym.Name;
@@ -194,15 +193,14 @@ namespace PInvoke.Test
 
     public static class StorageFactory
     {
-
         /// <summary>
         /// Used to create a simple set of types that can be used for testing purposes
         /// </summary>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static NativeStorage CreateStandard()
+        public static BasicSymbolStorage CreateStandard()
         {
-            NativeStorage ns = new NativeStorage();
+            var storage = new BasicSymbolStorage();
             NativePointer pt1 = default(NativePointer);
             NativeTypeDef td1 = default(NativeTypeDef);
             NativeTypeDef td2 = default(NativeTypeDef);
@@ -214,93 +212,92 @@ namespace PInvoke.Test
             List<NativeConstant> list = ProcessSal();
             foreach (NativeConstant cur in list)
             {
-                ns.AddConstant(cur);
+                storage.AddConstant(cur);
             }
 
             // Bool types
-            ns.AddTypedef(new NativeTypeDef("BOOL", BuiltinType.NativeInt32));
-            ns.AddTypedef(new NativeTypeDef("DWORD", new NativeBuiltinType(BuiltinType.NativeInt32, true)));
+            storage.AddTypeDef(new NativeTypeDef("BOOL", BuiltinType.NativeInt32));
+            storage.AddTypeDef(new NativeTypeDef("DWORD", new NativeBuiltinType(BuiltinType.NativeInt32, true)));
 
             // WPARAM 
             td1 = new NativeTypeDef("UINT_PTR", new NativeBuiltinType(BuiltinType.NativeInt32, true));
-            ns.AddTypedef(new NativeTypeDef("WPARAM", td1));
-            ns.AddTypedef(new NativeTypeDef("LPARAM", td1));
+            storage.AddTypeDef(new NativeTypeDef("WPARAM", td1));
+            storage.AddTypeDef(new NativeTypeDef("LPARAM", td1));
 
             // WCHAR
             NativeTypeDef wcharTd = new NativeTypeDef("WCHAR", new NativeBuiltinType(BuiltinType.NativeInt16, true));
-            ns.AddTypedef(wcharTd);
+            storage.AddTypeDef(wcharTd);
 
             // CHAR
             td1 = new NativeTypeDef("CHAR", BuiltinType.NativeChar);
-            ns.AddTypedef(td1);
+            storage.AddTypeDef(td1);
 
             // TCHAR
             td2 = new NativeTypeDef("TCHAR", td1);
-            ns.AddTypedef(td2);
+            storage.AddTypeDef(td2);
 
             // LPWSTR
             pt1 = new NativePointer(wcharTd);
             td2 = new NativeTypeDef("LPWSTR", pt1);
-            ns.AddTypedef(td2);
+            storage.AddTypeDef(td2);
 
             // LPCWSTR
             n1 = new NativeNamedType(wcharTd.Name, wcharTd);
             n1.IsConst = true;
             pt1 = new NativePointer(n1);
             td2 = new NativeTypeDef("LPCWSTR", pt1);
-            ns.AddTypedef(td2);
+            storage.AddTypeDef(td2);
 
             // LPSTR
             pt1 = new NativePointer(new NativeBuiltinType(BuiltinType.NativeChar));
             td1 = new NativeTypeDef("LPSTR", pt1);
-            ns.AddTypedef(td1);
+            storage.AddTypeDef(td1);
 
             // LPTSTR
-            ns.AddTypedef(new NativeTypeDef("LPTSTR", td1));
+            storage.AddTypeDef(new NativeTypeDef("LPTSTR", td1));
 
             // LPCSTR
             n1 = new NativeNamedType("char", true);
             n1.RealType = new NativeBuiltinType(BuiltinType.NativeChar, false);
             pt1 = new NativePointer(n1);
             td1 = new NativeTypeDef("LPCSTR", pt1);
-            ns.AddTypedef(td1);
+            storage.AddTypeDef(td1);
 
             // LPCTSTR
             td2 = new NativeTypeDef("LPCTSTR", td1);
-            ns.AddTypedef(td2);
+            storage.AddTypeDef(td2);
 
             // BSTR
-            ns.AddTypedef(new NativeTypeDef("OLECHAR", BuiltinType.NativeWChar));
-            ns.AddTypedef(new NativeTypeDef("BSTR", new NativePointer(new NativeTypeDef("OLECHAR", BuiltinType.NativeWChar))));
+            storage.AddTypeDef(new NativeTypeDef("OLECHAR", BuiltinType.NativeWChar));
+            storage.AddTypeDef(new NativeTypeDef("BSTR", new NativePointer(new NativeTypeDef("OLECHAR", BuiltinType.NativeWChar))));
 
             // Struct with a recrsive reference to itself
             s1 = new NativeStruct("RecursiveStruct");
             s1.Members.Add(new NativeMember("m1", new NativePointer(new NativeNamedType(s1.Name))));
-            ns.AddDefinedType(s1);
+            storage.AddDefinedType(s1);
 
             // Simple struct
             s1 = new NativeStruct("S1");
             s1.Members.Add(new NativeMember("m1", new NativeBuiltinType(BuiltinType.NativeBoolean)));
-            ns.AddDefinedType(s1);
+            storage.AddDefinedType(s1);
 
             // Simulate a few well known structures
 
             // DECIMAL
             s1 = new NativeStruct("tagDEC");
-            ns.AddDefinedType(s1);
-            ns.AddTypedef(new NativeTypeDef("DECIMAL", s1));
+            storage.AddDefinedType(s1);
+            storage.AddTypeDef(new NativeTypeDef("DECIMAL", s1));
 
             // CURRENCY
             u1 = new NativeUnion("tagCY");
-            ns.AddDefinedType(u1);
-            ns.AddTypedef(new NativeTypeDef("CY", u1));
-            ns.AddTypedef(new NativeTypeDef("CURRENCY", new NativeTypeDef("CY", u1)));
+            storage.AddDefinedType(u1);
+            storage.AddTypeDef(new NativeTypeDef("CY", u1));
+            storage.AddTypeDef(new NativeTypeDef("CURRENCY", new NativeTypeDef("CY", u1)));
 
             // BYTE
-            ns.AddTypedef(new NativeTypeDef("BYTE", new NativeBuiltinType(BuiltinType.NativeChar, true)));
+            storage.AddTypeDef(new NativeTypeDef("BYTE", new NativeBuiltinType(BuiltinType.NativeChar, true)));
 
-            ns.AcceptChanges();
-            return ns;
+            return storage;
         }
 
         private static List<NativeConstant> ProcessSal()
@@ -309,7 +306,6 @@ namespace PInvoke.Test
             Parser.NativeCodeAnalyzerResult result = analyzer.Analyze("SampleFiles\\specstrings.h");
             return result.ConvertMacrosToConstants();
         }
-
     }
 
     public static class GeneratedCodeVerification
@@ -403,7 +399,7 @@ namespace PInvoke.Test
         {
             Assert.True(bag.TryResolveSymbolsAndValues());
 
-            BasicConverter con = new BasicConverter();
+            BasicConverter con = new BasicConverter(lang, StorageFactory.CreateStandard());
             CodeTypeDeclarationCollection col = con.ConvertToCodeDom(bag, new ErrorProvider());
 
             VerifyConstValue(col, lang, name, val, type);
@@ -460,7 +456,7 @@ namespace PInvoke.Test
         {
             Assert.True(bag.TryResolveSymbolsAndValues());
 
-            BasicConverter con = new BasicConverter();
+            BasicConverter con = new BasicConverter(lang, StorageFactory.CreateStandard());
             CodeTypeDeclarationCollection col = con.ConvertToCodeDom(bag, new ErrorProvider());
 
             // Look for the constants class
@@ -530,7 +526,7 @@ namespace PInvoke.Test
                 if (0 == string.CompareOrdinal(cur.Name, name))
                 {
                     ctd = cur;
-                    break; // TODO: might not be correct. Was : Exit For
+                    break;
                 }
             }
 
@@ -572,7 +568,7 @@ namespace PInvoke.Test
                 if (string.Equals(name, cur.Name, StringComparison.Ordinal))
                 {
                     found = cur;
-                    break; // TODO: might not be correct. Was : Exit For
+                    break;
                 }
             }
 
@@ -626,7 +622,7 @@ namespace PInvoke.Test
                 if (0 == string.CompareOrdinal(name, mem.Name))
                 {
                     cMem = mem;
-                    break; // TODO: might not be correct. Was : Exit For
+                    break;
                 }
             }
 
@@ -656,7 +652,7 @@ namespace PInvoke.Test
                 if (string.Equals(name, cur.Name, StringComparison.Ordinal))
                 {
                     decl = cur;
-                    break; // TODO: might not be correct. Was : Exit For
+                    break;
                 }
             }
 
@@ -670,7 +666,7 @@ namespace PInvoke.Test
                 if (string.Equals(name, cur.Name, StringComparison.Ordinal))
                 {
                     arg = cur;
-                    break; // TODO: might not be correct. Was : Exit For
+                    break; 
                 }
             }
         }

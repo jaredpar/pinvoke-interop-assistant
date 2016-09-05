@@ -40,20 +40,20 @@ internal static class Program
         }
     }
 
-    private static NativeStorage CreateInitialNativeStorage()
+    private static BasicSymbolStorage CreateInitialBasicSymbolStorage()
     {
-        NativeStorage ns = new NativeStorage();
+        var ns = new BasicSymbolStorage();
 
         // Add in the basic type defs
-        ns.AddTypedef(new NativeTypeDef("SIZE_T", new NativeBuiltinType(BuiltinType.NativeInt32, true)));
-        ns.AddTypedef(new NativeTypeDef("DWORD64", new NativeBuiltinType(BuiltinType.NativeInt64, true)));
-        ns.AddTypedef(new NativeTypeDef("HWND", new NativePointer(BuiltinType.NativeVoid)));
-        ns.AddTypedef(new NativeTypeDef("HMENU", new NativePointer(BuiltinType.NativeVoid)));
-        ns.AddTypedef(new NativeTypeDef("HACCEL", new NativePointer(BuiltinType.NativeVoid)));
-        ns.AddTypedef(new NativeTypeDef("HBRUSH", new NativePointer(BuiltinType.NativeVoid)));
-        ns.AddTypedef(new NativeTypeDef("HFONT", new NativePointer(BuiltinType.NativeVoid)));
-        ns.AddTypedef(new NativeTypeDef("HDC", new NativePointer(BuiltinType.NativeVoid)));
-        ns.AddTypedef(new NativeTypeDef("HICON", new NativePointer(BuiltinType.NativeVoid)));
+        ns.AddTypeDef(new NativeTypeDef("SIZE_T", new NativeBuiltinType(BuiltinType.NativeInt32, true)));
+        ns.AddTypeDef(new NativeTypeDef("DWORD64", new NativeBuiltinType(BuiltinType.NativeInt64, true)));
+        ns.AddTypeDef(new NativeTypeDef("HWND", new NativePointer(BuiltinType.NativeVoid)));
+        ns.AddTypeDef(new NativeTypeDef("HMENU", new NativePointer(BuiltinType.NativeVoid)));
+        ns.AddTypeDef(new NativeTypeDef("HACCEL", new NativePointer(BuiltinType.NativeVoid)));
+        ns.AddTypeDef(new NativeTypeDef("HBRUSH", new NativePointer(BuiltinType.NativeVoid)));
+        ns.AddTypeDef(new NativeTypeDef("HFONT", new NativePointer(BuiltinType.NativeVoid)));
+        ns.AddTypeDef(new NativeTypeDef("HDC", new NativePointer(BuiltinType.NativeVoid)));
+        ns.AddTypeDef(new NativeTypeDef("HICON", new NativePointer(BuiltinType.NativeVoid)));
 
         return ns;
     }
@@ -64,27 +64,27 @@ internal static class Program
     /// <param name="ns"></param>
     /// <remarks></remarks>
 
-    private static void VerifyGeneratedStorage(NativeStorage ns)
+    private static void VerifyGeneratedStorage(BasicSymbolStorage ns)
     {
         NativeProcedure proc = null;
-        VerifyTrue(ns.TryLoadProcedure("SendMessageA", out proc));
-        VerifyTrue(ns.TryLoadProcedure("SendMessageW", out proc));
-        VerifyTrue(ns.TryLoadProcedure("GetForegroundWindow", out proc));
-        VerifyTrue(ns.TryLoadProcedure("CreateWellKnownSid", out proc));
+        VerifyTrue(ns.TryGetGlobalSymbol("SendMessageA", out proc));
+        VerifyTrue(ns.TryGetGlobalSymbol("SendMessageW", out proc));
+        VerifyTrue(ns.TryGetGlobalSymbol("GetForegroundWindow", out proc));
+        VerifyTrue(ns.TryGetGlobalSymbol("CreateWellKnownSid", out proc));
 
         NativeTypeDef typedef = null;
-        VerifyTrue(ns.TryLoadTypedef("LPCSTR", out typedef));
-        VerifyTrue(ns.TryLoadTypedef("LPWSTR", out typedef));
+        VerifyTrue(ns.TryGetGlobalSymbol("LPCSTR", out typedef));
+        VerifyTrue(ns.TryGetGlobalSymbol("LPWSTR", out typedef));
 
         NativeType defined = null;
-        VerifyTrue(ns.TryLoadByName("WNDPROC", out defined));
-        VerifyTrue(ns.TryLoadByName("HOOKPROC", out defined));
-        VerifyTrue(ns.TryLoadByName("tagPOINT", out defined));
-        VerifyTrue(ns.TryLoadByName("_SYSTEM_INFO", out defined));
+        VerifyTrue(ns.TryGetType("WNDPROC", out defined));
+        VerifyTrue(ns.TryGetType("HOOKPROC", out defined));
+        VerifyTrue(ns.TryGetType("tagPOINT", out defined));
+        VerifyTrue(ns.TryGetType("_SYSTEM_INFO", out defined));
 
         NativeConstant c = null;
-        VerifyTrue(ns.TryLoadConstant("WM_PAINT", out c));
-        VerifyTrue(ns.TryLoadConstant("WM_LBUTTONDOWN", out c));
+        VerifyTrue(ns.TryGetGlobalSymbol("WM_PAINT", out c));
+        VerifyTrue(ns.TryGetGlobalSymbol("WM_LBUTTONDOWN", out c));
 
     }
 
@@ -96,7 +96,7 @@ internal static class Program
         }
     }
 
-    private static NativeStorage Generate(TextWriter writer)
+    private static BasicSymbolStorage Generate(TextWriter writer)
     {
         NativeCodeAnalyzer analyzer = NativeCodeAnalyzerFactory.Create(OsVersion.WindowsVista);
         analyzer.IncludePathList.AddRange(NativeCodeAnalyzerFactory.GetCommonSdkPaths());
@@ -114,7 +114,7 @@ internal static class Program
         {
             Debug.Fail("Encountered an error during the parse");
         }
-        NativeSymbolBag bag = NativeSymbolBag.CreateFrom(result, CreateInitialNativeStorage(), ep);
+        NativeSymbolBag bag = NativeSymbolBag.CreateFrom(result, CreateInitialBasicSymbolStorage(), ep);
 
         // Resolve with the full dll list
         using (ProcedureFinder finder = new ProcedureFinder(FullDllList))
@@ -130,9 +130,11 @@ internal static class Program
         // GenerateCode(writer, bag)
 
         // Now write out the file
-        NativeStorage ns = bag.SaveToNativeStorage();
+        var ns = new BasicSymbolStorage();
+        bag.SaveToNativeStorage(ns);
         VerifyGeneratedStorage(ns);
-        ns.WriteXml("windows.xml");
+
+        // TODO: need to write to file again otherwise it's just in memory.  
 
         // Copy the file to the various applications
         File.Copy("windows.xml", "..\\..\\..\\ConsoleTool\\bin\\Debug\\windows.xml", true);

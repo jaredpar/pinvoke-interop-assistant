@@ -84,7 +84,7 @@ namespace WindowsTool
         private string _lastAssemblyPath;
 
         private bool _nativeStorageSet;
-        private NativeStorage _nativeStorage;
+        private INativeSymbolStorage _nativeStorage;
 
         private string _signatureString;
 
@@ -415,8 +415,8 @@ namespace WindowsTool
             if (!_nativeStorageSet && _nativeStorage != null)
             {
                 statusStrip.Text = String.Empty;
-                symbolDisplay.NativeStorage = _nativeStorage;
-                snippetDisplay.NativeStorage = _nativeStorage;
+                symbolDisplay.Storage = _nativeStorage;
+                snippetDisplay.Storage = _nativeStorage;
                 _nativeStorageSet = true;
             }
         }
@@ -1120,7 +1120,7 @@ namespace WindowsTool
         {
             try
             {
-                _nativeStorage = NativeStorage.LoadFromAssemblyPath();
+                _nativeStorage = new BasicSymbolStorage();
             }
             catch (Exception ex)
             {
@@ -1131,7 +1131,7 @@ namespace WindowsTool
             {
                 if (_nativeStorage == null)
                 {
-                    _nativeStorage = new NativeStorage();
+                    _nativeStorage = new BasicSymbolStorage();
                 }
             }
 

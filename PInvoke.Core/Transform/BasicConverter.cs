@@ -25,20 +25,14 @@ namespace PInvoke.Transform
     /// <remarks></remarks>
     public class BasicConverter
     {
-        private NativeStorage _ns;
+        private INativeSymbolStorage _storage;
         private LanguageType _type;
-
         private TransformKindFlags _transformKind = TransformKindFlags.All;
-        /// <summary>
-        /// Native storage to use when resolving types
-        /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public NativeStorage NativeStorage
+
+        public INativeSymbolStorage Storage
         {
-            get { return _ns; }
-            set { _ns = value; }
+            get { return _storage; }
+            set { _storage = value; }
         }
 
         /// <summary>
@@ -59,23 +53,15 @@ namespace PInvoke.Transform
             set { _transformKind = value; }
         }
 
-        public BasicConverter() : this(LanguageType.VisualBasic, NativeStorage.DefaultInstance)
+        public BasicConverter(LanguageType type, INativeSymbolStorage storage)
         {
-        }
-
-        public BasicConverter(LanguageType type) : this(type, NativeStorage.DefaultInstance)
-        {
-        }
-
-        public BasicConverter(LanguageType type, NativeStorage ns)
-        {
-            _ns = ns;
+            _storage = storage;
             _type = type;
         }
 
         public CodeTypeDeclarationCollection ConvertToCodeDom(NativeConstant c, ErrorProvider ep)
         {
-            NativeSymbolBag bag = new NativeSymbolBag(_ns);
+            NativeSymbolBag bag = new NativeSymbolBag(_storage);
             bag.AddConstant(c);
             return ConvertBagToCodeDom(bag, ep);
         }
@@ -89,8 +75,8 @@ namespace PInvoke.Transform
 
         public CodeTypeDeclarationCollection ConvertToCodeDom(NativeTypeDef typedef, ErrorProvider ep)
         {
-            NativeSymbolBag bag = new NativeSymbolBag(_ns);
-            bag.AddTypedef(typedef);
+            NativeSymbolBag bag = new NativeSymbolBag(_storage);
+            bag.AddTypeDef(typedef);
             return ConvertBagToCodeDom(bag, ep);
         }
 
@@ -103,7 +89,7 @@ namespace PInvoke.Transform
 
         public CodeTypeDeclarationCollection ConvertToCodeDom(NativeDefinedType definedNt, ErrorProvider ep)
         {
-            NativeSymbolBag bag = new NativeSymbolBag(_ns);
+            NativeSymbolBag bag = new NativeSymbolBag(_storage);
             bag.AddDefinedType(definedNt);
             return ConvertBagToCodeDom(bag, ep);
         }
@@ -117,7 +103,7 @@ namespace PInvoke.Transform
 
         public CodeTypeDeclarationCollection ConvertToCodeDom(NativeProcedure proc, ErrorProvider ep)
         {
-            NativeSymbolBag bag = new NativeSymbolBag(_ns);
+            NativeSymbolBag bag = new NativeSymbolBag(_storage);
             bag.AddProcedure(proc);
             return ConvertBagToCodeDom(bag, ep);
         }
@@ -177,8 +163,9 @@ namespace PInvoke.Transform
                 throw new ArgumentNullException("ep");
             }
 
-            NativeCodeAnalyzer analyzer = NativeCodeAnalyzerFactory.CreateForMiniParse(OsVersion.WindowsVista, _ns.LoadAllMacros());
-            // CTODO: probably should delete this 
+            var analyzer = NativeCodeAnalyzerFactory.CreateForMiniParse(OsVersion.WindowsVista, _storage.GetAllMacros());
+
+            // TODO: probably should delete this 
             analyzer.IncludePathList.Add("c:\\program files (x86)\\windows kits\\8.1\\include\\shared");
             NativeSymbolBag bag = default(NativeSymbolBag);
             using (System.IO.StringReader reader = new StringReader(code))
@@ -186,7 +173,7 @@ namespace PInvoke.Transform
                 NativeCodeAnalyzerResult result = analyzer.Analyze(reader);
 
                 ep.Append(result.ErrorProvider);
-                bag = NativeSymbolBag.CreateFrom(result, _ns);
+                bag = NativeSymbolBag.CreateFrom(result, _storage);
             }
 
             return ConvertBagToCodeDom(bag, ep);
@@ -348,7 +335,7 @@ namespace PInvoke.Transform
                 if (NativeSymbolCategory.Defined == sym.Category)
                 {
                     NativeDefinedType defined = null;
-                    if (!bag.TryFindDefinedType(sym.Name, out defined))
+                    if (!bag.TryGetGlobalSymbol(sym.Name, out defined))
                     {
                         bag.AddDefinedType((NativeDefinedType)sym);
                     }
@@ -387,7 +374,7 @@ namespace PInvoke.Transform
                             if (line == null)
                             {
                                 builder.Append(sigBuilder);
-                                break; // TODO: might not be correct. Was : Exit While
+                                break;
                             }
 
                             Match match = Regex.Match(line, "^\\s*public\\s+static(.*)$");
@@ -404,7 +391,7 @@ namespace PInvoke.Transform
 
                             if (Regex.IsMatch(line, "\\s*}\\s*"))
                             {
-                                break; // TODO: might not be correct. Was : Exit Do
+                                break;
                             }
                             sigBuilder.AppendLine(line);
                         } while (true);

@@ -64,7 +64,7 @@ namespace PInvoke.Transform
             }
             ThrowIfNull(child);
 
-            if (child.Kind == NativeSymbolKind.TypedefType)
+            if (child.Kind == NativeSymbolKind.TypeDefType)
             {
                 NativeTypeDef typedef = (NativeTypeDef)child;
                 if (typedef.RealType != null)

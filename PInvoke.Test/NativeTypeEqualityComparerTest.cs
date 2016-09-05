@@ -245,8 +245,8 @@ namespace PInvoke.Test
             NativeEnum e1 = new NativeEnum("e");
             NativeEnum e2 = new NativeEnum("e");
 
-            e1.Values.Add(new NativeEnumValue("v1"));
-            e2.Values.Add(new NativeEnumValue("v1"));
+            e1.Values.Add(new NativeEnumValue("e", "v1"));
+            e2.Values.Add(new NativeEnumValue("e", "v1"));
 
             NativeTypeEqualityComparer eq = NativeTypeEqualityComparer.TopLevel;
             Assert.True(eq.Equals1(e1, e2));
@@ -262,8 +262,8 @@ namespace PInvoke.Test
             NativeEnum e1 = new NativeEnum("e");
             NativeEnum e2 = new NativeEnum("e");
 
-            e1.Values.Add(new NativeEnumValue("v1", "foo"));
-            e2.Values.Add(new NativeEnumValue("v1"));
+            e1.AddValue("v1", "foo");
+            e2.AddValue("v1", "");
 
             NativeTypeEqualityComparer eq = NativeTypeEqualityComparer.TopLevel;
             Assert.False(eq.Equals1(e1, e2));
@@ -279,8 +279,8 @@ namespace PInvoke.Test
             NativeEnum e1 = new NativeEnum("e");
             NativeEnum e2 = new NativeEnum("e");
 
-            e1.Values.Add(new NativeEnumValue("v1"));
-            e2.Values.Add(new NativeEnumValue("v2"));
+            e1.Values.Add(new NativeEnumValue("e", "v1"));
+            e2.Values.Add(new NativeEnumValue("e", "v2"));
 
             NativeTypeEqualityComparer eq = NativeTypeEqualityComparer.TopLevel;
             Assert.False(eq.Equals1(e1, e2));
@@ -296,11 +296,11 @@ namespace PInvoke.Test
             NativeEnum e1 = new NativeEnum("e");
             NativeEnum e2 = new NativeEnum("e");
 
-            e1.Values.Add(new NativeEnumValue("v2"));
-            e1.Values.Add(new NativeEnumValue("v1"));
+            e1.Values.Add(new NativeEnumValue("e", "v2"));
+            e1.Values.Add(new NativeEnumValue("e", "v1"));
 
-            e2.Values.Add(new NativeEnumValue("v1"));
-            e2.Values.Add(new NativeEnumValue("v2"));
+            e2.Values.Add(new NativeEnumValue("e", "v1"));
+            e2.Values.Add(new NativeEnumValue("e", "v2"));
 
             NativeTypeEqualityComparer eq = NativeTypeEqualityComparer.TopLevel;
             Assert.False(eq.Equals1(e1, e2));
@@ -318,8 +318,8 @@ namespace PInvoke.Test
             NativeEnum e2 = new NativeEnum("e");
             NativeNamedType n2 = new NativeNamedType("e", e2);
 
-            e1.Values.Add(new NativeEnumValue("v1"));
-            e2.Values.Add(new NativeEnumValue("v1"));
+            e1.Values.Add(new NativeEnumValue("e", "v1"));
+            e2.Values.Add(new NativeEnumValue("e", "v1"));
 
             NativeTypeEqualityComparer eq = NativeTypeEqualityComparer.TopLevel;
             Assert.True(eq.Equals1(e1, n2));

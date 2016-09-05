@@ -14,7 +14,6 @@ namespace PInvoke.Test
 {
     public class NativeSymbolTest
     {
-
         private void VerifyReachable(NativeType nt, params string[] names)
         {
             NativeSymbolBag bag = new NativeSymbolBag();
@@ -27,7 +26,7 @@ namespace PInvoke.Test
             }
             else if (typedefNt != null)
             {
-                bag.AddTypedef((NativeTypeDef)nt);
+                bag.AddTypeDef((NativeTypeDef)nt);
             }
             else
             {
@@ -189,9 +188,9 @@ namespace PInvoke.Test
         public void Child3()
         {
             NativeEnum e1 = new NativeEnum("e1");
-            e1.Values.Add(new NativeEnumValue("n1", "v1"));
+            e1.AddValue("n1", "v1");
             VerifyTree(e1, "e1(n1(Value(v1)))");
-            e1.Values.Add(new NativeEnumValue("n2", "v2"));
+            e1.AddValue("n2", "v2");
             VerifyTree(e1, "e1(n1(Value(v1)))(n2(Value(v2)))");
 
         }
@@ -216,8 +215,8 @@ namespace PInvoke.Test
         public void Child5()
         {
             NativeEnum e1 = new NativeEnum("e1");
-            e1.Values.Add(new NativeEnumValue("n1", "v1"));
-            e1.ReplaceChild(e1.Values[0], new NativeEnumValue("n2", "v2"));
+            e1.Values.Add(new NativeEnumValue("e1", "n1", "v1"));
+            e1.ReplaceChild(e1.Values[0], new NativeEnumValue("e1", "n2", "v2"));
             VerifyTree(e1, "e1(n2(Value(v2)))");
         }
 
@@ -314,11 +313,11 @@ namespace PInvoke.Test
         {
             NativeTypeDef td = new NativeTypeDef("foo");
             td.RealType = new NativeBuiltinType(BuiltinType.NativeByte);
-            Assert.Same(td.RealType, td.DigThroughTypedefAndNamedTypes());
+            Assert.Same(td.RealType, td.DigThroughTypeDefAndNamedTypes());
 
             NativeTypeDef outerTd = new NativeTypeDef("bar");
             outerTd.RealType = td;
-            Assert.Same(td.RealType, outerTd.DigThroughTypedefAndNamedTypes());
+            Assert.Same(td.RealType, outerTd.DigThroughTypeDefAndNamedTypes());
         }
 
         /// <summary>
@@ -330,11 +329,11 @@ namespace PInvoke.Test
         {
             NativeNamedType named = new NativeNamedType("foo");
             named.RealType = new NativeBuiltinType(BuiltinType.NativeByte);
-            Assert.Same(named.RealType, named.DigThroughTypedefAndNamedTypes());
+            Assert.Same(named.RealType, named.DigThroughTypeDefAndNamedTypes());
 
             NativeNamedType outerNamed = new NativeNamedType("bar");
             outerNamed.RealType = named;
-            Assert.Same(named.RealType, outerNamed.DigThroughTypedefAndNamedTypes());
+            Assert.Same(named.RealType, outerNamed.DigThroughTypeDefAndNamedTypes());
         }
 
         /// <summary>
@@ -345,7 +344,7 @@ namespace PInvoke.Test
         public void Dig3()
         {
             NativeNamedType named = new NativeNamedType("foo");
-            Assert.Null(named.DigThroughTypedefAndNamedTypes());
+            Assert.Null(named.DigThroughTypeDefAndNamedTypes());
         }
 
         /// <summary>
@@ -356,10 +355,10 @@ namespace PInvoke.Test
         public void Dig4()
         {
             NativePointer pt = new NativePointer(BuiltinType.NativeByte);
-            Assert.Same(pt, pt.DigThroughTypedefAndNamedTypes());
+            Assert.Same(pt, pt.DigThroughTypeDefAndNamedTypes());
 
             NativeTypeDef td = new NativeTypeDef("foo", pt);
-            Assert.Same(pt, td.DigThroughTypedefAndNamedTypes());
+            Assert.Same(pt, td.DigThroughTypeDefAndNamedTypes());
         }
 
         /// <summary>
@@ -370,9 +369,9 @@ namespace PInvoke.Test
         public void Dig5()
         {
             NativePointer pt1 = new NativePointer(new NativeTypeDef("foo", BuiltinType.NativeFloat));
-            Assert.Equal(NativeSymbolKind.BuiltinType, pt1.RealType.DigThroughTypedefAndNamedTypes().Kind);
-            Assert.Equal(NativeSymbolKind.TypedefType, pt1.RealType.DigThroughTypedefAndNamedTypesFor("foo").Kind);
-            Assert.Null(pt1.RealType.DigThroughTypedefAndNamedTypesFor("bar"));
+            Assert.Equal(NativeSymbolKind.BuiltinType, pt1.RealType.DigThroughTypeDefAndNamedTypes().Kind);
+            Assert.Equal(NativeSymbolKind.TypeDefType, pt1.RealType.DigThroughTypeDefAndNamedTypesFor("foo").Kind);
+            Assert.Null(pt1.RealType.DigThroughTypeDefAndNamedTypesFor("bar"));
         }
 
         /// <summary>
@@ -385,13 +384,13 @@ namespace PInvoke.Test
             NativeNamedType named = new NativeNamedType("bar", new NativeTypeDef("td1", BuiltinType.NativeFloat));
             NativeTypeDef td = new NativeTypeDef("foo", named);
 
-            Assert.Equal(NativeSymbolKind.TypedefType, td.DigThroughTypedefAndNamedTypesFor("foo").Kind);
-            Assert.Same(td, td.DigThroughTypedefAndNamedTypesFor("foo"));
-            Assert.Equal(NativeSymbolKind.BuiltinType, td.DigThroughTypedefAndNamedTypes().Kind);
-            Assert.Equal(NativeSymbolKind.NamedType, td.DigThroughTypedefAndNamedTypesFor("bar").Kind);
+            Assert.Equal(NativeSymbolKind.TypeDefType, td.DigThroughTypeDefAndNamedTypesFor("foo").Kind);
+            Assert.Same(td, td.DigThroughTypeDefAndNamedTypesFor("foo"));
+            Assert.Equal(NativeSymbolKind.BuiltinType, td.DigThroughTypeDefAndNamedTypes().Kind);
+            Assert.Equal(NativeSymbolKind.NamedType, td.DigThroughTypeDefAndNamedTypesFor("bar").Kind);
 
             NativeNamedType named2 = new NativeNamedType("named2", td);
-            Assert.Equal(NativeSymbolKind.TypedefType, named2.DigThroughNamedTypesFor("foo").Kind);
+            Assert.Equal(NativeSymbolKind.TypeDefType, named2.DigThroughNamedTypesFor("foo").Kind);
             Assert.Null(named2.DigThroughNamedTypesFor("bar"));
         }
 

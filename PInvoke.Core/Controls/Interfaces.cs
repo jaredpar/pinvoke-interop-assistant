@@ -1,4 +1,5 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
+using PInvoke.Transform;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,9 +17,9 @@ namespace PInvoke.Controls
     {
         Transform.LanguageType LanguageType { get; set; }
 
-        NativeStorage NativeStorage { get; set; }
+        INativeSymbolStorage Storage { get; set; }
 
-        Transform.TransformKindFlags TransformKindFlags { get; set; }
+        TransformKindFlags TransformKindFlags { get; set; }
 
         string ManagedCode { get; }
 

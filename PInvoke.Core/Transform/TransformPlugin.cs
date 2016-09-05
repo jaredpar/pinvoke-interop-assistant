@@ -294,7 +294,7 @@ namespace PInvoke.Transform
                 if (IsType(cur.AttributeType, typeof(StructLayoutAttribute)))
                 {
                     attrib = cur;
-                    break; // TODO: might not be correct. Was : Exit For
+                    break;
                 }
             }
 
@@ -315,13 +315,13 @@ namespace PInvoke.Transform
         /// <remarks></remarks>
         protected bool IsBooleanType(NativeType nt, ref BooleanType type)
         {
-            if (nt.DigThroughTypedefAndNamedTypesFor("BOOL") != null)
+            if (nt.DigThroughTypeDefAndNamedTypesFor("BOOL") != null)
             {
                 type = BooleanType.Windows;
                 return true;
             }
 
-            nt = nt.DigThroughTypedefAndNamedTypes();
+            nt = nt.DigThroughTypeDefAndNamedTypes();
             if (nt.Kind == NativeSymbolKind.BuiltinType && ((NativeBuiltinType)nt).BuiltinType == BuiltinType.NativeBoolean)
             {
                 type = BooleanType.CStyle;
@@ -338,7 +338,7 @@ namespace PInvoke.Transform
 
         protected bool IsSystemIntType(NativeType nt)
         {
-            if (nt.DigThroughTypedefAndNamedTypesFor("UINT_PTR") != null || nt.DigThroughTypedefAndNamedTypesFor("LONG_PTR") != null || nt.DigThroughTypedefAndNamedTypesFor("size_t") != null)
+            if (nt.DigThroughTypeDefAndNamedTypesFor("UINT_PTR") != null || nt.DigThroughTypeDefAndNamedTypesFor("LONG_PTR") != null || nt.DigThroughTypeDefAndNamedTypesFor("size_t") != null)
             {
                 return true;
             }
@@ -353,24 +353,24 @@ namespace PInvoke.Transform
             // BYTE is commonly typedef'd out to char however it is not a char
             // type persay.  Essentially BYTE[] should not convert into String or
             // StringBuilder
-            if (nt.DigThroughTypedefAndNamedTypesFor("BYTE") != null)
+            if (nt.DigThroughTypeDefAndNamedTypesFor("BYTE") != null)
             {
                 return false;
             }
 
-            if (nt.DigThroughTypedefAndNamedTypesFor("TCHAR") != null)
+            if (nt.DigThroughTypeDefAndNamedTypesFor("TCHAR") != null)
             {
                 charSet = System.Runtime.InteropServices.CharSet.Auto;
                 return true;
             }
 
-            if (nt.DigThroughTypedefAndNamedTypesFor("WCHAR") != null || nt.DigThroughTypedefAndNamedTypesFor("wchar_t") != null)
+            if (nt.DigThroughTypeDefAndNamedTypesFor("WCHAR") != null || nt.DigThroughTypeDefAndNamedTypesFor("wchar_t") != null)
             {
                 charSet = System.Runtime.InteropServices.CharSet.Unicode;
                 return true;
             }
 
-            NativeType digged = nt.DigThroughTypedefAndNamedTypes();
+            NativeType digged = nt.DigThroughTypeDefAndNamedTypes();
             if (digged != null && digged.Kind == NativeSymbolKind.BuiltinType)
             {
                 NativeBuiltinType bt = (NativeBuiltinType)digged;
@@ -405,7 +405,7 @@ namespace PInvoke.Transform
         {
             ThrowIfNull(nt);
 
-            nt = nt.DigThroughTypedefAndNamedTypes();
+            nt = nt.DigThroughTypeDefAndNamedTypes();
             if (nt.Kind != NativeSymbolKind.ArrayType)
             {
                 return false;
@@ -418,7 +418,7 @@ namespace PInvoke.Transform
         {
             ThrowIfNull(nt);
 
-            nt = nt.DigThroughTypedefAndNamedTypes();
+            nt = nt.DigThroughTypeDefAndNamedTypes();
             if (nt.Kind != NativeSymbolKind.ArrayType)
             {
                 return false;
@@ -438,7 +438,7 @@ namespace PInvoke.Transform
         {
             ThrowIfNull(nt);
 
-            nt = nt.DigThroughTypedefAndNamedTypes();
+            nt = nt.DigThroughTypeDefAndNamedTypes();
             if (nt.Kind != NativeSymbolKind.PointerType)
             {
                 return false;
@@ -458,7 +458,7 @@ namespace PInvoke.Transform
         {
             ThrowIfNull(nt);
 
-            nt = nt.DigThroughTypedefAndNamedTypes();
+            nt = nt.DigThroughTypeDefAndNamedTypes();
             if (nt.Kind != NativeSymbolKind.PointerType)
             {
                 return false;
@@ -499,13 +499,13 @@ namespace PInvoke.Transform
 
         protected bool IsPointerToCharType(NativeType type, ref CharSet kind)
         {
-            NativeType digged = type.DigThroughTypedefAndNamedTypes();
+            NativeType digged = type.DigThroughTypeDefAndNamedTypes();
 
             if (digged != null && digged.Kind == NativeSymbolKind.PointerType)
             {
                 // Depending on the settings, LPTSTR and LPCTSTR are commonly going to be defined as pointing
                 // to a CHAR instead of a TCHAR
-                if (type.DigThroughTypedefAndNamedTypesFor("LPCTSTR") != null || type.DigThroughTypedefAndNamedTypesFor("LPTSTR") != null)
+                if (type.DigThroughTypeDefAndNamedTypesFor("LPCTSTR") != null || type.DigThroughTypeDefAndNamedTypesFor("LPTSTR") != null)
                 {
                     kind = CharSet.Auto;
                     return true;
@@ -547,7 +547,7 @@ namespace PInvoke.Transform
         /// <remarks></remarks>
         protected bool IsPointerToConst(NativeType type)
         {
-            type = type.DigThroughTypedefAndNamedTypes();
+            type = type.DigThroughTypeDefAndNamedTypes();
             if (type.Kind != NativeSymbolKind.PointerType)
             {
                 return false;
@@ -605,12 +605,12 @@ namespace PInvoke.Transform
         protected bool IsHandleType(NativeType nt)
         {
             nt = nt.DigThroughNamedTypes();
-            if (nt.Kind == NativeSymbolKind.TypedefType && 0 == string.CompareOrdinal(nt.Name, "HANDLE"))
+            if (nt.Kind == NativeSymbolKind.TypeDefType && 0 == string.CompareOrdinal(nt.Name, "HANDLE"))
             {
                 return true;
             }
 
-            nt = nt.DigThroughTypedefAndNamedTypes();
+            nt = nt.DigThroughTypeDefAndNamedTypes();
             if (nt.Kind == NativeSymbolKind.PointerType)
             {
                 NativeType realType = ((NativePointer)nt).RealTypeDigged;
@@ -648,42 +648,42 @@ namespace PInvoke.Transform
                 return false;
             }
 
-            if (nt.DigThroughTypedefAndNamedTypesFor("LPWSTR") != null)
+            if (nt.DigThroughTypeDefAndNamedTypesFor("LPWSTR") != null)
             {
                 kind = CharSet.Unicode;
                 isConst = false;
                 return true;
             }
 
-            if (nt.DigThroughTypedefAndNamedTypesFor("LPCWSTR") != null)
+            if (nt.DigThroughTypeDefAndNamedTypesFor("LPCWSTR") != null)
             {
                 kind = CharSet.Unicode;
                 isConst = true;
                 return true;
             }
 
-            if (nt.DigThroughTypedefAndNamedTypesFor("LPTSTR") != null)
+            if (nt.DigThroughTypeDefAndNamedTypesFor("LPTSTR") != null)
             {
                 kind = CharSet.Auto;
                 isConst = false;
                 return true;
             }
 
-            if (nt.DigThroughTypedefAndNamedTypesFor("LPCTSTR") != null)
+            if (nt.DigThroughTypeDefAndNamedTypesFor("LPCTSTR") != null)
             {
                 kind = CharSet.Auto;
                 isConst = true;
                 return true;
             }
 
-            if (nt.DigThroughTypedefAndNamedTypesFor("LPSTR") != null)
+            if (nt.DigThroughTypeDefAndNamedTypesFor("LPSTR") != null)
             {
                 kind = CharSet.Ansi;
                 isConst = false;
                 return true;
             }
 
-            if (nt.DigThroughTypedefAndNamedTypesFor("LPCSTR") != null)
+            if (nt.DigThroughTypeDefAndNamedTypesFor("LPCSTR") != null)
             {
                 kind = CharSet.Ansi;
                 isConst = true;
@@ -700,7 +700,7 @@ namespace PInvoke.Transform
                 return false;
             }
 
-            if (nt.DigThroughTypedefAndNamedTypesFor("BSTR") != null)
+            if (nt.DigThroughTypeDefAndNamedTypesFor("BSTR") != null)
             {
                 return true;
             }
@@ -1352,7 +1352,7 @@ namespace PInvoke.Transform
 
         private bool HasBetterManagedType(NativeType ntType, ref CodeTypeReference codeType, CodeAttributeDeclarationCollection codeAttrib, bool isPointer)
         {
-            NativeType digged = ntType.DigThroughTypedefAndNamedTypes();
+            NativeType digged = ntType.DigThroughTypeDefAndNamedTypes();
 
             // DECIMAL Structure.  There are no additional attributes necessary to Marshal this dataStructure
 
@@ -1715,13 +1715,13 @@ namespace PInvoke.Transform
                 return;
             }
 
-            NativeType type = ntParam.NativeType.DigThroughTypedefAndNamedTypes();
+            NativeType type = ntParam.NativeType.DigThroughTypeDefAndNamedTypes();
             if (type.Kind != NativeSymbolKind.PointerType)
             {
                 return;
             }
 
-            NativeType target = ((NativePointer)type).RealType.DigThroughTypedefAndNamedTypes();
+            NativeType target = ((NativePointer)type).RealType.DigThroughTypeDefAndNamedTypes();
             if (target.Kind != NativeSymbolKind.PointerType)
             {
                 return;
@@ -1764,13 +1764,13 @@ namespace PInvoke.Transform
                 return;
             }
 
-            NativeType type = ntParam.NativeType.DigThroughTypedefAndNamedTypes();
+            NativeType type = ntParam.NativeType.DigThroughTypeDefAndNamedTypes();
             if (type.Kind != NativeSymbolKind.PointerType)
             {
                 return;
             }
 
-            NativeType target = ((NativePointer)type).RealType.DigThroughTypedefAndNamedTypes();
+            NativeType target = ((NativePointer)type).RealType.DigThroughTypeDefAndNamedTypes();
             if (target.Kind != NativeSymbolKind.PointerType)
             {
                 return;

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PInvoke
 {
-    // CTODO: probably want to remove this
+    // TODO: probably want to remove this
     public static class PortConstants
     {
         public const char CarriageReturn = '\r';

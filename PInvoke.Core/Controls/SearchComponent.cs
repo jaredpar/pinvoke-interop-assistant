@@ -10,12 +10,12 @@ using PInvoke;
 
 namespace PInvoke.Controls
 {
-    public delegate bool Filter(object arg);
+    public delegate bool Filter(NativeName arg);
 
     public class Result
     {
-        public List<object> IncrementalFound;
-        public List<object> AllFound;
+        public List<NativeName> IncrementalFound;
+        public List<NativeName> AllFound;
         public bool Completed;
     }
 
@@ -26,10 +26,11 @@ namespace PInvoke.Controls
     public class IncrementalSearch
     {
         private TimeSpan _delayTime = TimeSpan.FromSeconds(0.2);
-        private IEnumerator _enumerator;
-        private List<object> _found = new List<object>();
+        private IEnumerator<NativeName> _enumerator;
+        private List<NativeName> _found = new List<NativeName>();
 
         private Filter _filter;
+
         /// <summary>
         /// Whether or not the search is completed
         /// </summary>
@@ -47,7 +48,7 @@ namespace PInvoke.Controls
             set { _delayTime = value; }
         }
 
-        public IncrementalSearch(IEnumerable enumerable, Filter cb)
+        public IncrementalSearch(IEnumerable<NativeName> enumerable, Filter cb)
         {
             _enumerator = enumerable.GetEnumerator();
             _filter = cb;
@@ -68,12 +69,12 @@ namespace PInvoke.Controls
                 Result res2 = new Result();
                 res2.Completed = true;
                 res2.AllFound = _found;
-                res2.IncrementalFound = new List<object>();
+                res2.IncrementalFound = new List<NativeName>();
                 return res2;
             }
 
             DateTime start = DateTime.Now;
-            List<object> list = new List<object>();
+            var list = new List<NativeName>();
             bool completed = false;
             do
             {
@@ -81,10 +82,10 @@ namespace PInvoke.Controls
                 {
                     _enumerator = null;
                     completed = true;
-                    break; // TODO: might not be correct. Was : Exit Do
+                    break;
                 }
 
-                object cur = _enumerator.Current;
+                var cur = _enumerator.Current;
                 if (_filter(cur))
                 {
                     list.Add(cur);
@@ -92,7 +93,7 @@ namespace PInvoke.Controls
 
                 if ((DateTime.Now - start) > _delayTime)
                 {
-                    break; // TODO: might not be correct. Was : Exit Do
+                    break;
                 }
             } while (true);
 

@@ -290,8 +290,8 @@ namespace PInvoke.Test
         [Fact()]
         public void RawString2()
         {
-            VerifyProc("void p1(LPCWSTR p)", "p1(InAttribute(),MarshalAsAttribute(UnmanagedType.LPWStr)In String) As Void");
             VerifyProc("void p1(LPCSTR p)", "p1(InAttribute(),MarshalAsAttribute(UnmanagedType.LPStr)In String) As Void");
+            VerifyProc("void p1(LPCWSTR p)", "p1(InAttribute(),MarshalAsAttribute(UnmanagedType.LPWStr)In String) As Void");
             VerifyProc("void p1(LPCTSTR p)", "p1(InAttribute(),MarshalAsAttribute(UnmanagedType.LPTStr)In String) As Void");
         }
 

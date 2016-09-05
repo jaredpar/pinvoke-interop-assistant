@@ -119,7 +119,7 @@ namespace PInvoke.Roslyn
                 if (sym.Category == NativeSymbolCategory.Defined)
                 {
                     NativeDefinedType defined = null;
-                    if (!bag.TryFindDefinedType(sym.Name, out defined))
+                    if (!bag.TryFindDefined(sym.Name, out defined))
                     {
                         bag.AddDefinedType((NativeDefinedType)sym);
                     }

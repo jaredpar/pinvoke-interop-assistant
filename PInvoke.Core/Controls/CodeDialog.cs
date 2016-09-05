@@ -1,34 +1,31 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
-using System.Windows.Forms;
-using PInvoke;
-using PInvoke.Parser;
+using System.Linq;
 using System.IO;
+using System.Windows.Forms;
+using PInvoke.Parser;
 
 namespace PInvoke.Controls
 {
     public partial class CodeDialog
     {
-
         private class Data
         {
             public string Text;
             public List<Macro> InitialMacroList;
         }
 
-        private List<Macro> _initialMacroList;
-
         private bool _changed;
+
         public string Code
         {
             get { return m_codeTb.Text; }
             set { m_codeTb.Text = value; }
         }
+
+        public List<Macro> InitialMacroList { get; } = new List<Macro>();
 
         private void m_okBtn_Click(System.Object sender, System.EventArgs e)
         {
@@ -40,13 +37,8 @@ namespace PInvoke.Controls
         {
             _changed = false;
             m_errorsTb.Text = "Parsing ...";
-            if (_initialMacroList == null)
-            {
-                _initialMacroList = NativeStorage.DefaultInstance.LoadAllMacros();
-            }
-
             Data data = new Data();
-            data.InitialMacroList = _initialMacroList;
+            data.InitialMacroList = InitialMacroList.ToList();
             data.Text = m_codeTb.Text;
             m_bgWorker.RunWorkerAsync(data);
         }

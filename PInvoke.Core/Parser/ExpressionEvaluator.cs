@@ -95,7 +95,7 @@ namespace PInvoke.Parser
         /// </summary>
         private ExpressionValue EvaluateCast(ExpressionNode node)
         {
-            // CTODO: why left here?  Shouldn't it be right? 
+            // TODO: why left here?  Shouldn't it be right? 
             return EvaluateCore(node.LeftNode);
         }
 

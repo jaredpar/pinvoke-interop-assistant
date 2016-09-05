@@ -87,7 +87,7 @@ namespace PInvoke.Parser
         UnionKeyword,
         EnumKeyword,
         ClassKeyword,
-        TypedefKeyword,
+        TypeDefKeyword,
         InlineKeyword,
         VolatileKeyword,
         ClrCallKeyword,
@@ -276,7 +276,7 @@ namespace PInvoke.Parser
             Dictionary<string, TokenType> keywordMap = new Dictionary<string, TokenType>(StringComparer.Ordinal);
             keywordMap["struct"] = TokenType.StructKeyword;
             keywordMap["union"] = TokenType.UnionKeyword;
-            keywordMap["typedef"] = TokenType.TypedefKeyword;
+            keywordMap["typedef"] = TokenType.TypeDefKeyword;
             keywordMap["enum"] = TokenType.EnumKeyword;
             keywordMap["class"] = TokenType.ClassKeyword;
             keywordMap["__declspec"] = TokenType.DeclSpec;
@@ -671,7 +671,7 @@ namespace PInvoke.Parser
 
             try
             {
-                // CTODO: Possible make this a function of Number
+                // TODO: Possible make this a function of Number
                 retChar = Convert.ToChar(Convert.ToInt32(number.Value));
                 return true;
             }
@@ -837,13 +837,13 @@ namespace PInvoke.Parser
                 }
                 else
                 {
-                    break; // TODO: might not be correct. Was : Exit Do
+                    break;
                 }
 
                 str = str.Substring(0, str.Length - 1);
                 if (string.IsNullOrEmpty(str))
                 {
-                    break; // TODO: might not be correct. Was : Exit Do
+                    break;
                 }
             } while (true);
 
@@ -863,7 +863,7 @@ namespace PInvoke.Parser
 
                         info.IsFloatingPoint = true;
                         str = str.Substring(0, i);
-                        break; // TODO: might not be correct. Was : Exit For
+                        break;
                     }
                     else if (cur == '.')
                     {

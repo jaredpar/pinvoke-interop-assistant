@@ -6,25 +6,22 @@ using System.Data;
 using System.Diagnostics;
 using System.ComponentModel;
 using System.Windows.Forms;
-using PInvoke;
-using ConstantRow = PInvoke.NativeStorage.ConstantRow;
 
 namespace PInvoke.Controls
 {
     public partial class SelectSymbolDialog
     {
-        private NativeStorage _ns;
+        private INativeSymbolStorage _storage;
         private SearchDataGrid _searchGrid;
-
         private NativeSymbolBag _bag;
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public NativeStorage NativeStorage
+
+        public INativeSymbolStorage Storage
         {
-            get { return _ns; }
+            get { return _storage; }
             set
             {
-                _ns = value;
-                _searchGrid.NativeStorage = value;
+                _storage = value;
+                _searchGrid.Storage = value;
             }
         }
 
@@ -36,23 +33,23 @@ namespace PInvoke.Controls
                 _searchGrid.SearchKind = value;
                 switch (value)
                 {
-                    case PInvoke.Controls.SearchKind.Constant:
+                    case SearchKind.Constant:
                         this.Name = "Select a Constant";
                         this.Label1.Text = "Constant Name";
                         break;
-                    case PInvoke.Controls.SearchKind.Procedure:
+                    case SearchKind.Procedure:
                         this.Name = "Select a Procedure";
                         this.Label1.Text = "Procedure Name";
                         break;
-                    case PInvoke.Controls.SearchKind.Type:
+                    case SearchKind.Type:
                         this.Name = "Select a Type";
                         this.Label1.Text = "Type Name";
                         break;
-                    case PInvoke.Controls.SearchKind.All:
+                    case SearchKind.All:
                         this.Name = "Select a Symbol";
                         this.Label1.Text = "Name";
                         break;
-                    case PInvoke.Controls.SearchKind.None:
+                    case SearchKind.None:
                         break;
                         // Do nothing
                 }
@@ -64,14 +61,15 @@ namespace PInvoke.Controls
             get { return _bag; }
         }
 
-        public SelectSymbolDialog() : this(SearchKind.Constant, NativeStorage.DefaultInstance)
+        public SelectSymbolDialog() : this(SearchKind.Constant, new BasicSymbolStorage())
         {
+
         }
 
-        public SelectSymbolDialog(SearchKind kind, NativeStorage ns)
+        public SelectSymbolDialog(SearchKind kind, INativeSymbolStorage ns)
         {
             InitializeComponent();
-            _ns = ns;
+            _storage = ns;
             _searchGrid = new SearchDataGrid();
             _searchGrid.Dock = DockStyle.Fill;
             TableLayoutPanel1.Controls.Add(_searchGrid, 1, 1);
@@ -79,7 +77,7 @@ namespace PInvoke.Controls
             SearchKind = kind;
         }
 
-        private void OnNameChanged(System.Object sender, System.EventArgs e)
+        private void OnNameChanged(object sender, EventArgs e)
         {
             if (_searchGrid != null)
             {
@@ -87,14 +85,14 @@ namespace PInvoke.Controls
             }
         }
 
-        private void m_okBtn_Click(System.Object sender, System.EventArgs e)
+        private void m_okBtn_Click(object sender, EventArgs e)
         {
-            this.DialogResult = System.Windows.Forms.DialogResult.OK;
+            DialogResult = DialogResult.OK;
             if (_searchGrid != null)
             {
-                this._bag = _searchGrid.SelectedSymbolBag;
+                _bag = _searchGrid.SelectedSymbolBag;
             }
-            this.Close();
+            Close();
         }
     }
 

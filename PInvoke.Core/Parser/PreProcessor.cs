@@ -456,7 +456,7 @@ namespace PInvoke.Parser
                 if (list[i].TokenType == TokenType.PoundDefine)
                 {
                     defineToken = list[i];
-                    break; // TODO: might not be correct. Was : Exit While
+                    break;
                 }
                 i += 1;
             }
@@ -468,7 +468,7 @@ namespace PInvoke.Parser
                 if (list[i].TokenType == TokenType.Word)
                 {
                     nameToken = list[i];
-                    break; // TODO: might not be correct. Was : Exit While
+                    break;
                 }
 
                 i += 1;
@@ -698,7 +698,7 @@ namespace PInvoke.Parser
                             ProcessCore(new TextReaderBag(fullPath, reader));
                         }
                         TraceToStream("include {0} end", name);
-                        break; // TODO: might not be correct. Was : Exit For
+                        break;
                     }
                 }
             }
@@ -1030,7 +1030,7 @@ namespace PInvoke.Parser
                 if (cur.TokenType == TokenType.Word && _macroMap.ContainsKey(cur.Value))
                 {
                     needAnotherPass = true;
-                    break; // TODO: might not be correct. Was : Exit For
+                    break;
                 }
             }
 

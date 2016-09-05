@@ -44,6 +44,11 @@
     <Import Include="System.Diagnostics" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BasicSymbolStorage.cs" />
+    <Compile Include="StorageUtil.Csv.cs" />
+    <Compile Include="StorageUtil.cs" />
+    <Compile Include="StorageUtil.Binary.cs" />
+    <Compile Include="CachingSymbolLookup.cs" />
     <Compile Include="Contract.cs" />
     <Compile Include="Controls\CodeBox.Designer.cs">
       <DependentUpon>CodeBox.cs</DependentUpon>
@@ -80,16 +85,38 @@
     <Compile Include="Controls\TranslateSnippetControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="EmptyNativeSymbolBag.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="INativeSymbolBag.cs" />
+    <Compile Include="INativeSymbolImporter.cs" />
+    <Compile Include="INativeSymbolStorage.cs" />
+    <Compile Include="INativeSymbolLookup.cs" />
+    <Compile Include="NativeGlobalSymbol.cs" />
+    <Compile Include="NativeName.cs" />
+    <Compile Include="Primitive\Bulk\BulkUtil.Writer.cs" />
+    <Compile Include="Primitive\Bulk\BulkUtil.Reader.cs" />
+    <Compile Include="Primitive\Bulk\BulkUtil.cs" />
+    <Compile Include="Primitive\Bulk\IBulkReader.cs" />
+    <Compile Include="Primitive\Bulk\IBulkWriter.cs" />
+    <Compile Include="Primitive\IPrimitiveReader.cs" />
+    <Compile Include="Primitive\IPrimitiveWriter.cs" />
+    <Compile Include="Primitive\PrimitiveEnumValueData.cs" />
+    <Compile Include="Primitive\PrimitiveConstantData.cs" />
+    <Compile Include="Primitive\PrimitiveTypeDefData.cs" />
+    <Compile Include="Primitive\PrimitiveTypeData.cs" />
+    <Compile Include="Primitive\PrimitiveProcedureData.cs" />
+    <Compile Include="Primitive\PrimitiveFunctionPointerData.cs" />
+    <Compile Include="Primitive\PrimitiveMemberData.cs" />
+    <Compile Include="Primitive\PrimitiveSimpleId.cs" />
+    <Compile Include="Primitive\PrimitiveSignatureTypes.cs" />
+    <Compile Include="Primitive\PrimitiveSalEntryData.cs" />
+    <Compile Include="Primitive\PrimitiveTypeId.cs" />
+    <Compile Include="Primitive\PrimitiveSymbolId.cs" />
+    <Compile Include="Primitive\PrimitiveExporter.cs" />
+    <Compile Include="Primitive\PrimitiveImporter.cs" />
+    <Compile Include="Primitive\BasicPrimitiveStorage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="NativeMethods.cs" />
-    <Compile Include="NativeStorage.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>NativeStorage.xsd</DependentUpon>
-    </Compile>
-    <Compile Include="NativeStorage.cs">
-      <DependentUpon>NativeStorage.xsd</DependentUpon>
-    </Compile>
     <Compile Include="NativeSymbolBag.cs" />
     <Compile Include="Parser\BinaryOperator.cs" />
     <Compile Include="Parser\ExpressionEvaluator.cs" />
@@ -148,18 +175,6 @@
       <DependentUpon>TranslateSnippetControl.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="NativeStorage.xsc">
-      <DependentUpon>NativeStorage.xsd</DependentUpon>
-    </None>
-    <None Include="NativeStorage.xsd">
-      <SubType>Designer</SubType>
-      <Generator>MSDataSetGenerator</Generator>
-      <LastGenOutput>NativeStorage.Designer.cs</LastGenOutput>
-    </None>
-    <None Include="NativeStorage.xss">
-      <DependentUpon>NativeStorage.xsd</DependentUpon>
-    </None>
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Linq;
 using System.IO;
 using System.Text.RegularExpressions;
 using static PInvoke.Contract;
@@ -17,103 +18,26 @@ namespace PInvoke.Parser
     /// <summary>
     /// Result of analyzing the Native Code
     /// </summary>
-    /// <remarks></remarks>
-    public class NativeCodeAnalyzerResult
+    public sealed class NativeCodeAnalyzerResult
     {
-        private Dictionary<string, Macro> _macroMap = new Dictionary<string, Macro>();
-        private List<NativeTypeDef> _typedefList = new List<NativeTypeDef>();
-        private List<NativeDefinedType> _definedTypeListt = new List<NativeDefinedType>();
-        private List<NativeProcedure> _procList = new List<NativeProcedure>();
-        private List<NativeConstant> _constList = new List<NativeConstant>();
-
-        private ErrorProvider _ep = new ErrorProvider();
         /// <summary>
         /// Final set of the macros once the code is analyzed
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public Dictionary<string, Macro> MacroMap
-        {
-            get { return _macroMap; }
-        }
+        public Dictionary<string, Macro> MacroMap { get; } = new Dictionary<string, Macro>();
 
         /// <summary>
-        /// Map of #typedefs encountered in the code
+        /// List of global symbols that were found.
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public List<NativeTypeDef> NativeTypeDefs
-        {
-            get { return _typedefList; }
-        }
-
-        /// <summary>
-        /// Map of defined types encountered in the code
-        /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public List<NativeDefinedType> NativeDefinedTypes
-        {
-            get { return _definedTypeListt; }
-        }
-
-        /// <summary>
-        /// List of NativeProcedure instances parsed from the code
-        /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public List<NativeProcedure> NativeProcedures
-        {
-            get { return _procList; }
-        }
-
-        /// <summary>
-        /// List of NativeConstants that were parsed out of the file
-        /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public List<NativeConstant> NativeConstants
-        {
-            get { return _constList; }
-        }
-
-        /// <summary>
-        /// Combination of both the typed constants and the macros that are converted into
-        /// constants
-        /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public List<NativeConstant> AllNativeConstants
-        {
-            get
-            {
-                List<NativeConstant> list = new List<NativeConstant>();
-                list.AddRange(NativeConstants);
-                list.AddRange(ConvertMacrosToConstants());
-                return list;
-            }
-        }
+        public List<NativeGlobalSymbol> Symbols { get; } = new List<NativeGlobalSymbol>();
 
         /// <summary>
         /// ErrorProvider for the result
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public ErrorProvider ErrorProvider
-        {
-            get { return _ep; }
-        }
-
+        public ErrorProvider ErrorProvider { get; } = new ErrorProvider();
 
         public NativeCodeAnalyzerResult()
         {
+
         }
 
         /// <summary>
@@ -123,9 +47,9 @@ namespace PInvoke.Parser
         /// <remarks></remarks>
         public List<NativeConstant> ConvertMacrosToConstants()
         {
-            List<NativeConstant> list = new List<NativeConstant>();
+            var list = new List<NativeConstant>();
 
-            foreach (Macro macro in _macroMap.Values)
+            foreach (Macro macro in MacroMap.Values)
             {
                 if (macro.IsMethod)
                 {
@@ -350,11 +274,10 @@ namespace PInvoke.Parser
 
             // add in the basic results
             result.ErrorProvider.Append(parseResult.ErrorProvider);
-
-            // Add in all of the parsed out types
-            result.NativeDefinedTypes.AddRange(parseResult.NativeDefinedTypes);
-            result.NativeTypeDefs.AddRange(parseResult.NativeTypedefs);
-            result.NativeProcedures.AddRange(parseResult.NativeProcedures);
+            result.Symbols.AddRange(parseResult.NativeDefinedTypes.Select(x => new NativeGlobalSymbol(x)));
+            result.Symbols.AddRange(parseResult.NativeTypeDefs.Select(x => new NativeGlobalSymbol(x)));
+            result.Symbols.AddRange(parseResult.NativeProcedures.Select(x => new NativeGlobalSymbol(x)));
+            result.Symbols.AddRange(parseResult.NativeEnumValues.Select(x => new NativeGlobalSymbol(x)));
         }
 
     }

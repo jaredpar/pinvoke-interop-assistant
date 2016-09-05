@@ -10,15 +10,96 @@ namespace PInvoke.Storage
 {
     public static partial class StorageUtil
     {
+        private static class CsvUtil
+        {
+            internal static string EscapeString(string str)
+            {
+                var builder = new StringBuilder(str.Length);
+                foreach (var c in str)
+                {
+                    switch (c)
+                    {
+                        case ',':
+                            builder.Append('#');
+                            break;
+                        case '#':
+                            builder.Append(@"\#");
+                            break;
+                        case '\r':
+                            builder.Append(@"\r");
+                            break;
+                        case '\n':
+                            builder.Append(@"\n");
+                            break;
+                        case '\\':
+                            builder.Append(@"\\");
+                            break;
+                        default:
+                            builder.Append(c);
+                            break;
+                    }
+                }
+
+                return builder.ToString();
+            }
+
+            internal static string UnescapeString(string str)
+            {
+                var builder = new StringBuilder(str.Length);
+                var i = 0;
+                while (i < str.Length)
+                {
+                    var c = str[i];
+                    if (c == '\\' && i + 1 < str.Length)
+                    {
+                        var n = str[i + 1];
+                        switch (n)
+                        {
+                            case '#':
+                                builder.Append('#');
+                                break;
+                            case '\\':
+                                builder.Append('\\');
+                                break;
+                            case 'r':
+                                builder.Append('\r');
+                                break;
+                            case 'n':
+                                builder.Append('\n');
+                                break;
+                            default:
+                                Debug.Assert(false);
+                                break;
+                        }
+                        i += 2;
+                    }
+                    else if (c == '#')
+                    {
+                        builder.Append(',');
+                        i++;
+                    }
+                    else
+                    {
+                        builder.Append(c);
+                        i++;
+                    }
+                }
+
+                return builder.ToString();
+            }
+        }
+
         private sealed class CsvBulkReader : IBulkReader
         {
             private readonly StreamReader _reader;
             private string[] _parts;
             private int _index;
+            private int _lineNumber;
 
             internal CsvBulkReader(Stream stream)
             {
                 _reader = new StreamReader(stream);
+                _lineNumber = -1;
                 ReadLine();
             }
 
@@ -29,6 +110,7 @@ namespace PInvoke.Storage
                 _parts = line == null
                     ? null
                     : line.Split(new[] { ',' }, StringSplitOptions.None);
+                _lineNumber++;
             }
 
             public bool IsDone() => _parts == null;
@@ -63,7 +145,8 @@ namespace PInvoke.Storage
                 {
                     return null;
                 }
-                return cur.Substring(1);
+
+                return CsvUtil.UnescapeString(cur.Substring(1));
             }
         }
 
@@ -71,6 +154,7 @@ namespace PInvoke.Storage
         {
             private readonly StreamWriter _writer;
             private readonly StringBuilder _builder = new StringBuilder();
+            private int _lineNumber;
 
             internal CsvBulkWriter(Stream stream)
             {
@@ -106,6 +190,7 @@ namespace PInvoke.Storage
             {
                 _writer.WriteLine(_builder.ToString());
                 _builder.Length = 0;
+                _lineNumber++;
             }
 
             public void WriteItemStart()
@@ -123,7 +208,7 @@ namespace PInvoke.Storage
                 else
                 {
                     _builder.Append("1");
-                    _builder.Append(str);
+                    _builder.Append(CsvUtil.EscapeString(str));
                 }
             }
 

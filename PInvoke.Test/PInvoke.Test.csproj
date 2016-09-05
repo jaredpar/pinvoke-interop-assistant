@@ -52,6 +52,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BasicSymbolStorageTest.cs" />
     <Compile Include="CodeDomIteratorTest.cs" />
     <Compile Include="CodeTransformTest.cs" />
     <Compile Include="EqualityUtil.cs" />

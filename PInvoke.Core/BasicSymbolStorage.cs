@@ -37,8 +37,18 @@ namespace PInvoke
                 case NativeNameKind.Struct:
                 case NativeNameKind.Union:
                 case NativeNameKind.FunctionPointer:
-                case NativeNameKind.Enum:
                     _definedMap.Add(name.Name, (NativeDefinedType)symbol);
+                    break;
+                case NativeNameKind.Enum:
+                    {
+                        // https://github.com/jaredpar/pinvoke/issues/16
+                        var enumeration = (NativeEnum)symbol;
+                        _definedMap.Add(enumeration.Name, enumeration);
+                        foreach (var value in enumeration.Values)
+                        {
+                            _enumValueMap.Add(value.Name, value);
+                        }
+                    }
                     break;
                 case NativeNameKind.Procedure:
                     _procMap.Add(name.Name, (NativeProcedure)symbol);
@@ -50,10 +60,9 @@ namespace PInvoke
                     _constMap.Add(name.Name, (NativeConstant)symbol);
                     break;
                 case NativeNameKind.EnumValue:
-                    _enumValueMap.Add(name.Name, (NativeEnumValue)symbol);
-                    break;
+                    throw new Exception("EnumValues are added automatically as a part of their containing enumeration");
                 default:
-                    break;
+                    throw Contract.CreateInvalidEnumValueException(globalSymbol.Kind);
             }
         }
 

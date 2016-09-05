@@ -11,6 +11,18 @@ namespace PInvoke
     {
         #region INativeSymbolLookup 
 
+        public static bool Contains(this INativeSymbolLookup lookup, NativeName name)
+        {
+            NativeGlobalSymbol symbol;
+            return lookup.TryGetGlobalSymbol(name, out symbol);
+        }
+
+        public static bool Contains(this INativeSymbolLookup lookup, string name)
+        {
+            NativeGlobalSymbol symbol;
+            return lookup.TryGetGlobalSymbol(name, out symbol);
+        }
+
         /// <summary>
         /// Do a lookup for a symbol with a specific name of the specified type.
         /// </summary>
@@ -158,11 +170,9 @@ namespace PInvoke
 
         public static void AddEnumAndValues(this INativeSymbolStorage storage, NativeEnum enumeration)
         {
+            // Enumerations are already special cased hence this behavior is automatic. 
+            // https://github.com/jaredpar/pinvoke/issues/16
             storage.Add(new NativeGlobalSymbol(enumeration));
-            foreach (var value in enumeration.Values)
-            {
-                storage.Add(new NativeGlobalSymbol(value));
-            }
         }
 
         public static IEnumerable<Macro> GetAllMacros(this INativeSymbolStorage storage)

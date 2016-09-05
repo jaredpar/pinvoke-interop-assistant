@@ -33,6 +33,11 @@ namespace PInvoke
             var exporter = new PrimitiveExporter(writer);
             foreach (var name in lookup.NativeNames)
             {
+                if (name.Kind == NativeNameKind.EnumValue)
+                {
+                    continue;
+                }
+
                 var symbol = lookup.GetGlobalSymbol(name);
                 exporter.Export(symbol.Symbol);
             }
@@ -51,8 +56,10 @@ namespace PInvoke
 
         public static void WriteCsv(Stream stream, INativeSymbolLookup lookup)
         {
-            var writer = BulkUtil.CreateWriter(new CsvBulkWriter(stream));
+            var bulkWriter = new CsvBulkWriter(stream);
+            var writer = BulkUtil.CreateWriter(bulkWriter);
             WriteCore(writer, lookup);
+            bulkWriter.WriteDone();
         }
     }
 }

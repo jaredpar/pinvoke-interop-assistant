@@ -137,8 +137,6 @@ namespace PInvoke
         /// <summary>
         /// Find all of the NativeNamedType instances for which a type could not be found
         /// </summary>
-        /// <returns></returns>
-        /// <remarks></remarks>
         public List<NativeSymbolRelationship> FindUnresolvedNativeSymbolRelationships()
         {
             List<NativeSymbolRelationship> list = new List<NativeSymbolRelationship>();
@@ -433,13 +431,13 @@ namespace PInvoke
 
             foreach (NativeSymbolRelationship rel in this.FindUnresolvedNativeSymbolRelationships())
             {
-                // Values and value expressions are resolved below
+                // Values and value expressions are resolved in a different pass.
                 if (rel.Symbol.Kind == NativeSymbolKind.Value || rel.Symbol.Kind == NativeSymbolKind.ValueExpression)
                 {
                     continue;
                 }
 
-                // All we can resolve here are NativeNamedType instances
+                // In this pass we are resolving the named type instances.
                 NativeNamedType namedType = rel.Symbol as NativeNamedType;
                 if (namedType == null)
                 {

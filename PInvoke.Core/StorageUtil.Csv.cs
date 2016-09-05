@@ -78,6 +78,11 @@ namespace PInvoke
                 _writer = new StreamWriter(stream);
             }
 
+            internal void WriteDone()
+            {
+                _writer.Flush();
+            }
+
             private void MaybeAddComma()
             {
                 if (_builder.Length > 0)
@@ -111,6 +116,7 @@ namespace PInvoke
 
             public void WriteString(string str)
             {
+                MaybeAddComma();
                 if (str == null)
                 {
                     _builder.Append("0");
@@ -120,6 +126,11 @@ namespace PInvoke
                     _builder.Append("1");
                     _builder.Append(str);
                 }
+            }
+
+            public void WriteEnd()
+            {
+                _writer.Flush();
             }
         }
     }

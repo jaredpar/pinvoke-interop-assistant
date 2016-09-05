@@ -19,7 +19,7 @@ namespace PInvoke
                 _reader = new BinaryReader(stream);
             }
 
-            public bool IsDone() => _reader.PeekChar() != -1;
+            public bool IsDone() => _reader.PeekChar() == -1;
 
             public bool ReadBoolean() => _reader.ReadBoolean();
 

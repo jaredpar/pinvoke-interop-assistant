@@ -76,14 +76,12 @@ namespace PInvoke.Primitive
                 case NativeSymbolKind.Constant:
                     DoExportConstant((NativeConstant)symbol);
                     break;
-                case NativeSymbolKind.EnumNameValue:
-                    DoExportEnumValue((NativeEnumValue)symbol);
-                    break;
                 case NativeSymbolKind.SalAttribute:
                 case NativeSymbolKind.SalEntry:
                 case NativeSymbolKind.BuiltinType:
                 case NativeSymbolKind.ProcedureSignature:
                 case NativeSymbolKind.BitVectorType:
+                case NativeSymbolKind.EnumNameValue:
                     // Must be handled elsewhere
                     Contract.ThrowIfFalse(false);
                     break;
@@ -115,6 +113,10 @@ namespace PInvoke.Primitive
         {
             var typeId = new PrimitiveSymbolId(e.Name, e.Kind);
             _writer.Write(typeId);
+            foreach (var value in e.Values)
+            {
+                DoExportEnumValue(value);
+            }
         }
 
         private void DoExportEnumValue(NativeEnumValue value)

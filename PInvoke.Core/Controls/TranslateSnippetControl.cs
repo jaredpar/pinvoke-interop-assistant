@@ -32,8 +32,8 @@ namespace PInvoke.Controls
         private bool _changed;
         public bool AutoGenerate
         {
-            get { return m_autoGenerateBtn.Checked; }
-            set { m_autoGenerateBtn.Checked = value; }
+            get { return _autoGenerateButton.Checked; }
+            set { _autoGenerateButton.Checked = value; }
         }
 
 
@@ -45,8 +45,8 @@ namespace PInvoke.Controls
             _storage = new BasicSymbolStorage();
 
             // Add any initialization after the InitializeComponent() call.
-            m_langTypeCb.Items.AddRange(EnumUtil.GetAllValuesObject<LanguageType>());
-            m_langTypeCb.SelectedItem = LanguageType.VisualBasic;
+            _languageTypeComboBox.Items.AddRange(EnumUtil.GetAllValuesObject<LanguageType>());
+            _languageTypeComboBox.SelectedItem = LanguageType.VisualBasic;
         }
 
         public TranslateSnippetControl(INativeSymbolStorage storage)
@@ -66,14 +66,14 @@ namespace PInvoke.Controls
         {
             get
             {
-                if (m_langTypeCb.SelectedItem == null)
+                if (_languageTypeComboBox.SelectedItem == null)
                 {
                     return Transform.LanguageType.VisualBasic;
                 }
 
-                return (LanguageType)m_langTypeCb.SelectedItem;
+                return (LanguageType)_languageTypeComboBox.SelectedItem;
             }
-            set { m_langTypeCb.SelectedItem = value; }
+            set { _languageTypeComboBox.SelectedItem = value; }
         }
 
         public INativeSymbolStorage Storage
@@ -97,7 +97,7 @@ namespace PInvoke.Controls
 
         public string ManagedCode
         {
-            get { return m_managedCodeBox.Text; }
+            get { return _managedCodeTextBox.Text; }
         }
 
         #endregion
@@ -106,7 +106,7 @@ namespace PInvoke.Controls
 
         private void OnNativeCodeChanged(object sender, EventArgs e)
         {
-            if (m_bgWorker.IsBusy)
+            if (_backgroundWorker.IsBusy)
             {
                 _changed = true;
             }
@@ -124,6 +124,8 @@ namespace PInvoke.Controls
                 RequestData req = (RequestData)e.Argument;
                 string code = req.Text;
                 NativeCodeAnalyzer analyzer = NativeCodeAnalyzerFactory.CreateForMiniParse(OsVersion.WindowsVista, req.InitialMacroList);
+
+                // TODO: shouldn't include this
                 analyzer.IncludePathList.Add("c:\\program files (x86)\\windows kits\\8.1\\include\\shared");
                 using (var reader = new StringReader(code))
                 {
@@ -155,7 +157,7 @@ namespace PInvoke.Controls
             {
                 RunWorker();
             }
-            else if (m_autoGenerateBtn.Checked)
+            else if (_autoGenerateButton.Checked)
             {
                 GenerateCode();
             }
@@ -169,7 +171,7 @@ namespace PInvoke.Controls
 
         private void OnAutoGenerateCodeCheckChanged(object sender, EventArgs e)
         {
-            if (m_autoGenerateBtn.Checked)
+            if (_autoGenerateButton.Checked)
             {
                 GenerateCode();
             }
@@ -177,7 +179,7 @@ namespace PInvoke.Controls
 
         private void OnLanguageTypeChanged(object sender, EventArgs e)
         {
-            if (m_autoGenerateBtn.Checked)
+            if (_autoGenerateButton.Checked)
             {
                 GenerateCode();
             }
@@ -192,7 +194,7 @@ namespace PInvoke.Controls
         {
             if (e.KeyCode == Keys.A & e.Modifiers == Keys.Control)
             {
-                m_nativeCodeTb.SelectAll();
+                _nativeCodeTextBox.SelectAll();
                 e.Handled = true;
             }
         }
@@ -212,8 +214,8 @@ namespace PInvoke.Controls
 
             RequestData data = new RequestData();
             data.InitialMacroList = new ReadOnlyCollection<Macro>(_initialMacroList);
-            data.Text = m_nativeCodeTb.Text;
-            m_bgWorker.RunWorkerAsync(data);
+            data.Text = _nativeCodeTextBox.Text;
+            _backgroundWorker.RunWorkerAsync(data);
         }
 
         private void GenerateCode()
@@ -222,11 +224,11 @@ namespace PInvoke.Controls
             {
                 var conv = new BasicConverter(LanguageType, _storage);
                 conv.TransformKindFlags = _transKind;
-                m_managedCodeBox.Code = conv.ConvertNativeCodeToPInvokeCode(m_nativeCodeTb.Text);
+                _managedCodeTextBox.Code = conv.ConvertNativeCodeToPInvokeCode(_nativeCodeTextBox.Text);
             }
             catch (Exception ex)
             {
-                m_managedCodeBox.Code = ex.Message;
+                _managedCodeTextBox.Code = ex.Message;
             }
         }
 

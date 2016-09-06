@@ -10,6 +10,8 @@ using System.Collections.Generic;
 using System.Threading;
 using PInvoke;
 using PInvoke.Controls;
+using PInvoke.Storage;
+using System.IO;
 
 namespace WindowsTool
 {
@@ -1120,7 +1122,10 @@ namespace WindowsTool
         {
             try
             {
-                _nativeStorage = new BasicSymbolStorage();
+                using (var stream = File.Open("windows.csv", FileMode.Open))
+                {
+                    _nativeStorage = StorageUtil.ReadCsv(stream);
+                }
             }
             catch (Exception ex)
             {

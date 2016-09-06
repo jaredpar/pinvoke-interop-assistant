@@ -116,6 +116,6 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>copy /y $(ProjectDir)..\StorageGenerator\Data\windows.xml $(TargetDir)</PostBuildEvent>
+    <PostBuildEvent>copy /y $(ProjectDir)..\StorageGenerator\Data\windows.csv $(TargetDir)</PostBuildEvent>
   </PropertyGroup>
 </Project>

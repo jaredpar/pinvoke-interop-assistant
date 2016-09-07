@@ -136,6 +136,10 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\PInvoke.Controls\PInvoke.Controls.csproj">
+      <Project>{aad41a25-9cc4-468a-827f-86ca8d01d1e5}</Project>
+      <Name>PInvoke.Controls</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PInvoke.Core\PInvoke.Core.csproj">
       <Project>{7923fd4f-41a0-48c0-8783-694802f2c1b0}</Project>
       <Name>PInvoke.Core</Name>

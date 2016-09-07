@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{566BF6D1-7434-4B60-9581-D5238D0A67CE}"
 EndProject
@@ -16,6 +16,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StorageGenerator", "StorageGenerator\StorageGenerator.csproj", "{99633762-B441-49B5-BA5A-504353ED21DF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConvertLegacyFormat", "ConvertLegacyFormat\ConvertLegacyFormat.csproj", "{8EA9EDD1-5707-41C3-BE29-F5414143C186}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PInvoke.Controls", "PInvoke.Controls\PInvoke.Controls.csproj", "{AAD41A25-9CC4-468A-827F-86CA8D01D1E5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -73,6 +75,14 @@ Global
 		{8EA9EDD1-5707-41C3-BE29-F5414143C186}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8EA9EDD1-5707-41C3-BE29-F5414143C186}.Release|x86.ActiveCfg = Release|Any CPU
 		{8EA9EDD1-5707-41C3-BE29-F5414143C186}.Release|x86.Build.0 = Release|Any CPU
+		{AAD41A25-9CC4-468A-827F-86CA8D01D1E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AAD41A25-9CC4-468A-827F-86CA8D01D1E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AAD41A25-9CC4-468A-827F-86CA8D01D1E5}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AAD41A25-9CC4-468A-827F-86CA8D01D1E5}.Debug|x86.Build.0 = Debug|Any CPU
+		{AAD41A25-9CC4-468A-827F-86CA8D01D1E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AAD41A25-9CC4-468A-827F-86CA8D01D1E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AAD41A25-9CC4-468A-827F-86CA8D01D1E5}.Release|x86.ActiveCfg = Release|Any CPU
+		{AAD41A25-9CC4-468A-827F-86CA8D01D1E5}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

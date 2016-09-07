@@ -102,9 +102,13 @@
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\WindowsTool\WindowsTool.csproj">
-      <Project>{2a7478a4-2c02-47f6-89ef-1bfb5e433211}</Project>
-      <Name>WindowsTool</Name>
+    <ProjectReference Include="..\PInvoke.Controls\PInvoke.Controls.csproj">
+      <Project>{aad41a25-9cc4-468a-827f-86ca8d01d1e5}</Project>
+      <Name>PInvoke.Controls</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PInvoke.Core\PInvoke.Core.csproj">
+      <Project>{7923fd4f-41a0-48c0-8783-694802f2c1b0}</Project>
+      <Name>PInvoke.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

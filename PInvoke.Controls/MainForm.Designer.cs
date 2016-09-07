@@ -1,4 +1,4 @@
-namespace WindowsTool
+namespace PInvoke.Controls
 {
     partial class MainForm
     {
@@ -18,7 +18,6 @@ namespace WindowsTool
                 components.Dispose();
             }
 
-            this.DisposeHelper(disposing);
             base.Dispose(disposing);
         }
 

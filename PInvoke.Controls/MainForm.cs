@@ -13,7 +13,7 @@ using PInvoke.Controls;
 using PInvoke.Storage;
 using System.IO;
 
-namespace WindowsTool
+namespace PInvoke.Controls
 {
     public partial class MainForm : Form
     {
@@ -75,8 +75,6 @@ namespace WindowsTool
 
         #region Fields and Properties
 
-        private Properties.Settings _userSettings = Properties.Settings.Default;
-
         private bool _firstTimeActivated;
         private bool _nativeStorageSet;
         private INativeSymbolStorage _nativeStorage;
@@ -126,7 +124,7 @@ namespace WindowsTool
         }
 
         //private static string applicationVersionString;
-        internal static string ApplicationVersionString
+        public static string ApplicationVersionString
         {
             get
             {
@@ -182,24 +180,6 @@ namespace WindowsTool
 
         #endregion
 
-        #region Dispose
-
-        private void DisposeHelper(bool disposing)
-        {
-            if (disposing)
-            {
-                _userSettings.Mode = (int)Mode;
-                _userSettings.PInvokeSnippetAutoGenerate = snippetDisplay.AutoGenerate;
-                _userSettings.PInvokeSearchAutoGenerate = symbolDisplay.AutoGenerate;
-                _userSettings.PInvokeLanguageType = symbolDisplay.LanguageType.ToString();
-                _userSettings.PInvokeSearchKind = symbolDisplay.SearchKind.ToString();
-                _userSettings.PInvokeShowAll = symbolDisplay.ShowAll;
-                _userSettings.Save();
-            }
-        }
-
-        #endregion
-
         #region Misc Handlers
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -219,35 +199,13 @@ namespace WindowsTool
             ThreadPool.QueueUserWorkItem(new WaitCallback(this.LoadNativeStorage), this);
 
             // Load up the correct tab page
-            switch ((TabMode)(_userSettings.Mode))
-            {
-                case TabMode.PInvokeSearch:
-                    tabControl1.SelectedTab = pinvokeSearchTabPage;
-                    break;
-                case TabMode.PInvokeSnippet:
-                    tabControl1.SelectedTab = pinvokeSnippetTabPage;
-                    break;
-                default:
-                    tabControl1.SelectedTab = pinvokeSnippetTabPage;
-                    break;
-            }
-
-            // Show all setting
-            showAllToolStripMenuItem.Checked = _userSettings.PInvokeShowAll;
-            symbolDisplay.ShowAll = _userSettings.PInvokeShowAll;
+            tabControl1.SelectedTab = pinvokeSearchTabPage;
 
             // Disable wrapper method generation
             PInvoke.Transform.TransformKindFlags transformFlags = PInvoke.Transform.TransformKindFlags.All;
             transformFlags &= ~PInvoke.Transform.TransformKindFlags.WrapperMethods;
             symbolDisplay.TransformKindFlags = transformFlags;
             snippetDisplay.TransformKindFlags = transformFlags;
-
-            // Load settings
-            symbolDisplay.AutoGenerate = _userSettings.PInvokeSearchAutoGenerate;
-            snippetDisplay.AutoGenerate = _userSettings.PInvokeSnippetAutoGenerate;
-            symbolDisplay.SearchKind = ParseOrDefault(_userSettings.PInvokeSearchKind, SearchKind.All);
-            symbolDisplay.LanguageType = ParseOrDefault(_userSettings.PInvokeLanguageType, PInvoke.Transform.LanguageType.CSharp);
-            snippetDisplay.LanguageType = ParseOrDefault(_userSettings.PInvokeLanguageType, PInvoke.Transform.LanguageType.CSharp);
             snippetDisplay.LanguageTypeChanged += new EventHandler(OnLanguageTypeChanged);
             symbolDisplay.LanguageTypeChanged += new EventHandler(OnLanguageTypeChanged);
         }

@@ -10,14 +10,15 @@ using System.Collections.Generic;
 using System.Threading;
 using PInvoke;
 using PInvoke.Controls;
+using PInvoke.Storage;
+using System.IO;
 
-namespace WindowsTool
+namespace PInvoke.Controls
 {
     public partial class MainForm : Form
     {
         private enum TabMode
         {
-            ReversePInvoke,
             PInvokeSearch,
             PInvokeSnippet
         }
@@ -74,15 +75,7 @@ namespace WindowsTool
 
         #region Fields and Properties
 
-        private Properties.Settings _userSettings = Properties.Settings.Default;
-
         private bool _firstTimeActivated;
-        private bool _printing;
-        private bool _printPending;
-
-        private string _lastTreePath;
-        private string _lastAssemblyPath;
-
         private bool _nativeStorageSet;
         private INativeSymbolStorage _nativeStorage;
 
@@ -98,11 +91,7 @@ namespace WindowsTool
         {
             get
             {
-                if (Object.ReferenceEquals(tabControl1.SelectedTab, reversePInvokeTabPage))
-                {
-                    return TabMode.ReversePInvoke;
-                }
-                else if (object.ReferenceEquals(tabControl1.SelectedTab, pinvokeSearchTabPage))
+                if (object.ReferenceEquals(tabControl1.SelectedTab, pinvokeSearchTabPage))
                 {
                     return TabMode.PInvokeSearch;
                 }
@@ -113,7 +102,7 @@ namespace WindowsTool
                 else
                 {
                     Debug.Fail("Invalid Mode");
-                    return TabMode.ReversePInvoke;
+                    return TabMode.PInvokeSnippet;
                 }
             }
         }
@@ -135,7 +124,7 @@ namespace WindowsTool
         }
 
         //private static string applicationVersionString;
-        internal static string ApplicationVersionString
+        public static string ApplicationVersionString
         {
             get
             {
@@ -181,40 +170,11 @@ namespace WindowsTool
                 this.MinimizeBox = false;
                 this.MaximizeBox = false;
                 this.ShowInTaskbar = false;
-
-                // remove the Help menu
-                menuStrip.Items.RemoveAt(menuStrip.Items.Count - 1);
-
-                // remove the Exit menu item
-                ToolStripMenuItem fileDropDown = (ToolStripMenuItem)menuStrip.Items[0];
-                fileDropDown.DropDownItems.RemoveAt(fileDropDown.DropDownItems.Count - 1);
-                fileDropDown.DropDownItems.RemoveAt(fileDropDown.DropDownItems.Count - 1);
             }
             else
             {
                 // Remove the Ok/Cancel panel
                 dialogFlowLayoutPanel.Visible = false;
-            }
-
-            treeView.PathSeparator = "\0";
-            treeView.TreeViewNodeSorter = new NodeSorter();
-        }
-
-        #endregion
-
-        #region Dispose
-
-        private void DisposeHelper(bool disposing)
-        {
-            if (disposing)
-            {
-                _userSettings.Mode = (int)Mode;
-                _userSettings.PInvokeSnippetAutoGenerate = snippetDisplay.AutoGenerate;
-                _userSettings.PInvokeSearchAutoGenerate = symbolDisplay.AutoGenerate;
-                _userSettings.PInvokeLanguageType = symbolDisplay.LanguageType.ToString();
-                _userSettings.PInvokeSearchKind = symbolDisplay.SearchKind.ToString();
-                _userSettings.PInvokeShowAll = symbolDisplay.ShowAll;
-                _userSettings.Save();
             }
         }
 
@@ -239,38 +199,13 @@ namespace WindowsTool
             ThreadPool.QueueUserWorkItem(new WaitCallback(this.LoadNativeStorage), this);
 
             // Load up the correct tab page
-            switch ((TabMode)(_userSettings.Mode))
-            {
-                case TabMode.ReversePInvoke:
-                    tabControl1.SelectedTab = reversePInvokeTabPage;
-                    break;
-                case TabMode.PInvokeSearch:
-                    tabControl1.SelectedTab = pinvokeSearchTabPage;
-                    break;
-                case TabMode.PInvokeSnippet:
-                    tabControl1.SelectedTab = pinvokeSnippetTabPage;
-                    break;
-                default:
-                    tabControl1.SelectedTab = reversePInvokeTabPage;
-                    break;
-            }
-
-            // Show all setting
-            showAllToolStripMenuItem.Checked = _userSettings.PInvokeShowAll;
-            symbolDisplay.ShowAll = _userSettings.PInvokeShowAll;
+            tabControl1.SelectedTab = pinvokeSearchTabPage;
 
             // Disable wrapper method generation
             PInvoke.Transform.TransformKindFlags transformFlags = PInvoke.Transform.TransformKindFlags.All;
             transformFlags &= ~PInvoke.Transform.TransformKindFlags.WrapperMethods;
             symbolDisplay.TransformKindFlags = transformFlags;
             snippetDisplay.TransformKindFlags = transformFlags;
-
-            // Load settings
-            symbolDisplay.AutoGenerate = _userSettings.PInvokeSearchAutoGenerate;
-            snippetDisplay.AutoGenerate = _userSettings.PInvokeSnippetAutoGenerate;
-            symbolDisplay.SearchKind = ParseOrDefault(_userSettings.PInvokeSearchKind, SearchKind.All);
-            symbolDisplay.LanguageType = ParseOrDefault(_userSettings.PInvokeLanguageType, PInvoke.Transform.LanguageType.CSharp);
-            snippetDisplay.LanguageType = ParseOrDefault(_userSettings.PInvokeLanguageType, PInvoke.Transform.LanguageType.CSharp);
             snippetDisplay.LanguageTypeChanged += new EventHandler(OnLanguageTypeChanged);
             symbolDisplay.LanguageTypeChanged += new EventHandler(OnLanguageTypeChanged);
         }
@@ -296,103 +231,7 @@ namespace WindowsTool
             this.Close();
         }
 
-        private void buttonOK_Click(object sender, EventArgs e)
-        {
-            // stringize the signature and comments
-            TreeNode node = treeView.SelectedNode;
-
-            /*
-
-            MethodDescriptor method_descr;
-            if (node != null && (method_descr = node.Tag as MethodDescriptor) != null)
-            {
-                System.IO.StringWriter writer = new System.IO.StringWriter();
-                TextWriterCodePrinter code_printer = new TextWriterCodePrinter(writer);
-
-                StringBuilder log_builder = new StringBuilder();
-                LogCallbackPrinter log_printer = new LogCallbackPrinter(delegate(string entry)
-                {
-                    log_builder.AppendFormat("// {0}{1}", entry, writer.NewLine);
-                });
-
-                PrintMethod(method_descr, code_printer, log_printer, true, true);
-                writer.Flush();
-
-                // The resulting signature string consists of:
-                // 1. [log as a series of single-line comments]
-                // 3. [definition of types used by the function]
-                // 2. function signature
-                if (log_builder.Length > 0) log_builder.Append(writer.NewLine);
-                this.signatureString = log_builder.ToString() + writer.GetStringBuilder().ToString();
-            }
-
-            */
-
-            this.DialogResult = DialogResult.OK;
-            this.Close();
-        }
-
-        private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            /*
-            // remember the assembly and the path in the tree
-            TreeNode node = treeView.SelectedNode;
-            lastTreePath = (node == null ? null : node.FullPath);
-
-            Reflector current = Reflector.CurrentReflector;
-            if (current != null)
-            {
-                lastAssemblyPath = current.AssemblyPath;
-
-                // free the reflector (and hence release the assembly)
-                Reflector.CurrentReflector = null;
-            }
-            else lastAssemblyPath = null;
-            */
-        }
-
-        private void MainForm_Shown(object sender, EventArgs e)
-        {
-            // restore the original state when the dialog is shown again
-            /*
-            if (lastAssemblyPath != null)
-            {
-                LoadAssembly(lastAssemblyPath);
-            }
-
-            if (lastTreePath != null)
-            {
-                TrySelectNode(lastTreePath);
-            }
-            */
-        }
-
         private void OnTabPageChanged(object sender, EventArgs e)
-        {
-            bool sigexp = (TabMode.ReversePInvoke == Mode);
-
-            // Force all of the menus to update now so that the hotkeys will
-            // be disabled
-            // editToolStripMenuItem_DropDownOpening(this, EventArgs.Empty);
-            openToolStripMenuItem.Enabled = sigexp;
-
-            optionsToolStripMenuItemExp.Available = sigexp;
-            optionsToolStripMenuItemImp.Available = !sigexp;
-
-            fileToolStripMenuItemExp.Available = sigexp;
-            fileToolStripMenuItemImp.Available = !sigexp;
-
-            if (TabMode.ReversePInvoke == Mode)
-            {
-                OnReversePInvokeTabDisplay();
-            }
-            else
-            {
-                OnPInvokeTabDisplay();
-            }
-        }
-
-        private void OnPInvokeTabDisplay()
         {
             if (_nativeStorage == null)
             {
@@ -419,17 +258,6 @@ namespace WindowsTool
                 snippetDisplay.Storage = _nativeStorage;
                 _nativeStorageSet = true;
             }
-        }
-
-        private void OnReversePInvokeTabDisplay()
-        {
-            // Ensure that the cursor is set to default.  If the user loads up the SigImp tab
-            // first, the cursor will be busy for a time.  During that time the user can switch
-            // the tab and we should reset the cursor
-            Cursor = Cursors.Default;
-            statusStripLabel.Text = String.Empty;
-            statusStripProgressBar.Visible = false;
-            statusStripProgressBar.Style = ProgressBarStyle.Blocks;
         }
 
         private void OnLanguageTypeChanged(object sender, EventArgs e)
@@ -1120,7 +948,10 @@ namespace WindowsTool
         {
             try
             {
-                _nativeStorage = new BasicSymbolStorage();
+                using (var stream = File.Open("windows.csv", FileMode.Open))
+                {
+                    _nativeStorage = StorageUtil.ReadCsv(stream);
+                }
             }
             catch (Exception ex)
             {

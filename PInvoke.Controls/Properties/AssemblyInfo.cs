@@ -1,22 +1,16 @@
-﻿
-using System.Reflection;
+﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-
-// The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("13713f69-be7a-492a-ba6c-df4fdcd5df15")]
-
-#if !RAZZLE_BUILD
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("WindowsTool")]
+[assembly: AssemblyTitle("PInvoke.Controls")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft Corporation")]
-[assembly: AssemblyProduct("WindowsTool")]
-[assembly: AssemblyCopyright("Copyright \u00A9 Microsoft Corporation")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("PInvoke.Controls")]
+[assembly: AssemblyCopyright("Copyright ©  2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -25,6 +19,9 @@ using System.Runtime.InteropServices;
 // COM, set the ComVisible attribute to true on that type.
 [assembly: ComVisible(false)]
 
+// The following GUID is for the ID of the typelib if this project is exposed to COM
+[assembly: Guid("aad41a25-9cc4-468a-827f-86ca8d01d1e5")]
+
 // Version information for an assembly consists of the following four values:
 //
 //      Major Version
@@ -32,7 +29,8 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
+// You can specify all the values or you can default the Build and Revision Numbers 
+// by using the '*' as shown below:
+// [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
-
-#endif // !RAZZLE_BUILD

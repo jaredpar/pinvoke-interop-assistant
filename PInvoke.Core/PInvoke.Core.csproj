@@ -52,41 +52,6 @@
     <Compile Include="Storage\StorageUtil.cs" />
     <Compile Include="Storage\StorageUtil.Binary.cs" />
     <Compile Include="Contract.cs" />
-    <Compile Include="Controls\CodeBox.Designer.cs">
-      <DependentUpon>CodeBox.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\CodeBox.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Controls\CodeDialog.Designer.cs">
-      <DependentUpon>CodeDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\CodeDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Controls\Interfaces.cs" />
-    <Compile Include="Controls\SearchComponent.cs" />
-    <Compile Include="Controls\SearchDataGrid.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Controls\SelectSymbolDialog.Designer.cs">
-      <DependentUpon>SelectSymbolDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\SelectSymbolDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Controls\SymbolDisplayControl.Designer.cs">
-      <DependentUpon>SymbolDisplayControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\SymbolDisplayControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Controls\TranslateSnippetControl.Designer.cs">
-      <DependentUpon>TranslateSnippetControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\TranslateSnippetControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
     <Compile Include="EmptyNativeSymbolBag.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="INativeSymbolBag.cs" />
@@ -133,28 +98,6 @@
     <Compile Include="Transform\Utilities.cs" />
     <Compile Include="Utilities.cs" />
     <Compile Include="Transform\BasicConverter.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Controls\CodeBox.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>CodeBox.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\CodeDialog.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>CodeDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\SelectSymbolDialog.resx">
-      <DependentUpon>SelectSymbolDialog.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\SymbolDisplayControl.resx">
-      <DependentUpon>SymbolDisplayControl.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\TranslateSnippetControl.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>TranslateSnippetControl.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

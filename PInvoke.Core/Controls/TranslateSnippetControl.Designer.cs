@@ -1,10 +1,10 @@
+// Copyright (c) Microsoft Corporation.  All rights reserved.
 
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
-// Copyright (c) Microsoft Corporation.  All rights reserved.
 namespace PInvoke.Controls
 {
     partial class TranslateSnippetControl : System.Windows.Forms.UserControl, ISignatureImportControl
@@ -13,22 +13,9 @@ namespace PInvoke.Controls
         [System.Diagnostics.DebuggerNonUserCode()]
         protected override void Dispose(bool disposing)
         {
-            try
-            {
-                if (disposing && components != null)
-                {
-                    components.Dispose();
-                }
-            }
-            finally
-            {
-                base.Dispose(disposing);
-            }
+            base.Dispose(disposing);
         }
 
-        //Required by the Windows Form Designer
-
-        private System.ComponentModel.IContainer components;
         //NOTE: The following procedure is required by the Windows Form Designer
         //It can be modified using the Windows Form Designer.  
         //Do not modify it using the code editor.

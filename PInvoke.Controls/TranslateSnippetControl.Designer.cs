@@ -164,6 +164,7 @@ namespace PInvoke.Controls
             this.TableLayoutPanel1.SetColumnSpan(this._nativeCodeTextBox, 2);
             this._nativeCodeTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this._nativeCodeTextBox.Location = new System.Drawing.Point(3, 43);
+            this._nativeCodeTextBox.MaxLength = 0;
             this._nativeCodeTextBox.Multiline = true;
             this._nativeCodeTextBox.Name = "_nativeCodeTextBox";
             this._nativeCodeTextBox.Size = new System.Drawing.Size(312, 178);

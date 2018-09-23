@@ -176,7 +176,8 @@ namespace PInvoke.Parser
                 _index++;
 
                 // Check for the end of the line
-                // Increment if we passed \r and are now on \n or the end 
+                // Increment if we passed \r and are now on \n or the end
+                // Not supported: line ending of just \r or \n
                 if (ret == Convert.ToChar(PortConstants.CarriageReturn))
                 {
                     if (_index == _text.Length || PeekChar() == Convert.ToChar(PortConstants.LineFeed))
@@ -220,6 +221,7 @@ namespace PInvoke.Parser
                 _index--;
 
                 // Decrement line if we are now on \r and it precedes \n or the end
+                // Not supported: line ending of just \r or \n
                 if (PeekChar() == Convert.ToChar(PortConstants.CarriageReturn))
                 {
                     if (_text[_index + 1] == Convert.ToChar(PortConstants.LineFeed))

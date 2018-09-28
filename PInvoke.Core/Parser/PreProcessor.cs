@@ -723,6 +723,7 @@ namespace PInvoke.Parser
         private void ProcessPoundPragma(PreprocessorLine line)
         {
             // We don't support #pragma at this point
+            // In particular #pragma push_macro and #pragma pop_macro
         }
 
         /// <summary>

@@ -173,16 +173,14 @@ namespace PInvoke.Parser
             {
                 EnsureNotEndOfStream();
                 char ret = _text[_index];
-                _index += 1;
+                _index++;
 
                 // Check for the end of the line
+                // Increment if we passed \r and are now on \n or the end
+                // Not supported: line ending of just \r or \n
                 if (ret == Convert.ToChar(PortConstants.CarriageReturn))
                 {
-                    if (_index == _text.Length)
-                    {
-                        _lineNumber += 1;
-                    }
-                    else if (PeekChar() == Convert.ToChar(PortConstants.LineFeed))
+                    if (_index == _text.Length || PeekChar() == Convert.ToChar(PortConstants.LineFeed))
                     {
                         _lineNumber += 1;
                     }
@@ -209,16 +207,27 @@ namespace PInvoke.Parser
             /// <remarks></remarks>
             public void EatChar()
             {
-                EnsureNotEndOfStream();
-                _index += 1;
+                ReadChar();
+                // Discard result
             }
 
-            public void MoveBack(int count)
+            public void BackupChar()
             {
-                _index -= count;
-                if (_index < 0)
+                if (_index == 0)
                 {
                     throw new ScannerInternalException("Moved back before the start of the Stream");
+                }
+
+                _index--;
+
+                // Decrement line if we are now on \r and it precedes \n or the end
+                // Not supported: line ending of just \r or \n
+                if (PeekChar() == Convert.ToChar(PortConstants.CarriageReturn))
+                {
+                    if (_text[_index + 1] == Convert.ToChar(PortConstants.LineFeed))
+                    {
+                        _lineNumber -= 1;
+                    }
                 }
             }
 
@@ -566,7 +575,7 @@ namespace PInvoke.Parser
 
             if (char.IsWhiteSpace(c) && c != PortConstants.CarriageReturn && c != PortConstants.LineFeed)
             {
-                _buffer.MoveBack(1);
+                _buffer.BackupChar();
                 return ReadWhitespace();
             }
 
@@ -696,7 +705,7 @@ namespace PInvoke.Parser
                 }
 
                 // Move back the character since we didn't process it
-                _buffer.MoveBack(1);
+                _buffer.BackupChar();
             }
 
             // There are several single character cases that are also a part of the double character 
@@ -743,7 +752,7 @@ namespace PInvoke.Parser
 
             // This isn't a special token.  It's some type of word or number so move back to 
             // the start of this stream and read the word.
-            _buffer.MoveBack(1);
+            _buffer.BackupChar();
             return ReadWordOrNumberToken();
         }
 
@@ -762,12 +771,12 @@ namespace PInvoke.Parser
                 if (!char.IsWhiteSpace(c))
                 {
                     done = true;
-                    _buffer.MoveBack(1);
+                    _buffer.BackupChar();
                 }
                 else if (c == PortConstants.CarriageReturn || c == PortConstants.LineFeed)
                 {
                     done = true;
-                    _buffer.MoveBack(1);
+                    _buffer.BackupChar();
                 }
                 else
                 {
@@ -1072,7 +1081,7 @@ namespace PInvoke.Parser
             Token token = ReadSingleQuoteOrCharacter();
             if (token.TokenType == TokenType.SingleQuote)
             {
-                _buffer.MoveBack(1);
+                _buffer.BackupChar();
                 return new Token(TokenType.Word, "L");
             }
             else
@@ -1094,7 +1103,7 @@ namespace PInvoke.Parser
             {
                 // Read a double quote which means there wasn't a valid string afterwards.  Move
                 // back over the " and return the L
-                _buffer.MoveBack(1);
+                _buffer.BackupChar();
                 return new Token(TokenType.Word, "L");
             }
             else
@@ -1142,7 +1151,9 @@ namespace PInvoke.Parser
 
         private string GetMessagePrefix()
         {
-            return string.Format("{0} {1}: ", _readerBag.Name, _buffer.LineNumber);
+            // Sometimes line number was incremented after reading the offending text;
+            // show a range, until this can be improved
+            return string.Format("{0} {1}-{2}: ", _readerBag.Name, _buffer.LineNumber == 0 ? 0 : _buffer.LineNumber - 1, _buffer.LineNumber);
         }
 
         #endregion

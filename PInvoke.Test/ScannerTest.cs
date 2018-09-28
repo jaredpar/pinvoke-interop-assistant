@@ -536,6 +536,40 @@ namespace PInvoke.Test
             VerifyNext(scanner, TokenType.DoubleQuote);
         }
 
+        /// <summary>
+        /// Test line number
+        /// </summary>
+        /// <remarks></remarks>
+        [Fact()]
+        public void LineNumber1()
+        {
+            Scanner scanner = CreateScanner("foo\r\nbar", _defaultOpts);
+            VerifyNext(scanner, TokenType.Word, "foo");
+            Assert.Equal(1, scanner.LineNumber);
+            VerifyNext(scanner, TokenType.Word, "bar");
+            Assert.Equal(2, scanner.LineNumber);
+        }
+
+        [Fact()]
+        public void LineNumber2()
+        {
+            Scanner scanner = CreateScanner("foo\r\n \r\nbar", _defaultOpts);
+            VerifyNext(scanner, TokenType.Word, "foo");
+            Assert.Equal(1, scanner.LineNumber);
+            VerifyNext(scanner, TokenType.Word, "bar");
+            Assert.Equal(3, scanner.LineNumber);
+        }
+
+        [Fact()]
+        public void LineNumber3()
+        {
+            Scanner scanner = CreateScanner("foo\r\n\r\nbar", _defaultOpts);
+            VerifyNext(scanner, TokenType.Word, "foo");
+            Assert.Equal(1, scanner.LineNumber);
+            VerifyNext(scanner, TokenType.Word, "bar");
+            Assert.Equal(3, scanner.LineNumber);
+        }
+
         [Fact()]
         public void LineComment1()
         {

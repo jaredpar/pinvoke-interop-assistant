@@ -638,24 +638,24 @@ namespace PInvoke.Parser
             List<Token> list = new List<Token>(line.GetValidTokens());
 
             // Get rid of the #include
-            ThrowIfFalse(list[1].TokenType == TokenType.PoundInclude);
+            ThrowIfFalse(list[0].TokenType == TokenType.PoundInclude);
             list.RemoveAt(0);
 
             string name = null;
-            if (list[1].TokenType == TokenType.OpLessThan)
+            if (list[0].TokenType == TokenType.OpLessThan)
             {
                 name = string.Empty;
                 list.RemoveAt(0);
-                while (list[1].TokenType != TokenType.OpGreaterThan)
+                while (list[0].TokenType != TokenType.OpGreaterThan)
                 {
-                    name += list[1].Value;
+                    name += list[0].Value;
                     list.RemoveAt(0);
                 }
                 list.RemoveAt(0);
             }
-            else if (list[1].IsQuotedString)
+            else if (list[0].IsQuotedString)
             {
-                name = TokenHelper.ConvertToString(list[1]);
+                name = TokenHelper.ConvertToString(list[0]);
             }
             else
             {

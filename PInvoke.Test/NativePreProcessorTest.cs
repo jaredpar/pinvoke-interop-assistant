@@ -96,6 +96,17 @@ namespace PInvoke.Test
         }
 
         [Fact()]
+        public void PoundInclude1()
+        {
+            string before = @"#include ""non_existent_file.h""";
+            string after = "";
+            var opts = new PreProcessorOptions() { FollowIncludes = true };
+            var map = VerifyImpl(opts, before, after);
+
+            Assert.True(map.Count == 0); // include not found
+        }
+
+        [Fact()]
         public void Conditional1()
         {
             string before = "#define foo bar" + PortConstants.NewLine + "#if foo" + PortConstants.NewLine + "hello" + PortConstants.NewLine + "#endif";

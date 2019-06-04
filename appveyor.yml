@@ -6,6 +6,9 @@ configuration: Debug
 branches:
   only:
     - master
+    
+before_build:
+  - nuget restore
 
 build:
   project: PInvoke.sln

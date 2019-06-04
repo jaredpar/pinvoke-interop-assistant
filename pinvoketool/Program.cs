@@ -7,6 +7,7 @@ using System.IO;
 
 namespace pinvoketool
 {
+
     class Program
     {
         static void Main(string[] args)
@@ -14,12 +15,14 @@ namespace pinvoketool
             var libname = default(string);
             var filename = default(string);
             var outputFilename = default(string);
+            var typesFilename = default(string);
 
             var p = new OptionSet()
             {
+                { "t|types=", "extra c/c++ types", x=> typesFilename = x  },
                 { "f|file=", "the c/c++ header to parse", x=> filename = x  },
                 { "o|output=", "file to create for output", x => outputFilename = x },
-                { "l|library",  "name of the exported library", x => libname = x },
+                { "l|library=",  "name of the exported library", x => libname = x },
             };
 
             var extra = default(List<string>);
@@ -48,6 +51,31 @@ namespace pinvoketool
                 try
                 {
                     var storage = new BasicSymbolStorage();
+
+                    if (!string.IsNullOrEmpty(typesFilename) && File.Exists(typesFilename))
+                    {
+                        try
+                        {
+                            var items = NativeType.Load(typesFilename);
+                            foreach(var item in items)
+                            {
+                                if(item.IsPointer)
+                                {
+                                    storage.AddTypeDef(new NativeTypeDef(item.Name, new NativePointer(item.BuiltInType)));
+                                }
+                                else
+                                {
+                                    storage.AddTypeDef(new NativeTypeDef(item.Name, new NativeBuiltinType(item.BuiltInType, item.IsUnsigned)));
+                                }
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            Console.Write($"An error happened loading NativeType file \"{typesFilename}\":");
+                            Console.WriteLine(e.Message);
+                            return;
+                        }
+                    }
 
                     var basicConverter = new BasicConverter(LanguageType.CSharp, storage)
                     {
@@ -81,7 +109,7 @@ namespace pinvoketool
             }
             else
             {
-                Console.Write($"An error happened: file \"{filename??"<none>"}\" does not exist.");
+                Console.Write($"An error happened: file \"{filename ?? "<none>"}\" does not exist.");
             }
         }
     }

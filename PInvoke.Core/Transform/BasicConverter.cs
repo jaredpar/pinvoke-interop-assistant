@@ -151,7 +151,7 @@ namespace PInvoke.Transform
         /// <param name="ep"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public CodeTypeDeclarationCollection ConvertNativeCodeToCodeDom(string code, ErrorProvider ep, string libraryName)
+        public CodeTypeDeclarationCollection ConvertNativeCodeToCodeDom(string code, ErrorProvider ep, string libraryName = null)
         {
             if (code == null)
             {

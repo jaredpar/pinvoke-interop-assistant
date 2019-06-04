@@ -5,9 +5,6 @@ branches:
   only:
     - master
 
-before_build: 
-  - nuget restore PInvoke.sln
-
 build:
   project: PInvoke.sln
   verbosity: minimal

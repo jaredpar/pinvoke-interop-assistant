@@ -1,11 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.645
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{566BF6D1-7434-4B60-9581-D5238D0A67CE}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsToolLauncher", "WindowsToolLauncher\WindowsToolLauncher.csproj", "{ED55731A-AFF0-4BD0-918A-5A343F018565}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PInvoke.Core", "PInvoke.Core\PInvoke.Core.csproj", "{7923FD4F-41A0-48C0-8783-694802F2C1B0}"
 EndProject
@@ -15,7 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StorageGenerator", "Storage
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConvertLegacyFormat", "ConvertLegacyFormat\ConvertLegacyFormat.csproj", "{8EA9EDD1-5707-41C3-BE29-F5414143C186}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PInvoke.Controls", "PInvoke.Controls\PInvoke.Controls.csproj", "{AAD41A25-9CC4-468A-827F-86CA8D01D1E5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pinvoketool", "pinvoketool\pinvoketool.csproj", "{0AA067B6-8144-40E0-93D2-955D3C3E1B5B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,14 +23,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{ED55731A-AFF0-4BD0-918A-5A343F018565}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{ED55731A-AFF0-4BD0-918A-5A343F018565}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{ED55731A-AFF0-4BD0-918A-5A343F018565}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{ED55731A-AFF0-4BD0-918A-5A343F018565}.Debug|x86.Build.0 = Debug|Any CPU
-		{ED55731A-AFF0-4BD0-918A-5A343F018565}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{ED55731A-AFF0-4BD0-918A-5A343F018565}.Release|Any CPU.Build.0 = Release|Any CPU
-		{ED55731A-AFF0-4BD0-918A-5A343F018565}.Release|x86.ActiveCfg = Release|Any CPU
-		{ED55731A-AFF0-4BD0-918A-5A343F018565}.Release|x86.Build.0 = Release|Any CPU
 		{7923FD4F-41A0-48C0-8783-694802F2C1B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7923FD4F-41A0-48C0-8783-694802F2C1B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7923FD4F-41A0-48C0-8783-694802F2C1B0}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -65,17 +55,20 @@ Global
 		{8EA9EDD1-5707-41C3-BE29-F5414143C186}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8EA9EDD1-5707-41C3-BE29-F5414143C186}.Release|x86.ActiveCfg = Release|Any CPU
 		{8EA9EDD1-5707-41C3-BE29-F5414143C186}.Release|x86.Build.0 = Release|Any CPU
-		{AAD41A25-9CC4-468A-827F-86CA8D01D1E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AAD41A25-9CC4-468A-827F-86CA8D01D1E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AAD41A25-9CC4-468A-827F-86CA8D01D1E5}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{AAD41A25-9CC4-468A-827F-86CA8D01D1E5}.Debug|x86.Build.0 = Debug|Any CPU
-		{AAD41A25-9CC4-468A-827F-86CA8D01D1E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AAD41A25-9CC4-468A-827F-86CA8D01D1E5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AAD41A25-9CC4-468A-827F-86CA8D01D1E5}.Release|x86.ActiveCfg = Release|Any CPU
-		{AAD41A25-9CC4-468A-827F-86CA8D01D1E5}.Release|x86.Build.0 = Release|Any CPU
+		{0AA067B6-8144-40E0-93D2-955D3C3E1B5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0AA067B6-8144-40E0-93D2-955D3C3E1B5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0AA067B6-8144-40E0-93D2-955D3C3E1B5B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0AA067B6-8144-40E0-93D2-955D3C3E1B5B}.Debug|x86.Build.0 = Debug|Any CPU
+		{0AA067B6-8144-40E0-93D2-955D3C3E1B5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0AA067B6-8144-40E0-93D2-955D3C3E1B5B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0AA067B6-8144-40E0-93D2-955D3C3E1B5B}.Release|x86.ActiveCfg = Release|Any CPU
+		{0AA067B6-8144-40E0-93D2-955D3C3E1B5B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B0FA871B-991D-4B6D-9BCF-429EF7DAD6FF}
 	EndGlobalSection
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = PInvoke.vsmdi

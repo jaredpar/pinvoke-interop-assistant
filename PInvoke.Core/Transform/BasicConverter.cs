@@ -63,7 +63,7 @@ namespace PInvoke.Transform
         {
             NativeSymbolBag bag = new NativeSymbolBag(_storage);
             bag.AddConstant(c);
-            return ConvertBagToCodeDom(bag, ep);
+            return ConvertBagToCodeDom(bag, ep, null);
         }
 
         public string ConvertToPInvokeCode(NativeConstant c)
@@ -77,7 +77,7 @@ namespace PInvoke.Transform
         {
             NativeSymbolBag bag = new NativeSymbolBag(_storage);
             bag.AddTypeDef(typedef);
-            return ConvertBagToCodeDom(bag, ep);
+            return ConvertBagToCodeDom(bag, ep, null);
         }
 
         public string ConvertToPInvokeCode(NativeTypeDef typedef)
@@ -91,7 +91,7 @@ namespace PInvoke.Transform
         {
             NativeSymbolBag bag = new NativeSymbolBag(_storage);
             bag.AddDefinedType(definedNt);
-            return ConvertBagToCodeDom(bag, ep);
+            return ConvertBagToCodeDom(bag, ep, null);
         }
 
         public string ConvertToPInvokeCode(NativeDefinedType definedNt)
@@ -101,30 +101,30 @@ namespace PInvoke.Transform
             return ConvertCodeDomToPInvokeCodeImpl(col, ep);
         }
 
-        public CodeTypeDeclarationCollection ConvertToCodeDom(NativeProcedure proc, ErrorProvider ep)
+        public CodeTypeDeclarationCollection ConvertToCodeDom(NativeProcedure proc, ErrorProvider ep, string libraryName)
         {
             NativeSymbolBag bag = new NativeSymbolBag(_storage);
             bag.AddProcedure(proc);
-            return ConvertBagToCodeDom(bag, ep);
+            return ConvertBagToCodeDom(bag, ep, libraryName);
         }
 
-        public string ConvertToPInvokeCode(NativeProcedure proc)
+        public string ConvertToPInvokeCode(NativeProcedure proc, string libraryName)
         {
             ErrorProvider ep = new ErrorProvider();
-            CodeTypeDeclarationCollection col = ConvertToCodeDom(proc, ep);
+            CodeTypeDeclarationCollection col = ConvertToCodeDom(proc, ep, libraryName);
             return ConvertCodeDomToPInvokeCodeImpl(col, ep);
         }
 
         public CodeTypeDeclarationCollection ConvertToCodeDom(NativeSymbolBag bag, ErrorProvider ep)
         {
-            return ConvertBagToCodeDom(bag, ep);
+            return ConvertBagToCodeDom(bag, ep, null);
         }
 
-        public string ConvertToPInvokeCode(NativeSymbolBag bag)
-        {
-            ErrorProvider ep = new ErrorProvider();
-            return ConvertBagToPInvokeCodeImpl(bag, ep);
-        }
+        //public string ConvertToPInvokeCode(NativeSymbolBag bag)
+        //{
+        //    ErrorProvider ep = new ErrorProvider();
+        //    return ConvertBagToPInvokeCodeImpl(bag, ep);
+        //}
 
         /// <summary>
         /// Convert the block of Native code into PInvoke code
@@ -132,7 +132,7 @@ namespace PInvoke.Transform
         /// <param name="code"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public string ConvertNativeCodeToPInvokeCode(string code)
+        public string ConvertNativeCodeToPInvokeCode(string code, string libraryName)
         {
             if (code == null)
             {
@@ -140,7 +140,7 @@ namespace PInvoke.Transform
             }
 
             ErrorProvider ep = new ErrorProvider();
-            CodeTypeDeclarationCollection col = ConvertNativeCodeToCodeDom(code, ep);
+            CodeTypeDeclarationCollection col = ConvertNativeCodeToCodeDom(code, ep, libraryName);
             return ConvertCodeDomToPInvokeCodeImpl(col, ep);
         }
 
@@ -151,7 +151,7 @@ namespace PInvoke.Transform
         /// <param name="ep"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public CodeTypeDeclarationCollection ConvertNativeCodeToCodeDom(string code, ErrorProvider ep)
+        public CodeTypeDeclarationCollection ConvertNativeCodeToCodeDom(string code, ErrorProvider ep, string libraryName)
         {
             if (code == null)
             {
@@ -176,12 +176,12 @@ namespace PInvoke.Transform
                 bag = NativeSymbolBag.CreateFrom(result, Storage);
             }
 
-            return ConvertBagToCodeDom(bag, ep);
+            return ConvertBagToCodeDom(bag, ep, libraryName);
         }
 
-        private string ConvertBagToPInvokeCodeImpl(NativeSymbolBag bag, ErrorProvider ep)
+        private string ConvertBagToPInvokeCodeImpl(NativeSymbolBag bag, ErrorProvider ep, string libraryName)
         {
-            CodeTypeDeclarationCollection col = ConvertBagToCodeDom(bag, ep);
+            CodeTypeDeclarationCollection col = ConvertBagToCodeDom(bag, ep, libraryName);
             return ConvertCodeDomToPInvokeCodeImpl(col, ep);
         }
 
@@ -266,7 +266,7 @@ namespace PInvoke.Transform
         /// <param name="ep"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        private CodeTypeDeclarationCollection ConvertBagToCodeDom(NativeSymbolBag bag, ErrorProvider ep)
+        private CodeTypeDeclarationCollection ConvertBagToCodeDom(NativeSymbolBag bag, ErrorProvider ep, string libraryName)
         {
             ThrowIfNull(bag);
             ThrowIfNull(ep);
@@ -304,7 +304,7 @@ namespace PInvoke.Transform
             List<NativeProcedure> procList = new List<NativeProcedure>(bag.FindResolvedProcedures());
             if (procList.Count > 0)
             {
-                CodeTypeDeclaration procType = transform.GenerateProcedures(procList);
+                CodeTypeDeclaration procType = transform.GenerateProcedures(procList, libraryName);
                 marshalUtil.Process(procType);
                 col.Add(procType);
             }

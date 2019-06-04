@@ -1,14 +1,10 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
-using System.CodeDom;
-using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
 using PInvoke.Parser;
+using System;
+using System.CodeDom;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using static PInvoke.Contract;
 
 namespace PInvoke.Transform
@@ -247,7 +243,7 @@ namespace PInvoke.Transform
         /// <param name="enumerable"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public CodeTypeDeclaration GenerateProcedures(IEnumerable<NativeProcedure> enumerable)
+        public CodeTypeDeclaration GenerateProcedures(IEnumerable<NativeProcedure> enumerable, string libraryName)
         {
             if (enumerable == null)
             {
@@ -261,7 +257,7 @@ namespace PInvoke.Transform
 
             foreach (NativeProcedure proc in enumerable)
             {
-                ctd.Members.Add(GenerateProcedure(proc));
+                ctd.Members.Add(GenerateProcedure(proc, libraryName));
             }
 
             return ctd;
@@ -273,7 +269,7 @@ namespace PInvoke.Transform
         /// <param name="ntProc"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public CodeMemberMethod GenerateProcedure(NativeProcedure ntProc)
+        public CodeMemberMethod GenerateProcedure(NativeProcedure ntProc, string libraryName)
         {
             if (ntProc == null)
             {
@@ -281,11 +277,13 @@ namespace PInvoke.Transform
             }
 
             // Create the proc
-            NativeSignature ntSig = ntProc.Signature;
+            var ntSig = ntProc.Signature;
             string procComment = "Return Type: ";
-            CodeMemberMethod proc = new CodeMemberMethod();
-            proc.Name = ntProc.Name;
-            proc.ReturnType = GenerateTypeReferenceImpl(ntSig.ReturnType, ref procComment);
+            var proc = new CodeMemberMethod
+            {
+                Name = ntProc.Name,
+                ReturnType = GenerateTypeReferenceImpl(ntSig.ReturnType, ref procComment)
+            };
             proc.UserData[TransformConstants.ReturnType] = ntSig.ReturnType;
             if (ntSig.ReturnTypeSalAttribute != null)
             {
@@ -301,7 +299,7 @@ namespace PInvoke.Transform
             proc.UserData[TransformConstants.ReturnTypeSal] = ntSig.ReturnTypeSalAttribute;
 
             // Add the DLL import attribute
-            string dllName = ntProc.DllName;
+            string dllName = ntProc.DllName ?? libraryName;
             if (string.IsNullOrEmpty(dllName))
             {
                 dllName = "<Unknown>";

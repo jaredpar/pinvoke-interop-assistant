@@ -10,6 +10,7 @@ using System.IO;
 using PInvoke;
 using PInvoke.Parser;
 using PInvoke.Transform;
+using PInvoke.NativeTypes;
 
 internal static class Program
 {

@@ -8,6 +8,8 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using static PInvoke.Contract;
 using PInvoke.Parser;
+using PInvoke.NativeTypes;
+using PInvoke.NativeTypes.Enums;
 
 namespace PInvoke
 {

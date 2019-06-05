@@ -1,11 +1,9 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
+using PInvoke.NativeTypes;
+using PInvoke.NativeTypes.Enums;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
-using PInvoke;
 
 namespace PInvoke.Test
 {

@@ -10,6 +10,8 @@ using PInvoke;
 using PInvoke.Parser;
 using System.IO;
 using Xunit;
+using PInvoke.NativeTypes;
+
 namespace PInvoke.Test
 {
 

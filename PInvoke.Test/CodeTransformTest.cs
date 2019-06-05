@@ -1,13 +1,6 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
-using System.Text;
-using PInvoke;
+using PInvoke.NativeTypes;
 using PInvoke.Transform;
-using System.CodeDom;
 using Xunit;
 using static PInvoke.Test.GeneratedCodeVerification;
 

@@ -1,11 +1,9 @@
-﻿using System;
+﻿using PInvoke.NativeTypes;
+using PInvoke.NativeTypes.Enums;
+using PInvoke.Storage;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit;
-using PInvoke.Storage;
 
 namespace PInvoke.Test
 {

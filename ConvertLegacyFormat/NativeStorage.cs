@@ -12,6 +12,8 @@ using Microsoft.Win32;
 using static PInvoke.Contract;
 using PInvoke;
 using System.IO;
+using PInvoke.NativeTypes.Enums;
+using PInvoke.NativeTypes;
 
 namespace PInvoke
 {

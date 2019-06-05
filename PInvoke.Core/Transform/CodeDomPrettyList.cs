@@ -9,6 +9,7 @@ using System.CodeDom;
 using System.Text.RegularExpressions;
 using PInvoke;
 using static PInvoke.Contract;
+using PInvoke.NativeTypes;
 
 namespace PInvoke.Transform
 {

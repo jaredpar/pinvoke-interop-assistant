@@ -1,12 +1,8 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
+using PInvoke.NativeTypes;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
-using System.Text;
-using PInvoke;
 using Xunit;
 
 namespace PInvoke.Test

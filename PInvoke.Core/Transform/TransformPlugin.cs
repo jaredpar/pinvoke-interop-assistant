@@ -14,6 +14,8 @@ using CodeParamPair = System.Collections.Generic.KeyValuePair<System.CodeDom.Cod
 using static PInvoke.Contract;
 using static PInvoke.Transform.CodeDomUtil;
 using static PInvoke.Transform.MarshalAttributeFactory;
+using PInvoke.NativeTypes;
+using PInvoke.NativeTypes.Enums;
 
 namespace PInvoke.Transform
 {

@@ -1,5 +1,6 @@
 ﻿using Mono.Options;
 using PInvoke;
+using PInvoke.NativeTypes;
 using PInvoke.Transform;
 using System;
 using System.Collections.Generic;

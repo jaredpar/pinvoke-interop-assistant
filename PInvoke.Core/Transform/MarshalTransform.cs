@@ -10,6 +10,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using CodeParam = System.CodeDom.CodeParameterDeclarationExpression;
 using CodeParamPair = System.Collections.Generic.KeyValuePair<System.CodeDom.CodeParameterDeclarationExpression, System.CodeDom.CodeParameterDeclarationExpression>;
+using PInvoke.NativeTypes;
+using PInvoke.NativeTypes.Enums;
 
 namespace PInvoke.Transform
 {

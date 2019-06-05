@@ -15,6 +15,8 @@ using PInvoke.Transform;
 using static PInvoke.Contract;
 using System.CodeDom.Compiler;
 using System.Text;
+using PInvoke.NativeTypes;
+using PInvoke.NativeTypes.Enums;
 
 namespace PInvoke.Transform
 {

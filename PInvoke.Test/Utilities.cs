@@ -12,6 +12,7 @@ using PInvoke.Transform;
 using Xunit;
 using System.CodeDom.Compiler;
 using System.IO;
+using PInvoke.NativeTypes;
 
 namespace PInvoke.Test
 {

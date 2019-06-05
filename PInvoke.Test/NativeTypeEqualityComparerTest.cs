@@ -7,6 +7,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Text;
 using PInvoke;
+using PInvoke.NativeTypes;
 using Xunit;
 namespace PInvoke.Test
 {

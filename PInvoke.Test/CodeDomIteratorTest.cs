@@ -1,13 +1,8 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
-using System.Text;
-using PInvoke.Parser;
 using PInvoke.Transform;
+using System;
 using System.CodeDom;
+using System.Collections.Generic;
 using Xunit;
 
 namespace PInvoke.Test

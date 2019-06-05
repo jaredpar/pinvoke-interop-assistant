@@ -7,6 +7,8 @@ using System.Data;
 using System.Diagnostics;
 using System.Text;
 using PInvoke;
+using PInvoke.NativeTypes;
+using PInvoke.NativeTypes.Enums;
 using PInvoke.Transform;
 using Xunit;
 

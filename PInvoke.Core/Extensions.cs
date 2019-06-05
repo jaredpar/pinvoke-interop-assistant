@@ -1,4 +1,6 @@
-﻿using PInvoke.Parser;
+﻿using PInvoke.NativeTypes;
+using PInvoke.NativeTypes.Enums;
+using PInvoke.Parser;
 using System;
 using System.Collections.Generic;
 using System.Linq;

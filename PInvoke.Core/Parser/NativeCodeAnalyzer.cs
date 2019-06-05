@@ -9,6 +9,8 @@ using System.Linq;
 using System.IO;
 using System.Text.RegularExpressions;
 using static PInvoke.Contract;
+using PInvoke.NativeTypes;
+using PInvoke.NativeTypes.Enums;
 
 namespace PInvoke.Parser
 {

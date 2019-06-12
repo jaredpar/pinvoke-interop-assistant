@@ -3,6 +3,7 @@
 using PInvoke.NativeTypes;
 using PInvoke.NativeTypes.Enums;
 using PInvoke.Parser;
+using PInvoke.Parser.Enums;
 using System;
 using System.CodeDom;
 using System.Collections.Generic;

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using static PInvoke.Contract;
 using PInvoke.Parser;
 using PInvoke.NativeTypes.Enums;
+using PInvoke.Parser.Enums;
 
 namespace PInvoke.NativeTypes
 {
@@ -14,28 +15,21 @@ namespace PInvoke.NativeTypes
     [DebuggerDisplay("{Value} ({ValueKind})")]
     public class NativeValue : NativeExtraSymbol
     {
-        private NativeValueKind _valueKind;
-
-        private object _value;
         /// <summary>
         /// The actual value
         /// </summary>
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public object Value
-        {
-            get { return _value; }
-            set { _value = value; }
-        }
+        public object Value { get; set; }
 
         public NativeSymbol SymbolValue
         {
             get
             {
-                if ((_valueKind == NativeValueKind.SymbolValue))
+                if ((ValueKind == NativeValueKind.SymbolValue))
                 {
-                    return (NativeSymbol)_value;
+                    return (NativeSymbol)Value;
                 }
 
                 return null;
@@ -46,9 +40,9 @@ namespace PInvoke.NativeTypes
         {
             get
             {
-                if ((_valueKind == NativeValueKind.SymbolType))
+                if ((ValueKind == NativeValueKind.SymbolType))
                 {
-                    return (NativeSymbol)_value;
+                    return (NativeSymbol)Value;
                 }
 
                 return null;
@@ -61,10 +55,7 @@ namespace PInvoke.NativeTypes
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public NativeValueKind ValueKind
-        {
-            get { return _valueKind; }
-        }
+        public NativeValueKind ValueKind { get; }
 
         /// <summary>
         /// Is the value resolvable
@@ -82,7 +73,7 @@ namespace PInvoke.NativeTypes
                     case NativeValueKind.String:
                     case NativeValueKind.Character:
                     case NativeValueKind.Boolean:
-                        return this._value != null;
+                        return this.Value != null;
                     case NativeValueKind.SymbolType:
                         return SymbolType != null;
                     case NativeValueKind.SymbolValue:
@@ -104,14 +95,14 @@ namespace PInvoke.NativeTypes
         {
             get
             {
-                switch (_valueKind)
+                switch (ValueKind)
                 {
                     case NativeValueKind.Number:
-                        return _value.ToString();
+                        return Value.ToString();
                     case NativeValueKind.String:
-                        return _value.ToString();
+                        return Value.ToString();
                     case NativeValueKind.Character:
-                        return _value.ToString();
+                        return Value.ToString();
                     case NativeValueKind.SymbolType:
                         if (SymbolType != null)
                         {
@@ -127,7 +118,7 @@ namespace PInvoke.NativeTypes
 
                         return Name;
                     default:
-                        ThrowInvalidEnumValue(_valueKind);
+                        ThrowInvalidEnumValue(ValueKind);
                         return string.Empty;
                 }
             }
@@ -145,17 +136,17 @@ namespace PInvoke.NativeTypes
         private NativeValue(string name, object value, NativeValueKind kind)
         {
             this.Name = name;
-            _valueKind = kind;
-            _value = value;
+            ValueKind = kind;
+            Value = value;
         }
 
         public override IEnumerable<NativeSymbol> GetChildren()
         {
-            if (_valueKind == NativeValueKind.SymbolType)
+            if (ValueKind == NativeValueKind.SymbolType)
             {
                 return GetSingleChild(SymbolType);
             }
-            else if (_valueKind == NativeValueKind.SymbolValue)
+            else if (ValueKind == NativeValueKind.SymbolValue)
             {
                 return GetSingleChild(SymbolValue);
             }
@@ -167,13 +158,13 @@ namespace PInvoke.NativeTypes
 
         public override void ReplaceChild(NativeSymbol oldChild, NativeSymbol newChild)
         {
-            if (_valueKind == NativeValueKind.SymbolType)
+            if (ValueKind == NativeValueKind.SymbolType)
             {
                 NativeSymbol x = null;
                 ReplaceChildSingle(SymbolType, newChild, ref x);
                 Value = x;
             }
-            else if (_valueKind == NativeValueKind.SymbolValue)
+            else if (ValueKind == NativeValueKind.SymbolValue)
             {
                 NativeSymbol x = null;
                 ReplaceChildSingle(SymbolValue, newChild, ref x);
@@ -232,27 +223,25 @@ namespace PInvoke.NativeTypes
             ThrowIfNull(cur);
             ThrowIfFalse(cur.Kind == ExpressionKind.Leaf);
 
-            Token token = cur.Token;
-            NativeValue ntVal = null;
+            var token = cur.Token;
+            var ntVal = default(NativeValue);
             if (token.IsQuotedString)
             {
-                string strValue = null;
-                if (TokenHelper.TryConvertToString(token, out strValue))
+                if (TokenHelper.TryConvertToString(token, out string strValue))
                 {
                     ntVal = NativeValue.CreateString(strValue);
                 }
             }
             else if (token.IsNumber)
             {
-                Number value;
-                if (TokenHelper.TryConvertToNumber(token, out value))
+                if (TokenHelper.TryConvertToNumber(token, out Number value))
                 {
                     ntVal = NativeValue.CreateNumber(value);
                 }
             }
             else if (token.IsCharacter)
             {
-                char cValue = 'c';
+                var cValue = 'c';
                 if (TokenHelper.TryConvertToChar(token, out cValue))
                 {
                     ntVal = NativeValue.CreateCharacter(cValue);
@@ -272,14 +261,11 @@ namespace PInvoke.NativeTypes
             }
             else if (token.IsAnyWord)
             {
-                NativeConstant constant;
-                NativeEnum enumeration;
-                NativeEnumValue value;
-                if (bag != null && bag.TryGetGlobalSymbol(token.Value, out constant))
+                if (bag != null && bag.TryGetGlobalSymbol(token.Value, out NativeConstant constant))
                 {
                     ntVal = NativeValue.CreateSymbolValue(token.Value, constant);
                 }
-                else if (bag != null && bag.TryGetEnumByValueName(token.Value, out enumeration, out value))
+                else if (bag != null && bag.TryGetEnumByValueName(token.Value, out NativeEnum enumeration, out NativeEnumValue value))
                 {
                     ntVal = NativeValue.CreateSymbolValue(token.Value, enumeration);
                 }

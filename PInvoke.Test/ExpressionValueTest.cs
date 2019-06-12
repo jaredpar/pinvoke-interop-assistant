@@ -9,6 +9,7 @@ using System.Text;
 using System.IO;
 using PInvoke.Parser;
 using Xunit;
+using PInvoke.Parser.Enums;
 
 namespace PInvoke.Test
 {

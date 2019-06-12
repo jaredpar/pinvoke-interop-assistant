@@ -10,11 +10,11 @@ namespace PInvoke.Storage
 {
     public sealed class BulkImporter
     {
-        private readonly IBulkReader _reader;
+        private readonly IBulkReader reader;
 
         private BulkImporter(IBulkReader reader)
         {
-            _reader = reader;
+            this.reader = reader;
         }
 
         public static BasicSymbolStorage Import(IBulkReader reader)
@@ -26,7 +26,7 @@ namespace PInvoke.Storage
         private BasicSymbolStorage Go()
         {
             var storage = new BasicSymbolStorage();
-            while (!_reader.IsDone())
+            while (!reader.IsDone())
             {
                 var symbol = Import();
                 storage.Add(symbol);
@@ -37,10 +37,10 @@ namespace PInvoke.Storage
 
         private NativeGlobalSymbol Import()
         {
-            _reader.ReadItemStart();
+            reader.ReadItemStart();
             try
             {
-                var kind = _reader.ReadNameKind();
+                var kind = reader.ReadNameKind();
                 switch (kind)
                 {
                     case NativeNameKind.Struct:
@@ -64,18 +64,18 @@ namespace PInvoke.Storage
             }
             finally
             {
-                _reader.ReadItemEnd();
+                reader.ReadItemEnd();
             }
         }
 
         private NativeType ImportTypeReference()
         {
-            var kind = _reader.ReadSymbolKind();
+            var kind = reader.ReadSymbolKind();
             switch (kind)
             {
                 case NativeSymbolKind.ArrayType:
                     {
-                        var elementCount = _reader.ReadInt32();
+                        var elementCount = reader.ReadInt32();
                         var type = ImportTypeReference();
                         return new NativeArray(type, elementCount);
                     }
@@ -85,19 +85,19 @@ namespace PInvoke.Storage
                     }
                 case NativeSymbolKind.BuiltinType:
                     {
-                        var bt = (BuiltinType)_reader.ReadInt32();
+                        var bt = (BuiltinType)reader.ReadInt32();
                         return new NativeBuiltinType(bt);
                     }
                 case NativeSymbolKind.BitVectorType:
                     {
-                        var count = _reader.ReadInt32();
+                        var count = reader.ReadInt32();
                         return new NativeBitVector(count);
                     }
                 case NativeSymbolKind.NamedType:
                     {
-                        var qualification = _reader.ReadString();
-                        var name = _reader.ReadString();
-                        var isConst = _reader.ReadBoolean();
+                        var qualification = reader.ReadString();
+                        var name = reader.ReadString();
+                        var isConst = reader.ReadBoolean();
                         return new NativeNamedType(qualification: qualification, name: name, isConst: isConst);
                     }
                 case NativeSymbolKind.OpaqueType:
@@ -111,7 +111,7 @@ namespace PInvoke.Storage
 
         private NativeGlobalSymbol ImportTypeDef()
         {
-            var name = _reader.ReadString();
+            var name = reader.ReadString();
             var type = ImportTypeReference();
             var typeDef = new NativeTypeDef(name, type);
             return new NativeGlobalSymbol(typeDef);
@@ -119,9 +119,9 @@ namespace PInvoke.Storage
 
         private NativeGlobalSymbol ImportConstant()
         {
-            var name = _reader.ReadString();
-            var value = _reader.ReadString();
-            var kind = (ConstantKind)_reader.ReadInt32();
+            var name = reader.ReadString();
+            var value = reader.ReadString();
+            var kind = (ConstantKind)reader.ReadInt32();
             var constant = new NativeConstant(name, value, kind);
             return new NativeGlobalSymbol(constant);
         }
@@ -129,15 +129,15 @@ namespace PInvoke.Storage
         private NativeGlobalSymbol ImportStructOrUnion(NativeNameKind kind)
         {
             Contract.Requires(kind == NativeNameKind.Struct || kind == NativeNameKind.Union);
-            var name = _reader.ReadString();
+            var name = reader.ReadString();
             var nt = kind == NativeNameKind.Struct
                 ? (NativeDefinedType)new NativeStruct(name)
                 : new NativeUnion(name);
 
-            var count = _reader.ReadInt32();
+            var count = reader.ReadInt32();
             for (var i = 0; i < count; i++)
             {
-                var memberName = _reader.ReadString();
+                var memberName = reader.ReadString();
                 var memberType = ImportTypeReference();
                 nt.Members.Add(new NativeMember(memberName, memberType));
             }
@@ -147,12 +147,12 @@ namespace PInvoke.Storage
 
         private NativeGlobalSymbol ImportEnum()
         {
-            var e = new NativeEnum(_reader.ReadString());
-            var count = _reader.ReadInt32();
+            var e = new NativeEnum(reader.ReadString());
+            var count = reader.ReadInt32();
             for (var i = 0; i < count; i++)
             {
-                var name = _reader.ReadString();
-                var value = _reader.ReadString();
+                var name = reader.ReadString();
+                var value = reader.ReadString();
                 e.AddValue(name, value);
             }
 
@@ -162,11 +162,11 @@ namespace PInvoke.Storage
         private NativeSalAttribute ImportSalAttribute()
         {
             var sal = new NativeSalAttribute();
-            var count = _reader.ReadInt32();
+            var count = reader.ReadInt32();
             for (var i = 0; i < count; i++)
             {
-                var type = (SalEntryType)_reader.ReadInt32();
-                var text = _reader.ReadString();
+                var type = (SalEntryType)reader.ReadInt32();
+                var text = reader.ReadString();
                 var entry = new NativeSalEntry(type, text);
                 sal.SalEntryList.Add(entry);
             }
@@ -175,14 +175,16 @@ namespace PInvoke.Storage
 
         private NativeSignature ImportSignature()
         {
-            var sig = new NativeSignature();
-            sig.ReturnTypeSalAttribute = ImportSalAttribute();
-            sig.ReturnType = ImportTypeReference();
+            var sig = new NativeSignature
+            {
+                ReturnTypeSalAttribute = ImportSalAttribute(),
+                ReturnType = ImportTypeReference()
+            };
 
-            var count = _reader.ReadInt32();
+            var count = reader.ReadInt32();
             for (var i = 0; i < count; i++)
             {
-                var name = _reader.ReadString();
+                var name = reader.ReadString();
                 var type = ImportTypeReference();
                 sig.Parameters.Add(new NativeParameter(name, type));
             }
@@ -192,18 +194,22 @@ namespace PInvoke.Storage
 
         private NativeGlobalSymbol ImportFunctionPointer()
         {
-            var ptr = new NativeFunctionPointer(_reader.ReadString());
-            ptr.CallingConvention = (NativeCallingConvention)_reader.ReadInt32();
-            ptr.Signature = ImportSignature();
+            var ptr = new NativeFunctionPointer(reader.ReadString())
+            {
+                CallingConvention = (NativeCallingConvention)reader.ReadInt32(),
+                Signature = ImportSignature()
+            };
             return new NativeGlobalSymbol(ptr);
         }
 
         private NativeGlobalSymbol ImportProcedure()
         {
-            var proc = new NativeProcedure(_reader.ReadString());
-            proc.CallingConvention = (NativeCallingConvention)_reader.ReadInt32();
-            proc.DllName = _reader.ReadString();
-            proc.Signature = ImportSignature();
+            var proc = new NativeProcedure(reader.ReadString())
+            {
+                CallingConvention = (NativeCallingConvention)reader.ReadInt32(),
+                DllName = reader.ReadString(),
+                Signature = ImportSignature()
+            };
             return new NativeGlobalSymbol(proc);
         }
     }

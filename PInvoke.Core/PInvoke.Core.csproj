@@ -79,12 +79,16 @@
     <Compile Include="NativeTypes\NativeValueExpression.cs" />
     <Compile Include="NativeTypes\Enums\NativeValueKind.cs" />
     <Compile Include="NativeTypes\Enums\SalEntryType.cs" />
+    <Compile Include="Parser\Enums\ExpressionKind.cs" />
+    <Compile Include="Storage\BinaryBulkReader.cs" />
+    <Compile Include="Storage\BinaryBulkWriter.cs" />
     <Compile Include="Storage\BulkExporter.cs" />
     <Compile Include="Storage\BulkImporter.cs" />
+    <Compile Include="Storage\CsvBulkReader.cs" />
+    <Compile Include="Storage\CsvBulkWriter.cs" />
+    <Compile Include="Storage\CsvUtil.cs" />
     <Compile Include="Storage\Extensions.cs" />
-    <Compile Include="Storage\StorageUtil.Csv.cs" />
     <Compile Include="Storage\StorageUtil.cs" />
-    <Compile Include="Storage\StorageUtil.Binary.cs" />
     <Compile Include="Contract.cs" />
     <Compile Include="EmptyNativeSymbolBag.cs" />
     <Compile Include="Extensions.cs" />
@@ -98,7 +102,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="NativeSymbolBag.cs" />
-    <Compile Include="Parser\BinaryOperator.cs" />
+    <Compile Include="Parser\Enums\BinaryOperator.cs" />
     <Compile Include="Parser\ExpressionEvaluator.cs" />
     <Compile Include="Parser\ExpressionNode.cs" />
     <Compile Include="Parser\ExpressionValue.StringValue.cs" />

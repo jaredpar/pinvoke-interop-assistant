@@ -1,5 +1,6 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
+using PInvoke.Parser.Enums;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,30 +15,31 @@ namespace PInvoke.Parser
     /// </summary>
     public sealed class ExpressionEvaluator
     {
-        private readonly ExpressionParser _parser = new ExpressionParser();
-        private readonly Dictionary<string, Macro> _macroMap;
-        private readonly ScannerOptions _opts;
+        private readonly ExpressionParser parser = new ExpressionParser();
+        private readonly Dictionary<string, Macro> macroMap;
+        private readonly ScannerOptions opts;
 
         public ExpressionEvaluator(Dictionary<string, Macro> macroMap = null)
         {
-            _macroMap = macroMap ?? new Dictionary<string, Macro>();
-            _opts = new ScannerOptions();
-            _opts.HideComments = true;
-            _opts.HideNewLines = true;
-            _opts.HideWhitespace = true;
-            _opts.ThrowOnEndOfStream = false;
+            this.macroMap = macroMap ?? new Dictionary<string, Macro>();
+            opts = new ScannerOptions
+            {
+                HideComments = true,
+                HideNewLines = true,
+                HideWhitespace = true,
+                ThrowOnEndOfStream = false
+            };
         }
 
         public bool TryEvaluate(string expr, out ExpressionValue result)
         {
-            List<Token> list = Scanner.TokenizeText(expr, _opts);
+            var list = Scanner.TokenizeText(expr, opts);
             return TryEvaluate(list, out result);
         }
 
         public bool TryEvaluate(List<Token> list, out ExpressionValue result)
         {
-            ExpressionNode node = null;
-            if (!_parser.TryParse(list, out node))
+            if (!parser.TryParse(list, out ExpressionNode node))
             {
                 result = null;
                 return false;
@@ -104,7 +106,7 @@ namespace PInvoke.Parser
             bool value =
                 node.Token.Value == "defined" &&
                 node.LeftNode != null &&
-                _macroMap.ContainsKey(node.LeftNode.Token.Value);
+                macroMap.ContainsKey(node.LeftNode.Token.Value);
 
             return ExpressionValue.Create(value);
         }
@@ -137,11 +139,10 @@ namespace PInvoke.Parser
 
         private ExpressionValue EvaluateLeaf(ExpressionNode node)
         {
-            Token token = node.Token;
+            var token = node.Token;
             if (token.IsNumber)
             {
-                Number value;
-                if (!TokenHelper.TryConvertToNumber(node.Token, out value))
+                if (!TokenHelper.TryConvertToNumber(node.Token, out Number value))
                 {
                     throw new Exception($"Can't convert token to number {node.Token}");
                 }
@@ -162,7 +163,7 @@ namespace PInvoke.Parser
             }
             else if (token.IsCharacter)
             {
-                char cValue = '0';
+                var cValue = '0';
                 if (!TokenHelper.TryConvertToChar(node.Token, out cValue))
                 {
                     throw new Exception($"Can't convert token to char {node.Token}");
@@ -171,8 +172,7 @@ namespace PInvoke.Parser
             }
             else if (token.IsQuotedString)
             {
-                string sValue = null;
-                if (!TokenHelper.TryConvertToString(token, out sValue))
+                if (!TokenHelper.TryConvertToString(token, out string sValue))
                 {
                     throw new Exception($"Can't convert token to string {node.Token}");
                 }
@@ -193,12 +193,10 @@ namespace PInvoke.Parser
             Contract.Requires(node.Kind == ExpressionKind.Leaf);
             Contract.Requires(node.Token.TokenType == TokenType.Word);
 
-            ExpressionValue value = default(ExpressionValue);
-            Macro m = null;
-            if (_macroMap.TryGetValue(node.Token.Value, out m))
+            var value = default(ExpressionValue);
+            if (macroMap.TryGetValue(node.Token.Value, out Macro m))
             {
-                Number numValue;
-                if (TokenHelper.TryConvertToNumber(m.Value, out numValue))
+                if (TokenHelper.TryConvertToNumber(m.Value, out Number numValue))
                 {
                     value = ExpressionValue.Create(numValue);
                 }
@@ -217,8 +215,7 @@ namespace PInvoke.Parser
 
         private ExpressionValue EvaluateBinaryOperation(ExpressionNode node)
         {
-            BinaryOperator op;
-            if (!TryConvertToBinaryOperator(node.Token.TokenType, out op))
+            if (!TryConvertToBinaryOperator(node.Token.TokenType, out BinaryOperator op))
             {
                 throw new Exception($"Invalid binary node {node.Token.TokenType}");
             }

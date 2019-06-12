@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using PInvoke.NativeTypes.Enums;
 using PInvoke.Parser;
+using PInvoke.Parser.Enums;
 
 namespace PInvoke.NativeTypes
 {
@@ -134,7 +135,7 @@ namespace PInvoke.NativeTypes
                 return;
             }
 
-            if (cur.Kind == Parser.ExpressionKind.Leaf)
+            if (cur.Kind == ExpressionKind.Leaf)
             {
                 var ntVal = NativeValue.TryCreateForLeaf(cur, bag: null);
 
@@ -147,7 +148,7 @@ namespace PInvoke.NativeTypes
                     _errorParsingExpr = true;
                 }
             }
-            else if (cur.Kind == Parser.ExpressionKind.Cast)
+            else if (cur.Kind == ExpressionKind.Cast)
             {
                 // Create nodes for the cast expressions.  The target should be a symbol
                 _valueList.Add(NativeValue.CreateSymbolType(cur.Token.Value));

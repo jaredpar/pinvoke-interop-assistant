@@ -1,5 +1,6 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
+using PInvoke.Parser.Enums;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,39 +13,6 @@ using static PInvoke.Contract;
 
 namespace PInvoke.Parser
 {
-
-    /// <summary>
-    /// Kind of expression
-    /// </summary>
-    /// <remarks></remarks>
-    public enum ExpressionKind
-    {
-
-        // Binary operation such as +,-,/ 
-        // Token: Operation
-        BinaryOperation,
-
-        // '-' operation.  Left is the value
-        NegativeOperation,
-
-        // ! operation, Left is the value
-        NegationOperation,
-
-        // Token is the name of the function.  
-        // Left: Value
-        // Right: , if there are more arguments
-        FunctionCall,
-
-        List,
-
-        // Token: Target Type
-        // Left: Source that is being cast
-        Cast,
-
-        // Token: Value of the expression
-        Leaf
-    }
-
     /// <summary>
     /// Converts an expression into an expression tree
     /// </summary>
@@ -54,8 +22,7 @@ namespace PInvoke.Parser
 
         public ExpressionNode Parse(string expression)
         {
-            ExpressionNode node = null;
-            if (!this.TryParse(expression, out node))
+            if (!TryParse(expression, out ExpressionNode node))
             {
                 throw new InvalidOperationException("Unable to parse the expression");
             }
@@ -65,8 +32,7 @@ namespace PInvoke.Parser
 
         public bool IsParsable(string expression)
         {
-            ExpressionNode node = null;
-            return TryParse(expression, out node);
+            return TryParse(expression, out ExpressionNode node);
         }
 
         public bool TryParse(List<Token> tokens, out ExpressionNode node)
@@ -88,7 +54,7 @@ namespace PInvoke.Parser
 
             using (var reader = new StringReader(expression))
             {
-                Scanner scanner = new Scanner(reader);
+                var scanner = new Scanner(reader);
                 scanner.Options.HideNewLines = true;
                 scanner.Options.HideComments = true;
                 scanner.Options.HideWhitespace = true;
@@ -99,9 +65,7 @@ namespace PInvoke.Parser
 
         private bool TryParseComplete(List<Token> tokens, out ExpressionNode node)
         {
-            ExpressionNode cur = null;
-            List<Token> remaining = null;
-            if (!TryParseCore(tokens, out cur, out remaining))
+            if (!TryParseCore(tokens, out ExpressionNode cur, out List<Token> remaining))
             {
                 node = null;
                 return false;
@@ -127,16 +91,17 @@ namespace PInvoke.Parser
             }
             else
             {
-                ExpressionNode right = null;
-                if (!TryParseComplete(remaining.GetRange(1, remaining.Count - 1), out right))
+                if (!TryParseComplete(remaining.GetRange(1, remaining.Count - 1), out ExpressionNode right))
                 {
                     node = null;
                     return false;
                 }
 
-                node = new ExpressionNode(ExpressionKind.BinaryOperation, remaining[0]);
-                node.LeftNode = cur;
-                node.RightNode = right;
+                node = new ExpressionNode(ExpressionKind.BinaryOperation, remaining[0])
+                {
+                    LeftNode = cur,
+                    RightNode = right
+                };
                 return true;
             }
         }

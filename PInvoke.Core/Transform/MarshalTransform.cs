@@ -12,6 +12,7 @@ using CodeParam = System.CodeDom.CodeParameterDeclarationExpression;
 using CodeParamPair = System.Collections.Generic.KeyValuePair<System.CodeDom.CodeParameterDeclarationExpression, System.CodeDom.CodeParameterDeclarationExpression>;
 using PInvoke.NativeTypes;
 using PInvoke.NativeTypes.Enums;
+using PInvoke.Transform.Enums;
 
 namespace PInvoke.Transform
 {
@@ -26,56 +27,51 @@ namespace PInvoke.Transform
 
     public class MarshalTransform
     {
-        private TransformKindFlags _kind;
-        private CodeTransform _trans;
+        private CodeTransform transform;
 
-        private List<TransformPlugin> _list = new List<TransformPlugin>();
-        internal TransformKindFlags Kind
-        {
-            get { return _kind; }
-            set { _kind = value; }
-        }
+        private List<TransformPlugin> transformPlugins = new List<TransformPlugin>();
+        internal TransformKindFlags Kind { get; set; }
 
         public MarshalTransform(LanguageType lang, NativeSymbolBag bag, TransformKindFlags kind)
         {
-            _trans = new CodeTransform(lang, bag);
+            transform = new CodeTransform(lang, bag);
             Kind = kind;
 
             // Method Parameters
-            _list.Add(new BooleanTypesTransformPlugin());
+            transformPlugins.Add(new BooleanTypesTransformPlugin());
 
             // Process BSTR types before any other string.  BSTR can techinally be used as other String types
             // such as LPWSTR and the other string matching code will flag them as such.  Therefore we will 
             // process them first since the reverse is not true
-            _list.Add(new BstrTransformPlugin());
-            _list.Add(new MutableStringBufferTransformPlugin());
-            _list.Add(new ConstantStringTransformPlugin());
-            _list.Add(new ArrayParameterTransformPlugin(_trans));
-            _list.Add(new BetterManagedTypesTransformPlugin());
-            _list.Add(new PointerToKnownTypeTransformPlugin(_trans));
-            _list.Add(new SystemIntTransformPlugin());
-            _list.Add(new RawStringTransformPlugin());
+            transformPlugins.Add(new BstrTransformPlugin());
+            transformPlugins.Add(new MutableStringBufferTransformPlugin());
+            transformPlugins.Add(new ConstantStringTransformPlugin());
+            transformPlugins.Add(new ArrayParameterTransformPlugin(transform));
+            transformPlugins.Add(new BetterManagedTypesTransformPlugin());
+            transformPlugins.Add(new PointerToKnownTypeTransformPlugin(transform));
+            transformPlugins.Add(new SystemIntTransformPlugin());
+            transformPlugins.Add(new RawStringTransformPlugin());
 
             // Very low on the list as it's a last ditch effort
-            _list.Add(new DoublePointerOutTransformPlugin());
-            _list.Add(new PointerPointerTransformPlugin());
-            _list.Add(new DirectionalModifiersTransformPlugin());
+            transformPlugins.Add(new DoublePointerOutTransformPlugin());
+            transformPlugins.Add(new PointerPointerTransformPlugin());
+            transformPlugins.Add(new DirectionalModifiersTransformPlugin());
 
             // Struct Member
-            _list.Add(new StringBufferStructMemberTransformPlugin());
-            _list.Add(new StringPointerStructMemberTransformPlugin());
-            _list.Add(new BoolStructMemberTransformPlugin());
+            transformPlugins.Add(new StringBufferStructMemberTransformPlugin());
+            transformPlugins.Add(new StringPointerStructMemberTransformPlugin());
+            transformPlugins.Add(new BoolStructMemberTransformPlugin());
 
             // Union Members
-            _list.Add(new BoolUnionMemberTransformPlugin());
+            transformPlugins.Add(new BoolUnionMemberTransformPlugin());
 
             // Mainly wrapper generators
-            _list.Add(new OneWayStringBufferTransformPlugin());
-            _list.Add(new TwoWayStringBufferTransformPlugin());
-            _list.Add(new TwoWayViaReturnStringBufferTransformPlugin());
-            _list.Add(new PInvokePointerTransformPlugin());
+            transformPlugins.Add(new OneWayStringBufferTransformPlugin());
+            transformPlugins.Add(new TwoWayStringBufferTransformPlugin());
+            transformPlugins.Add(new TwoWayViaReturnStringBufferTransformPlugin());
+            transformPlugins.Add(new PInvokePointerTransformPlugin());
 
-            foreach (TransformPlugin cur in _list)
+            foreach (TransformPlugin cur in transformPlugins)
             {
                 cur.LanguageType = lang;
             }
@@ -147,7 +143,7 @@ namespace PInvoke.Transform
 
         private void ProcessDelegate(CodeTypeDelegate del)
         {
-            foreach (TransformPlugin plugin in _list)
+            foreach (TransformPlugin plugin in transformPlugins)
             {
                 if (0 != (plugin.TransformKind & TransformKindFlags.Signature))
                 {
@@ -172,7 +168,7 @@ namespace PInvoke.Transform
             // left in the raw form of IntPtr, Int and such.  Essentially all value types.  It's possible
             // to create an alignment issue if we try and refactor these out to better types.  For instance
             // we could create a string for an IntPtr and create an alignment issue
-            foreach (TransformPlugin plugin in _list)
+            foreach (var plugin in transformPlugins)
             {
                 if (0 != (plugin.TransformKind & TransformKindFlags.UnionMembers))
                 {
@@ -198,7 +194,7 @@ namespace PInvoke.Transform
                 return;
             }
 
-            foreach (TransformPlugin plugin in _list)
+            foreach (TransformPlugin plugin in transformPlugins)
             {
                 if (0 != (plugin.TransformKind & TransformKindFlags.Signature))
                 {
@@ -214,7 +210,7 @@ namespace PInvoke.Transform
                 return;
             }
 
-            foreach (TransformPlugin plugin in _list)
+            foreach (TransformPlugin plugin in transformPlugins)
             {
                 if (0 != (plugin.TransformKind & TransformKindFlags.Signature))
                 {
@@ -230,7 +226,7 @@ namespace PInvoke.Transform
                 return;
             }
 
-            foreach (TransformPlugin plugin in _list)
+            foreach (TransformPlugin plugin in transformPlugins)
             {
                 if (0 != (plugin.TransformKind & kind))
                 {
@@ -247,7 +243,7 @@ namespace PInvoke.Transform
             }
 
             List<CodeMemberMethod> list = new List<CodeMemberMethod>();
-            foreach (TransformPlugin plugin in _list)
+            foreach (TransformPlugin plugin in transformPlugins)
             {
                 if (0 != (plugin.TransformKind & TransformKindFlags.WrapperMethods))
                 {

@@ -20,12 +20,12 @@ namespace PInvoke.Transform
     /// <remarks></remarks>
     public class CodeDomPrettyList
     {
-        private NativeSymbolBag _bag;
+        private NativeSymbolBag bag;
 
-        private List<NativeTypeDef> _resolvedTypeDefList;
+        private List<NativeTypeDef> resolvedTypeDefList;
         public CodeDomPrettyList(NativeSymbolBag bag)
         {
-            _bag = bag;
+            this.bag = bag;
         }
 
         public void PerformRename(CodeTypeDeclarationCollection col)
@@ -35,19 +35,21 @@ namespace PInvoke.Transform
                 throw new ArgumentNullException("col");
             }
 
-            Dictionary<string, string> map = new Dictionary<string, string>(StringComparer.Ordinal);
-            map.Add("tagPOINT", "Point");
+            var map = new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                { "tagPOINT", "Point" }
+            };
 
-            CodeDomIterator it = new CodeDomIterator();
-            List<object> list = it.Iterate(col);
+            var it = new CodeDomIterator();
+            var list = it.Iterate(col);
 
             // Use the iterator so we make sure to reach nested types
             foreach (CodeTypeDeclaration ctd in FindUnmodifiedTypes(list))
             {
-                NativeDefinedType definedNt = GetDefined(ctd);
+                var definedNt = GetDefined(ctd);
                 if (IsBadName(ctd.Name))
                 {
-                    foreach (NativeTypeDef possible in FindTypeDefsTargeting(definedNt))
+                    foreach (var possible in FindTypeDefsTargeting(definedNt))
                     {
                         if (!IsBadName(possible.Name))
                         {
@@ -69,8 +71,7 @@ namespace PInvoke.Transform
             // Use the iterator so we make sure to reach nested types
             foreach (object obj in col)
             {
-                CodeTypeDeclaration ctd = obj as CodeTypeDeclaration;
-                if (ctd != null)
+                if (obj is CodeTypeDeclaration ctd)
                 {
                     NativeDefinedType definedNt = GetDefined(ctd);
                     if (definedNt != null && 0 == string.CompareOrdinal(definedNt.Name, ctd.Name))
@@ -174,15 +175,15 @@ namespace PInvoke.Transform
         private List<NativeTypeDef> FindTypeDefsTargeting(NativeType target)
         {
             // Build the cache
-            if (_resolvedTypeDefList == null)
+            if (resolvedTypeDefList == null)
             {
-                _resolvedTypeDefList = new List<NativeTypeDef>(_bag.FindResolvedTypeDefs());
+                resolvedTypeDefList = new List<NativeTypeDef>(bag.FindResolvedTypeDefs());
             }
 
             List<NativeTypeDef> list = new List<NativeTypeDef>();
 
             // First look in the symbol bag
-            foreach (NativeTypeDef td in _resolvedTypeDefList)
+            foreach (NativeTypeDef td in resolvedTypeDefList)
             {
                 if (object.ReferenceEquals(td.RealTypeDigged, target))
                 {
@@ -192,7 +193,7 @@ namespace PInvoke.Transform
 
             // Next look in the native storage for more types  
             // TODO: this cast is bad.
-            var lookup = _bag.NextSymbolLookup;
+            var lookup = bag.NextSymbolLookup;
             foreach (var name in lookup.NativeNames.Where(x => x.Kind == NativeNameKind.TypeDef))
             {
                 var typeDef = lookup.GetGlobalSymbol<NativeTypeDef>(name);

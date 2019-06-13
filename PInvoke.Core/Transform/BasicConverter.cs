@@ -17,6 +17,7 @@ using System.CodeDom.Compiler;
 using System.Text;
 using PInvoke.NativeTypes;
 using PInvoke.NativeTypes.Enums;
+using PInvoke.Transform.Enums;
 
 namespace PInvoke.Transform
 {
@@ -27,15 +28,7 @@ namespace PInvoke.Transform
     /// <remarks></remarks>
     public class BasicConverter
     {
-        private INativeSymbolStorage _storage;
-        private LanguageType _type;
-        private TransformKindFlags _transformKind = TransformKindFlags.All;
-
-        public INativeSymbolStorage Storage
-        {
-            get { return _storage; }
-            set { _storage = value; }
-        }
+        public INativeSymbolStorage Storage { get; set; }
 
         /// <summary>
         /// Language to generate into
@@ -43,17 +36,9 @@ namespace PInvoke.Transform
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public LanguageType LanguageType
-        {
-            get { return _type; }
-            set { _type = value; }
-        }
+        public LanguageType LanguageType { get; set; }
 
-        public TransformKindFlags TransformKindFlags
-        {
-            get { return _transformKind; }
-            set { _transformKind = value; }
-        }
+        public TransformKindFlags TransformKindFlags { get; set; } = TransformKindFlags.All;
 
         public BasicConverter(LanguageType type, INativeSymbolStorage storage)
         {
@@ -63,57 +48,57 @@ namespace PInvoke.Transform
 
         public CodeTypeDeclarationCollection ConvertToCodeDom(NativeConstant c, ErrorProvider ep)
         {
-            NativeSymbolBag bag = new NativeSymbolBag(_storage);
+            var bag = new NativeSymbolBag(Storage);
             bag.AddConstant(c);
             return ConvertBagToCodeDom(bag, ep, null);
         }
 
         public string ConvertToPInvokeCode(NativeConstant c)
         {
-            ErrorProvider ep = new ErrorProvider();
-            CodeTypeDeclarationCollection col = ConvertToCodeDom(c, ep);
+            var ep = new ErrorProvider();
+            var col = ConvertToCodeDom(c, ep);
             return ConvertCodeDomToPInvokeCodeImpl(col, ep);
         }
 
         public CodeTypeDeclarationCollection ConvertToCodeDom(NativeTypeDef typedef, ErrorProvider ep)
         {
-            NativeSymbolBag bag = new NativeSymbolBag(_storage);
+            var bag = new NativeSymbolBag(Storage);
             bag.AddTypeDef(typedef);
             return ConvertBagToCodeDom(bag, ep, null);
         }
 
         public string ConvertToPInvokeCode(NativeTypeDef typedef)
         {
-            ErrorProvider ep = new ErrorProvider();
-            CodeTypeDeclarationCollection col = ConvertToCodeDom(typedef, ep);
+            var ep = new ErrorProvider();
+            var col = ConvertToCodeDom(typedef, ep);
             return ConvertCodeDomToPInvokeCodeImpl(col, ep);
         }
 
         public CodeTypeDeclarationCollection ConvertToCodeDom(NativeDefinedType definedNt, ErrorProvider ep)
         {
-            NativeSymbolBag bag = new NativeSymbolBag(_storage);
+            var bag = new NativeSymbolBag(Storage);
             bag.AddDefinedType(definedNt);
             return ConvertBagToCodeDom(bag, ep, null);
         }
 
         public string ConvertToPInvokeCode(NativeDefinedType definedNt)
         {
-            ErrorProvider ep = new ErrorProvider();
-            CodeTypeDeclarationCollection col = ConvertToCodeDom(definedNt, ep);
+            var ep = new ErrorProvider();
+            var col = ConvertToCodeDom(definedNt, ep);
             return ConvertCodeDomToPInvokeCodeImpl(col, ep);
         }
 
         public CodeTypeDeclarationCollection ConvertToCodeDom(NativeProcedure proc, ErrorProvider ep, string libraryName)
         {
-            NativeSymbolBag bag = new NativeSymbolBag(_storage);
+            var bag = new NativeSymbolBag(Storage);
             bag.AddProcedure(proc);
             return ConvertBagToCodeDom(bag, ep, libraryName);
         }
 
         public string ConvertToPInvokeCode(NativeProcedure proc, string libraryName)
         {
-            ErrorProvider ep = new ErrorProvider();
-            CodeTypeDeclarationCollection col = ConvertToCodeDom(proc, ep, libraryName);
+            var ep = new ErrorProvider();
+            var col = ConvertToCodeDom(proc, ep, libraryName);
             return ConvertCodeDomToPInvokeCodeImpl(col, ep);
         }
 
@@ -141,8 +126,8 @@ namespace PInvoke.Transform
                 throw new ArgumentNullException("code");
             }
 
-            ErrorProvider ep = new ErrorProvider();
-            CodeTypeDeclarationCollection col = ConvertNativeCodeToCodeDom(code, ep, libraryName);
+            var ep = new ErrorProvider();
+            var col = ConvertNativeCodeToCodeDom(code, ep, libraryName);
             return ConvertCodeDomToPInvokeCodeImpl(col, ep);
         }
 
@@ -165,14 +150,14 @@ namespace PInvoke.Transform
                 throw new ArgumentNullException("ep");
             }
 
-            var analyzer = NativeCodeAnalyzerFactory.CreateForMiniParse(OsVersion.WindowsVista, _storage.GetAllMacros());
+            var analyzer = NativeCodeAnalyzerFactory.CreateForMiniParse(OsVersion.WindowsVista, Storage.GetAllMacros());
 
             // TODO: probably should delete this 
             analyzer.IncludePathList.Add("c:\\program files (x86)\\windows kits\\8.1\\include\\shared");
-            NativeSymbolBag bag = default(NativeSymbolBag);
+            var bag = default(NativeSymbolBag);
             using (System.IO.StringReader reader = new StringReader(code))
             {
-                NativeCodeAnalyzerResult result = analyzer.Analyze(reader);
+                var result = analyzer.Analyze(reader);
 
                 ep.Append(result.ErrorProvider);
                 bag = NativeSymbolBag.CreateFrom(result, Storage);
@@ -183,14 +168,16 @@ namespace PInvoke.Transform
 
         private string ConvertBagToPInvokeCodeImpl(NativeSymbolBag bag, ErrorProvider ep, string libraryName)
         {
-            CodeTypeDeclarationCollection col = ConvertBagToCodeDom(bag, ep, libraryName);
+            var col = ConvertBagToCodeDom(bag, ep, libraryName);
             return ConvertCodeDomToPInvokeCodeImpl(col, ep);
         }
 
         public string ConvertCodeDomToPInvokeCode(CodeTypeDeclaration ctd)
         {
-            CodeTypeDeclarationCollection col = new CodeTypeDeclarationCollection();
-            col.Add(ctd);
+            var col = new CodeTypeDeclarationCollection
+            {
+                ctd
+            };
             return ConvertCodeDomToPInvokeCodeImpl(col, new ErrorProvider());
         }
 
@@ -206,7 +193,7 @@ namespace PInvoke.Transform
 
         public string ConvertCodeDomToPInvokeCodeImpl(CodeTypeDeclarationCollection col, ErrorProvider ep)
         {
-            return ConvertCodeDomToPInvokeCodeImpl(_type, col, ep);
+            return ConvertCodeDomToPInvokeCodeImpl(LanguageType, col, ep);
         }
 
         public static string ConvertCodeDomToPInvokeCodeImpl(LanguageType type, CodeTypeDeclarationCollection col, ErrorProvider ep)
@@ -214,18 +201,18 @@ namespace PInvoke.Transform
             ThrowIfNull(col);
             ThrowIfNull(ep);
 
-            StringWriter writer = new StringWriter();
-            CodeDomProvider provider = default(CodeDomProvider);
-            string commentStart = null;
+            var writer = new StringWriter();
+            var provider = default(CodeDomProvider);
+            var commentStart = default(string);
 
             // Generate based on the language
             switch (type)
             {
-                case Transform.LanguageType.VisualBasic:
+                case LanguageType.VisualBasic:
                     commentStart = "'";
                     provider = new Microsoft.VisualBasic.VBCodeProvider();
                     break;
-                case Transform.LanguageType.CSharp:
+                case LanguageType.CSharp:
                     commentStart = "//";
                     provider = new Microsoft.CSharp.CSharpCodeProvider();
                     break;
@@ -249,7 +236,7 @@ namespace PInvoke.Transform
                 provider.GenerateCodeFromMember(ctd, writer, new CodeGeneratorOptions());
             }
 
-            if (type == Transform.LanguageType.CSharp)
+            if (type == LanguageType.CSharp)
             {
                 // CSharp specific fixup
                 return FixupCSharpCode(writer.ToString());

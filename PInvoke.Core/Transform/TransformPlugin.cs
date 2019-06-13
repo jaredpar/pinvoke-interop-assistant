@@ -16,6 +16,7 @@ using static PInvoke.Transform.CodeDomUtil;
 using static PInvoke.Transform.MarshalAttributeFactory;
 using PInvoke.NativeTypes;
 using PInvoke.NativeTypes.Enums;
+using PInvoke.Transform.Enums;
 
 namespace PInvoke.Transform
 {
@@ -47,13 +48,7 @@ namespace PInvoke.Transform
         private const string s_processedReturnKey = "fd83becd-ba9f-4c08-9e79-c3285b74c8cb";
 
         private const string s_processedMemberKey = "a12fe995-7b38-4b84-82d5-38e315499806";
-
-        private LanguageType _lang;
-        public LanguageType LanguageType
-        {
-            get { return _lang; }
-            set { _lang = value; }
-        }
+        public LanguageType LanguageType { get; set; }
 
         public abstract TransformKindFlags TransformKind { get; }
 
@@ -2687,8 +2682,8 @@ namespace PInvoke.Transform
 
         protected override void ProcessSingleUnionField(System.CodeDom.CodeTypeDeclaration ctd, System.CodeDom.CodeMemberField field, NativeMember ntMem)
         {
-            NativeType nt = ntMem.NativeType;
-            BooleanType bType = BooleanType.CStyle;
+            var nt = ntMem.NativeType;
+            var bType = BooleanType.CStyle;
             if (nt != null && IsBooleanType(nt, ref bType))
             {
                 field.CustomAttributes.Add(MarshalAttributeFactory.CreateBooleanMarshalAttribute(BooleanType.CStyle));

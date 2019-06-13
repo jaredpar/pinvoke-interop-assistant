@@ -1,5 +1,6 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 using PInvoke.Transform;
+using PInvoke.Transform.Enums;
 using System;
 using System.CodeDom;
 using System.Collections.Generic;
@@ -15,9 +16,9 @@ namespace PInvoke.Test
     {
         private List<object> Convert(string code)
         {
-            BasicConverter converter = new BasicConverter(LanguageType.VisualBasic, StorageFactory.CreateStandard());
-            CodeTypeDeclarationCollection ctd = converter.ConvertNativeCodeToCodeDom(code, new PInvoke.ErrorProvider());
-            CodeDomIterator it = new CodeDomIterator();
+            var converter = new BasicConverter(LanguageType.VisualBasic, StorageFactory.CreateStandard());
+            var ctd = converter.ConvertNativeCodeToCodeDom(code, new ErrorProvider());
+            var it = new CodeDomIterator();
             return it.Iterate(ctd);
         }
 
@@ -25,8 +26,7 @@ namespace PInvoke.Test
         {
             foreach (object obj in list)
             {
-                CodeTypeReference typeRef = obj as CodeTypeReference;
-                if (typeRef != null)
+                if (obj is CodeTypeReference typeRef)
                 {
                     if (0 == string.CompareOrdinal(name, typeRef.BaseType))
                     {
@@ -42,8 +42,7 @@ namespace PInvoke.Test
         {
             foreach (object obj in list)
             {
-                CodeMemberField field = obj as CodeMemberField;
-                if (field != null && 0 == string.CompareOrdinal(field.Name, name))
+                if (obj is CodeMemberField field && 0 == string.CompareOrdinal(field.Name, name))
                 {
                     return;
                 }
@@ -56,8 +55,7 @@ namespace PInvoke.Test
         {
             foreach (object obj in list)
             {
-                CodeMemberMethod field = obj as CodeMemberMethod;
-                if (field != null && 0 == string.CompareOrdinal(field.Name, name))
+                if (obj is CodeMemberMethod field && 0 == string.CompareOrdinal(field.Name, name))
                 {
                     return;
                 }
@@ -69,8 +67,7 @@ namespace PInvoke.Test
         {
             foreach (object obj in list)
             {
-                CodeTypeDeclaration ctd = obj as CodeTypeDeclaration;
-                if (ctd != null && 0 == string.CompareOrdinal(ctd.Name, name))
+                if (obj is CodeTypeDeclaration ctd && 0 == string.CompareOrdinal(ctd.Name, name))
                 {
                     return;
                 }

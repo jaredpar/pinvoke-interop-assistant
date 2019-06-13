@@ -18,7 +18,7 @@ namespace PInvoke.Transform
     /// <remarks></remarks>
     public class NativeSymbolTransform
     {
-        private NativeSymbolIterator _it = new NativeSymbolIterator();
+        private NativeSymbolIterator iterator = new NativeSymbolIterator();
 
         public NativeSymbolTransform()
         {
@@ -26,9 +26,9 @@ namespace PInvoke.Transform
 
         public void CollapseNamedTypes(NativeSymbol ns)
         {
-            foreach (NativeSymbolRelationship rel in _it.FindAllNativeSymbolRelationships(ns))
+            foreach (var relationship in iterator.FindAllNativeSymbolRelationships(ns))
             {
-                CollapseNamedTypesImpl(rel.Parent, rel.Symbol);
+                CollapseNamedTypesImpl(relationship.Parent, relationship.Symbol);
             }
         }
 
@@ -42,7 +42,7 @@ namespace PInvoke.Transform
 
             if (child.Kind == NativeSymbolKind.NamedType)
             {
-                NativeNamedType namedNt = (NativeNamedType)child;
+                var namedNt = (NativeNamedType)child;
                 if (namedNt.RealType != null)
                 {
                     ns.ReplaceChild(child, namedNt.RealType);
@@ -52,9 +52,9 @@ namespace PInvoke.Transform
 
         public void CollapseTypedefs(NativeSymbol ns)
         {
-            foreach (NativeSymbolRelationship rel in _it.FindAllNativeSymbolRelationships(ns))
+            foreach (var relationship in iterator.FindAllNativeSymbolRelationships(ns))
             {
-                CollapseTypedefsImpl(rel.Parent, rel.Symbol);
+                CollapseTypedefsImpl(relationship.Parent, relationship.Symbol);
             }
         }
 
@@ -68,7 +68,7 @@ namespace PInvoke.Transform
 
             if (child.Kind == NativeSymbolKind.TypeDefType)
             {
-                NativeTypeDef typedef = (NativeTypeDef)child;
+                var typedef = (NativeTypeDef)child;
                 if (typedef.RealType != null)
                 {
                     ns.ReplaceChild(child, typedef.RealType);
@@ -85,7 +85,7 @@ namespace PInvoke.Transform
         /// <remarks></remarks>
         public void RenameTypeSymbol(NativeSymbol ns, string oldName, string newName)
         {
-            foreach (NativeSymbol sym in _it.FindAllNativeSymbols(ns))
+            foreach (var sym in iterator.FindAllNativeSymbols(ns))
             {
                 if ((sym.Category == NativeSymbolCategory.Defined || sym.Kind == NativeSymbolKind.NamedType) && 0 == string.CompareOrdinal(sym.Name, oldName))
                 {

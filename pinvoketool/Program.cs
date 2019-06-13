@@ -2,6 +2,7 @@
 using PInvoke;
 using PInvoke.NativeTypes;
 using PInvoke.Transform;
+using PInvoke.Transform.Enums;
 using System;
 using System.Collections.Generic;
 using System.IO;

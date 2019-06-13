@@ -4,6 +4,7 @@ using PInvoke.NativeTypes;
 using PInvoke.NativeTypes.Enums;
 using PInvoke.Parser;
 using PInvoke.Parser.Enums;
+using PInvoke.Transform.Enums;
 using System;
 using System.CodeDom;
 using System.Collections.Generic;
@@ -36,15 +37,15 @@ namespace PInvoke.Transform
     /// <remarks></remarks>
     public class CodeTransform
     {
-        private LanguageType _lang;
-        private NativeSymbolBag _bag;
+        private LanguageType language;
+        private NativeSymbolBag bag;
         private Dictionary<string, NativeSymbol> _typeMap = new Dictionary<string, NativeSymbol>(StringComparer.Ordinal);
         private Dictionary<string, NativeSymbol> _symbolValueMap = new Dictionary<string, NativeSymbol>(StringComparer.Ordinal);
 
-        public CodeTransform(LanguageType lang, NativeSymbolBag bag)
+        public CodeTransform(LanguageType language, NativeSymbolBag bag)
         {
-            _lang = lang;
-            _bag = bag;
+            this.language = language;
+            this.bag = bag;
         }
 
         /// <summary>
@@ -856,16 +857,16 @@ namespace PInvoke.Transform
         {
             ThrowIfNull(node);
 
-            CodeExpression left = this.GenerateValueExpressionImpl(node.LeftNode, ref exprType);
-            return new CodeNegativeExpression(_lang, left);
+            var left = this.GenerateValueExpressionImpl(node.LeftNode, ref exprType);
+            return new CodeNegativeExpression(language, left);
         }
 
         private CodeExpression GenerateValueExpressionNegation(ExpressionNode node, ref CodeTypeReference exprType)
         {
             ThrowIfNull(node);
 
-            CodeExpression left = this.GenerateValueExpressionImpl(node.LeftNode, ref exprType);
-            return new CodeNotExpression(_lang, left);
+            var left = this.GenerateValueExpressionImpl(node.LeftNode, ref exprType);
+            return new CodeNotExpression(language, left);
         }
 
         private CodeExpression GenerateValueExpressionBinaryOperation(ExpressionNode node, ref CodeTypeReference exprType)
@@ -884,7 +885,7 @@ namespace PInvoke.Transform
 
             }
 
-            CodeBinaryOperatorType type = default(CodeBinaryOperatorType);
+            var type = default(CodeBinaryOperatorType);
 
             switch (node.Token.TokenType)
             {
@@ -955,9 +956,9 @@ namespace PInvoke.Transform
                     return null;
             }
 
-            CodeTypeReference leftType = null;
-            CodeTypeReference rightType = null;
-            CodeExpression expr = new CodeShiftExpression(this._lang, isLeft, GenerateValueExpressionImpl(node.LeftNode, ref leftType), GenerateValueExpressionImpl(node.RightNode, ref rightType));
+            var leftType = default(CodeTypeReference);
+            var rightType = default(CodeTypeReference);
+            var expr = new CodeShiftExpression(language, isLeft, GenerateValueExpressionImpl(node.LeftNode, ref leftType), GenerateValueExpressionImpl(node.RightNode, ref rightType));
             exprType = leftType;
             return expr;
         }
@@ -966,7 +967,7 @@ namespace PInvoke.Transform
         {
             ThrowIfNull(node);
 
-            var ntVal = NativeValue.TryCreateForLeaf(node, _bag);
+            var ntVal = NativeValue.TryCreateForLeaf(node, bag);
             if (ntVal == null)
             {
                 throw new InvalidOperationException("Expected a NativeValue");

@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 using PInvoke.NativeTypes;
 using PInvoke.Transform;
+using PInvoke.Transform.Enums;
 using Xunit;
 using static PInvoke.Test.GeneratedCodeVerification;
 

@@ -13,6 +13,7 @@ using Xunit;
 using System.CodeDom.Compiler;
 using System.IO;
 using PInvoke.NativeTypes;
+using PInvoke.Transform.Enums;
 
 namespace PInvoke.Test
 {

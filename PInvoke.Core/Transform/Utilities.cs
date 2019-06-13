@@ -10,39 +10,10 @@ using System.Text;
 using System.Text.RegularExpressions;
 using CodeParam = System.CodeDom.CodeParameterDeclarationExpression;
 using PInvoke.NativeTypes.Enums;
+using PInvoke.Transform.Enums;
 
 namespace PInvoke.Transform
 {
-
-    #region "LanguageType"
-
-    /// <summary>
-    /// Supported language types to export as
-    /// </summary>
-    /// <remarks></remarks>
-    public enum LanguageType
-    {
-        VisualBasic,
-        CSharp
-    }
-
-    #endregion
-
-    #region "MarshalAttributeFactory"
-
-    public enum StringKind
-    {
-        Ascii,
-        Unicode,
-        Unknown
-    }
-
-    public enum BooleanType
-    {
-        Windows,
-        CStyle,
-        Variant
-    }
 
     static internal class MarshalAttributeFactory
     {
@@ -225,9 +196,6 @@ namespace PInvoke.Transform
 
 
     }
-    #endregion
-
-    #region "CodeDomUtil"
 
     internal static class CodeDomUtil
     {
@@ -335,7 +303,4 @@ namespace PInvoke.Transform
             return AreEqual(new CodeTypeReference(left), right);
         }
     }
-
-    #endregion
-
 }

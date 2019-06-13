@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 using PInvoke.NativeTypes;
 using PInvoke.NativeTypes.Enums;
+using PInvoke.Transform.Enums;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,90 +12,26 @@ using static PInvoke.Contract;
 namespace PInvoke.Transform
 {
 
-    public enum SalEntryListType
-    {
-        Pre,
-        Item,
-        Post
-    }
-
-    public class SalEntry
-    {
-        public SalEntryType Type;
-
-        public string Text;
-        public SalEntry(SalEntryType type)
-        {
-            this.Type = type;
-            this.Text = string.Empty;
-        }
-
-        public SalEntry(NativeSalEntry other)
-        {
-            this.Type = other.SalEntryType;
-            this.Text = other.Text.Trim(' ');
-        }
-    }
-
-    /// <summary>
-    /// Set of SAL annotation entries
-    /// </summary>
-    /// <remarks></remarks>
-    public class SalEntrySet
-    {
-        private SalEntryListType _type;
-
-        private List<SalEntry> _list = new List<SalEntry>();
-        public SalEntryListType Type
-        {
-            get { return _type; }
-            set { _type = value; }
-        }
-
-        public List<SalEntry> List
-        {
-            get { return _list; }
-        }
-
-        public SalEntrySet(SalEntryListType type)
-        {
-            Type = type;
-        }
-
-        public SalEntry FindEntry(SalEntryType type)
-        {
-            foreach (SalEntry entry in List)
-            {
-                if (entry.Type == type)
-                {
-                    return entry;
-                }
-            }
-
-            return null;
-        }
-    }
-
     /// <summary>
     /// Used to analyze SAL attributes
     /// </summary>
     /// <remarks></remarks>
     public class SalAnalyzer
     {
-        private NativeSalAttribute _sal;
-        private List<SalEntrySet> _preList = new List<SalEntrySet>();
-        private List<SalEntrySet> _itemList = new List<SalEntrySet>();
+        private NativeSalAttribute sal;
+        private List<SalEntrySet> preList = new List<SalEntrySet>();
+        private List<SalEntrySet> itemList = new List<SalEntrySet>();
 
-        private List<SalEntrySet> _postList = new List<SalEntrySet>();
+        private List<SalEntrySet> postList = new List<SalEntrySet>();
         public SalAnalyzer(NativeSalAttribute sal)
         {
-            _sal = sal;
+            this.sal = sal;
             BuildLists();
         }
 
         public bool IsEmpty
         {
-            get { return _preList.Count == 0 && _postList.Count == 0; }
+            get { return preList.Count == 0 && postList.Count == 0; }
         }
 
         #region "Loose Directional Mappings"
@@ -137,7 +74,7 @@ namespace PInvoke.Transform
         /// <remarks></remarks>
         public bool IsIn()
         {
-            if (_preList.Count != 2 || _itemList.Count != 0 || _postList.Count != 0)
+            if (preList.Count != 2 || itemList.Count != 0 || postList.Count != 0)
             {
                 return false;
             }
@@ -159,7 +96,7 @@ namespace PInvoke.Transform
         /// <remarks></remarks>
         public bool IsInOptional()
         {
-            if (_preList.Count != 2 || _itemList.Count != 0 || _postList.Count != 0)
+            if (preList.Count != 2 || itemList.Count != 0 || postList.Count != 0)
             {
                 return false;
             }
@@ -200,7 +137,7 @@ namespace PInvoke.Transform
         public bool IsInOut()
         {
 
-            if (_preList.Count != 1 || _itemList.Count != 0 || _postList.Count != 1)
+            if (preList.Count != 1 || itemList.Count != 0 || postList.Count != 1)
             {
                 return false;
             }
@@ -226,7 +163,7 @@ namespace PInvoke.Transform
         {
             sizeArg = null;
 
-            if (_preList.Count != 3 || _itemList.Count != 0 || _postList.Count != 0)
+            if (preList.Count != 3 || itemList.Count != 0 || postList.Count != 0)
             {
                 return false;
             }
@@ -253,7 +190,7 @@ namespace PInvoke.Transform
         {
             sizeArg = null;
 
-            if (_preList.Count != 3 || _itemList.Count != 0 || _postList.Count != 0)
+            if (preList.Count != 3 || itemList.Count != 0 || postList.Count != 0)
             {
                 return false;
             }
@@ -280,7 +217,7 @@ namespace PInvoke.Transform
         {
             sizeArg = null;
 
-            if (_preList.Count != 3 || _itemList.Count != 0 || _postList.Count != 0)
+            if (preList.Count != 3 || itemList.Count != 0 || postList.Count != 0)
             {
                 return false;
             }
@@ -307,7 +244,7 @@ namespace PInvoke.Transform
         {
             sizeArg = null;
 
-            if (_preList.Count != 3 || _itemList.Count != 0 || _postList.Count != 0)
+            if (preList.Count != 3 || itemList.Count != 0 || postList.Count != 0)
             {
                 return false;
             }
@@ -339,7 +276,7 @@ namespace PInvoke.Transform
         public bool IsOutElementBuffer(out string sizeArg)
         {
                 sizeArg = null;
-            if (_preList.Count != 0 || _itemList.Count != 1 || _postList.Count != 1)
+            if (preList.Count != 0 || itemList.Count != 1 || postList.Count != 1)
             {
                 return false;
             }
@@ -373,7 +310,7 @@ namespace PInvoke.Transform
         {
             sizeArg = null;
 
-            if (_preList.Count != 0 || _itemList.Count != 1 || _postList.Count != 1)
+            if (preList.Count != 0 || itemList.Count != 1 || postList.Count != 1)
             {
                 return false;
             }
@@ -410,7 +347,7 @@ namespace PInvoke.Transform
             writableSize = null;
             readableSize = null;
 
-            if (_preList.Count != 0 || _itemList.Count != 1 || _postList.Count != 2)
+            if (preList.Count != 0 || itemList.Count != 1 || postList.Count != 2)
             {
                 return false;
             }
@@ -448,7 +385,7 @@ namespace PInvoke.Transform
             writableSize = null;
             readableSize = null;
 
-            if (_preList.Count != 0 || _itemList.Count != 1 || _postList.Count != 2)
+            if (preList.Count != 0 || itemList.Count != 1 || postList.Count != 2)
             {
                 return false;
             }
@@ -475,7 +412,7 @@ namespace PInvoke.Transform
         /// <remarks></remarks>
         public bool IsOutByteBuffer(ref string sizeArg)
         {
-            if (_preList.Count != 0 || _itemList.Count != 1 || _postList.Count != 1)
+            if (preList.Count != 0 || itemList.Count != 1 || postList.Count != 1)
             {
                 return false;
             }
@@ -500,7 +437,7 @@ namespace PInvoke.Transform
         /// <remarks></remarks>
         public bool IsOutByteBufferOptional(ref string sizeArg)
         {
-            if (_preList.Count != 0 || _itemList.Count != 1 || _postList.Count != 1)
+            if (preList.Count != 0 || itemList.Count != 1 || postList.Count != 1)
             {
                 return false;
             }
@@ -528,7 +465,7 @@ namespace PInvoke.Transform
             sizeArg = null;
             readableArg = null;
 
-            if (_preList.Count != 0 || _itemList.Count != 1 || _postList.Count != 2)
+            if (preList.Count != 0 || itemList.Count != 1 || postList.Count != 2)
             {
                 return false;
             }
@@ -555,7 +492,7 @@ namespace PInvoke.Transform
         /// <remarks></remarks>
         public bool IsOutPartByteBufferOptional(ref string sizeArg, ref string readableArg)
         {
-            if (_preList.Count != 0 || _itemList.Count != 1 || _postList.Count != 2)
+            if (preList.Count != 0 || itemList.Count != 1 || postList.Count != 2)
             {
                 return false;
             }
@@ -590,7 +527,7 @@ namespace PInvoke.Transform
         public bool IsInOutElementBuffer(ref string sizeArg)
         {
 
-            if (_preList.Count != 1 || _itemList.Count != 1 || _postList.Count != 1)
+            if (preList.Count != 1 || itemList.Count != 1 || postList.Count != 1)
             {
                 return false;
             }
@@ -617,7 +554,7 @@ namespace PInvoke.Transform
         public bool IsInOutByteBuffer(ref string sizeArg)
         {
 
-            if (_preList.Count != 1 || _itemList.Count != 1 || _postList.Count != 1)
+            if (preList.Count != 1 || itemList.Count != 1 || postList.Count != 1)
             {
                 return false;
             }
@@ -641,7 +578,7 @@ namespace PInvoke.Transform
         /// <remarks></remarks>
         public bool IsDerefOut()
         {
-            if (_preList.Count != 0 || _itemList.Count != 1 || _postList.Count != 4)
+            if (preList.Count != 0 || itemList.Count != 1 || postList.Count != 4)
             {
                 return false;
             }
@@ -701,17 +638,17 @@ namespace PInvoke.Transform
 
         public SalEntrySet FindPost(params SalEntryType[] args)
         {
-            return FindSet(_postList, args);
+            return FindSet(postList, args);
         }
 
         public SalEntrySet FindPre(params SalEntryType[] args)
         {
-            return FindSet(_preList, args);
+            return FindSet(preList, args);
         }
 
         public SalEntrySet FindItem(params SalEntryType[] args)
         {
-            return FindSet(_itemList, args);
+            return FindSet(itemList, args);
         }
 
         /// <summary>
@@ -723,12 +660,12 @@ namespace PInvoke.Transform
         /// <remarks></remarks>
         private SalEntrySet FindSet(List<SalEntrySet> list, SalEntryType[] args)
         {
-            foreach (SalEntrySet item in list)
+            foreach (var item in list)
             {
                 if (item.List.Count == args.Length)
                 {
                     bool match = true;
-                    for (Int32 i = 0; i <= args.Length - 1; i++)
+                    for (var i = 0; i <= args.Length - 1; i++)
                     {
                         if (item.List[i].Type != args[i])
                         {
@@ -749,13 +686,13 @@ namespace PInvoke.Transform
 
         private void BuildLists()
         {
-            ThrowIfNull(_sal);
-            if (_sal.IsEmpty)
+            ThrowIfNull(sal);
+            if (sal.IsEmpty)
             {
                 return;
             }
 
-            List<NativeSalEntry> list = new List<NativeSalEntry>(_sal.SalEntryList);
+            List<NativeSalEntry> list = new List<NativeSalEntry>(sal.SalEntryList);
             List<SalEntrySet> dest = new List<SalEntrySet>();
             SalEntrySet cur = null;
             if (list[0].SalEntryType == SalEntryType.Post)
@@ -803,13 +740,13 @@ namespace PInvoke.Transform
                 switch (l.Type)
                 {
                     case SalEntryListType.Post:
-                        _postList.Add(l);
+                        postList.Add(l);
                         break;
                     case SalEntryListType.Pre:
-                        _preList.Add(l);
+                        preList.Add(l);
                         break;
                     case SalEntryListType.Item:
-                        _itemList.Add(l);
+                        itemList.Add(l);
                         break;
                     default:
                         ThrowInvalidEnumValue(l.Type);

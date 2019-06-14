@@ -18,6 +18,7 @@ using System.Text;
 using PInvoke.NativeTypes;
 using PInvoke.NativeTypes.Enums;
 using PInvoke.Transform.Enums;
+using System.Linq;
 
 namespace PInvoke.Transform
 {
@@ -214,7 +215,7 @@ namespace PInvoke.Transform
                     break;
                 case LanguageType.CSharp:
                     commentStart = "//";
-                    provider = new Microsoft.CSharp.CSharpCodeProvider();                    
+                    provider = new Microsoft.CSharp.CSharpCodeProvider();
                     break;
                 default:
                     ThrowInvalidEnumValue(type);
@@ -231,20 +232,7 @@ namespace PInvoke.Transform
                 writer.WriteLine("{0} Error: {1}", commentStart, err);
             }
 
-            // TODO : look in to refactoring to use this code - 
-            // https://docs.microsoft.com/en-us/dotnet/api/system.codedom.compiler.codedomprovider?view=netframework-4.8
-            // https://docs.microsoft.com/en-us/dotnet/framework/reflection-and-codedom/how-to-create-a-class-using-codedom
-            // https://docs.microsoft.com/en-us/dotnet/api/system.codedom.compiler.codedomprovider.generatecodefrommember?view=netframework-4.8
-            foreach (CodeTypeDeclaration ctd in col)
-            {
-                provider.GenerateCodeFromMember(
-                    ctd, 
-                    writer, 
-                    new CodeGeneratorOptions
-                    {
-                        BracingStyle = "C",
-                    });
-            }
+            Generate(col, writer, provider);
 
             if (type == LanguageType.CSharp)
             {
@@ -257,6 +245,50 @@ namespace PInvoke.Transform
             }
 
         }
+
+#if USE_LEGACY
+        private static void Generate(CodeTypeDeclarationCollection col, StringWriter writer, CodeDomProvider provider)
+        {
+            // TODO : look in to refactoring to use this code - 
+            // https://docs.microsoft.com/en-us/dotnet/api/system.codedom.compiler.codedomprovider?view=netframework-4.8
+            // https://docs.microsoft.com/en-us/dotnet/framework/reflection-and-codedom/how-to-create-a-class-using-codedom
+            // https://docs.microsoft.com/en-us/dotnet/api/system.codedom.compiler.codedomprovider.generatecodefrommember?view=netframework-4.8
+            foreach (CodeTypeDeclaration ctd in col)
+            {
+                provider.GenerateCodeFromMember(
+                    ctd,
+                    writer,
+                    new CodeGeneratorOptions
+                    {
+                        BracingStyle = "C",
+                    });
+            }
+        }
+
+#else
+        private static void Generate(CodeTypeDeclarationCollection col, StringWriter writer, CodeDomProvider provider)
+        {
+            var compileUnit = new CodeCompileUnit();
+            var nameSpace = new CodeNamespace("Test")
+            {
+                Imports = { new CodeNamespaceImport("System") },
+            };
+
+            compileUnit.Namespaces.Add(nameSpace);
+          
+            // TODO : look in to refactoring to use this code - 
+            // https://docs.microsoft.com/en-us/dotnet/api/system.codedom.compiler.codedomprovider?view=netframework-4.8
+            // https://docs.microsoft.com/en-us/dotnet/framework/reflection-and-codedom/how-to-create-a-class-using-codedom
+            // https://docs.microsoft.com/en-us/dotnet/api/system.codedom.compiler.codedomprovider.generatecodefrommember?view=netframework-4.8
+            foreach (CodeTypeDeclaration ctd in col)
+            {
+                nameSpace.Types.Add(ctd);
+            }
+
+            provider.GenerateCodeFromCompileUnit(compileUnit, writer, new CodeGeneratorOptions { BracingStyle = "C" });
+        }
+
+#endif
 
         /// <summary>
         /// Core conversion routine.  All code should just go through this 

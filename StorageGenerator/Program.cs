@@ -25,18 +25,20 @@ internal static class Program
     {
         get
         {
-            List<string> list = new List<string>(ProcedureFinder.DefaultDllList);
-            list.Add("oleaut32.dll");
-            list.Add("ole32.dll");
-            list.Add("ole2.dll");
-            list.Add("ole2disp.dll");
-            list.Add("ole2nls.dll");
-            list.Add("msvcr80.dll");
-            list.Add("nt64.dll");
-            list.Add("msimg32.dll");
-            list.Add("winscard.dll");
-            list.Add("winspool.dll");
-            list.Add("comctl32.dll");
+            List<string> list = new List<string>(ProcedureFinder.DefaultDllList)
+            {
+                "oleaut32.dll",
+                "ole32.dll",
+                "ole2.dll",
+                "ole2disp.dll",
+                "ole2nls.dll",
+                "msvcr80.dll",
+                "nt64.dll",
+                "msimg32.dll",
+                "winscard.dll",
+                "winspool.dll",
+                "comctl32.dll"
+            };
             return list;
         }
     }

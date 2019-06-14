@@ -604,7 +604,7 @@ namespace PInvoke.Test
             foreach (string sig in sigArray)
             {
                 bool ret = VerifyProcImpl(code, sig, ref all);
-                Assert.True(ret, "Could not find the method. Looking For :" + sig + PortConstants.NewLine + "Found:" + all);
+                Assert.True(ret, "Could not find the method. Looking For :" + sig + Environment.NewLine+ "Found:" + all);
             }
         }
 

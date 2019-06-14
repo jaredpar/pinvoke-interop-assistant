@@ -11,6 +11,5 @@ namespace PInvoke
     {
         public const char CarriageReturn = '\r';
         public const char LineFeed = '\n';
-        public const string NewLine = "\r\n";
     }
 }

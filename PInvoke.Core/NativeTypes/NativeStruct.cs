@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
 
+using PInvoke.Enums;
 using PInvoke.NativeTypes.Enums;
 
 namespace PInvoke.NativeTypes

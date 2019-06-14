@@ -3,6 +3,7 @@ using PInvoke;
 using PInvoke.NativeTypes;
 using PInvoke.Transform;
 using PInvoke.Transform.Enums;
+using pinvoketool.Enums;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -59,15 +60,32 @@ namespace pinvoketool
                         try
                         {
                             var items = NativeType.Load(typesFilename);
-                            foreach(var item in items)
+                            foreach (var item in items)
                             {
-                                if(item.IsPointer)
+                                switch (item.Kind)
                                 {
-                                    storage.AddTypeDef(new NativeTypeDef(item.Name, new NativePointer(item.BuiltInType)));
-                                }
-                                else
-                                {
-                                    storage.AddTypeDef(new NativeTypeDef(item.Name, new NativeBuiltinType(item.BuiltInType, item.IsUnsigned)));
+                                    case NativeTypeKind.Pointer:
+                                        {
+                                            storage.AddTypeDef(new NativeTypeDef(item.Name, new NativePointer(item.BuiltInType)));
+                                            break;
+                                        };
+
+                                    case NativeTypeKind.BuiltIn:
+                                        {
+                                            storage.AddTypeDef(new NativeTypeDef(item.Name, new NativeBuiltinType(item.BuiltInType, item.IsUnsigned)));
+                                            break;
+                                        }
+
+                                    case NativeTypeKind.Struct:
+                                        {
+                                            storage.AddDefinedType(new NativeStruct(item.Name));
+                                            break;
+                                        }
+                                    case NativeTypeKind.Enum:
+                                        {
+                                            storage.AddDefinedType(new NativeEnum(item.Name));
+                                            break;
+                                        }
                                 }
                             }
                         }
@@ -81,7 +99,7 @@ namespace pinvoketool
 
                     var basicConverter = new BasicConverter(LanguageType.CSharp, storage)
                     {
-                        TransformKindFlags = TransformKindFlags.All,
+                        TransformKindFlags = TransformKindFlags.StructMembers,
                     };
 
                     var code = basicConverter.ConvertNativeCodeToPInvokeCode(cstring, libname);

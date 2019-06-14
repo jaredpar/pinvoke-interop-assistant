@@ -1,4 +1,5 @@
-﻿using PInvoke.NativeTypes;
+﻿using PInvoke.Enums;
+using PInvoke.NativeTypes;
 using PInvoke.NativeTypes.Enums;
 using System;
 using System.Collections.Generic;
@@ -75,8 +76,7 @@ namespace PInvoke
                 case NativeNameKind.FunctionPointer:
                 case NativeNameKind.Enum:
                     {
-                        NativeDefinedType definedType;
-                        if (_definedMap.TryGetValue(name.Name, out definedType))
+                        if (_definedMap.TryGetValue(name.Name, out NativeDefinedType definedType))
                         {
                             symbol = new NativeGlobalSymbol(definedType);
                             return true;
@@ -85,8 +85,7 @@ namespace PInvoke
                     break;
                 case NativeNameKind.Procedure:
                     {
-                        NativeProcedure proc;
-                        if (_procMap.TryGetValue(name.Name, out proc))
+                        if (_procMap.TryGetValue(name.Name, out NativeProcedure proc))
                         {
                             symbol = new NativeGlobalSymbol(proc);
                             return true;
@@ -95,8 +94,7 @@ namespace PInvoke
                     break;
                 case NativeNameKind.TypeDef:
                     {
-                        NativeTypeDef typeDef;
-                        if (_typeDefMap.TryGetValue(name.Name, out typeDef))
+                        if (_typeDefMap.TryGetValue(name.Name, out NativeTypeDef typeDef))
                         {
                             symbol = new NativeGlobalSymbol(typeDef);
                             return true;
@@ -105,8 +103,7 @@ namespace PInvoke
                     break;
                 case NativeNameKind.Constant:
                     {
-                        NativeConstant constant;
-                        if (_constMap.TryGetValue(name.Name, out constant))
+                        if (_constMap.TryGetValue(name.Name, out NativeConstant constant))
                         {
                             symbol = new NativeGlobalSymbol(constant);
                             return true;
@@ -115,8 +112,7 @@ namespace PInvoke
                     break;
                 case NativeNameKind.EnumValue:
                     {
-                        NativeEnumValue value;
-                        if (_enumValueMap.TryGetValue(name.Name, out value))
+                        if (_enumValueMap.TryGetValue(name.Name, out NativeEnumValue value))
                         {
                             symbol = new NativeGlobalSymbol(value);
                             return true;

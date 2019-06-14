@@ -1,4 +1,5 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
+using PInvoke.Enums;
 using PInvoke.NativeTypes.Enums;
 using System;
 
@@ -67,12 +68,8 @@ namespace PInvoke.NativeTypes
 
         public NativeConstant(string name, string value, ConstantKind kind)
         {
-            if (name == null)
-            {
-                throw new ArgumentNullException("name");
-            }
+            this.Name = name ?? throw new ArgumentNullException("name");
 
-            this.Name = name;
             ConstantKind = kind;
 
             // We don't support macro methods at this point.  Instead we will just generate out the 

@@ -405,7 +405,7 @@ namespace PInvoke.Test
         [Fact()]
         public void MultilineBasicScan1()
         {
-            Scanner scanner = CreateScanner("foo" + PortConstants.NewLine + "bar", _lineOpts);
+            Scanner scanner = CreateScanner("foo" + Environment.NewLine+ "bar", _lineOpts);
             VerifyNext(scanner, TokenType.Word, "foo");
             VerifyNext(scanner, TokenType.NewLine);
             VerifyNext(scanner, TokenType.Word, "bar");
@@ -414,7 +414,7 @@ namespace PInvoke.Test
         [Fact()]
         public void MultilineBasicScan2()
         {
-            Scanner scanner = CreateScanner("foo," + PortConstants.NewLine + "bar[]", _lineOpts);
+            Scanner scanner = CreateScanner("foo," + Environment.NewLine+ "bar[]", _lineOpts);
             VerifyNext(scanner, TokenType.Word, "foo");
             VerifyNext(scanner, TokenType.Comma);
             VerifyNext(scanner, TokenType.NewLine);
@@ -426,7 +426,7 @@ namespace PInvoke.Test
         [Fact()]
         public void MultilineBasicScan3()
         {
-            Scanner scanner = CreateScanner("bar,   " + PortConstants.NewLine + "foo", _lineOpts);
+            Scanner scanner = CreateScanner("bar,   " + Environment.NewLine+ "foo", _lineOpts);
             VerifyNext(scanner, TokenType.Word, "bar");
             VerifyNext(scanner, TokenType.Comma);
             VerifyNext(scanner, TokenType.NewLine);
@@ -628,11 +628,11 @@ namespace PInvoke.Test
         [Fact()]
         public void LineComment6()
         {
-            Scanner scanner = CreateScanner("foo //bar" + PortConstants.NewLine, new ScannerOptions());
+            Scanner scanner = CreateScanner("foo //bar" + Environment.NewLine, new ScannerOptions());
             VerifyNext(scanner, TokenType.Word, "foo");
             VerifyNext(scanner, TokenType.WhiteSpace, " ");
             VerifyNext(scanner, TokenType.LineComment, "//bar");
-            VerifyNext(scanner, TokenType.NewLine, PortConstants.NewLine);
+            VerifyNext(scanner, TokenType.NewLine, Environment.NewLine);
         }
 
         [Fact()]

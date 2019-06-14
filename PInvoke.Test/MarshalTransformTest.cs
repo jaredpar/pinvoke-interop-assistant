@@ -590,7 +590,7 @@ namespace PInvoke.Test
         [Fact()]
         public void TypedefToArray1()
         {
-            VerifyProc("typedef int D[10];" + PortConstants.NewLine + "int p1(D param1);", "p1(In Int32(1)) As Int32");
+            VerifyProc("typedef int D[10];" + Environment.NewLine+ "int p1(D param1);", "p1(In Int32(1)) As Int32");
         }
 
         /// <summary>
@@ -600,7 +600,7 @@ namespace PInvoke.Test
         [Fact()]
         public void TypedefToArray2()
         {
-            VerifyTypeMembers("typedef int D[10];" + PortConstants.NewLine + "struct s1 { D m1; };", "s1", "m1", "System.Int32(1) m1");
+            VerifyTypeMembers("typedef int D[10];" + Environment.NewLine+ "struct s1 { D m1; };", "s1", "m1", "System.Int32(1) m1");
         }
 
         /// <summary>

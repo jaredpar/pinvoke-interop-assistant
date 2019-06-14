@@ -66,7 +66,7 @@ namespace PInvoke.Test
         private ParseResult SalParse(string text)
         {
             string salText = File.ReadAllText("SampleFiles\\Sal.txt");
-            text = salText + PortConstants.NewLine + text;
+            text = salText + Environment.NewLine+ text;
 
             PreProcessorOptions opts = new PreProcessorOptions();
             PreProcessorEngine pre = new PreProcessorEngine(opts);

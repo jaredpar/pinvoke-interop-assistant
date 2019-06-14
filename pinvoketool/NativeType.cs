@@ -1,17 +1,20 @@
 ﻿using PInvoke;
+using pinvoketool.Enums;
 using System.IO;
 using System.Xml.Serialization;
 
 namespace pinvoketool
 {
+
     public class NativeType
     {
         public NativeType()
         {
+            
         }
 
         public string Name { get; set; }
-        public bool IsPointer { get; set; }
+        public NativeTypeKind Kind { get; set; } = NativeTypeKind.BuiltIn;
         public bool IsUnsigned { get; set; }
 
         public BuiltinType BuiltInType { get; set; }

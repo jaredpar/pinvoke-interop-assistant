@@ -1,4 +1,5 @@
-﻿using PInvoke.NativeTypes;
+﻿using PInvoke.Enums;
+using PInvoke.NativeTypes;
 using PInvoke.NativeTypes.Enums;
 using System;
 using System.Collections.Generic;

@@ -21,32 +21,33 @@ namespace PInvoke
         {
             get
             {
-                List<string> list = new List<string>();
-                list.Add("kernel32.dll");
-                list.Add("ntdll.dll");
-                list.Add("user32.dll");
-                list.Add("advapi32.dll");
-                list.Add("gdi32.dll");
-                list.Add("crypt32.dll");
-                list.Add("cryptnet.dll");
-                list.Add("opengl32.dll");
-                list.Add("ws2_32.dll");
-                list.Add("shell32.dll");
-                list.Add("mpr.dll");
-                list.Add("mswsock.dll");
-                list.Add("winmm.dll");
-                list.Add("imm32.dll");
-                list.Add("comdlg32.dll");
-                list.Add("rpcns4.dll");
-                list.Add("rpcrt4.dll");
-                list.Add("urlmon.dll");
-                return list;
+                return new List<string>
+                {
+                    "kernel32.dll",
+                    "ntdll.dll",
+                    "user32.dll",
+                    "advapi32.dll",
+                    "gdi32.dll",
+                    "crypt32.dll",
+                    "cryptnet.dll",
+                    "opengl32.dll",
+                    "ws2_32.dll",
+                    "shell32.dll",
+                    "mpr.dll",
+                    "mswsock.dll",
+                    "winmm.dll",
+                    "imm32.dll",
+                    "comdlg32.dll",
+                    "rpcns4.dll",
+                    "rpcrt4.dll",
+                    "urlmon.dll"
+                };
             }
         }
 
-        private Dictionary<string, IntPtr> _dllMap = new Dictionary<string, IntPtr>();
+        private Dictionary<string, IntPtr> dllMap = new Dictionary<string, IntPtr>();
 
-        private bool _loaded = false;
+        private bool loaded = false;
         /// <summary>
         /// List of dll's to look for
         /// </summary>
@@ -55,7 +56,7 @@ namespace PInvoke
         /// <remarks></remarks>
         public IEnumerable<string> DllNames
         {
-            get { return _dllMap.Keys; }
+            get { return dllMap.Keys; }
         }
 
         public ProcedureFinder() : this(DefaultDllList)
@@ -72,7 +73,7 @@ namespace PInvoke
 
         public void Dispose()
         {
-            foreach (IntPtr ptr in _dllMap.Values)
+            foreach (IntPtr ptr in dllMap.Values)
             {
                 NativeMethods.FreeLibrary(ptr);
             }
@@ -86,8 +87,8 @@ namespace PInvoke
                 throw new ArgumentNullException("dllName");
             }
 
-            _dllMap.Add(dllName, IntPtr.Zero);
-            _loaded = false;
+            dllMap.Add(dllName, IntPtr.Zero);
+            loaded = false;
         }
 
         public bool TryFindDllNameExact(string procName, out string dllName)
@@ -120,12 +121,12 @@ namespace PInvoke
         {
             ThrowIfNull(procName);
 
-            if (!_loaded)
+            if (!loaded)
             {
                 LoadLibraryList();
             }
 
-            foreach (KeyValuePair<string, IntPtr> pair in _dllMap)
+            foreach (KeyValuePair<string, IntPtr> pair in dllMap)
             {
                 if (pair.Value == IntPtr.Zero)
                 {
@@ -147,18 +148,18 @@ namespace PInvoke
 
         private void LoadLibraryList()
         {
-            List<string> list = new List<string>(_dllMap.Keys);
-            foreach (string name in list)
+            var list = new List<string>(dllMap.Keys);
+            foreach (var name in list)
             {
-                IntPtr ptr = _dllMap[name];
+                var ptr = dllMap[name];
                 if (ptr == IntPtr.Zero)
                 {
                     ptr = NativeMethods.LoadLibraryEx(name, IntPtr.Zero, 0u);
-                    _dllMap[name] = ptr;
+                    dllMap[name] = ptr;
                 }
             }
 
-            _loaded = true;
+            loaded = true;
         }
 
     }

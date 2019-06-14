@@ -1,4 +1,5 @@
-﻿using PInvoke.NativeTypes;
+﻿using PInvoke.Enums;
+using PInvoke.NativeTypes;
 using PInvoke.NativeTypes.Enums;
 using System;
 using System.Collections.Generic;
@@ -8,17 +9,6 @@ using System.Threading.Tasks;
 
 namespace PInvoke
 {
-    public enum NativeNameKind
-    {
-        Struct,
-        Union,
-        FunctionPointer,
-        Procedure,
-        TypeDef,
-        Constant,
-        Enum,
-        EnumValue
-    }
 
     public static class NativeNameUtil
     {
@@ -90,8 +80,7 @@ namespace PInvoke
 
         public static bool TryGetName(NativeSymbol symbol, out NativeName name)
         {
-            NativeNameKind kind;
-            if (!TryGetNativeNameKind(symbol.Kind, out kind))
+            if (!TryGetNativeNameKind(symbol.Kind, out NativeNameKind kind))
             {
                 name = NativeName.Nil;
                 return false;
@@ -103,8 +92,7 @@ namespace PInvoke
 
         public static NativeName GetName(NativeSymbol symbol)
         {
-            NativeName name;
-            if (!TryGetName(symbol, out name))
+            if (!TryGetName(symbol, out NativeName name))
             {
                 throw new Exception($"Unable to create name for {symbol.Name} {symbol.Kind}");
             }
@@ -116,8 +104,7 @@ namespace PInvoke
         {
             foreach (var symbol in symbols)
             {
-                NativeName name;
-                if (TryGetName(symbol, out name))
+                if (TryGetName(symbol, out NativeName name))
                 {
                     yield return name;
                 }

@@ -641,7 +641,7 @@ namespace PInvoke.Parser
                     {
                         _buffer.EatChar();
                     }
-                    token = new Token(TokenType.NewLine, PortConstants.NewLine);
+                    token = new Token(TokenType.NewLine, Environment.NewLine);
                     break;
             }
 

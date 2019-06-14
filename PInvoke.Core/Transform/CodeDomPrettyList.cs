@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using PInvoke;
 using static PInvoke.Contract;
 using PInvoke.NativeTypes;
+using PInvoke.Enums;
 
 namespace PInvoke.Transform
 {

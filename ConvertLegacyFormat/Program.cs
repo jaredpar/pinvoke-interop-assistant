@@ -1,4 +1,5 @@
 ﻿using PInvoke;
+using PInvoke.Enums;
 using PInvoke.Storage;
 using System;
 using System.Collections.Generic;

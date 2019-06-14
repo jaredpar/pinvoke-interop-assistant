@@ -45,6 +45,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BasicSymbolStorage.cs" />
+    <Compile Include="Constants.cs" />
+    <Compile Include="EnumerableShim.cs" />
+    <Compile Include="EnumUtil.cs" />
+    <Compile Include="ErrorProvider.cs" />
+    <Compile Include="Enums\NativeNameKind.cs" />
     <Compile Include="NativeTypes\Enums\BuiltinType.cs" />
     <Compile Include="NativeTypes\Enums\ConstantKind.cs" />
     <Compile Include="NativeTypes\NativeArray.cs" />
@@ -143,7 +148,6 @@
     <Compile Include="Transform\SalEntrySet.cs" />
     <Compile Include="Transform\TransformPlugin.cs" />
     <Compile Include="Transform\Utilities.cs" />
-    <Compile Include="Utilities.cs" />
     <Compile Include="Transform\BasicConverter.cs" />
   </ItemGroup>
   <ItemGroup />

@@ -1,4 +1,5 @@
-﻿using PInvoke.NativeTypes;
+﻿using PInvoke.Enums;
+using PInvoke.NativeTypes;
 using System;
 using Xunit;
 

@@ -14,6 +14,7 @@ using PInvoke;
 using System.IO;
 using PInvoke.NativeTypes.Enums;
 using PInvoke.NativeTypes;
+using PInvoke.Enums;
 
 namespace PInvoke
 {

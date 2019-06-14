@@ -1,4 +1,5 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
+using PInvoke.Enums;
 using PInvoke.NativeTypes.Enums;
 using System.Diagnostics;
 

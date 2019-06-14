@@ -1,24 +1,17 @@
 
 // Copyright (c) Microsoft Corporation.  All rights reserved.
-using System;
-using System.IO;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
-using System.CodeDom;
-using System.Diagnostics.CodeAnalysis;
-using System.Text.RegularExpressions;
-using PInvoke;
-using PInvoke.Parser;
-using PInvoke.Transform;
-using static PInvoke.Contract;
-using System.CodeDom.Compiler;
-using System.Text;
 using PInvoke.NativeTypes;
 using PInvoke.NativeTypes.Enums;
+using PInvoke.Parser;
 using PInvoke.Transform.Enums;
-using System.Linq;
+using System;
+using System.CodeDom;
+using System.CodeDom.Compiler;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using System.Text.RegularExpressions;
+using static PInvoke.Contract;
 
 namespace PInvoke.Transform
 {
@@ -40,6 +33,9 @@ namespace PInvoke.Transform
         public LanguageType LanguageType { get; set; }
 
         public TransformKindFlags TransformKindFlags { get; set; } = TransformKindFlags.All;
+
+        public string Namespace { get; set; } = "Temp";
+        public List<string> Imports { get; set; }
 
         public BasicConverter(LanguageType type, INativeSymbolStorage storage)
         {
@@ -194,10 +190,10 @@ namespace PInvoke.Transform
 
         public string ConvertCodeDomToPInvokeCodeImpl(CodeTypeDeclarationCollection col, ErrorProvider ep)
         {
-            return ConvertCodeDomToPInvokeCodeImpl(LanguageType, col, ep);
+            return ConvertCodeDomToPInvokeCodeImpl(LanguageType, col, ep, Namespace, Imports);
         }
 
-        public static string ConvertCodeDomToPInvokeCodeImpl(LanguageType type, CodeTypeDeclarationCollection col, ErrorProvider ep)
+        public static string ConvertCodeDomToPInvokeCodeImpl(LanguageType type, CodeTypeDeclarationCollection col, ErrorProvider ep, string nameSpaceName, IEnumerable<string> imports)
         {
             ThrowIfNull(col);
             ThrowIfNull(ep);
@@ -232,7 +228,7 @@ namespace PInvoke.Transform
                 writer.WriteLine("{0} Error: {1}", commentStart, err);
             }
 
-            Generate(col, writer, provider);
+            Generate(col, writer, provider, nameSpaceName, imports);
 
             if (type == LanguageType.CSharp)
             {
@@ -247,7 +243,7 @@ namespace PInvoke.Transform
         }
 
 #if USE_LEGACY
-        private static void Generate(CodeTypeDeclarationCollection col, StringWriter writer, CodeDomProvider provider)
+        private static void Generate(CodeTypeDeclarationCollection col, StringWriter writer, CodeDomProvider provider, string namespaceName, IEnumerable<string> imports)
         {
             // TODO : look in to refactoring to use this code - 
             // https://docs.microsoft.com/en-us/dotnet/api/system.codedom.compiler.codedomprovider?view=netframework-4.8
@@ -266,16 +262,21 @@ namespace PInvoke.Transform
         }
 
 #else
-        private static void Generate(CodeTypeDeclarationCollection col, StringWriter writer, CodeDomProvider provider)
+        private static void Generate(CodeTypeDeclarationCollection col, StringWriter writer, CodeDomProvider provider, string namespaceName, IEnumerable<string> imports)
         {
             var compileUnit = new CodeCompileUnit();
-            var nameSpace = new CodeNamespace("Test")
-            {
-                Imports = { new CodeNamespaceImport("System") },
-            };
+            var nameSpace = new CodeNamespace(namespaceName);
 
             compileUnit.Namespaces.Add(nameSpace);
-          
+
+            if (imports != null)
+            {
+                foreach (var name in imports)
+                {
+                    nameSpace.Imports.Add(new CodeNamespaceImport(name));
+                }
+            }
+
             // TODO : look in to refactoring to use this code - 
             // https://docs.microsoft.com/en-us/dotnet/api/system.codedom.compiler.codedomprovider?view=netframework-4.8
             // https://docs.microsoft.com/en-us/dotnet/framework/reflection-and-codedom/how-to-create-a-class-using-codedom

@@ -14,6 +14,7 @@ namespace pinvoketool
         }
 
         public string Name { get; set; }
+        public string Namespace { get; set; }
         public NativeTypeKind Kind { get; set; } = NativeTypeKind.BuiltIn;
         public bool IsUnsigned { get; set; }
 

@@ -19,6 +19,8 @@ namespace pinvoketool
             var filename = default(string);
             var outputFilename = default(string);
             var typesFilename = default(string);
+            var namespaces = new List<string>();
+            var targetNamespace = "GeneratedCode";
 
             var p = new OptionSet()
             {
@@ -26,6 +28,22 @@ namespace pinvoketool
                 { "f|file=", "the c/c++ header to parse", x=> filename = x  },
                 { "o|output=", "file to create for output", x => outputFilename = x },
                 { "l|library=",  "name of the exported library", x => libname = x },
+                { "n|namespace=",  "name of the exported library", x =>
+                    {
+                        if(!string.IsNullOrEmpty(x))
+                        {
+                            targetNamespace = x;
+                        }
+                    }
+                },
+                { "i|imports=",  "imported namespaces to add in scope", x => 
+                     {
+                        if(!string.IsNullOrEmpty(x) && !namespaces.Contains(x))
+                        {
+                            namespaces.Add(x);
+                        }
+                    }
+                },
             };
 
             var extra = default(List<string>);
@@ -62,6 +80,11 @@ namespace pinvoketool
                             var items = NativeType.Load(typesFilename);
                             foreach (var item in items)
                             {
+                                if(!string.IsNullOrEmpty(item.Namespace) && !namespaces.Contains(item.Namespace))
+                                {
+                                    namespaces.Add(item.Namespace);
+                                }
+
                                 switch (item.Kind)
                                 {
                                     case NativeTypeKind.Pointer:
@@ -100,6 +123,8 @@ namespace pinvoketool
                     var basicConverter = new BasicConverter(LanguageType.CSharp, storage)
                     {
                         TransformKindFlags = TransformKindFlags.WrapperMethods,
+                        Namespace = targetNamespace,
+                        Imports = namespaces
                     };
 
                     var code = basicConverter.ConvertNativeCodeToPInvokeCode(cstring, libname);

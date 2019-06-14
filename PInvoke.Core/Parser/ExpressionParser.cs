@@ -56,7 +56,7 @@ namespace PInvoke.Parser
             {
                 var scanner = new Scanner(reader);
                 scanner.Options.HideNewLines = true;
-                scanner.Options.HideComments = true;
+                scanner.Options.HideComments = false; // we want to carry through comments
                 scanner.Options.HideWhitespace = true;
                 scanner.Options.ThrowOnEndOfStream = false;
                 return TryParseComplete(scanner.Tokenize(), out node);

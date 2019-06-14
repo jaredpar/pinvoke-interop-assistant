@@ -85,6 +85,9 @@
     <Compile Include="NativeTypes\Enums\NativeValueKind.cs" />
     <Compile Include="NativeTypes\Enums\SalEntryType.cs" />
     <Compile Include="Parser\Enums\ExpressionKind.cs" />
+    <Compile Include="Parser\ScannerInternalException.cs" />
+    <Compile Include="Parser\ScannerMark.cs" />
+    <Compile Include="Parser\ScannerOptions.cs" />
     <Compile Include="Storage\BinaryBulkReader.cs" />
     <Compile Include="Storage\BinaryBulkWriter.cs" />
     <Compile Include="Storage\BulkExporter.cs" />

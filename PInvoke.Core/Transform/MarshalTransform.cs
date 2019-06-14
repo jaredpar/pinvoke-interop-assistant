@@ -40,7 +40,7 @@ namespace PInvoke.Transform
             // Method Parameters
             transformPlugins.Add(new BooleanTypesTransformPlugin());
 
-            // Process BSTR types before any other string.  BSTR can techinally be used as other String types
+            // Process BSTR types before any other string.  BSTR can technically be used as other String types
             // such as LPWSTR and the other string matching code will flag them as such.  Therefore we will 
             // process them first since the reverse is not true
             transformPlugins.Add(new BstrTransformPlugin());
@@ -86,8 +86,7 @@ namespace PInvoke.Transform
         public void Process(CodeTypeDeclaration ctd)
         {
             // First check and see if it is a delegate type, if so run the delegate hueristics
-            CodeTypeDelegate ctdDel = ctd as CodeTypeDelegate;
-            if (ctdDel != null && ctdDel.UserData.Contains(TransformConstants.DefinedType))
+            if (ctd is CodeTypeDelegate ctdDel && ctdDel.UserData.Contains(TransformConstants.DefinedType))
             {
                 ProcessDelegate(ctdDel);
                 return;
@@ -116,26 +115,25 @@ namespace PInvoke.Transform
 
             // Now process the methods on the type.  First step is to convert all of them into 
             // best PInvoke signature.  Then create wrapper methods for them
-            CodeTypeMemberCollection col = new CodeTypeMemberCollection(ctd.Members);
-            List<CodeMemberMethod> list = new List<CodeMemberMethod>();
+            var col = new CodeTypeMemberCollection(ctd.Members);
+            var list = new List<CodeMemberMethod>();
 
-            foreach (CodeTypeMember mem in col)
+            foreach (var mem in col)
             {
                 // Look at procedures
-                CodeMemberMethod codeProc = mem as CodeMemberMethod;
-                if (codeProc != null && codeProc.UserData.Contains(TransformConstants.Procedure))
+                if (mem is CodeMemberMethod codeProc && codeProc.UserData.Contains(TransformConstants.Procedure))
                 {
                     list.Add(codeProc);
                 }
             }
 
-            foreach (CodeMemberMethod codeProc in list)
+            foreach (var codeProc in list)
             {
                 ProcessParameters(codeProc);
                 ProcessReturnType(codeProc);
             }
 
-            foreach (CodeMemberMethod codeProc in list)
+            foreach (var codeProc in list)
             {
                 ProcessWrapperMethods(ctd, codeProc);
             }

@@ -22,26 +22,34 @@ namespace PInvoke.Test
         private ScannerOptions _rudeEndOpts;
         public ScannerTest()
         {
-            _defaultOpts = new ScannerOptions();
-            _defaultOpts.ThrowOnEndOfStream = false;
-            _defaultOpts.HideComments = true;
-            _defaultOpts.HideNewLines = true;
-            _defaultOpts.HideWhitespace = true;
+            _defaultOpts = new ScannerOptions
+            {
+                ThrowOnEndOfStream = false,
+                HideComments = true,
+                HideNewLines = true,
+                HideWhitespace = true
+            };
 
-            _lineOpts = new ScannerOptions();
-            _lineOpts.ThrowOnEndOfStream = false;
-            _lineOpts.HideComments = true;
-            _lineOpts.HideNewLines = false;
-            _lineOpts.HideWhitespace = true;
+            _lineOpts = new ScannerOptions
+            {
+                ThrowOnEndOfStream = false,
+                HideComments = true,
+                HideNewLines = false,
+                HideWhitespace = true
+            };
 
-            _commentOpts = new ScannerOptions();
-            _commentOpts.HideComments = false;
-            _commentOpts.ThrowOnEndOfStream = false;
-            _commentOpts.HideNewLines = true;
-            _commentOpts.HideWhitespace = true;
+            _commentOpts = new ScannerOptions
+            {
+                HideComments = false,
+                ThrowOnEndOfStream = false,
+                HideNewLines = true,
+                HideWhitespace = true
+            };
 
-            _rudeEndOpts = new ScannerOptions();
-            _rudeEndOpts.ThrowOnEndOfStream = true;
+            _rudeEndOpts = new ScannerOptions
+            {
+                ThrowOnEndOfStream = true
+            };
         }
 
         private void VerifyNext(Scanner scanner, TokenType tt)

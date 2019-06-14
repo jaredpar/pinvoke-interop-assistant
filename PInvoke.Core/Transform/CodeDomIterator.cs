@@ -22,7 +22,7 @@ namespace PInvoke.Transform
         {
             ThrowIfNull(col);
 
-            List<object> list = new List<object>();
+            var list = new List<object>();
             foreach (CodeTypeDeclaration ctd in col)
             {
                 IterateTypeMemberImpl(ctd, list);
@@ -35,7 +35,7 @@ namespace PInvoke.Transform
         {
             ThrowIfNull(ctd);
 
-            List<object> list = new List<object>();
+            var list = new List<object>();
             IterateTypeMemberImpl(ctd, list);
             return list;
         }
@@ -50,43 +50,37 @@ namespace PInvoke.Transform
             list.Add(ctm);
             IterateAttributesImpl(ctm.CustomAttributes, list);
 
-            CodeMemberEvent memEvent = ctm as CodeMemberEvent;
-            if (memEvent != null)
+            if (ctm is CodeMemberEvent memEvent)
             {
                 IterateMemberEventImpl(memEvent, list);
                 return;
             }
 
-            CodeMemberField memField = ctm as CodeMemberField;
-            if (memField != null)
+            if (ctm is CodeMemberField memField)
             {
                 IterateMemberFieldImpl(memField, list);
                 return;
             }
 
-            CodeMemberMethod memMethod = ctm as CodeMemberMethod;
-            if (memMethod != null)
+            if (ctm is CodeMemberMethod memMethod)
             {
                 IterateMemberMethodImpl(memMethod, list);
                 return;
             }
 
-            CodeMemberProperty memProperty = ctm as CodeMemberProperty;
-            if (memProperty != null)
+            if (ctm is CodeMemberProperty memProperty)
             {
                 IterateMemberPropertyImpl(memProperty, list);
                 return;
             }
 
-            CodeSnippetTypeMember memSnippet = ctm as CodeSnippetTypeMember;
-            if (memSnippet != null)
+            if (ctm is CodeSnippetTypeMember memSnippet)
             {
                 IterateSnippetTypeImpl(memSnippet, list);
                 return;
             }
 
-            CodeTypeDeclaration typeDecl = ctm as CodeTypeDeclaration;
-            if (typeDecl != null)
+            if (ctm is CodeTypeDeclaration typeDecl)
             {
                 IterateTypeDeclarationImpl(typeDecl, list);
                 return;
@@ -123,8 +117,7 @@ namespace PInvoke.Transform
 
             IterateTypeParametersImpl(ctd.TypeParameters, list);
 
-            CodeTypeDelegate delType = ctd as CodeTypeDelegate;
-            if (delType != null)
+            if (ctd is CodeTypeDelegate delType)
             {
                 list.Add(delType.ReturnType);
 

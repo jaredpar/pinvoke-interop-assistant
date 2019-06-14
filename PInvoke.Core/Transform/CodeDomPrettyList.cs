@@ -45,7 +45,7 @@ namespace PInvoke.Transform
             var list = it.Iterate(col);
 
             // Use the iterator so we make sure to reach nested types
-            foreach (CodeTypeDeclaration ctd in FindUnmodifiedTypes(list))
+            foreach (var ctd in FindUnmodifiedTypes(list))
             {
                 var definedNt = GetDefined(ctd);
                 if (IsBadName(ctd.Name))
@@ -67,14 +67,14 @@ namespace PInvoke.Transform
         private List<CodeTypeDeclaration> FindUnmodifiedTypes(List<object> col)
         {
 
-            List<CodeTypeDeclaration> list = new List<CodeTypeDeclaration>();
+            var list = new List<CodeTypeDeclaration>();
 
             // Use the iterator so we make sure to reach nested types
-            foreach (object obj in col)
+            foreach (var obj in col)
             {
                 if (obj is CodeTypeDeclaration ctd)
                 {
-                    NativeDefinedType definedNt = GetDefined(ctd);
+                    var definedNt = GetDefined(ctd);
                     if (definedNt != null && 0 == string.CompareOrdinal(definedNt.Name, ctd.Name))
                     {
                         list.Add(ctd);
@@ -119,22 +119,18 @@ namespace PInvoke.Transform
 
             foreach (object obj in col)
             {
-                CodeTypeDeclaration ctd = obj as CodeTypeDeclaration;
-                if (ctd != null)
+                if (obj is CodeTypeDeclaration ctd)
                 {
-                    string newName = null;
-                    if (map.TryGetValue(ctd.Name, out newName))
+                    if (map.TryGetValue(ctd.Name, out string newName))
                     {
                         ctd.Name = newName;
                     }
                     continue;
                 }
 
-                CodeTypeReference typeRef = obj as CodeTypeReference;
-                if (typeRef != null)
+                if (obj is CodeTypeReference typeRef)
                 {
-                    string newName = null;
-                    if (map.TryGetValue(typeRef.BaseType, out newName))
+                    if (map.TryGetValue(typeRef.BaseType, out string newName))
                     {
                         typeRef.BaseType = newName;
                     }
@@ -159,8 +155,7 @@ namespace PInvoke.Transform
 
             foreach (object obj in col)
             {
-                CodeCustomExpression custom = obj as CodeCustomExpression;
-                if (custom != null)
+                if (obj is CodeCustomExpression custom)
                 {
                     custom.ResetValue();
                 }
@@ -181,12 +176,12 @@ namespace PInvoke.Transform
                 resolvedTypeDefList = new List<NativeTypeDef>(bag.FindResolvedTypeDefs());
             }
 
-            List<NativeTypeDef> list = new List<NativeTypeDef>();
+            var list = new List<NativeTypeDef>();
 
             // First look in the symbol bag
-            foreach (NativeTypeDef td in resolvedTypeDefList)
+            foreach (var td in resolvedTypeDefList)
             {
-                if (object.ReferenceEquals(td.RealTypeDigged, target))
+                if (ReferenceEquals(td.RealTypeDigged, target))
                 {
                     list.Add(td);
                 }

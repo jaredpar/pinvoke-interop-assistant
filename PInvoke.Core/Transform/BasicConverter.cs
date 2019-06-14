@@ -214,7 +214,7 @@ namespace PInvoke.Transform
                     break;
                 case LanguageType.CSharp:
                     commentStart = "//";
-                    provider = new Microsoft.CSharp.CSharpCodeProvider();
+                    provider = new Microsoft.CSharp.CSharpCodeProvider();                    
                     break;
                 default:
                     ThrowInvalidEnumValue(type);
@@ -231,9 +231,19 @@ namespace PInvoke.Transform
                 writer.WriteLine("{0} Error: {1}", commentStart, err);
             }
 
+            // TODO : look in to refactoring to use this code - 
+            // https://docs.microsoft.com/en-us/dotnet/api/system.codedom.compiler.codedomprovider?view=netframework-4.8
+            // https://docs.microsoft.com/en-us/dotnet/framework/reflection-and-codedom/how-to-create-a-class-using-codedom
+            // https://docs.microsoft.com/en-us/dotnet/api/system.codedom.compiler.codedomprovider.generatecodefrommember?view=netframework-4.8
             foreach (CodeTypeDeclaration ctd in col)
             {
-                provider.GenerateCodeFromMember(ctd, writer, new CodeGeneratorOptions());
+                provider.GenerateCodeFromMember(
+                    ctd, 
+                    writer, 
+                    new CodeGeneratorOptions
+                    {
+                        BracingStyle = "C",
+                    });
             }
 
             if (type == LanguageType.CSharp)
@@ -268,32 +278,32 @@ namespace PInvoke.Transform
             bag.TryResolveSymbolsAndValues(ep);
 
             // Create the codedom transform
-            CodeTransform transform = new CodeTransform(LanguageType, bag);
-            MarshalTransform marshalUtil = new MarshalTransform(LanguageType, bag, TransformKindFlags);
-            CodeTypeDeclarationCollection col = new CodeTypeDeclarationCollection();
+            var transform = new CodeTransform(LanguageType, bag);
+            var marshalUtil = new MarshalTransform(LanguageType, bag, TransformKindFlags);
+            var col = new CodeTypeDeclarationCollection();
 
             // Only output the constants if there are actually any
-            List<NativeConstant> list = new List<NativeConstant>(bag.FindResolvedConstants());
+            var list = new List<NativeConstant>(bag.FindResolvedConstants());
             if (list.Count > 0)
             {
-                CodeTypeDeclaration constCtd = transform.GenerateConstants(list);
+                var constCtd = transform.GenerateConstants(list);
                 if (constCtd.Members.Count > 0)
                 {
                     col.Add(constCtd);
                 }
             }
 
-            foreach (NativeDefinedType definedNt in bag.FindResolvedDefinedTypes())
+            foreach (var definedNt in bag.FindResolvedDefinedTypes())
             {
-                CodeTypeDeclaration ctd = transform.GenerateDeclaration(definedNt);
+                var ctd = transform.GenerateDeclaration(definedNt);
                 marshalUtil.Process(ctd);
                 col.Add(ctd);
             }
 
-            List<NativeProcedure> procList = new List<NativeProcedure>(bag.FindResolvedProcedures());
+            var procList = new List<NativeProcedure>(bag.FindResolvedProcedures());
             if (procList.Count > 0)
             {
-                CodeTypeDeclaration procType = transform.GenerateProcedures(procList, libraryName);
+                var procType = transform.GenerateProcedures(procList, libraryName);
                 marshalUtil.Process(procType);
                 col.Add(procType);
             }
@@ -302,7 +312,7 @@ namespace PInvoke.Transform
             AddHelperTypes(col);
 
             // Next step is to run the pretty lister on it
-            CodeDomPrettyList prettyLister = new CodeDomPrettyList(bag);
+            var prettyLister = new CodeDomPrettyList(bag);
             prettyLister.PerformRename(col);
 
             return col;
@@ -346,7 +356,7 @@ namespace PInvoke.Transform
             var builder = new StringBuilder();
             using (var reader = new StringReader(code))
             {
-                string line = reader.ReadLine();
+                var line = reader.ReadLine();
 
                 while (line != null)
                 {
@@ -356,7 +366,7 @@ namespace PInvoke.Transform
                         builder.AppendLine(line);
 
                         // Process the signature line by line
-                        StringBuilder sigBuilder = new StringBuilder();
+                        var sigBuilder = new StringBuilder();
                         do
                         {
                             line = reader.ReadLine();
@@ -366,7 +376,7 @@ namespace PInvoke.Transform
                                 break;
                             }
 
-                            Match match = Regex.Match(line, "^\\s*public\\s+static(.*)$");
+                            var match = Regex.Match(line, "^\\s*public\\s+static(.*)$");
                             if (match.Success)
                             {
                                 line = "public static extern " + match.Groups[1].Value;

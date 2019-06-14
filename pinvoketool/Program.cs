@@ -99,7 +99,7 @@ namespace pinvoketool
 
                     var basicConverter = new BasicConverter(LanguageType.CSharp, storage)
                     {
-                        TransformKindFlags = TransformKindFlags.StructMembers,
+                        TransformKindFlags = TransformKindFlags.WrapperMethods,
                     };
 
                     var code = basicConverter.ConvertNativeCodeToPInvokeCode(cstring, libname);

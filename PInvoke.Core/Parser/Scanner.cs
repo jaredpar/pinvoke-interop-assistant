@@ -1,9 +1,7 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -12,81 +10,20 @@ using static PInvoke.Contract;
 
 namespace PInvoke.Parser
 {
-
-    /// <summary>
-    /// Options for the Scanner
-    /// </summary>
-    /// <remarks></remarks>
-    public class ScannerOptions
-    {
-        public bool ThrowOnEndOfStream;
-        public bool HideComments;
-        public bool HideWhitespace;
-
-        public bool HideNewLines;
-
-        public ScannerOptions()
-        {
-        }
-    }
-
-    /// <summary>
-    /// Used to mark a point in the scanner to which a caller can move back to
-    /// </summary>
-    /// <remarks></remarks>
-    public class ScannerMark
-    {
-        private int _index;
-        private int _lineNumber;
-
-        internal int Index
-        {
-            get { return _index; }
-        }
-
-        internal int LineNumber
-        {
-            get { return _lineNumber; }
-        }
-
-        internal ScannerMark(int index, int lineNumber)
-        {
-            _index = index;
-            _lineNumber = lineNumber;
-        }
-    }
-
-
     /// <summary>
     /// Scans the Stream for tokens of interest
     /// </summary>
     /// <remarks></remarks>
     public class Scanner
     {
-
-        #region "ScannerInternalException"
-        private class ScannerInternalException : Exception
-        {
-
-            public ScannerInternalException(string msg) : base(msg)
-            {
-            }
-
-            public ScannerInternalException(string msg, Exception inner) : base(msg, inner)
-            {
-            }
-        }
-        #endregion
-
         #region "ScannerBuffer"
 
         [DebuggerDisplay("{Display}")]
         private class ScannerBuffer
         {
-            private string _text;
-            private int _index;
+            private string text;
+            private int index;
 
-            private int _lineNumber;
             /// <summary>
             /// Used as a debugger display property.  Gives a preview of the location in the stream
             /// </summary>
@@ -97,21 +34,21 @@ namespace PInvoke.Parser
             {
                 get
                 {
-                    int startIndex = _index - 10;
-                    int endIndex = _index + 15;
+                    int startIndex = index - 10;
+                    int endIndex = index + 15;
                     if (startIndex <= 0)
                     {
                         startIndex = 0;
                     }
 
-                    if (endIndex >= _text.Length)
+                    if (endIndex >= text.Length)
                     {
-                        endIndex = _text.Length - 1;
+                        endIndex = text.Length - 1;
                     }
 
-                    string value = _text.Substring(startIndex, _index - startIndex);
+                    string value = text.Substring(startIndex, index - startIndex);
                     value += "->";
-                    value += _text.Substring(_index, endIndex - _index);
+                    value += text.Substring(index, endIndex - index);
                     return value;
                 }
             }
@@ -122,10 +59,7 @@ namespace PInvoke.Parser
             /// <value></value>
             /// <returns></returns>
             /// <remarks></remarks>
-            public int LineNumber
-            {
-                get { return _lineNumber; }
-            }
+            public int LineNumber { get; private set; }
 
             /// <summary>
             /// True when we reach the end of the stream
@@ -135,14 +69,14 @@ namespace PInvoke.Parser
             /// <remarks></remarks>
             public bool EndOfStream
             {
-                get { return _index >= _text.Length; }
+                get { return index >= text.Length; }
             }
 
             public ScannerBuffer(TextReader reader)
             {
-                _text = reader.ReadToEnd();
-                _index = 0;
-                _lineNumber = 1;
+                text = reader.ReadToEnd();
+                index = 0;
+                LineNumber = 1;
             }
 
             /// <summary>
@@ -151,7 +85,7 @@ namespace PInvoke.Parser
             /// <remarks></remarks>
             public ScannerMark Mark()
             {
-                return new ScannerMark(_index, _lineNumber);
+                return new ScannerMark { Index = index, LineNumber = LineNumber };
             }
 
             /// <summary>
@@ -160,9 +94,9 @@ namespace PInvoke.Parser
             /// <remarks></remarks>
             public void RollBack(ScannerMark mark)
             {
-                Contract.ThrowIfNull(mark, "Must be passed a valid ScannerMark");
-                _index = mark.Index;
-                _lineNumber = mark.LineNumber;
+                ThrowIfNull(mark, "Must be passed a valid ScannerMark");
+                index = mark.Index;
+                LineNumber = mark.LineNumber;
             }
 
             /// <summary>
@@ -172,17 +106,17 @@ namespace PInvoke.Parser
             public char ReadChar()
             {
                 EnsureNotEndOfStream();
-                char ret = _text[_index];
-                _index++;
+                char ret = text[index];
+                index++;
 
                 // Check for the end of the line
                 // Increment if we passed \r and are now on \n or the end
                 // Not supported: line ending of just \r or \n
                 if (ret == Convert.ToChar(PortConstants.CarriageReturn))
                 {
-                    if (_index == _text.Length || PeekChar() == Convert.ToChar(PortConstants.LineFeed))
+                    if (index == text.Length || PeekChar() == Convert.ToChar(PortConstants.LineFeed))
                     {
-                        _lineNumber += 1;
+                        LineNumber += 1;
                     }
                 }
 
@@ -197,7 +131,7 @@ namespace PInvoke.Parser
             public char PeekChar()
             {
                 EnsureNotEndOfStream();
-                return _text[_index];
+                return text[index];
             }
 
             /// <summary>
@@ -213,20 +147,20 @@ namespace PInvoke.Parser
 
             public void BackupChar()
             {
-                if (_index == 0)
+                if (index == 0)
                 {
                     throw new ScannerInternalException("Moved back before the start of the Stream");
                 }
 
-                _index--;
+                index--;
 
                 // Decrement line if we are now on \r and it precedes \n or the end
                 // Not supported: line ending of just \r or \n
                 if (PeekChar() == Convert.ToChar(PortConstants.CarriageReturn))
                 {
-                    if (_text[_index + 1] == Convert.ToChar(PortConstants.LineFeed))
+                    if (text[index + 1] == Convert.ToChar(PortConstants.LineFeed))
                     {
-                        _lineNumber -= 1;
+                        LineNumber -= 1;
                     }
                 }
             }
@@ -239,28 +173,23 @@ namespace PInvoke.Parser
                 }
             }
         }
+
         #endregion
 
-        private ErrorProvider _errorProvider = new ErrorProvider();
-        private ScannerOptions _options;
-
-        private TextReaderBag _readerBag;
+        private TextReaderBag readerBag;
         /// <summary>
         /// Stream we are reading from
         /// </summary>
         /// <remarks></remarks>
 
-        private ScannerBuffer _buffer;
+        private ScannerBuffer buffer;
         /// <summary>
         /// Options for the Scanner
         /// </summary>
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public ScannerOptions Options
-        {
-            get { return _options; }
-        }
+        public ScannerOptions Options { get; }
 
         /// <summary>
         /// What line number are we currently on
@@ -270,7 +199,7 @@ namespace PInvoke.Parser
         /// <remarks></remarks>
         public int LineNumber
         {
-            get { return _buffer.LineNumber; }
+            get { return buffer.LineNumber; }
         }
 
         /// <summary>
@@ -279,11 +208,7 @@ namespace PInvoke.Parser
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public ErrorProvider ErrorProvider
-        {
-            get { return _errorProvider; }
-            set { _errorProvider = value; }
-        }
+        public ErrorProvider ErrorProvider { get; set; } = new ErrorProvider();
 
         /// <summary>
         /// Name of the file
@@ -293,7 +218,7 @@ namespace PInvoke.Parser
         /// <remarks></remarks>
         public string Name
         {
-            get { return _readerBag.Name; }
+            get { return readerBag.Name; }
         }
 
         /// <summary>
@@ -306,23 +231,23 @@ namespace PInvoke.Parser
         {
             get
             {
-                if (_options.ThrowOnEndOfStream)
+                if (Options.ThrowOnEndOfStream)
                 {
                     bool ret = false;
                     try
                     {
-                        _options.ThrowOnEndOfStream = false;
-                        ret = this.PeekNextToken().TokenType == TokenType.EndOfStream;
+                        Options.ThrowOnEndOfStream = false;
+                        ret = PeekNextToken().TokenType == TokenType.EndOfStream;
                     }
                     finally
                     {
-                        _options.ThrowOnEndOfStream = true;
+                        Options.ThrowOnEndOfStream = true;
                     }
                     return ret;
                 }
                 else
                 {
-                    return this.PeekNextToken().TokenType == TokenType.EndOfStream;
+                    return PeekNextToken().TokenType == TokenType.EndOfStream;
                 }
             }
         }
@@ -335,9 +260,9 @@ namespace PInvoke.Parser
         {
             ThrowIfNull(bag);
             ThrowIfNull(options);
-            _readerBag = bag;
-            _buffer = new ScannerBuffer(bag.TextReader);
-            _options = options;
+            readerBag = bag;
+            buffer = new ScannerBuffer(bag.TextReader);
+            Options = options;
         }
 
 
@@ -350,14 +275,14 @@ namespace PInvoke.Parser
         public Token GetNextToken()
         {
 
-            Token ret = null;
-            bool done = false;
+            var ret = default(Token);
+            var done = false;
             do
             {
                 // Easy cases are out of the way.  Now we need to actually go ahead and 
                 // parse out the next token.  Mark the stream so that if scanning fails
                 // we can send back a token of the remainder of the line
-                ScannerMark mark = _buffer.Mark();
+                var mark = buffer.Mark();
                 try
                 {
                     ret = GetNextTokenImpl();
@@ -365,7 +290,7 @@ namespace PInvoke.Parser
                 catch (ScannerInternalException ex)
                 {
                     AddWarning(ex.Message);
-                    _buffer.RollBack(mark);
+                    buffer.RollBack(mark);
                     ret = new Token(TokenType.Text, SafeReadTillEndOfLine());
                 }
 
@@ -414,15 +339,15 @@ namespace PInvoke.Parser
         /// <remarks></remarks>
         public Token PeekNextToken()
         {
-            Token token = default(Token);
-            ScannerMark mark = _buffer.Mark();
+            var token = default(Token);
+            var mark = buffer.Mark();
             try
             {
                 token = GetNextToken();
             }
             finally
             {
-                _buffer.RollBack(mark);
+                buffer.RollBack(mark);
             }
 
             return token;
@@ -436,23 +361,23 @@ namespace PInvoke.Parser
         /// <remarks></remarks>
         public List<Token> PeekTokenList(int count)
         {
-            ScannerMark mark = this.Mark();
-            bool oldThrow = _options.ThrowOnEndOfStream;
-            _options.ThrowOnEndOfStream = false;
+            var mark = Mark();
+            bool oldThrow = Options.ThrowOnEndOfStream;
+            Options.ThrowOnEndOfStream = false;
             try
             {
-                List<Token> list = new List<Token>();
+                var list = new List<Token>();
                 for (int i = 0; i <= count - 1; i++)
                 {
-                    list.Add(this.GetNextToken());
+                    list.Add(GetNextToken());
                 }
 
                 return list;
             }
             finally
             {
-                _options.ThrowOnEndOfStream = oldThrow;
-                this.Rollback(mark);
+                Options.ThrowOnEndOfStream = oldThrow;
+                Rollback(mark);
             }
         }
 
@@ -465,7 +390,7 @@ namespace PInvoke.Parser
         /// <remarks></remarks>
         public Token GetNextTokenNotOfType(params TokenType[] types)
         {
-            Token token = GetNextToken();
+            var token = GetNextToken();
 
             while (Array.IndexOf(types, token.TokenType) >= 0 && token.TokenType != TokenType.EndOfStream)
             {
@@ -483,15 +408,15 @@ namespace PInvoke.Parser
         /// <remarks></remarks>
         public Token PeekNextTokenNotOfType(params TokenType[] types)
         {
-            ScannerMark mark = _buffer.Mark();
-            Token token = default(Token);
+            var mark = buffer.Mark();
+            var token = default(Token);
             try
             {
                 token = GetNextTokenNotOfType(types);
             }
             finally
             {
-                _buffer.RollBack(mark);
+                buffer.RollBack(mark);
             }
 
             return token;
@@ -505,10 +430,10 @@ namespace PInvoke.Parser
         /// <remarks></remarks>
         public Token GetNextToken(TokenType tt)
         {
-            Token token = GetNextToken();
+            var token = GetNextToken();
             if (token.TokenType != tt)
             {
-                string msg = string.Format("Expected token of type {0} but found {1} instead.", tt, token.TokenType);
+                var msg = $"Expected token of type {tt} but found {token.TokenType} instead.";
                 throw new InvalidOperationException(msg);
             }
 
@@ -523,7 +448,7 @@ namespace PInvoke.Parser
         /// <remarks></remarks>
         public ScannerMark Mark()
         {
-            return _buffer.Mark();
+            return buffer.Mark();
         }
 
         /// <summary>
@@ -533,7 +458,7 @@ namespace PInvoke.Parser
         /// <remarks></remarks>
         public void Rollback(ScannerMark mark)
         {
-            _buffer.RollBack(mark);
+            buffer.RollBack(mark);
         }
 
         /// <summary>
@@ -543,10 +468,10 @@ namespace PInvoke.Parser
         /// <remarks></remarks>
         public List<Token> Tokenize()
         {
-            List<Token> list = new List<Token>();
-            while (!this.EndOfStream)
+            var list = new List<Token>();
+            while (!EndOfStream)
             {
-                list.Add(this.GetNextToken());
+                list.Add(GetNextToken());
             }
 
             return list;
@@ -563,19 +488,19 @@ namespace PInvoke.Parser
         {
 
             // First check and see if we're at 'EndOfStream'.  
-            if (_buffer.EndOfStream)
+            if (buffer.EndOfStream)
             {
                 return new Token(TokenType.EndOfStream, string.Empty);
             }
 
             Token token = null;
-            char c = _buffer.ReadChar();
+            char c = buffer.ReadChar();
 
             // First check for whitespace and return that
 
             if (char.IsWhiteSpace(c) && c != PortConstants.CarriageReturn && c != PortConstants.LineFeed)
             {
-                _buffer.BackupChar();
+                buffer.BackupChar();
                 return ReadWhitespace();
             }
 
@@ -637,9 +562,9 @@ namespace PInvoke.Parser
                     break;
                 case PortConstants.CarriageReturn:
                 case PortConstants.LineFeed:
-                    if (!_buffer.EndOfStream && _buffer.PeekChar() == PortConstants.LineFeed)
+                    if (!buffer.EndOfStream && buffer.PeekChar() == PortConstants.LineFeed)
                     {
-                        _buffer.EatChar();
+                        buffer.EatChar();
                     }
                     token = new Token(TokenType.NewLine, Environment.NewLine);
                     break;
@@ -654,9 +579,9 @@ namespace PInvoke.Parser
             // We've gotten past the characters that can be determined by the first character.  Now 
             // we need to consider the second character as well.  Do an EndOfStream check here 
             // since there could just be a single character left in the Stream
-            if (!_buffer.EndOfStream)
+            if (!buffer.EndOfStream)
             {
-                string c2 = _buffer.ReadChar().ToString();
+                string c2 = buffer.ReadChar().ToString();
                 string both = c + c2;
                 switch (both)
                 {
@@ -705,7 +630,7 @@ namespace PInvoke.Parser
                 }
 
                 // Move back the character since we didn't process it
-                _buffer.BackupChar();
+                buffer.BackupChar();
             }
 
             // There are several single character cases that are also a part of the double character 
@@ -752,7 +677,7 @@ namespace PInvoke.Parser
 
             // This isn't a special token.  It's some type of word or number so move back to 
             // the start of this stream and read the word.
-            _buffer.BackupChar();
+            buffer.BackupChar();
             return ReadWordOrNumberToken();
         }
 
@@ -767,22 +692,22 @@ namespace PInvoke.Parser
             bool done = false;
             do
             {
-                char c = _buffer.ReadChar();
+                char c = buffer.ReadChar();
                 if (!char.IsWhiteSpace(c))
                 {
                     done = true;
-                    _buffer.BackupChar();
+                    buffer.BackupChar();
                 }
                 else if (c == PortConstants.CarriageReturn || c == PortConstants.LineFeed)
                 {
                     done = true;
-                    _buffer.BackupChar();
+                    buffer.BackupChar();
                 }
                 else
                 {
                     builder.Append(c);
                 }
-            } while (!(done || _buffer.EndOfStream));
+            } while (!(done || buffer.EndOfStream));
 
             return new Token(TokenType.WhiteSpace, builder.ToString());
         }
@@ -803,11 +728,11 @@ namespace PInvoke.Parser
             if (IsNumber(word, ref numberType))
             {
                 // Loop for a floating point number literal
-                if (!_buffer.EndOfStream && _buffer.PeekChar() == '.')
+                if (!buffer.EndOfStream && buffer.PeekChar() == '.')
                 {
-                    ScannerMark mark = _buffer.Mark();
+                    ScannerMark mark = buffer.Mark();
 
-                    _buffer.ReadChar();
+                    buffer.ReadChar();
                     string fullWord = word + "." + ReadWord();
                     TokenType fullNumberType = TokenType.Ampersand;
                     if (IsNumber(fullWord, ref fullNumberType))
@@ -816,7 +741,7 @@ namespace PInvoke.Parser
                     }
                     else
                     {
-                        _buffer.RollBack(mark);
+                        buffer.RollBack(mark);
                     }
                 }
 
@@ -855,9 +780,9 @@ namespace PInvoke.Parser
             StringBuilder builder = new StringBuilder();
             bool done = false;
 
-            while (!done && !_buffer.EndOfStream)
+            while (!done && !buffer.EndOfStream)
             {
-                char c = _buffer.PeekChar();
+                char c = buffer.PeekChar();
                 if (c == PortConstants.CarriageReturn | c == PortConstants.LineFeed)
                 {
                     done = true;
@@ -865,7 +790,7 @@ namespace PInvoke.Parser
                 else
                 {
                     builder.Append(c);
-                    _buffer.ReadChar();
+                    buffer.ReadChar();
                 }
             }
 
@@ -882,13 +807,13 @@ namespace PInvoke.Parser
             StringBuilder builder = new StringBuilder();
             bool done = false;
 
-            while (!done && !_buffer.EndOfStream)
+            while (!done && !buffer.EndOfStream)
             {
-                char c = _buffer.PeekChar();
+                char c = buffer.PeekChar();
                 if (char.IsLetterOrDigit(c) || c == '_' || c == '$')
                 {
                     builder.Append(c);
-                    _buffer.EatChar();
+                    buffer.EatChar();
                 }
                 else
                 {
@@ -942,13 +867,13 @@ namespace PInvoke.Parser
             bool done = false;
             builder.Append("/*");
 
-            while (!done && !_buffer.EndOfStream)
+            while (!done && !buffer.EndOfStream)
             {
-                char c = _buffer.ReadChar();
-                if ((c == '*' && _buffer.PeekChar() == '/'))
+                char c = buffer.ReadChar();
+                if ((c == '*' && buffer.PeekChar() == '/'))
                 {
                     builder.Append("*/");
-                    _buffer.EatChar();
+                    buffer.EatChar();
                     // Eat the /
                     done = true;
                 }
@@ -969,7 +894,7 @@ namespace PInvoke.Parser
         /// <remarks></remarks>
         private Token ReadDoubleQuoteOrString()
         {
-            ScannerMark mark = _buffer.Mark();
+            ScannerMark mark = buffer.Mark();
             try
             {
                 StringBuilder builder = new StringBuilder();
@@ -978,7 +903,7 @@ namespace PInvoke.Parser
                 bool done = false;
                 while (!done)
                 {
-                    char c = _buffer.ReadChar();
+                    char c = buffer.ReadChar();
                     switch (c)
                     {
                         case '"':
@@ -987,7 +912,7 @@ namespace PInvoke.Parser
                             break;
                         case '\\':
                             builder.Append(c);
-                            builder.Append(_buffer.ReadChar());
+                            builder.Append(buffer.ReadChar());
                             break;
                         default:
                             builder.Append(c);
@@ -1001,7 +926,7 @@ namespace PInvoke.Parser
             {
                 // If we get a scanner exception while trying to read the string then this
                 // is just a simple quote.  Rollback the buffer and return the quote token
-                _buffer.RollBack(mark);
+                buffer.RollBack(mark);
                 return new Token(TokenType.DoubleQuote, "\"");
             }
         }
@@ -1014,19 +939,19 @@ namespace PInvoke.Parser
         /// <remarks></remarks>
         private Token ReadSingleQuoteOrCharacter()
         {
-            if (_buffer.EndOfStream)
+            if (buffer.EndOfStream)
             {
                 return new Token(TokenType.SingleQuote, "'");
             }
 
-            ScannerMark mark = _buffer.Mark();
+            ScannerMark mark = buffer.Mark();
             Token token = null;
             try
             {
-                char data = _buffer.ReadChar();
+                char data = buffer.ReadChar();
                 if (data != '\\')
                 {
-                    if (_buffer.ReadChar() == '\'')
+                    if (buffer.ReadChar() == '\'')
                     {
                         token = new Token(TokenType.CharacterAnsi, '\'' + data.ToString() + '\'');
                     }
@@ -1038,13 +963,13 @@ namespace PInvoke.Parser
 
                     do
                     {
-                        data = _buffer.ReadChar();
+                        data = buffer.ReadChar();
                         if (data == '\'')
                         {
                             token = new Token(TokenType.CharacterAnsi, '\'' + builder.ToString() + '\'');
                             break; // TODO: might not be correct. Was : Exit Do
                         }
-                        else if (_buffer.EndOfStream || builder.Length > 5)
+                        else if (buffer.EndOfStream || builder.Length > 5)
                         {
                             break;
                         }
@@ -1062,7 +987,7 @@ namespace PInvoke.Parser
 
             if (token == null)
             {
-                _buffer.RollBack(mark);
+                buffer.RollBack(mark);
                 token = new Token(TokenType.SingleQuote, "'");
             }
 
@@ -1081,7 +1006,7 @@ namespace PInvoke.Parser
             Token token = ReadSingleQuoteOrCharacter();
             if (token.TokenType == TokenType.SingleQuote)
             {
-                _buffer.BackupChar();
+                buffer.BackupChar();
                 return new Token(TokenType.Word, "L");
             }
             else
@@ -1103,7 +1028,7 @@ namespace PInvoke.Parser
             {
                 // Read a double quote which means there wasn't a valid string afterwards.  Move
                 // back over the " and return the L
-                _buffer.BackupChar();
+                buffer.BackupChar();
                 return new Token(TokenType.Word, "L");
             }
             else
@@ -1131,7 +1056,7 @@ namespace PInvoke.Parser
 
         public void AddError(string msg)
         {
-            _errorProvider.AddError(GetMessagePrefix() + msg);
+            ErrorProvider.AddError(GetMessagePrefix() + msg);
         }
 
         public void AddError(string format, params object[] args)
@@ -1141,7 +1066,7 @@ namespace PInvoke.Parser
 
         public void AddWarning(string msg)
         {
-            _errorProvider.AddWarning(GetMessagePrefix() + msg);
+            ErrorProvider.AddWarning(GetMessagePrefix() + msg);
         }
 
         public void AddWarning(string format, params object[] args)
@@ -1153,7 +1078,7 @@ namespace PInvoke.Parser
         {
             // Sometimes line number was incremented after reading the offending text;
             // show a range, until this can be improved
-            return string.Format("{0} {1}-{2}: ", _readerBag.Name, _buffer.LineNumber == 0 ? 0 : _buffer.LineNumber - 1, _buffer.LineNumber);
+            return string.Format("{0} {1}-{2}: ", readerBag.Name, buffer.LineNumber == 0 ? 0 : buffer.LineNumber - 1, buffer.LineNumber);
         }
 
         #endregion

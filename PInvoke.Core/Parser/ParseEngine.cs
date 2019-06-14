@@ -146,10 +146,10 @@ namespace PInvoke.Parser
 
         #endregion
 
-        private bool _parsing;
-        private Scanner _scanner;
-        private ParseResult _result;
-        private ErrorProvider _errorProvider = new ErrorProvider();
+        private bool parsing;
+        private Scanner scanner;
+        private ParseResult resultant;
+        private ErrorProvider errorProvider = new ErrorProvider();
 
         private Dictionary<string, SalEntryType> _salTable = new Dictionary<string, SalEntryType>(StringComparer.OrdinalIgnoreCase);
         private string DisplayString
@@ -165,7 +165,6 @@ namespace PInvoke.Parser
         {
             BuildLookupTables();
         }
-
 
         private void BuildLookupTables()
         {
@@ -189,41 +188,45 @@ namespace PInvoke.Parser
         public ParseResult Parse(string text)
         {
             dynamic bytes = Encoding.UTF8.GetBytes(text);
-            MemoryStream stream = new MemoryStream(bytes);
-            return Parse(new StreamReader(stream));
+            var stream = new MemoryStream(bytes); // TODO : using
+            return Parse(new StreamReader(stream)); // TODO : using
         }
 
         private ParseResult ParseCore(TextReaderBag readerBag)
         {
             ThrowIfNull(readerBag);
-            ThrowIfTrue(_parsing, "Recursive parsing is not supported.  Instead create a new Parser");
-            ParseResult toReturn = null;
+            ThrowIfTrue(parsing, "Recursive parsing is not supported.  Instead create a new Parser");
+            var toReturn = default(ParseResult);
 
             try
             {
                 // Build the options
-                ScannerOptions opts = new ScannerOptions();
-                opts.ThrowOnEndOfStream = true;
-                opts.HideWhitespace = true;
-                opts.HideNewLines = true;
-                opts.HideComments = true;
+                var opts = new ScannerOptions
+                {
+                    ThrowOnEndOfStream = true,
+                    HideWhitespace = true,
+                    HideNewLines = true,
+                    HideComments = true // TODO : if we set this to true the prser barfs on the comments
+                };
 
-                _parsing = true;
-                _result = new ParseResult();
-                _scanner = new Scanner(readerBag, opts);
-                _scanner.ErrorProvider = _result.ErrorProvider;
+                parsing = true;
+                resultant = new ParseResult();
+                scanner = new Scanner(readerBag, opts)
+                {
+                    ErrorProvider = resultant.ErrorProvider
+                };
 
                 // Actually do the parsing
                 ParseCoreRoutine();
 
-                _result.ErrorProvider.Append(_errorProvider);
-                toReturn = _result;
+                resultant.ErrorProvider.Append(errorProvider);
+                toReturn = resultant;
             }
             finally
             {
-                _scanner = null;
-                _parsing = false;
-                _result = null;
+                scanner = null;
+                parsing = false;
+                resultant = null;
             }
 
             return toReturn;
@@ -246,7 +249,7 @@ namespace PInvoke.Parser
             while (!done)
             {
                 // Check for the end of the stream
-                if (_scanner.EndOfStream)
+                if (scanner.EndOfStream)
                 {
                     done = true;
                     continue;
@@ -254,16 +257,16 @@ namespace PInvoke.Parser
 
                 // Setup a mark.  If the routine fails to parse we want to rollback the scanner
                 // and read past the troublesome line
-                ScannerMark mark = _scanner.Mark();
+                ScannerMark mark = scanner.Mark();
 
-                Token token = _scanner.PeekNextToken();
+                Token token = scanner.PeekNextToken();
                 try
                 {
                     NativeSalAttribute ntSal = new NativeSalAttribute();
                     if (token.TokenType == TokenType.DeclSpec)
                     {
                         ntSal = ProcessSalAttribute();
-                        token = _scanner.PeekNextToken();
+                        token = scanner.PeekNextToken();
                     }
 
                     if (token.TokenType == TokenType.TypeDefKeyword)
@@ -279,7 +282,7 @@ namespace PInvoke.Parser
                     {
                         // Next try and process a type
                         NativeType parsedType = ProcessTypeNameOrType();
-                        Token nextToken = _scanner.PeekNextToken();
+                        Token nextToken = scanner.PeekNextToken();
 
                         if (parsedType.Category == NativeSymbolCategory.Defined)
                         {
@@ -302,7 +305,7 @@ namespace PInvoke.Parser
                     else
                     {
                         ProcessGlobalTokenForUnsupportedScenario();
-                        _scanner.GetNextToken();
+                        scanner.GetNextToken();
                     }
                 }
                 catch (ParseException ex)
@@ -312,11 +315,11 @@ namespace PInvoke.Parser
                         parseErrorTable.Add(ex.Message, null);
                         if (ex.IsError)
                         {
-                            _errorProvider.AddError(ex.Message);
+                            errorProvider.AddError(ex.Message);
                         }
                         else
                         {
-                            _errorProvider.AddWarning(ex.Message);
+                            errorProvider.AddWarning(ex.Message);
                         }
 
                         // If the thrower did not put the stream in a good place chew
@@ -331,8 +334,8 @@ namespace PInvoke.Parser
                 catch (EndOfStreamException)
                 {
                     // Rollback the scanner and process the next line
-                    _errorProvider.AddError("Unexpectedly hit the end of the stream");
-                    _scanner.Rollback(mark);
+                    errorProvider.AddError("Unexpectedly hit the end of the stream");
+                    scanner.Rollback(mark);
                     ChewThroughEndOfLine();
 
 
@@ -340,8 +343,8 @@ namespace PInvoke.Parser
                 catch (Exception ex)
                 {
                     // Rollback the scanner.  The process through this line
-                    _errorProvider.AddError(ex.Message);
-                    _scanner.Rollback(mark);
+                    errorProvider.AddError(ex.Message);
+                    scanner.Rollback(mark);
                     ChewThroughEndOfLine();
                 }
             }
@@ -356,15 +359,15 @@ namespace PInvoke.Parser
         {
 
             // Chew through the typedef token if it hasn't been consumed
-            Token token = _scanner.PeekNextToken();
+            Token token = scanner.PeekNextToken();
             if (token.TokenType == TokenType.TypeDefKeyword)
             {
-                _scanner.GetNextToken();
+                scanner.GetNextToken();
             }
 
             NativeSalAttribute sal = default(NativeSalAttribute);
             NativeType source = default(NativeType);
-            ScannerMark typeMark = _scanner.Mark();
+            ScannerMark typeMark = scanner.Mark();
             try
             {
                 // Get the type name which is the source of the typedef.  This can only 
@@ -387,7 +390,7 @@ namespace PInvoke.Parser
             }
             catch (Exception ex)
             {
-                _scanner.Rollback(typeMark);
+                scanner.Rollback(typeMark);
                 string msg = string.Format("Error processing typedef \"{0}\": {1}", PeekLineInformation(4), ex.Message);
                 throw ParseException.CreateError(msg, ex);
             }
@@ -412,9 +415,9 @@ namespace PInvoke.Parser
             Contract.ThrowIfNull(nameprefix);
 
             // If this called with a struct token still in the stream, remove it
-            if (_scanner.PeekNextToken().TokenType == TokenType.ClassKeyword)
+            if (scanner.PeekNextToken().TokenType == TokenType.ClassKeyword)
             {
-                _scanner.GetNextToken();
+                scanner.GetNextToken();
             }
 
             return ProcessStruct(nameprefix);
@@ -440,14 +443,14 @@ namespace PInvoke.Parser
             Contract.ThrowIfNull(namePrefix);
 
             // If this called with a struct token still in the stream, remove it
-            if (_scanner.PeekNextToken().TokenType == TokenType.StructKeyword)
+            if (scanner.PeekNextToken().TokenType == TokenType.StructKeyword)
             {
-                _scanner.GetNextToken();
+                scanner.GetNextToken();
             }
 
             // Remove any SAL attribute
             // TODO: It may be worthwhile in a future version to add support for the __declspec attribute
-            if (_scanner.PeekNextToken().TokenType == TokenType.DeclSpec)
+            if (scanner.PeekNextToken().TokenType == TokenType.DeclSpec)
             {
                 ProcessSalAttribute();
             }
@@ -456,10 +459,10 @@ namespace PInvoke.Parser
             // struct and otherwise it's inline
             string name = null;
             bool isInline = false;
-            Token nameToken = _scanner.PeekNextToken();
+            Token nameToken = scanner.PeekNextToken();
             if (nameToken.TokenType == TokenType.Word)
             {
-                _scanner.GetNextToken();
+                scanner.GetNextToken();
                 name = namePrefix + nameToken.Value;
                 isInline = false;
             }
@@ -471,19 +474,19 @@ namespace PInvoke.Parser
 
             // For forward declaration structs the next token will be a ';'.  There is nothing 
             // to add for structures of this type
-            if (_scanner.PeekNextToken().TokenType == TokenType.Semicolon)
+            if (scanner.PeekNextToken().TokenType == TokenType.Semicolon)
             {
                 return null;
             }
 
             // Check through the open brace structure
-            _scanner.GetNextToken(TokenType.BraceOpen);
+            scanner.GetNextToken(TokenType.BraceOpen);
 
             // Get the members
             List<NativeMember> list = ProcessTypeMemberList(name);
 
             // Move through the close brace
-            _scanner.GetNextToken(TokenType.BraceClose);
+            scanner.GetNextToken(TokenType.BraceClose);
 
             // Create the struct type
             NativeStruct ntStruct = new NativeStruct();
@@ -523,20 +526,20 @@ namespace PInvoke.Parser
             Contract.ThrowIfNull(namePrefix);
 
             // Check through the union token if it hasn't been consumed
-            Token token = _scanner.PeekNextToken();
+            Token token = scanner.PeekNextToken();
             if (token.TokenType == TokenType.UnionKeyword)
             {
-                _scanner.GetNextToken();
+                scanner.GetNextToken();
             }
 
             // See if this is an inline union or a named one
             bool isInline = false;
             string name = string.Empty;
-            token = _scanner.PeekNextToken();
+            token = scanner.PeekNextToken();
             if (token.TokenType == TokenType.Word)
             {
                 name = namePrefix + token.Value;
-                _scanner.GetNextToken();
+                scanner.GetNextToken();
             }
             else
             {
@@ -544,12 +547,12 @@ namespace PInvoke.Parser
             }
 
             // Get the open brace
-            _scanner.GetNextToken(TokenType.BraceOpen);
+            scanner.GetNextToken(TokenType.BraceOpen);
 
             List<NativeMember> list = ProcessTypeMemberList(name);
 
             // Get the close brace
-            _scanner.GetNextToken(TokenType.BraceClose);
+            scanner.GetNextToken(TokenType.BraceClose);
 
             // Create the union
             NativeUnion ntUnion = new NativeUnion();
@@ -582,19 +585,19 @@ namespace PInvoke.Parser
             Contract.ThrowIfNull(namePrefix);
 
             // Move past the enum token if it's still in the stream
-            Token token = _scanner.PeekNextToken();
+            Token token = scanner.PeekNextToken();
             if (token.TokenType == TokenType.EnumKeyword)
             {
-                _scanner.GetNextToken();
+                scanner.GetNextToken();
             }
 
             // Check to see if this is an inline enum
             bool isInline = false;
             string name = string.Empty;
-            token = _scanner.PeekNextToken();
+            token = scanner.PeekNextToken();
             if (token.TokenType == TokenType.Word)
             {
-                _scanner.GetNextToken();
+                scanner.GetNextToken();
                 isInline = false;
                 name = namePrefix + token.Value;
             }
@@ -604,7 +607,7 @@ namespace PInvoke.Parser
             }
 
             // Get the open brace
-            _scanner.GetNextToken(TokenType.BraceOpen);
+            scanner.GetNextToken(TokenType.BraceOpen);
 
             var ntEnum = new NativeEnum(name);
             ntEnum.IsAnonymous = isInline;
@@ -613,12 +616,12 @@ namespace PInvoke.Parser
             List<NativeEnumValue> list = ProcessEnumValues(ntEnum.Name);
             foreach (var item in list)
             {
-                _result.NativeEnumValues.Add(item);
+                resultant.NativeEnumValues.Add(item);
                 ntEnum.Values.Add(item);
             }
 
             // Get the close brace
-            _scanner.GetNextToken(TokenType.BraceClose);
+            scanner.GetNextToken(TokenType.BraceClose);
 
             // If this isnot' an inline type then process the post type defs
             if (!isInline)
@@ -639,7 +642,7 @@ namespace PInvoke.Parser
             List<NativeEnumValue> list = new List<NativeEnumValue>();
 
             // Allow for an empty enum list
-            if (_scanner.PeekNextToken().TokenType == TokenType.BraceClose)
+            if (scanner.PeekNextToken().TokenType == TokenType.BraceClose)
             {
                 return list;
             }
@@ -647,34 +650,34 @@ namespace PInvoke.Parser
             bool done = false;
             while (!done)
             {
-                Token nameToken = _scanner.GetNextToken(TokenType.Word);
+                Token nameToken = scanner.GetNextToken(TokenType.Word);
 
-                Token token = _scanner.PeekNextToken();
+                Token token = scanner.PeekNextToken();
                 switch (token.TokenType)
                 {
                     case TokenType.Comma:
-                        _scanner.GetNextToken();
+                        scanner.GetNextToken();
                         list.Add(new NativeEnumValue(enumName, nameToken.Value));
                         break;
                     case TokenType.BraceClose:
                         list.Add(new NativeEnumValue(enumName, nameToken.Value));
                         break;
                     case TokenType.OpAssign:
-                        _scanner.GetNextToken();
+                        scanner.GetNextToken();
                         string value = ProcessConstantValue();
-                        if (_scanner.PeekNextToken().TokenType == TokenType.Comma)
+                        if (scanner.PeekNextToken().TokenType == TokenType.Comma)
                         {
-                            _scanner.GetNextToken();
+                            scanner.GetNextToken();
                         }
                         list.Add(new NativeEnumValue(enumName: enumName, valueName: nameToken.Value, value: value));
                         break;
                     default:
-                        _scanner.AddWarning("Unexpected token while processing enum values: {0}", token.TokenType);
+                        scanner.AddWarning("Unexpected token while processing enum values: {0}", token.TokenType);
                         done = true;
                         break;
                 }
 
-                token = _scanner.PeekNextToken();
+                token = scanner.PeekNextToken();
                 if (token.TokenType == TokenType.BraceClose)
                 {
                     done = true;
@@ -686,7 +689,7 @@ namespace PInvoke.Parser
 
         private NativeProcedure ProcessProcedure()
         {
-            ScannerMark mark = _scanner.Mark();
+            ScannerMark mark = scanner.Mark();
             TriState<NativeCallingConvention> callmod = new TriState<NativeCallingConvention>();
             ProcessCalltypeModifier(ref callmod);
 
@@ -696,7 +699,7 @@ namespace PInvoke.Parser
             NativeType retType = ProcessTypeNameOrType();
             if (retType == null)
             {
-                _scanner.Rollback(mark);
+                scanner.Rollback(mark);
                 return null;
             }
 
@@ -712,23 +715,23 @@ namespace PInvoke.Parser
         private NativeProcedure ProcessProcedure(NativeType retType, NativeSalAttribute retTypeSal, TriState<NativeCallingConvention> callmod)
         {
             ThrowIfNull(callmod);
-            ScannerMark mark = _scanner.Mark();
+            ScannerMark mark = scanner.Mark();
 
             ProcessCalltypeModifier(ref callmod);
-            Token nameToken = _scanner.PeekNextToken();
+            Token nameToken = scanner.PeekNextToken();
             if (nameToken.TokenType != TokenType.Word)
             {
-                _scanner.Rollback(mark);
+                scanner.Rollback(mark);
                 return null;
             }
-            _scanner.GetNextToken();
+            scanner.GetNextToken();
 
             try
             {
                 List<NativeParameter> list = ProcessParameterList(nameToken.Value);
                 if (list == null)
                 {
-                    _scanner.Rollback(mark);
+                    scanner.Rollback(mark);
                     return null;
                 }
 
@@ -745,7 +748,7 @@ namespace PInvoke.Parser
 
                 // Check to see if the procedure has an inline block declared after it.  If so then process
                 // the block away
-                if (!_scanner.EndOfStream && _scanner.PeekNextToken().TokenType == TokenType.BraceOpen)
+                if (!scanner.EndOfStream && scanner.PeekNextToken().TokenType == TokenType.BraceOpen)
                 {
                     ProcessBlock(TokenType.BraceOpen, TokenType.BraceClose);
                     throw ParseException.CreateWarningStreamOk("Ignoring Procedure {0} because it is defined inline.", proc.Name);
@@ -775,9 +778,9 @@ namespace PInvoke.Parser
 
         private void ProcessCalltypeModifier(ref TriState<NativeCallingConvention> value)
         {
-            while (TokenHelper.IsCallTypeModifier(_scanner.PeekNextToken().TokenType))
+            while (TokenHelper.IsCallTypeModifier(scanner.PeekNextToken().TokenType))
             {
-                Token token = _scanner.GetNextToken();
+                Token token = scanner.GetNextToken();
                 NativeCallingConvention callmod = default(NativeCallingConvention);
                 switch (token.TokenType)
                 {
@@ -816,15 +819,15 @@ namespace PInvoke.Parser
         /// <remarks></remarks>
         private void ProcessAccessModifiers()
         {
-            Token token = _scanner.PeekNextToken();
+            Token token = scanner.PeekNextToken();
             while (token.IsAccessModifier)
             {
-                _scanner.GetNextToken();
-                token = _scanner.PeekNextToken();
+                scanner.GetNextToken();
+                token = scanner.PeekNextToken();
                 if (token.TokenType == TokenType.Colon)
                 {
-                    _scanner.GetNextToken();
-                    token = _scanner.PeekNextToken();
+                    scanner.GetNextToken();
+                    token = scanner.PeekNextToken();
                 }
             }
         }
@@ -850,9 +853,9 @@ namespace PInvoke.Parser
 
             // It's fine for this method to be called with the scanner either immediately before or 
             // after the opening paren
-            if (_scanner.PeekNextToken().TokenType == TokenType.ParenOpen)
+            if (scanner.PeekNextToken().TokenType == TokenType.ParenOpen)
             {
-                _scanner.GetNextToken();
+                scanner.GetNextToken();
             }
 
             // Remove the calling convention
@@ -860,23 +863,23 @@ namespace PInvoke.Parser
             ProcessCalltypeModifier(ref callmod);
 
             // If there is a * in the name then parse that as well
-            if (_scanner.PeekNextToken().TokenType == TokenType.Asterisk)
+            if (scanner.PeekNextToken().TokenType == TokenType.Asterisk)
             {
-                _scanner.GetNextToken();
+                scanner.GetNextToken();
             }
 
             // Get the acutal name from code.  Make sure to handle the anonymous function pointer case
             string name = null;
-            if (_scanner.PeekNextToken().TokenType == TokenType.Word)
+            if (scanner.PeekNextToken().TokenType == TokenType.Word)
             {
-                name = namePrefix + _scanner.GetNextToken().Value;
+                name = namePrefix + scanner.GetNextToken().Value;
             }
             else
             {
                 name = NativeSymbolBag.GenerateAnonymousName();
             }
 
-            _scanner.GetNextToken(TokenType.ParenClose);
+            scanner.GetNextToken(TokenType.ParenClose);
 
             return ProcessFunctionPointerParameters(name, retType, retTypeSal, callmod);
         }
@@ -915,41 +918,41 @@ namespace PInvoke.Parser
         {
             List<NativeParameter> list = new List<NativeParameter>();
 
-            Token token = _scanner.GetNextToken();
+            Token token = scanner.GetNextToken();
             if (token.TokenType != TokenType.ParenOpen)
             {
                 return null;
             }
 
             // Check for the (void) signature
-            List<Token> voidList = _scanner.PeekTokenList(2);
+            List<Token> voidList = scanner.PeekTokenList(2);
 
             if (voidList[1].TokenType == TokenType.ParenClose && voidList[0].TokenType == TokenType.VoidKeyword)
             {
                 // Get the tokens for the signature off of the stream
-                _scanner.GetNextToken(TokenType.VoidKeyword);
-                _scanner.GetNextToken(TokenType.ParenClose);
+                scanner.GetNextToken(TokenType.VoidKeyword);
+                scanner.GetNextToken(TokenType.ParenClose);
                 return list;
             }
 
             do
             {
-                token = _scanner.PeekNextToken();
+                token = scanner.PeekNextToken();
                 if (token.TokenType == TokenType.ParenClose)
                 {
-                    _scanner.GetNextToken();
+                    scanner.GetNextToken();
                     break;
                 }
                 else if (token.TokenType == TokenType.Period)
                 {
                     // Check for variable arguments signature
-                    List<Token> varList = _scanner.PeekTokenList(3);
+                    List<Token> varList = scanner.PeekTokenList(3);
                     if (varList[1].TokenType == TokenType.Period && varList[2].TokenType == TokenType.Period)
                     {
                         ProcessBlockRemainder(TokenType.ParenOpen, TokenType.ParenClose);
 
                         // Make sure to remove the { if it is both variable and inline
-                        if (!_scanner.EndOfStream && _scanner.PeekNextToken().TokenType == TokenType.BraceOpen)
+                        if (!scanner.EndOfStream && scanner.PeekNextToken().TokenType == TokenType.BraceOpen)
                         {
                             ProcessBlock(TokenType.BraceOpen, TokenType.BraceClose);
                         }
@@ -961,9 +964,9 @@ namespace PInvoke.Parser
                 // Process the actual parameter
                 list.Add(ProcessParameter());
 
-                if (_scanner.PeekNextToken().TokenType == TokenType.Comma)
+                if (scanner.PeekNextToken().TokenType == TokenType.Comma)
                 {
-                    _scanner.GetNextToken();
+                    scanner.GetNextToken();
                 }
             } while (true);
 
@@ -979,13 +982,13 @@ namespace PInvoke.Parser
             NativeParameter param = new NativeParameter();
             param.NativeType = ProcessTypeName();
 
-            if (_scanner.PeekNextToken().TokenType == TokenType.Word)
+            if (scanner.PeekNextToken().TokenType == TokenType.Word)
             {
                 // Match the name if it's present
-                param.Name = _scanner.GetNextToken().Value;
+                param.Name = scanner.GetNextToken().Value;
 
             }
-            else if (_scanner.PeekNextToken().TokenType == TokenType.ParenOpen)
+            else if (scanner.PeekNextToken().TokenType == TokenType.ParenOpen)
             {
                 // It's legal to have an inline function pointer as a parameter type.  In that
                 // case though the parameter will have no name and will instead take the name of 
@@ -1003,10 +1006,10 @@ namespace PInvoke.Parser
 
             // It's valid for the trailing [] to come after the parameter name and we
             // need to process them here
-            while (_scanner.PeekNextToken().TokenType == TokenType.BracketOpen)
+            while (scanner.PeekNextToken().TokenType == TokenType.BracketOpen)
             {
-                _scanner.GetNextToken();
-                _scanner.GetNextToken(TokenType.BracketClose);
+                scanner.GetNextToken();
+                scanner.GetNextToken(TokenType.BracketClose);
 
                 param.NativeType = new NativePointer(param.NativeType);
             }
@@ -1028,14 +1031,14 @@ namespace PInvoke.Parser
             bool done = false;
             do
             {
-                Token token = _scanner.PeekNextToken();
+                Token token = scanner.PeekNextToken();
                 if (token.TokenType == TokenType.Comma || token.TokenType == TokenType.BraceClose)
                 {
                     done = true;
                 }
                 else
                 {
-                    _scanner.GetNextToken();
+                    scanner.GetNextToken();
                     value += token.Value;
                 }
             } while (!(done));
@@ -1066,12 +1069,12 @@ namespace PInvoke.Parser
             {
                 do
                 {
-                    if (_scanner.EndOfStream)
+                    if (scanner.EndOfStream)
                     {
                         break;
                     }
 
-                    Token token = _scanner.PeekNextToken();
+                    Token token = scanner.PeekNextToken();
                     switch (token.TokenType)
                     {
                         case TokenType.Semicolon:
@@ -1081,7 +1084,7 @@ namespace PInvoke.Parser
                             break;
                         case TokenType.Comma:
                             // Delimiter between the type names.  Ignore it
-                            _scanner.GetNextToken();
+                            scanner.GetNextToken();
                             break;
                         default:
                             NativeTypeDef ntDef = ProcessTypePostTypedefSingle(originalNt);
@@ -1118,7 +1121,7 @@ namespace PInvoke.Parser
             TriState<NativeCallingConvention> callmod = new TriState<NativeCallingConvention>();
             ProcessCalltypeModifier(ref callmod);
 
-            Token peekToken = _scanner.PeekNextToken();
+            Token peekToken = scanner.PeekNextToken();
 
             if (peekToken.TokenType == TokenType.ParenOpen)
             {
@@ -1130,10 +1133,10 @@ namespace PInvoke.Parser
             else if (peekToken.TokenType == TokenType.Word)
             {
                 // Standard typedef
-                name = _scanner.GetNextToken(TokenType.Word).Value;
+                name = scanner.GetNextToken(TokenType.Word).Value;
 
                 // The newer function pointer syntax allows you to forgo the parens and *
-                if (_scanner.PeekNextToken().TokenType == TokenType.ParenOpen)
+                if (scanner.PeekNextToken().TokenType == TokenType.ParenOpen)
                 {
                     nt = ProcessFunctionPointerParameters(name, nt, new NativeSalAttribute(), callmod);
                 }
@@ -1142,14 +1145,14 @@ namespace PInvoke.Parser
             {
                 // Ignore this typedef.  Some parts of the windows header files attempt to typedef out
                 // certain items we consider kewords.
-                _scanner.GetNextToken();
+                scanner.GetNextToken();
                 return null;
 
             }
             else
             {
                 // Unknown
-                throw ParseException.CreateError("Error processing typedef list.  Expected word or paren open but found '{0}'.", _scanner.PeekNextToken().Value);
+                throw ParseException.CreateError("Error processing typedef list.  Expected word or paren open but found '{0}'.", scanner.PeekNextToken().Value);
             }
 
             // Now that we've processed out the type, we need to once again process modifiers because
@@ -1168,7 +1171,7 @@ namespace PInvoke.Parser
         private List<NativeMember> ProcessTypeMemberList(string parentTypeName)
         {
             List<NativeMember> list = new List<NativeMember>();
-            Token token = _scanner.PeekNextToken();
+            Token token = scanner.PeekNextToken();
             if (token.TokenType == TokenType.BraceClose)
             {
                 // Empty struct
@@ -1184,11 +1187,11 @@ namespace PInvoke.Parser
                 list.Add(member);
 
                 // Get the end token.  Process any comma seperated list of members
-                Token endToken = _scanner.GetNextToken();
+                Token endToken = scanner.GetNextToken();
                 while (endToken.TokenType == TokenType.Comma)
                 {
                     list.Add(ProcessNativeMemberWithType(parentTypeName, list.Count, member.NativeType));
-                    endToken = _scanner.GetNextToken();
+                    endToken = scanner.GetNextToken();
                 }
 
                 if (endToken.TokenType == TokenType.ParenOpen)
@@ -1198,25 +1201,25 @@ namespace PInvoke.Parser
                     ProcessBlockRemainder(TokenType.ParenOpen, TokenType.ParenClose);
 
                     // Remove the const qualifier if present
-                    if (!_scanner.EndOfStream && _scanner.PeekNextToken().TokenType == TokenType.ConstKeyword)
+                    if (!scanner.EndOfStream && scanner.PeekNextToken().TokenType == TokenType.ConstKeyword)
                     {
-                        _scanner.GetNextToken();
+                        scanner.GetNextToken();
                     }
 
                     // Remave an inline definition
-                    if (!_scanner.EndOfStream && _scanner.PeekNextToken().TokenType == TokenType.BraceOpen)
+                    if (!scanner.EndOfStream && scanner.PeekNextToken().TokenType == TokenType.BraceOpen)
                     {
                         ProcessBlock(TokenType.BraceOpen, TokenType.BraceClose);
                     }
 
-                    if (!_scanner.EndOfStream && _scanner.PeekNextToken().TokenType == TokenType.Semicolon)
+                    if (!scanner.EndOfStream && scanner.PeekNextToken().TokenType == TokenType.Semicolon)
                     {
-                        _scanner.GetNextToken();
+                        scanner.GetNextToken();
                     }
 
                     // This is not a fatal parse problem.  Simply add a warning and continue with 
                     // the rest of the members
-                    _errorProvider.AddWarning("Type member procedures are not supported: {0}.{1}", parentTypeName, member.Name);
+                    errorProvider.AddWarning("Type member procedures are not supported: {0}.{1}", parentTypeName, member.Name);
                 }
                 else
                 {
@@ -1227,7 +1230,7 @@ namespace PInvoke.Parser
                 }
 
                 // See if the next token is a close brace
-                if (_scanner.PeekNextToken().TokenType == TokenType.BraceClose)
+                if (scanner.PeekNextToken().TokenType == TokenType.BraceClose)
                 {
                     done = true;
                 }
@@ -1274,12 +1277,12 @@ namespace PInvoke.Parser
 
         private NativeMember ProcessNativeMemberWithType(string parentTypeName, int index, NativeType nt)
         {
-            Token nextToken = _scanner.PeekNextToken();
+            Token nextToken = scanner.PeekNextToken();
             string name = null;
 
             if (nextToken.TokenType == TokenType.Word)
             {
-                _scanner.GetNextToken();
+                scanner.GetNextToken();
                 name = nextToken.Value;
             }
             else
@@ -1289,7 +1292,7 @@ namespace PInvoke.Parser
             }
 
             // Check for an array suffix on the type
-            Token token = _scanner.PeekNextToken();
+            Token token = scanner.PeekNextToken();
             if (token.TokenType == TokenType.BracketOpen)
             {
                 nt = ProcessArraySuffix(nt);
@@ -1298,9 +1301,9 @@ namespace PInvoke.Parser
             {
                 // This is a bitvector.  Read in the size and change the type of the 
                 // member to be a proper bitvector
-                _scanner.GetNextToken();
+                scanner.GetNextToken();
                 Number value;
-                Token sizeToken = _scanner.GetNextToken(TokenType.Number);
+                Token sizeToken = scanner.GetNextToken(TokenType.Number);
                 if (!TokenHelper.TryConvertToNumber(sizeToken, out value))
                 {
                     throw ParseException.CreateError("Expected number after bit vector specifier: {0}", sizeToken);
@@ -1321,11 +1324,11 @@ namespace PInvoke.Parser
         {
 
             // Remove type name precursors from the stream
-            Token token = _scanner.PeekNextToken();
+            Token token = scanner.PeekNextToken();
 
             if (token.TokenType == TokenType.StructKeyword || token.TokenType == TokenType.UnionKeyword || token.TokenType == TokenType.EnumKeyword || token.TokenType == TokenType.ClassKeyword)
             {
-                _scanner.GetNextToken();
+                scanner.GetNextToken();
             }
 
             NativeType nt = ProcessShortTypeName();
@@ -1344,8 +1347,8 @@ namespace PInvoke.Parser
 
         private NativeDefinedType ProcessDefinedTypeCore(string namePrefix, bool includeFunctionPointers)
         {
-            ScannerMark mark = _scanner.Mark();
-            Token token = _scanner.PeekNextToken();
+            ScannerMark mark = scanner.Mark();
+            Token token = scanner.PeekNextToken();
 
             // Remove the SAL attribute if present
             if (token.TokenType == TokenType.DeclSpec)
@@ -1355,7 +1358,7 @@ namespace PInvoke.Parser
 
             if (token.TokenType == TokenType.StructKeyword)
             {
-                _scanner.GetNextToken();
+                scanner.GetNextToken();
                 ProcessSalAttribute();
 
                 // If the type name starts with struct there are one of
@@ -1364,7 +1367,7 @@ namespace PInvoke.Parser
                 //   2) Inline Type: struct { int bar; } 
                 //   3) normal Struct: struct foo { int bar; }
 
-                List<Token> peekList = _scanner.PeekTokenList(2);
+                List<Token> peekList = scanner.PeekTokenList(2);
 
                 if ((peekList[0].TokenType == TokenType.Word && peekList[1].TokenType == TokenType.BraceOpen) || peekList[0].TokenType == TokenType.BraceOpen)
                 {
@@ -1376,10 +1379,10 @@ namespace PInvoke.Parser
             }
             else if (token.TokenType == TokenType.UnionKeyword)
             {
-                _scanner.GetNextToken();
+                scanner.GetNextToken();
                 ProcessSalAttribute();
 
-                List<Token> peekList = _scanner.PeekTokenList(2);
+                List<Token> peekList = scanner.PeekTokenList(2);
 
                 if ((peekList[0].TokenType == TokenType.Word && peekList[1].TokenType == TokenType.BraceOpen) || peekList[0].TokenType == TokenType.BraceOpen)
                 {
@@ -1389,10 +1392,10 @@ namespace PInvoke.Parser
             }
             else if (token.TokenType == TokenType.EnumKeyword)
             {
-                _scanner.GetNextToken();
+                scanner.GetNextToken();
                 ProcessSalAttribute();
 
-                List<Token> peekList = _scanner.PeekTokenList(2);
+                List<Token> peekList = scanner.PeekTokenList(2);
 
                 if ((peekList[0].TokenType == TokenType.Word && peekList[1].TokenType == TokenType.BraceOpen) || peekList[0].TokenType == TokenType.BraceOpen)
                 {
@@ -1401,7 +1404,7 @@ namespace PInvoke.Parser
             }
             else if (token.TokenType == TokenType.ClassKeyword)
             {
-                _scanner.GetNextToken();
+                scanner.GetNextToken();
                 ProcessSalAttribute();
 
                 // If the type name starts with Class there are one of
@@ -1410,7 +1413,7 @@ namespace PInvoke.Parser
                 //   2) Inline Type: Class { int bar; } 
                 //   3) normal Class: Class foo { int bar; }
 
-                List<Token> peekList = _scanner.PeekTokenList(2);
+                List<Token> peekList = scanner.PeekTokenList(2);
 
                 if ((peekList[0].TokenType == TokenType.Word && peekList[1].TokenType == TokenType.BraceOpen) || peekList[0].TokenType == TokenType.BraceOpen)
                 {
@@ -1427,13 +1430,13 @@ namespace PInvoke.Parser
 
                 NativeType retType = ProcessTypeName();
 
-                if (retType != null && _scanner.PeekNextToken().TokenType == TokenType.ParenOpen)
+                if (retType != null && scanner.PeekNextToken().TokenType == TokenType.ParenOpen)
                 {
                     return this.ProcessFunctionPointer(namePrefix, retType);
                 }
             }
 
-            _scanner.Rollback(mark);
+            scanner.Rollback(mark);
             return null;
         }
 
@@ -1472,44 +1475,44 @@ namespace PInvoke.Parser
         private NativeType ProcessShortTypeName()
         {
             bool isConst = false;
-            Token qualifiedToken = _scanner.PeekNextToken();
+            Token qualifiedToken = scanner.PeekNextToken();
             if (qualifiedToken.TokenType == TokenType.ConstKeyword)
             {
                 isConst = true;
-                _scanner.GetNextToken();
-                qualifiedToken = _scanner.PeekNextToken();
+                scanner.GetNextToken();
+                qualifiedToken = scanner.PeekNextToken();
             }
 
             // Remove the volatile qualifier
             if (qualifiedToken.TokenType == TokenType.VolatileKeyword)
             {
-                _scanner.GetNextToken();
+                scanner.GetNextToken();
             }
 
             // Look for any type name qualifiers 
             if (qualifiedToken.TokenType == TokenType.StructKeyword || qualifiedToken.TokenType == TokenType.UnionKeyword || qualifiedToken.TokenType == TokenType.EnumKeyword || qualifiedToken.TokenType == TokenType.ClassKeyword)
             {
-                _scanner.GetNextToken();
+                scanner.GetNextToken();
 
                 // It's possible to put a __declspec here.  Go ahead and remove it
-                if (_scanner.PeekNextToken().TokenType == TokenType.DeclSpec)
+                if (scanner.PeekNextToken().TokenType == TokenType.DeclSpec)
                 {
                     ProcessSalAttribute();
                 }
-                return new NativeNamedType(qualifiedToken.Value, _scanner.GetNextToken(TokenType.Word).Value);
+                return new NativeNamedType(qualifiedToken.Value, scanner.GetNextToken(TokenType.Word).Value);
             }
 
             // Down to simple types.  Look for any type prefixes
             NativeBuiltinType bt = null;
-            Token token = _scanner.GetNextToken();
+            Token token = scanner.GetNextToken();
 
             if (token.TokenType == TokenType.LongKeyword || token.TokenType == TokenType.SignedKeyword || token.TokenType == TokenType.UnsignedKeyword)
             {
                 // If the next token is a builtin type keyword then these are modifiers of that
                 // keyword
-                if (_scanner.PeekNextToken().IsTypeKeyword)
+                if (scanner.PeekNextToken().IsTypeKeyword)
                 {
-                    NativeBuiltinType.TryConvertToBuiltinType(_scanner.GetNextToken().TokenType, out bt);
+                    NativeBuiltinType.TryConvertToBuiltinType(scanner.GetNextToken().TokenType, out bt);
                     bt.IsUnsigned = (token.TokenType == TokenType.UnsignedKeyword);
                 }
                 else
@@ -1556,18 +1559,18 @@ namespace PInvoke.Parser
             bool done = false;
             do
             {
-                Token token = _scanner.PeekNextToken();
+                Token token = scanner.PeekNextToken();
                 switch (token.TokenType)
                 {
                     case TokenType.Asterisk:
                         // Wrap it in a pointer and eat the token
                         nt = new NativePointer(nt);
-                        _scanner.GetNextToken();
+                        scanner.GetNextToken();
 
                         // Handle typeName * const name.
-                        if (_scanner.PeekNextToken().TokenType == TokenType.ConstKeyword)
+                        if (scanner.PeekNextToken().TokenType == TokenType.ConstKeyword)
                         {
-                            _scanner.GetNextToken();
+                            scanner.GetNextToken();
                         }
                         break;
                     case TokenType.BracketOpen:
@@ -1582,20 +1585,20 @@ namespace PInvoke.Parser
                     case TokenType.ConstKeyword:
                         // If the const modifier proceeds a pointer then allow the pointer to 
                         // be processed.  Otherwise we are done
-                        _scanner.GetNextToken();
-                        if (_scanner.PeekNextToken().TokenType != TokenType.Asterisk)
+                        scanner.GetNextToken();
+                        if (scanner.PeekNextToken().TokenType != TokenType.Asterisk)
                         {
                             done = true;
                         }
                         break;
                     case TokenType.VolatileKeyword:
                         // Igore the volatile qualifier
-                        _scanner.GetNextToken();
+                        scanner.GetNextToken();
                         break;
                     case TokenType.Pointer32Keyword:
                     case TokenType.Pointer64Keyword:
                         // Ignore the pointer modifiers
-                        _scanner.GetNextToken();
+                        scanner.GetNextToken();
                         break;
                     case TokenType.ParenOpen:
                         // Hit a function pointer inside the parameter list.  Type name is completed
@@ -1645,22 +1648,22 @@ namespace PInvoke.Parser
                 }
             }
 
-            _result.NativeDefinedTypes.Add(nt);
-            _result.ParsedTypes.Add(nt);
+            resultant.NativeDefinedTypes.Add(nt);
+            resultant.ParsedTypes.Add(nt);
         }
 
         private void ProcessParsedTypeDef(NativeTypeDef typeDef)
         {
             ThrowIfNull(typeDef);
 
-            _result.NativeTypeDefs.Add(typeDef);
-            _result.ParsedTypes.Add(typeDef);
+            resultant.NativeTypeDefs.Add(typeDef);
+            resultant.ParsedTypes.Add(typeDef);
         }
 
         private void ProcessParsedProcedure(NativeProcedure proc)
         {
             ThrowIfNull(proc);
-            _result.NativeProcedures.Add(proc);
+            resultant.NativeProcedures.Add(proc);
         }
 
         /// <summary>
@@ -1684,15 +1687,15 @@ namespace PInvoke.Parser
                 object count = null;
 
                 // Move past the opening [
-                Token token = _scanner.GetNextToken();
+                Token token = scanner.GetNextToken();
                 if (token.TokenType == TokenType.BracketOpen)
                 {
-                    token = _scanner.GetNextToken();
+                    token = scanner.GetNextToken();
                 }
 
                 // If it's a number then it's the rank of the array
 
-                if ((token.TokenType == TokenType.Number || token.TokenType == TokenType.HexNumber) && _scanner.PeekNextToken().TokenType == TokenType.BracketClose)
+                if ((token.TokenType == TokenType.Number || token.TokenType == TokenType.HexNumber) && scanner.PeekNextToken().TokenType == TokenType.BracketClose)
                 {
                     Number number;
                     if (!TokenHelper.TryConvertToNumber(token, out number))
@@ -1702,7 +1705,7 @@ namespace PInvoke.Parser
 
                     // The token should now be the closing bracket.  
                     count = number.ConvertToInteger();
-                    token = _scanner.GetNextToken(TokenType.BracketClose);
+                    token = scanner.GetNextToken(TokenType.BracketClose);
                 }
                 else if (token.TokenType == TokenType.BracketClose)
                 {
@@ -1715,11 +1718,11 @@ namespace PInvoke.Parser
                     List<Token> exprList = new List<Token>();
                     exprList.Add(token);
 
-                    Token nextToken = _scanner.GetNextToken();
+                    Token nextToken = scanner.GetNextToken();
                     while (nextToken.TokenType != TokenType.BracketClose)
                     {
                         exprList.Add(nextToken);
-                        nextToken = _scanner.GetNextToken();
+                        nextToken = scanner.GetNextToken();
                     }
 
                     ExpressionEvaluator ee = new ExpressionEvaluator();
@@ -1750,7 +1753,7 @@ namespace PInvoke.Parser
                     }
                 }
 
-                if (_scanner.PeekNextToken().TokenType != TokenType.BracketOpen)
+                if (scanner.PeekNextToken().TokenType != TokenType.BracketOpen)
                 {
                     done = true;
                 }
@@ -1772,7 +1775,7 @@ namespace PInvoke.Parser
         /// <remarks></remarks>
         private NativeSalAttribute ProcessSalAttribute()
         {
-            Token token = _scanner.PeekNextToken();
+            Token token = scanner.PeekNextToken();
             NativeSalAttribute sal = new NativeSalAttribute();
             if (token.TokenType != TokenType.DeclSpec)
             {
@@ -1782,9 +1785,9 @@ namespace PInvoke.Parser
             bool done = false;
             do
             {
-                _scanner.GetNextToken();
-                _scanner.GetNextToken(TokenType.ParenOpen);
-                Token directive = _scanner.GetNextToken();
+                scanner.GetNextToken();
+                scanner.GetNextToken(TokenType.ParenOpen);
+                Token directive = scanner.GetNextToken();
 
                 // It's legal for the SAL attribute to be custom defined and as such
                 // we should process the argument
@@ -1792,9 +1795,9 @@ namespace PInvoke.Parser
                 {
                     int depth = 0;
                     string text = directive.Value;
-                    while (depth > 0 || _scanner.PeekNextToken().TokenType != TokenType.ParenClose)
+                    while (depth > 0 || scanner.PeekNextToken().TokenType != TokenType.ParenClose)
                     {
-                        Token cur = _scanner.GetNextToken();
+                        Token cur = scanner.GetNextToken();
                         text += cur.Value;
                         switch (cur.TokenType)
                         {
@@ -1816,10 +1819,10 @@ namespace PInvoke.Parser
                 }
 
                 // Get the close paren
-                _scanner.GetNextToken();
+                scanner.GetNextToken();
 
                 // See if there are more declarations
-                if (_scanner.PeekNextToken().TokenType != TokenType.DeclSpec)
+                if (scanner.PeekNextToken().TokenType != TokenType.DeclSpec)
                 {
                     done = true;
                 }
@@ -1836,7 +1839,7 @@ namespace PInvoke.Parser
         private List<Token> ProcessBlock(TokenType openType, TokenType closeType)
         {
             List<Token> list = new List<Token>();
-            list.Add(_scanner.GetNextToken(openType));
+            list.Add(scanner.GetNextToken(openType));
             return ProcessBlockRemainderCore(list, openType, closeType);
         }
 
@@ -1851,12 +1854,12 @@ namespace PInvoke.Parser
             int depth = 1;
             do
             {
-                if (_scanner.EndOfStream)
+                if (scanner.EndOfStream)
                 {
                     throw ParseException.CreateError("Encountered end of stream while attempting to process a block");
                 }
 
-                Token nextToken = _scanner.GetNextToken();
+                Token nextToken = scanner.GetNextToken();
                 list.Add(nextToken);
                 if (nextToken.TokenType == openType)
                 {
@@ -1925,7 +1928,7 @@ namespace PInvoke.Parser
         /// <remarks></remarks>
         private void ProcessGlobalTokenForUnsupportedScenario()
         {
-            Token token = _scanner.PeekNextToken();
+            Token token = scanner.PeekNextToken();
             switch (token.TokenType)
             {
                 case TokenType.BracketOpen:
@@ -1945,19 +1948,19 @@ namespace PInvoke.Parser
         {
             bool done = false;
 
-            bool prevOpt = _scanner.Options.HideNewLines;
+            bool prevOpt = scanner.Options.HideNewLines;
             try
             {
-                _scanner.Options.HideNewLines = false;
+                scanner.Options.HideNewLines = false;
                 while (!done)
                 {
-                    if (_scanner.EndOfStream)
+                    if (scanner.EndOfStream)
                     {
                         done = true;
                     }
                     else
                     {
-                        Token token = _scanner.GetNextToken();
+                        Token token = scanner.GetNextToken();
                         if (token.TokenType == TokenType.NewLine)
                         {
                             done = true;
@@ -1967,30 +1970,30 @@ namespace PInvoke.Parser
             }
             finally
             {
-                _scanner.Options.HideNewLines = prevOpt;
+                scanner.Options.HideNewLines = prevOpt;
             }
         }
 
 
         private string PeekLineInformation(int count)
         {
-            ScannerMark mark = _scanner.Mark();
-            bool old = _scanner.Options.HideWhitespace;
+            ScannerMark mark = scanner.Mark();
+            bool old = scanner.Options.HideWhitespace;
             try
             {
-                _scanner.Options.HideWhitespace = false;
+                scanner.Options.HideWhitespace = false;
 
                 var b = new StringBuilder();
                 int found = 0;
 
                 while (found < count)
                 {
-                    if (_scanner.EndOfStream)
+                    if (scanner.EndOfStream)
                     {
                         break; // TODO: might not be correct. Was : Exit While
                     }
 
-                    Token cur = _scanner.GetNextToken();
+                    Token cur = scanner.GetNextToken();
                     b.Append(cur.Value);
                     if (TokenType.WhiteSpace != cur.TokenType)
                     {
@@ -2002,8 +2005,8 @@ namespace PInvoke.Parser
             }
             finally
             {
-                _scanner.Options.HideWhitespace = old;
-                _scanner.Rollback(mark);
+                scanner.Options.HideWhitespace = old;
+                scanner.Rollback(mark);
             }
         }
 

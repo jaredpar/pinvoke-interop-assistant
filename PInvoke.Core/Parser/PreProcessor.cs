@@ -1,9 +1,7 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -284,12 +282,13 @@ namespace PInvoke.Parser
 
         private ScannerOptions CreateScannerOptions()
         {
-            ScannerOptions opts = new ScannerOptions();
-            opts.HideComments = true;
-            opts.HideNewLines = false;
-            opts.HideWhitespace = false;
-            opts.ThrowOnEndOfStream = false;
-            return opts;
+            return new ScannerOptions
+            {
+                HideComments = false,
+                HideNewLines = false,
+                HideWhitespace = false,
+                ThrowOnEndOfStream = false
+            };
         }
 
         /// <summary>

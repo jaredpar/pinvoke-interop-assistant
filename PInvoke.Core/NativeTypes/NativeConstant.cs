@@ -10,20 +10,14 @@ namespace PInvoke.NativeTypes
     /// </summary>
     public class NativeConstant : NativeExtraSymbol
     {
-        private NativeValueExpression _value;
-
-        private ConstantKind _constantKind;
+        private NativeValueExpression value;
         /// <summary>
         /// What type of constant is this
         /// </summary>
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public ConstantKind ConstantKind
-        {
-            get { return _constantKind; }
-            set { _constantKind = value; }
-        }
+        public ConstantKind ConstantKind { get; set; }
 
         /// <summary>
         /// Value for the constant
@@ -33,20 +27,20 @@ namespace PInvoke.NativeTypes
         /// <remarks></remarks>
         public NativeValueExpression Value
         {
-            get { return _value; }
-            set { _value = value; }
+            get { return value; }
+            set { this.value = value; }
         }
 
         public string RawValue
         {
             get
             {
-                if (_value == null)
+                if (value == null)
                 {
                     return string.Empty;
                 }
 
-                return _value.Expression;
+                return value.Expression;
             }
         }
 
@@ -84,12 +78,12 @@ namespace PInvoke.NativeTypes
 
         public override System.Collections.Generic.IEnumerable<NativeSymbol> GetChildren()
         {
-            return GetSingleChild(_value);
+            return GetSingleChild(value);
         }
 
         public override void ReplaceChild(NativeSymbol oldChild, NativeSymbol newChild)
         {
-            ReplaceChildSingle(oldChild, newChild, ref _value);
+            ReplaceChildSingle(oldChild, newChild, ref value);
         }
 
     }

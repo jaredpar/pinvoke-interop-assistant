@@ -24,7 +24,7 @@ namespace PInvoke.Parser
             this.macroMap = macroMap ?? new Dictionary<string, Macro>();
             opts = new ScannerOptions
             {
-                HideComments = true,
+                HideComments = false, // we want to carry through comments
                 HideNewLines = true,
                 HideWhitespace = true,
                 ThrowOnEndOfStream = false
